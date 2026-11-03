@@ -41,9 +41,9 @@ def digest(statements, fye):
     for x in rev:
         e, v = x["end"], x["v"]
         s = f"{fy_label(fye, e, 'Q')} (ended {e}): revenue ${v / 1e9:.2f}B"
-        if gp.get(e):
+        if gp.get(e) and v:
             s += f", gross margin {gp[e] / v * 100:.1f}%"
-        if op.get(e):
+        if op.get(e) and v:
             s += f", operating margin {op[e] / v * 100:.1f}%"
         if ni.get(e) is not None:
             s += f", net income ${ni[e] / 1e9:.2f}B"

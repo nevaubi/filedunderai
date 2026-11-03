@@ -49,7 +49,7 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 
 | Job | When | What |
 |---|---|---|
-| `/api/cron/prices?part=N&parts=4` | 21:40-21:55 Mon-Fri | Bars and stats for a quarter of the stocks each (part 0 adds index, rate and commodity symbols); every part rebuilds the index |
+| `/api/cron/prices?part=N&parts=8` | 21:40-21:54 Mon-Fri | Bars and stats for an eighth of the stocks each, with a 250s budget (part 0 adds index, rate and commodity symbols); every part rebuilds the index |
 | `/api/cron/macro` | 12:10 daily | Curve, FRED, fed funds, macro news and brief |
 | `/api/cron/companies` | six runs a day | Checks SEC submissions for all 500 (rotating cursor). New 10-K/10-Q/8-K: full reprocess, up to 15 per run. Other new filings (Form 4, 144, proxies) are written straight to `filings` |
 | `/api/cron/news` | 13:00, 19:00 | Rolling news + summary refresh, 14 companies per run |

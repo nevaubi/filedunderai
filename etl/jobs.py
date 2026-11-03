@@ -241,7 +241,7 @@ def companies_job(sb, tickers=None, workers=4, refresh_news=False, refresh_summa
 
 
 # ---------------------------------------------------------------- prices
-def prices_job(sb, intraday=True, full_history=False, part=None, parts=1):
+def prices_job(sb, intraday=True, full_history=False, part=None, parts=1, time_budget=None):
     """Daily and 5-minute bars. With parts > 1 the stock list is split so each run fits a function time limit;
     part 0 also carries the market symbols. Each part writes its own stats file, merged by build_index."""
     with Run(sb, "prices") as run:
@@ -250,8 +250,9 @@ def prices_job(sb, intraday=True, full_history=False, part=None, parts=1):
             comp = comp[part::parts]
         with_market = part in (None, 0)
         syms = (MARKET_SYMBOLS if with_market else []) + comp
-        daily, err1 = prices.fetch_many(syms, "2y", "1d")
-        intra, err2 = prices.fetch_many((["SPY", "QQQ"] if with_market else []) + comp, "5d", "5m") if intraday else ({}, {})
+        t0 = time.time()
+        daily, err1 = prices.fetch_many(syms, "2y", "1d", deadline=t0 + time_budget * 0.6 if time_budget else None)
+        intra, err2 = prices.fetch_many((["SPY", "QQQ"] if with_market else []) + comp, "5d", "5m", deadline=t0 + time_budget * 0.8 if time_budget else None) if intraday else ({}, {})
         spy = daily.get("SPY", {}).get("bars")
         if not spy:
             try:
@@ -267,7 +268,11 @@ def prices_job(sb, intraday=True, full_history=False, part=None, parts=1):
 
         def put(item):
             s_, d = item
-            sb.put_json(f"prices/{prices.path_key(s_)}.json", {"meta": d["meta"], "d": d["bars"], "i": (intra.get(s_) or {}).get("bars", [])}, cache="max-age=300")
+            i_bars = (intra.get(s_) or {}).get("bars")
+            if i_bars is None and intraday:
+                prev = _cache(sb, f"prices/{prices.path_key(s_)}.json", {}) or {}
+                i_bars = prev.get("i", [])
+            sb.put_json(f"prices/{prices.path_key(s_)}.json", {"meta": d["meta"], "d": d["bars"], "i": i_bars or []}, cache="max-age=300")
 
         with ThreadPoolExecutor(8) as ex:
             list(ex.map(put, daily.items()))

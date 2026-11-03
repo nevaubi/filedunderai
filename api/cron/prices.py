@@ -8,9 +8,9 @@ from _common import serve  # noqa: E402
 
 def run(sb, query):
     from etl import jobs
-    parts = int(query.get("parts", 4))
+    parts = int(query.get("parts", 8))
     part = int(query.get("part", 0))
-    n, errors = jobs.prices_job(sb, intraday=True, part=part, parts=parts)
+    n, errors = jobs.prices_job(sb, intraday=True, part=part, parts=parts, time_budget=250)
     return {"part": part, "symbols": n, "errors": len(errors)}
 
 

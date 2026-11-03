@@ -19,20 +19,36 @@
   },
   "crons": [
     {
-      "path": "/api/cron/prices?part=0&parts=4",
+      "path": "/api/cron/prices?part=0&parts=8",
       "schedule": "40 21 * * 1-5"
     },
     {
-      "path": "/api/cron/prices?part=1&parts=4",
-      "schedule": "45 21 * * 1-5"
+      "path": "/api/cron/prices?part=1&parts=8",
+      "schedule": "42 21 * * 1-5"
     },
     {
-      "path": "/api/cron/prices?part=2&parts=4",
+      "path": "/api/cron/prices?part=2&parts=8",
+      "schedule": "44 21 * * 1-5"
+    },
+    {
+      "path": "/api/cron/prices?part=3&parts=8",
+      "schedule": "46 21 * * 1-5"
+    },
+    {
+      "path": "/api/cron/prices?part=4&parts=8",
+      "schedule": "48 21 * * 1-5"
+    },
+    {
+      "path": "/api/cron/prices?part=5&parts=8",
       "schedule": "50 21 * * 1-5"
     },
     {
-      "path": "/api/cron/prices?part=3&parts=4",
-      "schedule": "55 21 * * 1-5"
+      "path": "/api/cron/prices?part=6&parts=8",
+      "schedule": "52 21 * * 1-5"
+    },
+    {
+      "path": "/api/cron/prices?part=7&parts=8",
+      "schedule": "54 21 * * 1-5"
     },
     {
       "path": "/api/cron/macro",

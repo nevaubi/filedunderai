@@ -42,10 +42,14 @@ def chart(sym, rng="2y", interval="1d"):
     return {"meta": meta, "bars": bars}
 
 
-def fetch_many(symbols, rng="2y", interval="1d", workers=3, pause=0.35):
+def fetch_many(symbols, rng="2y", interval="1d", workers=3, pause=0.35, deadline=None):
+    """Fetches bars for many symbols. With a deadline (epoch seconds) remaining symbols are skipped once it passes,
+    so a scheduled run finishes inside its time limit; skipped symbols keep yesterday's files."""
     out, errors = {}, {}
 
     def one(s):
+        if deadline and time.time() > deadline:
+            return s, None, "skipped: deadline"
         time.sleep(pause)
         try:
             return s, chart(s, rng, interval), None
@@ -60,9 +64,11 @@ def fetch_many(symbols, rng="2y", interval="1d", workers=3, pause=0.35):
                 errors[s] = err or "no bars"
     # rate-limited symbols get a slower second pass
     retry = [s for s, e in errors.items() if "429" in e]
-    if retry:
+    if retry and not (deadline and time.time() + 25 > deadline):
         time.sleep(20)
         for s in retry:
+            if deadline and time.time() > deadline:
+                break
             time.sleep(2.5)
             s_, d, err = one(s)
             if d and d["bars"]:
