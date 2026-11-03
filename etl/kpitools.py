@@ -95,7 +95,7 @@ def norm(s):
 def numbers_in(text):
     """Numbers printed in a string, as floats, with parentheses read as negatives."""
     out = []
-    for m in re.finditer(r"\(?-?\$?\d[\d,]*(?:\.\d+)?\)?", text or ""):
+    for m in re.finditer(r"\(?-?\$?(?:\d[\d,]*(?:\.\d+)?|(?<![\d.])\.\d+)\)?", text or ""):
         s = m.group(0)
         neg = s.startswith("(") and s.endswith(")") or "-" in s
         try:
