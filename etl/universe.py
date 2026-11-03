@@ -530,4 +530,5 @@ PREDECESSORS = {
     "ETN": [(31277, "2012-11-30")],      # Eaton Corporation before Eaton plc
     "DOW": [(29915, "2019-04-01")],      # The Dow Chemical Company before Dow Inc.
     "JCI": [(53669, "2016-09-02")],      # Johnson Controls, Inc. before the Tyco merger
+    "XOM": [(34088, "2026-07-01")],      # Exxon Mobil Corporation before the 2026 holding-company reorganization
 }

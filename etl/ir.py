@@ -562,6 +562,9 @@ def sec_exhibits(sb, ticker, cik, filings, have_ids, have_hashes, log=print, fye
             href = re.findall(r'href="([^"]+)"', row)
             if len(cells) >= 4 and cells[3].upper().startswith("EX-99") and href:
                 names.append(href[0].rsplit("/", 1)[-1])
+        # some filers (e.g. IBM before 2016) put the earnings release in the body of the 8-K itself
+        if not names and "2.02" in (f.get("i") or "") and f.get("p"):
+            names.append(f["p"])
         for name in names:
             low = name.lower()
             if not low.endswith((".htm", ".html", ".pdf", ".xlsx", ".xls", ".pptx")):
@@ -576,7 +579,7 @@ def sec_exhibits(sb, ticker, cik, filings, have_ids, have_hashes, log=print, fye
                     continue
                 items = f.get("i") or ""
                 title = f"8-K {f['d']} {name} (Items {items})"
-                hint = "release" if "2.02" in items and re.search(r"99[-_.]?1\b|99\.?1[^0-9]|ex991", low) else None
+                hint = "release" if "2.02" in items and (re.search(r"99[-_.]?1\b|99\.?1[^0-9]|ex991", low) or name == f.get("p")) else None
                 ref = dt.date.fromisoformat(f["d"]) if "2.02" in items else None
                 if store_document(sb, ticker, url, body, ext, title, folder, have_hashes, kind_hint=hint, log=log, fye=fye, ref_date=ref):
                     stored += 1
