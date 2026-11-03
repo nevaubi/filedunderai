@@ -89,7 +89,8 @@ def parse_ref(ref):
 
 
 def norm(s):
-    return re.sub(r"\s+", " ", str(s or "")).strip().lower()
+    # PDF ligatures can come through as NUL characters; Postgres rejects them, so they are read as spaces
+    return re.sub(r"\s+", " ", str(s or "").replace("\x00", " ")).strip().lower()
 
 
 def numbers_in(text):
@@ -226,6 +227,8 @@ def validate(sb, data, fix=False):
                                              "errors": [f"duplicate period with a different value ({seen[key]} vs {v.get('value')})"]})
                 continue
             seen[key] = v.get("value")
+            if isinstance(v.get("quote"), str) and "\x00" in v["quote"]:
+                v["quote"] = re.sub(r" +", " ", v["quote"].replace("\x00", " "))
             report["values"] += 1
             errs = check_value(sb, docs, v)
             if errs:
