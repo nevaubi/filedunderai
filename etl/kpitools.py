@@ -159,12 +159,35 @@ def check_value(sb, docs_by_id, v):
             pv = nums[0] * scale
             if not (_close(pv, value) or _close(-pv, value)):
                 errs.append(f"printed {printed} x {scale} = {pv} does not match value {value}")
+            elif pv and _close(-pv, value) and not _close(pv, value) and not _negative_ok(str(printed), v.get("quote") or ""):
+                errs.append(f"value {value} is negative but nothing in the printed figure or quote says so")
             if q and str(printed).replace("$", "").strip("() ") not in v.get("quote", ""):
                 errs.append(f"printed {printed!r} not inside quote")
     else:
         if not any(_close(n * s, value) or _close(-n * s, value) for n in numbers_in(v.get("quote")) for s in (1, 1e3, 1e6, 1e9, 0.01)):
             errs.append(f"no number in the quote matches value {value}")
     return errs
+
+
+_NEG_BEFORE = re.compile(r"\b(down|declin\w*|decreas\w*|lower|fell|fall\w*|drop\w*|negative|loss\w*|reduc\w*|contract\w*|headwind\w*|unfavorabl\w*|outflow\w*|minus|deficit|shrank|below|less|offset by)\b[^.;]{0,60}$", re.I)
+_NEG_AFTER = re.compile(r"^[\s%$a-z]{0,12}\b(lower|less|decline|decrease|drop|down|loss|losses|headwind|unfavorable|negative|reduction|contraction|below)\b", re.I)
+
+
+def _negative_ok(printed, quote):
+    """A negative value needs a sign in the printed figure ((1.2), -1.2, −1.2) or a word around it in the quote
+    ("down 4 percent", "3% lower", "losses of $7.0 billion", "(0.09)")."""
+    p = printed.strip()
+    if p.startswith(("(", "-", "−", "$(")) or p.endswith(")"):
+        return True
+    core = re.escape(p.replace("$", "").strip("() "))
+    for m in re.finditer(r"(?<![\d.])" + core + r"(?![\d])", quote):
+        i, j = m.start(), m.end()
+        pre = quote[max(0, i - 3):i]
+        if "(" in pre or pre.rstrip().endswith(("-", "−")):
+            return True
+        if _NEG_BEFORE.search(quote[:i]) or _NEG_AFTER.search(quote[j:]):
+            return True
+    return False
 
 
 def _close(a, b):
