@@ -512,3 +512,123 @@ def publish_filings_job(sb, tickers=None, workers=6):
         for tk, n in ex.map(one, tickers):
             total += n
     return total
+
+
+# ---------------------------------------------------------------- segments (XBRL dimensions)
+def _viewer_or_fetch(sb, cik, f):
+    """Filing HTML for parsing: the stored viewer copy when present, otherwise EDGAR (and store the viewer copy)."""
+    import gzip as _gz
+    try:
+        raw = sb.get_object("public-data", f"filings/{f['a']}.html.gz", public=True)
+    except Exception:
+        raw = None
+    if raw:
+        try:
+            return _gz.decompress(raw).decode("utf-8", "replace")
+        except OSError:
+            return raw.decode("utf-8", "replace")
+    html = docs.filing_html(sec.filing_url(cik, f["a"], f["p"]))
+    if html:
+        try:
+            docs.publish_filing(sb, html, cik, f["a"])
+        except Exception as e:
+            print("publish failed", f["a"], str(e)[:120])
+    return html
+
+
+def periodic_filings(cik, cut, forms=("10-K", "10-Q")):
+    """10-K and 10-Q filings since cut, newest first, following the paged submissions files for heavy filers."""
+    sub = sec.submissions(cik)
+    out = [f for f in sec.filing_list(sub) if f["f"] in forms and f["d"] >= cut and f.get("p")]
+    recent = sub["filings"]["recent"]["filingDate"]
+    if recent and min(recent) > cut:
+        for extra in sub["filings"].get("files", []):
+            if extra.get("filingTo", "9999") < cut:
+                continue
+            page = sec.sec_json(f"https://data.sec.gov/submissions/{extra['name']}")
+            out += [f for f in sec.filing_list({"filings": {"recent": page}}) if f["f"] in forms and f["d"] >= cut and f.get("p")]
+    seen, res = set(), []
+    for f in sorted(out, key=lambda f: f["d"], reverse=True):
+        if f["a"] not in seen:
+            seen.add(f["a"])
+            res.append(f)
+    return res
+
+
+def segments_for(sb, tk, years=None, log=print):
+    from . import segments as S
+    years = years or S.TABLE_YEARS
+    u = BY_TICKER[tk]
+    cik = u["cik"]
+    b = _cache(sb, f"companies/{tk}.json", {})
+    fye = (b.get("profile") or {}).get("fiscalYearEnd") or "1231"
+    cut = (dt.date.today() - dt.timedelta(days=int(365 * years))).isoformat()
+    fl = periodic_filings(cik, cut)
+    parsed = []
+    for f in fl:
+        try:
+            html = _viewer_or_fetch(sb, cik, f)
+            if not html:
+                continue
+            ctx, facts = S.parse_ixbrl(html)
+            if facts:
+                parsed.append((f, ctx, facts))
+        except Exception as e:
+            log(f"  {tk} {f['a']} parse failed: {str(e)[:140]}")
+    labels = {}
+    for f in [x for x in fl if x["f"] == "10-K"][:1] + [x for x in fl if x["f"] == "10-Q"][:1]:
+        try:
+            labels.update(S.label_linkbase(cik, f["a"], f["p"]))
+        except Exception as e:
+            log(f"  {tk} labels {f['a']} failed: {str(e)[:120]}")
+    obs, totals = S.collect(parsed)
+    tables = S.pick_tables(S.add_residuals(S.build_tables(obs, totals, fye, labels, fundamentals.fy_label)))
+    bundle = {"ticker": tk, "generated": now_iso(), "fye": fye, "filings": len(parsed), "tables": tables}
+    sb.put_json(f"segments/{tk}.json", bundle, cache="max-age=600")
+    rows = []
+    for t in tables:
+        for r in t["rows"]:
+            kid = f"xbrl:{t['id']}:{r['key']}"
+            for kind in ("A", "Q", "I"):
+                for end, c in r[kind].items():
+                    rows.append({"ticker": tk, "kpi_id": kid[:300], "period_kind": kind, "period_end": end, "fiscal_label": c.get("p"), "value": c["v"],
+                                 "unit": "USD", "source_kind": "xbrl", "source_id": c.get("accn") or "", "anchor": {"id": c.get("id"), "name": c.get("name"), "ctx": c.get("ctx")},
+                                 "derived": c.get("derived"), "reconciled": (t["recon"].get(f"{kind}:{end}") or {}).get("ok"), "updated_at": now_iso()})
+    if rows:
+        try:
+            sb.upsert("kpi_values", rows, "ticker,kpi_id,period_kind,period_end,source_kind", batch=1000)
+        except Exception as e:
+            log(f"  {tk} kpi_values upsert failed: {str(e)[:160]}")
+    ok = sum(1 for t in tables for rc in t["recon"].values() if rc["ok"])
+    bad = sum(1 for t in tables for rc in t["recon"].values() if not rc["ok"])
+    return {"tables": len(tables), "filings": len(parsed), "recon_ok": ok, "recon_residual": bad}
+
+
+def segments_job(sb, tickers=None, workers=5, time_budget=None):
+    t0 = time.time()
+    with Run(sb, "segments") as run:
+        tickers = tickers or [t for t, *_ in UNIVERSE]
+        done, failed = {}, {}
+
+        def one(tk):
+            if time_budget and time.time() - t0 > time_budget:
+                return tk, None, "skipped: time budget"
+            try:
+                return tk, segments_for(sb, tk), None
+            except Exception as e:
+                return tk, None, str(e)[:300]
+
+        with ThreadPoolExecutor(workers) as ex:
+            for tk, res, err in ex.map(one, tickers):
+                if res:
+                    done[tk] = res
+                    print("ok", tk, res, flush=True)
+                else:
+                    failed[tk] = err
+                    print("fail", tk, err, flush=True)
+        idx = _cache(sb, "meta/segments.json", {"companies": {}})
+        idx["companies"].update(done)
+        idx["generated"] = now_iso()
+        sb.put_json("meta/segments.json", idx, cache="max-age=600")
+        run.stats.update({"done": len(done), "failed": failed})
+        return done, failed

@@ -139,6 +139,73 @@ create index if not exists insider_ticker_date on insider_transactions (ticker, 
 create index if not exists insider_filed on insider_transactions (filed desc);
 create index if not exists insider_code on insider_transactions (code, tx_date desc);
 
+-- Investor relations: sites, stored documents, KPI taxonomy and values (XBRL dimensions and IR documents).
+create table if not exists ir_sites (
+  ticker            text primary key references companies(ticker) on delete cascade,
+  ir_url            text,
+  results_url       text,
+  platform          text,
+  notes             text,
+  discovered_at     timestamptz not null default now()
+);
+
+create table if not exists ir_documents (
+  id                text primary key,
+  ticker            text not null references companies(ticker) on delete cascade,
+  url               text not null,
+  title             text,
+  doc_type          text,
+  fiscal_label      text,
+  period_end        date,
+  published         date,
+  ext               text,
+  content_type      text,
+  bytes             bigint,
+  sha256            text,
+  storage_path      text,
+  source_page       text,
+  pages             integer,
+  text_path         text,
+  extracted_at      timestamptz,
+  fetched_at        timestamptz not null default now()
+);
+create index if not exists ir_docs_ticker on ir_documents (ticker, period_end desc nulls last);
+create index if not exists ir_docs_type on ir_documents (doc_type);
+
+create table if not exists kpi_definitions (
+  ticker            text not null references companies(ticker) on delete cascade,
+  kpi_id            text not null,
+  name              text not null,
+  category          text,
+  subcategory       text,
+  unit              text,
+  parent_id         text,
+  sums_to_parent    boolean not null default false,
+  source_kind       text not null default 'ir',
+  description       text,
+  sort              integer,
+  updated_at        timestamptz not null default now(),
+  primary key (ticker, kpi_id)
+);
+
+create table if not exists kpi_values (
+  ticker            text not null references companies(ticker) on delete cascade,
+  kpi_id            text not null,
+  period_kind       text not null check (period_kind in ('Q','A','I')),
+  period_end        date not null,
+  fiscal_label      text,
+  value             numeric not null,
+  unit              text,
+  source_kind       text not null,
+  source_id         text not null,
+  anchor            jsonb,
+  derived           jsonb,
+  reconciled        boolean,
+  updated_at        timestamptz not null default now(),
+  primary key (ticker, kpi_id, period_kind, period_end, source_kind)
+);
+create index if not exists kpi_values_lookup on kpi_values (kpi_id, period_kind, period_end desc);
+
 create table if not exists summaries (
   id                text primary key,
   kind              text not null,
@@ -193,7 +260,7 @@ revoke all on function bump_usage(text, integer) from public, anon, authenticate
 do $$
 declare t text;
 begin
-  foreach t in array array['companies','company_metrics','filings','facts','prices_daily','macro_observations','news_items','summaries','documents','insider_transactions'] loop
+  foreach t in array array['companies','company_metrics','filings','facts','prices_daily','macro_observations','news_items','summaries','documents','insider_transactions','ir_sites','ir_documents','kpi_definitions','kpi_values'] loop
     execute format('alter table %I enable row level security', t);
     if not exists (select 1 from pg_policies where tablename = t and policyname = 'public read') then
       execute format('create policy "public read" on %I for select to anon, authenticated using (true)', t);
@@ -205,6 +272,8 @@ end $$;
 
 -- Storage buckets: public-data serves the site's JSON; raw keeps source documents.
 insert into storage.buckets (id, name, public) values ('public-data', 'public-data', true)
+  on conflict (id) do update set public = true;
+insert into storage.buckets (id, name, public) values ('ir', 'ir', true)
   on conflict (id) do update set public = true;
 insert into storage.buckets (id, name, public) values ('raw', 'raw', false)
   on conflict (id) do nothing;
