@@ -541,8 +541,21 @@ def _viewer_or_fetch(sb, cik, f):
     return html
 
 
-def periodic_filings(cik, cut, forms=("10-K", "10-Q")):
-    """10-K and 10-Q filings since cut, newest first, following the paged submissions files for heavy filers."""
+def periodic_filings(cik, cut, forms=("10-K", "10-Q"), ticker=None):
+    """10-K and 10-Q filings since cut, newest first, following the paged submissions files for heavy filers. With a
+    ticker, filings of predecessor registrants (holding-company reorganisations) up to their cut-off are included,
+    each carrying its own "cik"."""
+    from .universe import PREDECESSORS
+    res = _periodic(cik, cut, forms)
+    for pcik, until in PREDECESSORS.get(ticker or "", []):
+        try:
+            res += [dict(f, cik=pcik) for f in _periodic(pcik, cut, forms) if f["d"] <= until]
+        except Exception as e:
+            print(f"  predecessor {pcik} filings failed: {str(e)[:120]}")
+    return sorted(res, key=lambda f: f["d"], reverse=True)
+
+
+def _periodic(cik, cut, forms):
     sub = sec.submissions(cik)
     out = [f for f in sec.filing_list(sub) if f["f"] in forms and f["d"] >= cut and f.get("p")]
     recent = sub["filings"]["recent"]["filingDate"]
@@ -568,7 +581,7 @@ def segments_for(sb, tk, years=None, log=print):
     b = _cache(sb, f"companies/{tk}.json", {})
     fye = (b.get("profile") or {}).get("fiscalYearEnd") or "1231"
     cut = (dt.date.today() - dt.timedelta(days=int(365 * years))).isoformat()
-    fl = periodic_filings(cik, cut)
+    fl = periodic_filings(cik, cut, ticker=tk)
     parsed = []
     keep_names = {n for _f, _l, _u, names in S.FAMILIES for n in names}
 
@@ -593,11 +606,11 @@ def segments_for(sb, tk, years=None, log=print):
             facts = None
             # inline XBRL became mandatory for large filers in mid-2019; older reports carry a separate instance file
             if f["d"] >= "2019-06-01":
-                html = _viewer_or_fetch(sb, cik, f)
+                html = _viewer_or_fetch(sb, f.get("cik", cik), f)
                 if html:
                     ctx, facts = S.parse_ixbrl(html)
             if not facts:
-                url = S.instance_url(cik, f["a"])
+                url = S.instance_url(f.get("cik", cik), f["a"])
                 if url:
                     ctx, facts = S.parse_instance(S.sec_get(url, timeout=120))
             if facts:
@@ -616,7 +629,7 @@ def segments_for(sb, tk, years=None, log=print):
     older = [next((x for x in tenks if x["d"] < cutoff), None) for cutoff in ("2013-06-01", "2016-06-01", "2019-06-01")]
     for f in [x for x in older if x] + tenks[:1] + [x for x in fl if x["f"] == "10-Q"][:1]:
         try:
-            labels.update(S.label_linkbase(cik, f["a"], f["p"]))
+            labels.update(S.label_linkbase(f.get("cik", cik), f["a"], f["p"]))
         except Exception as e:
             log(f"  {tk} labels {f['a']} failed: {str(e)[:120]}")
     obs, totals = S.collect(parsed)

@@ -518,3 +518,16 @@ SECTOR_ETF = {"Information Technology": "XLK", "Financials": "XLF", "Energy": "X
               "Consumer Staples": "XLP", "Industrials": "XLI", "Utilities": "XLU", "Materials": "XLB", "Real Estate": "XLRE", "Communication Services": "XLC"}
 
 BY_TICKER = {t: {"ticker": t, "cik": c, "name": n, "sector": s} for t, c, n, s in UNIVERSE}
+
+# Companies whose earlier filings sit under another EDGAR registrant after a holding-company reorganisation or
+# re-domiciling. Filings of the predecessor CIK up to the cut-off date belong to the same reporting history.
+PREDECESSORS = {
+    "DIS": [(1001039, "2019-03-20")],    # The Walt Disney Company (now TWDC Enterprises 18) before the Fox deal holdco
+    "BLK": [(1364742, "2024-10-01")],    # BlackRock, Inc. (now BlackRock Finance) before the GIP holdco
+    "GOOGL": [(1288776, "2015-10-02")],  # Google Inc. before Alphabet
+    "LIN": [(884905, "2018-10-31")],     # Praxair (now Linde Inc.) before the Linde plc combination
+    "MDT": [(64670, "2015-01-26")],      # Medtronic, Inc. before Medtronic plc
+    "ETN": [(31277, "2012-11-30")],      # Eaton Corporation before Eaton plc
+    "DOW": [(29915, "2019-04-01")],      # The Dow Chemical Company before Dow Inc.
+    "JCI": [(53669, "2016-09-02")],      # Johnson Controls, Inc. before the Tyco merger
+}

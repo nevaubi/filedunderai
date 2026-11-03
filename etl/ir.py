@@ -363,7 +363,7 @@ def process_company(sb, ticker, name, cik, since_year=None, max_docs=90, refresh
     # 1. EDGAR 8-K exhibits
     cut = (dt.date.today() - dt.timedelta(days=int(365 * sec_years))).isoformat()
     try:
-        eights = [f for f in periodic_filings(cik, cut, forms=("8-K", "8-K/A")) if "2.02" in (f.get("i") or "") or "7.01" in (f.get("i") or "")]
+        eights = [f for f in periodic_filings(cik, cut, forms=("8-K", "8-K/A"), ticker=ticker) if "2.02" in (f.get("i") or "") or "7.01" in (f.get("i") or "")]
         stats["sec"] = sec_exhibits(sb, ticker, cik, eights, have_ids, have_hashes, log=log, fye=fye)
     except Exception as e:
         log(f"  {ticker} 8-K exhibits failed: {str(e)[:160]}")
@@ -491,7 +491,7 @@ def sec_exhibits(sb, ticker, cik, filings, have_ids, have_hashes, log=print, fye
     """Earnings releases, supplements and presentations filed as 8-K exhibits (Items 2.02 and 7.01)."""
     stored = 0
     for f in filings:
-        folder = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{f['a'].replace('-', '')}/"
+        folder = f"https://www.sec.gov/Archives/edgar/data/{int(f.get('cik', cik))}/{f['a'].replace('-', '')}/"
         try:
             page = sec_get(folder + f"{f['a']}-index.htm", timeout=40)
         except Exception as e:
