@@ -306,9 +306,17 @@ def load_pricestats(sb):
 
 
 # ---------------------------------------------------------------- index + feed
+def _ins_net(entry):
+    w = (entry or {}).get("w90") or {}
+    if not w:
+        return None
+    return (w.get("buy_value") or 0) - (w.get("sell_value") or 0)
+
+
 def build_index(sb, pstats=None):
     fund = _cache(sb, "meta/fundamentals.json", {})
     pstats = pstats or load_pricestats(sb)
+    ins = (_cache(sb, "meta/insiders.json", {}) or {}).get("companies", {})
     rows, metrics = [], []
     for tk, *_ in UNIVERSE:
         f = fund.get(tk)
@@ -333,7 +341,7 @@ def build_index(sb, pstats=None):
             m["buyback_yield"] = f["bb_ttm"] / mcap
         metrics.append({k: (None if isinstance(v, float) and v != v else v) for k, v in m.items()})
         rows.append({**{k: v for k, v in m.items() if k not in ("updated_at",)}, "name": f["name"], "legal_name": f.get("legal_name"), "sector": f["sector"], "sic": f.get("sic"),
-                     "exchange": f.get("exchange"), "fye": f.get("fye"), "latest_filing": f.get("latest_filing"), "has_source_tables": f.get("has_source_tables"), "sp100": tk in SP100, "spark": ps.get("spark", [])})
+                     "exchange": f.get("exchange"), "fye": f.get("fye"), "latest_filing": f.get("latest_filing"), "has_source_tables": f.get("has_source_tables"), "sp100": tk in SP100, "insider_net_90d": _ins_net(ins.get(tk)), "spark": ps.get("spark", [])})
     if metrics:
         sb.upsert("company_metrics", metrics, "ticker")
     sb.put_json("index.json", {"generated": now_iso(), "sectors": SECTOR_ETF, "companies": rows}, cache="max-age=120")

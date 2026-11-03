@@ -949,6 +949,7 @@ const SCR_COLS = [
   { k: "net_margin_ttm", n: "Net margin", r: 1, f: v => fpct(v) },
   { k: "dividend_yield", n: "Div yield", r: 1, f: v => fpct(v, 2) },
   { k: "beta_1y", n: "Beta", r: 1, f: v => v ? v.toFixed(2) : "–" },
+  { k: "insider_net_90d", n: "Insider net 90d", r: 1, f: v => v ? (v > 0 ? "+" : "−") + fmtMoney(Math.abs(v)) : "–", c: 1 },
   { k: "latest_quarter", n: "Last Q", r: 1, f: v => v || "–" },
 ];
 const SCR_PRESETS = [
@@ -959,6 +960,7 @@ const SCR_PRESETS = [
   ["Dividend payers", { min: { dividend_yield: 0.025 }, sort: "dividend_yield" }],
   ["Value", { max: { pe_ttm: 18 }, sort: "pe_ttm", desc: false }],
   ["Laggards YTD", { max: { ret_ytd: 0 }, sort: "ret_ytd", desc: false }],
+  ["Insider buying", { min: { insider_net_90d: 1 }, sort: "insider_net_90d", desc: true }],
 ];
 function pScreener() {
   const st = STATE.scr; st.min = st.min || {}; st.max = st.max || {};
