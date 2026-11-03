@@ -200,6 +200,9 @@ def _close(a, b):
     return abs(a - b) <= max(floor, abs(b) * 0.0015)
 
 
+TIE_REL = float(os.environ.get("KPI_TIE_REL", "0.001"))
+
+
 def validate(sb, data, fix=False):
     """Checks every value against its source page or cell, recomputes derived values, and checks that children sum to
     parents marked sums_to_parent. Returns (report, cleaned data)."""
@@ -262,7 +265,7 @@ def validate(sb, data, fix=False):
             s, tot = sum(parts), idx[(parent, kind, pe)]
             # each printed figure carries up to half a rounding unit of error, so the sum may drift by that much per line
             slack = 0.5 * sum(unit.get((c, kind, pe), 0) for c in kids) + 0.5 * unit.get((parent, kind, pe), 0)
-            ok = _close(s, tot) or abs(s - tot) <= max(1.0, abs(tot) * 0.006, slack * 1.0001)
+            ok = _close(s, tot) or abs(s - tot) <= max(1.0, abs(tot) * TIE_REL, slack * 1.0001)
             (report["ties"] if ok else report["tie_failures"]).append({"parent": parent, "group": grp, "kind": kind, "period_end": pe, "sum": s, "total": tot})
     return report, data
 
