@@ -305,6 +305,47 @@ MONTHS = {m: i + 1 for i, m in enumerate(["jan", "feb", "mar", "apr", "may", "ju
 PERIOD_ENDS = {}
 
 
+_NAMED_Q = [re.compile(r"(?<![a-z])q([1-4])[\s_.-]*(?:fy)?[\s_.-]*((?:19|20)?\d\d)(?!\d)", re.I),
+            re.compile(r"(?<!\d)((?:19|20)\d\d)[\s_.-]*q([1-4])(?![0-9])", re.I),
+            re.compile(r"(?<![a-z])(first|second|third|fourth)[\s_.-]*quarter[\s_.-]*(?:fy)?[\s_.-]*((?:19|20)\d\d)(?!\d)", re.I)]
+_ORD = {"first": 1, "second": 2, "third": 3, "fourth": 4}
+
+
+def named_quarter(fye, name, d, ends_known=None):
+    """(label, quarter end) when a file name states its quarter ("q32024", "2026q3", "q3-fy24", "third-quarter-2024")
+    and that quarter is the latest or the one before it to end before date d; None otherwise."""
+    q = yy = None
+    for i, rx in enumerate(_NAMED_Q):
+        m = rx.search(name or "")
+        if not m:
+            continue
+        a, b = m.group(1), m.group(2)
+        if i == 0:
+            q, yy = int(a), b
+        elif i == 1:
+            q, yy = int(b), a
+        else:
+            q, yy = _ORD[a.lower()], b
+        break
+    if not q:
+        return None
+    from .fundamentals import norm_fye
+    if norm_fye(fye) != "1231":
+        # off-calendar filers often name files by calendar quarter, which would map to the wrong fiscal quarter
+        return None
+    yy = int(yy) % 100
+    want = f"Q{q} FY{yy:02d}"
+    probe = d
+    for _ in range(2):
+        label, e = quarter_for_date(fye, probe, ends_known)
+        if not e:
+            return None
+        if label == want:
+            return label, e
+        probe = e
+    return None
+
+
 def quarter_for_date(fye, d, ends_known=None):
     """(label, quarter end) of the latest fiscal quarter that ended at least three days before date d. Uses the
     company's actual period end dates when known (52/53-week years), else calendar quarter ends from the FYE."""
@@ -314,6 +355,19 @@ def quarter_for_date(fye, d, ends_known=None):
         cands = [e for e in ends_known if e <= d - dt.timedelta(days=3)]
         if cands:
             e = max(cands)
+            # known period ends come from filed 10-Q/10-Ks, so the quarter an earnings release reports on is often
+            # not among them yet: step forward 13 weeks at a time while another quarter has ended before date d
+            _l, cal = quarter_for_date(fye, d)
+            while e + dt.timedelta(days=91) <= d - dt.timedelta(days=3):
+                nxt = e + dt.timedelta(days=91)
+                # calendar-quarter filers end on month ends; 52/53-week filers 13 weeks after the last known end
+                if cal and abs((cal - nxt).days) <= 7:
+                    nxt = cal
+                elif cal:
+                    snap = quarter_for_date(fye, nxt + dt.timedelta(days=8))[1]
+                    if snap and abs((snap - nxt).days) <= 3:
+                        nxt = snap
+                e = nxt
             return fy_label(fye, e.isoformat(), "Q"), e
     fm, fd = int(fye[:2]), int(fye[2:])
     ends = []
@@ -464,8 +518,10 @@ def store_document(sb, ticker, url, body, ext, title, source_page, have_hashes, 
             first = json.dumps(list(text["sheets"].items())[:1], default=str)[:3000]
     period_end = None
     if ref_date and fye:
-        # an 8-K exhibit belongs to the latest fiscal quarter that ended before the filing
-        label, pe = quarter_for_date(fye, ref_date, PERIOD_ENDS.get(ticker))
+        # an 8-K exhibit belongs to the latest fiscal quarter that ended before the filing, unless its file name
+        # names an earlier quarter (recast tables such as "q32024pressreleasetables.htm" filed after the quarter)
+        label, pe = named_quarter(fye, url.rsplit("/", 1)[-1], ref_date, PERIOD_ENDS.get(ticker)) or \
+            quarter_for_date(fye, ref_date, PERIOD_ENDS.get(ticker))
         period_end = pe.isoformat() if pe else None
     else:
         label, year = period_hint(url, title)
