@@ -139,9 +139,9 @@ def instance_url(cik, accn):
 
 def humanize(qname):
     local = qname.split(":")[-1]
-    local = re.sub(r"Member$", "", local)
+    local = re.sub(r"(?i)(member)+$", "", local)
     s = re.sub(r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", " ", local)
-    s = re.sub(r"\bSegment\b$", "", s).strip()
+    s = re.sub(r"(?i)\s*segment$", "", s).strip()
     small = {"And", "Of", "The", "For", "In", "To", "On", "Or"}
     words = s.split()
     return " ".join(w.lower() if i and w in small else w for i, w in enumerate(words)) or local
@@ -450,6 +450,9 @@ def _nest(rows, series):
         rows.pop(k)
 
 
+_TOTALISH = re.compile(r"^(total|totals|totalsegments?|totalreportablesegments?|totalcountries|segmenttotal|consolidated|consolidatedtotal)$")
+
+
 def _drop_total_alias(rows, series, total_series):
     """A member that equals the consolidated total in every period (for example "Total products and services") is the
     total itself, not a line of the breakdown."""
@@ -459,7 +462,8 @@ def _drop_total_alias(rows, series, total_series):
             continue
         rv = _vals(series[k])
         common = [p for p in rv if p in tot]
-        if len(common) >= 2 and all(_close(rv[p], tot[p]) for p in common):
+        need = 1 if _TOTALISH.match(_norm(r["label"])) else 2
+        if len(common) >= need and all(_close(rv[p], tot[p]) for p in common):
             for c in [c for c in rows.values() if c["parent"] == k]:
                 c["parent"] = None
             rows.pop(k)
@@ -677,10 +681,19 @@ ISO = {"US": "United States", "CN": "China", "TW": "Taiwan", "HK": "Hong Kong", 
        "PR": "Puerto Rico", "NZ": "New Zealand", "LU": "Luxembourg", "BM": "Bermuda", "KY": "Cayman Islands", "RU": "Russia", "TR": "Turkey", "EG": "Egypt"}
 
 
+def clean_label(t):
+    """Strips XBRL scaffolding from a member label: "[Member]", "Segment Member", a trailing "Segment"."""
+    t = re.sub(r"\s*\[(Member|Axis|Domain)\]\s*$", "", t or "", flags=re.I).strip()
+    t = re.sub(r"(?i)([\s_-]*(segments?[\s_-]*)?member)+$", "", t).strip()
+    t2 = re.sub(r"(?i)\s+segment$", "", t).strip()
+    return t2 or t
+
+
 def member_label(m, labels):
     if m in labels:
-        t = labels[m]
-        return t.title() if t.isupper() and len(t) > 3 else t
+        t = clean_label(labels[m]) or labels[m]
+        # all-caps multi-word labels read better in title case; single acronyms (EMEA, APAC) stay as printed
+        return t.title() if t.isupper() and " " in t and len(t) > 3 else t
     local = m.split(":")[-1]
     if m.split(":")[0] in ("country", "srt") and local in ISO:
         return ISO[local]
