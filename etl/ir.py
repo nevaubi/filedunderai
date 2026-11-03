@@ -373,10 +373,13 @@ def process_company(sb, ticker, name, cik, since_year=None, max_docs=90, refresh
         site = {"ticker": ticker, "ir_url": cands[0] if cands else None, "discovered_at": now_iso(), "notes": json.dumps({"candidates": cands[:5]})}
         sb.upsert("ir_sites", [site], "ticker")
     pages = []
+    # the IR website is mapped at most once a week per company (Firecrawl credits); EDGAR exhibits are checked every run
+    recent_web = any(d for d in existing) and site.get("results_url") and site.get("discovered_at", "") >= (dt.datetime.utcnow() - dt.timedelta(days=7)).isoformat()
+    if recent_web and not refresh_site:
+        web = False
     if site.get("ir_url") and web:
         docs, pages = discover_documents(site["ir_url"], log=log)
-        if pages:
-            sb.upsert("ir_sites", [{"ticker": ticker, "ir_url": site["ir_url"], "results_url": pages[0]}], "ticker")
+        sb.upsert("ir_sites", [{"ticker": ticker, "ir_url": site["ir_url"], "results_url": pages[0] if pages else site["ir_url"], "discovered_at": now_iso()}], "ticker")
         cand = [(u, t) for u, t in docs.items() if keep_doc(u, t, since_year) and classify(u, t) != "other"]
         prio = {"supplement": 0, "presentation": 1, "remarks": 2, "release": 3, "transcript": 4, "annual_report": 5, "other": 6}
         cand.sort(key=lambda ut: (-(period_hint(*ut)[1] or 0), prio[classify(*ut)]))
