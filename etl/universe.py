@@ -543,4 +543,5 @@ PREDECESSORS = {
     "VTRS": [(1623613, "2020-11-16"),    # Mylan N.V. before the Upjohn combination
              (69499, "2015-02-27")],     # Mylan Inc. before the Dutch reorganization
     "TPL": [(97517, "2021-01-11")],      # Texas Pacific Land Trust before the corporate reorganization
+    "PLD": [(899881, "2011-06-03")],     # ProLogis (the trust; accounting acquirer) before the AMB merger
 }
