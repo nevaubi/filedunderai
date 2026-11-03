@@ -1,0 +1,373 @@
+"""KPI extraction tooling: read stored IR documents, validate an extraction file, and publish it.
+
+    python -m etl.kpitools docs TICKER                    list stored documents (id, type, period, pages)
+    python -m etl.kpitools text DOCID [PAGE]              print a document page (1-based) or every page
+    python -m etl.kpitools sheet DOCID [SHEET]            print a workbook sheet with A1 cell references
+    python -m etl.kpitools grep TICKER PATTERN            search every document of a company (regex, case-insensitive)
+    python -m etl.kpitools periods TICKER                 fiscal labels and exact period end dates to use
+    python -m etl.kpitools xbrl TICKER                    summary of the XBRL segment tables already on the site
+    python -m etl.kpitools validate FILE                  check an extraction file: quotes, values, sums, Q4
+    python -m etl.kpitools publish FILE                   validate, then write kpis/{T}.json and kpi rows
+
+Extraction file schema (JSON):
+{
+  "ticker": "NFLX",
+  "kpis": [
+    {"id": "paid_memberships_total", "name": "Paid memberships", "category": "Members", "subcategory": null,
+     "unit": "count" | "USD" | "%" | "USD_per_unit" | "x" | "days" | "units" | text,
+     "parent": null | "<kpi id>", "sums_to_parent": false, "is_total": false, "description": "...",
+     "values": [
+        {"kind": "Q" | "A" | "I", "period_end": "2026-09-30", "fiscal_label": "Q3 FY26", "value": 301630000,
+         "doc": "<document id>", "page": 7, "sheet": null, "cell": null,
+         "quote": "exact text copied from that page that contains the printed number",
+         "printed": "301.63", "scale": 1000000}
+     ]}
+  ],
+  "derived": [   // values computed rather than printed (for example Q4 = FY - Q1 - Q2 - Q3)
+     {"kpi": "<kpi id>", "kind": "Q", "period_end": "...", "fiscal_label": "Q4 FY25", "value": 123,
+      "formula": "FY2025 - Q1 - Q2 - Q3", "inputs": [{"kind": "A", "period_end": "..."}, {"kind": "Q", "period_end": "..."}]}
+  ],
+  "notes": "anything the reviewer should know"
+}
+Values are in base units: dollars (not millions), members (not millions), percentages as printed (12.5 means 12.5%).
+"""
+import gzip
+import json
+import os
+import re
+import sys
+import urllib.request
+
+from .common import Supabase, load_env, now_iso
+
+IR_PUBLIC = None
+_TEXT_CACHE = {}
+
+
+def _ir_public(sb):
+    return f"{sb.url}/storage/v1/object/public/ir/"
+
+
+def docs_for(sb, ticker):
+    return sb.select("ir_documents", f"select=id,url,title,doc_type,fiscal_label,period_end,ext,bytes,pages,text_path,storage_path,fetched_at&ticker=eq.{ticker}")
+
+
+def text_of(sb, doc):
+    if doc["id"] in _TEXT_CACHE:
+        return _TEXT_CACHE[doc["id"]]
+    if not doc.get("text_path"):
+        return None
+    with urllib.request.urlopen(_ir_public(sb) + doc["text_path"], timeout=60) as r:
+        raw = r.read()
+    try:
+        raw = gzip.decompress(raw)
+    except OSError:
+        pass
+    t = json.loads(raw)
+    _TEXT_CACHE[doc["id"]] = t
+    return t
+
+
+def col_name(i):
+    s, i = "", i + 1
+    while i:
+        m = (i - 1) % 26
+        s = chr(65 + m) + s
+        i = (i - 1) // 26
+    return s
+
+
+def parse_ref(ref):
+    m = re.match(r"^([A-Z]+)(\d+)$", (ref or "").upper())
+    if not m:
+        return None
+    c = 0
+    for ch in m.group(1):
+        c = c * 26 + ord(ch) - 64
+    return int(m.group(2)) - 1, c - 1
+
+
+def norm(s):
+    return re.sub(r"\s+", " ", str(s or "")).strip().lower()
+
+
+def numbers_in(text):
+    """Numbers printed in a string, as floats, with parentheses read as negatives."""
+    out = []
+    for m in re.finditer(r"\(?-?\$?\d[\d,]*(?:\.\d+)?\)?", text or ""):
+        s = m.group(0)
+        neg = s.startswith("(") and s.endswith(")") or "-" in s
+        try:
+            v = float(re.sub(r"[^\d.]", "", s))
+        except ValueError:
+            continue
+        out.append(-v if neg else v)
+    return out
+
+
+def check_value(sb, docs_by_id, v):
+    """Returns a list of problems for one extracted value (empty when it checks out)."""
+    errs = []
+    d = docs_by_id.get(v.get("doc"))
+    if not d:
+        return [f"unknown document {v.get('doc')}"]
+    t = text_of(sb, d)
+    if not t:
+        return [f"document {d['id']} has no text"]
+    value = v.get("value")
+    if value is None:
+        return ["missing value"]
+    if t["kind"] == "sheets":
+        sheet = v.get("sheet")
+        rows = t["sheets"].get(sheet) if sheet else None
+        if rows is None:
+            return [f"sheet {sheet!r} not in {list(t['sheets'])[:8]}"]
+        rc = parse_ref(v.get("cell"))
+        if not rc:
+            return [f"bad cell reference {v.get('cell')!r}"]
+        r, c = rc
+        cellv = rows[r][c] if r < len(rows) and c < len(rows[r]) else None
+        if not isinstance(cellv, (int, float)):
+            return [f"{sheet}!{v.get('cell')} holds {cellv!r}, not a number"]
+        scale = v.get("scale") or 1
+        if not _close(cellv * scale, value) and not _close(cellv * scale * 100, value) and not _close(cellv, value):
+            errs.append(f"{sheet}!{v.get('cell')} = {cellv} (x{scale}) does not match value {value}")
+        return errs
+    pages = t["pages"]
+    page = v.get("page") or 1
+    if page < 1 or page > len(pages):
+        return [f"page {page} out of range (1-{len(pages)})"]
+    ptxt = norm(pages[page - 1])
+    q = norm(v.get("quote"))
+    if not q:
+        errs.append("missing quote")
+    elif q not in ptxt:
+        # tolerate quotes that span a line break or repeated spaces differently
+        q2 = re.sub(r"[^a-z0-9.,%$()-]", "", q)
+        if q2 not in re.sub(r"[^a-z0-9.,%$()-]", "", ptxt):
+            errs.append(f"quote not found on page {page}: {v.get('quote')[:80]!r}")
+    printed = v.get("printed")
+    scale = v.get("scale") or 1
+    if printed is not None:
+        nums = numbers_in(str(printed))
+        if not nums:
+            errs.append(f"printed {printed!r} has no number")
+        else:
+            pv = nums[0] * scale
+            if not (_close(pv, value) or _close(-pv, value)):
+                errs.append(f"printed {printed} x {scale} = {pv} does not match value {value}")
+            if q and str(printed).replace("$", "").strip("() ") not in v.get("quote", ""):
+                errs.append(f"printed {printed!r} not inside quote")
+    else:
+        if not any(_close(n * s, value) or _close(-n * s, value) for n in numbers_in(v.get("quote")) for s in (1, 1e3, 1e6, 1e9, 0.01)):
+            errs.append(f"no number in the quote matches value {value}")
+    return errs
+
+
+def _close(a, b):
+    try:
+        return abs(float(a) - float(b)) <= max(0.5, abs(float(b)) * 0.0015)
+    except (TypeError, ValueError):
+        return False
+
+
+def validate(sb, data, fix=False):
+    """Checks every value against its source page or cell, recomputes derived values, and checks that children sum to
+    parents marked sums_to_parent. Returns (report, cleaned data)."""
+    tk = data["ticker"]
+    docs = {d["id"]: d for d in docs_for(sb, tk)}
+    report = {"ticker": tk, "values": 0, "bad_values": [], "ties": [], "tie_failures": [], "derived_bad": []}
+    kpis = {k["id"]: k for k in data.get("kpis", [])}
+    for k in data.get("kpis", []):
+        good = []
+        for v in k.get("values", []):
+            report["values"] += 1
+            errs = check_value(sb, docs, v)
+            if errs:
+                report["bad_values"].append({"kpi": k["id"], "period_end": v.get("period_end"), "kind": v.get("kind"), "errors": errs})
+            else:
+                good.append(v)
+        if fix:
+            k["values"] = good
+    # derived values: recompute from inputs
+    idx = {(k["id"], v["kind"], v["period_end"]): v["value"] for k in data.get("kpis", []) for v in k.get("values", [])}
+    for dv in data.get("derived", []):
+        ins = []
+        for inp in dv.get("inputs", []):
+            ins.append(idx.get((dv["kpi"], inp["kind"], inp["period_end"])))
+        if None in ins or not ins:
+            report["derived_bad"].append({**dv, "error": "missing input"})
+            continue
+        if dv.get("formula", "").startswith("FY") or "-" in dv.get("formula", ""):
+            calc = ins[0] - sum(ins[1:])
+        else:
+            calc = sum(ins)
+        if not _close(calc, dv["value"]):
+            report["derived_bad"].append({**dv, "error": f"recomputed {calc}"})
+        else:
+            idx[(dv["kpi"], dv["kind"], dv["period_end"])] = dv["value"]
+    # sums: children flagged sums_to_parent must add up to the parent
+    children = {}
+    for k in data.get("kpis", []):
+        if k.get("parent") and k.get("sums_to_parent"):
+            children.setdefault(k["parent"], []).append(k["id"])
+    for parent, kids in children.items():
+        periods = {(kind, pe) for (kid, kind, pe) in idx if kid == parent}
+        for kind, pe in sorted(periods):
+            parts = [idx.get((c, kind, pe)) for c in kids]
+            if any(p is None for p in parts):
+                continue
+            s, tot = sum(parts), idx[(parent, kind, pe)]
+            ok = _close(s, tot) or abs(s - tot) <= max(1.0, abs(tot) * 0.006)
+            (report["ties"] if ok else report["tie_failures"]).append({"parent": parent, "kind": kind, "period_end": pe, "sum": s, "total": tot})
+    return report, data
+
+
+def publish(sb, data, fye="1231"):
+    """Writes kpis/{T}.json (grouped for display) and kpi_definitions / kpi_values rows. Only validated values."""
+    report, data = validate(sb, data, fix=True)
+    tk = data["ticker"]
+    docs = {d["id"]: d for d in docs_for(sb, tk)}
+    tie = {(t["parent"], t["kind"], t["period_end"]): True for t in report["ties"]}
+    tie.update({(t["parent"], t["kind"], t["period_end"]): False for t in report["tie_failures"]})
+    derived = {(d["kpi"], d["kind"], d["period_end"]): d for d in data.get("derived", []) if not any(x for x in report["derived_bad"] if x["kpi"] == d["kpi"] and x["period_end"] == d["period_end"])}
+    kpis = data.get("kpis", [])
+    order = {k["id"]: i for i, k in enumerate(kpis)}
+    depth = {}
+
+    def dep(k):
+        if k["id"] in depth:
+            return depth[k["id"]]
+        p = next((x for x in kpis if x["id"] == k.get("parent")), None)
+        depth[k["id"]] = 0 if not p else min(3, dep(p) + 1)
+        return depth[k["id"]]
+
+    groups = {}
+    defs, rows = [], []
+    for k in kpis:
+        g = groups.setdefault((k.get("category") or "Operating metrics", k.get("subcategory")), [])
+        vals = {"Q": {}, "A": {}, "I": {}}
+        for v in k.get("values", []):
+            d = docs.get(v["doc"], {})
+            vals[v["kind"]][v["period_end"]] = {"v": v["value"], "doc": v["doc"], "page": v.get("page"), "sheet": v.get("sheet"), "cell": v.get("cell"),
+                                                "quote": v.get("quote"), "doc_title": (d.get("title") or "").split("||")[0][:120], "path": d.get("storage_path"),
+                                                "ext": d.get("ext"), "url": d.get("url"), "label": v.get("fiscal_label"),
+                                                "tie": tie.get((k["id"], v["kind"], v["period_end"]))}
+            rows.append({"ticker": tk, "kpi_id": k["id"], "period_kind": v["kind"], "period_end": v["period_end"], "fiscal_label": v.get("fiscal_label"),
+                         "value": v["value"], "unit": k.get("unit"), "source_kind": "ir", "source_id": v["doc"],
+                         "anchor": {"page": v.get("page"), "sheet": v.get("sheet"), "cell": v.get("cell"), "quote": (v.get("quote") or "")[:400]},
+                         "derived": None, "reconciled": tie.get((k["id"], v["kind"], v["period_end"])), "updated_at": now_iso()})
+        for (kid, kind, pe), dv in derived.items():
+            if kid != k["id"]:
+                continue
+            src = next((vals[i["kind"]].get(i["period_end"]) for i in dv["inputs"] if vals[i["kind"]].get(i["period_end"])), None) or {}
+            vals[kind][pe] = {**src, "v": dv["value"], "label": dv.get("fiscal_label"), "derived": {"formula": dv["formula"], "inputs": dv["inputs"]},
+                              "tie": tie.get((k["id"], kind, pe))}
+            rows.append({"ticker": tk, "kpi_id": k["id"], "period_kind": kind, "period_end": pe, "fiscal_label": dv.get("fiscal_label"), "value": dv["value"],
+                         "unit": k.get("unit"), "source_kind": "ir", "source_id": "derived", "anchor": None, "derived": {"formula": dv["formula"], "inputs": dv["inputs"]},
+                         "reconciled": tie.get((k["id"], kind, pe)), "updated_at": now_iso()})
+        g.append({"id": k["id"], "name": k["name"], "unit": k.get("unit"), "parent": k.get("parent"), "depth": dep(k), "is_total": bool(k.get("is_total")),
+                  "sums_to_parent": bool(k.get("sums_to_parent")), "description": k.get("description"), "values": vals})
+        defs.append({"ticker": tk, "kpi_id": k["id"], "name": k["name"], "category": k.get("category"), "subcategory": k.get("subcategory"), "unit": k.get("unit"),
+                     "parent_id": k.get("parent"), "sums_to_parent": bool(k.get("sums_to_parent")), "source_kind": "ir", "description": k.get("description"),
+                     "sort": order[k["id"]], "updated_at": now_iso()})
+    bundle = {"ticker": tk, "generated": now_iso(), "notes": data.get("notes"),
+              "groups": [{"category": c, "subcategory": s, "items": items} for (c, s), items in groups.items() if any(any(it["values"][x]) for it in items for x in "QAI")],
+              "check": {"values": report["values"], "rejected": len(report["bad_values"]), "ties": len(report["ties"]), "tie_failures": len(report["tie_failures"])}}
+    sb.put_json(f"kpis/{tk}.json", bundle, cache="max-age=600")
+    if defs:
+        sb.upsert("kpi_definitions", defs, "ticker,kpi_id")
+    if rows:
+        uniq = {(r["kpi_id"], r["period_kind"], r["period_end"]): r for r in rows}
+        sb.upsert("kpi_values", list(uniq.values()), "ticker,kpi_id,period_kind,period_end,source_kind", batch=1000)
+    return report
+
+
+def main():
+    load_env()
+    sb = Supabase()
+    cmd, args = sys.argv[1], sys.argv[2:]
+    if cmd == "docs":
+        for d in sorted(docs_for(sb, args[0]), key=lambda d: (d.get("fiscal_label") or "", d["doc_type"] or ""), reverse=True):
+            title = (d.get("title") or "").split("||")[0][:90]
+            print(f"{d['id']}  {d['doc_type'] or '-':12} {d.get('fiscal_label') or '-':9} {d['ext']:6} pages={d.get('pages')}  {title}")
+    elif cmd == "text":
+        d = _doc(sb, args[0])
+        t = text_of(sb, d)
+        if t["kind"] == "sheets":
+            print("This is a workbook; use: sheet", args[0], "SHEET. Sheets:", list(t["sheets"]))
+            return
+        pages = t["pages"]
+        sel = [int(args[1])] if len(args) > 1 else range(1, len(pages) + 1)
+        for p in sel:
+            print(f"===== page {p} / {len(pages)} =====")
+            print(pages[p - 1])
+    elif cmd == "sheet":
+        d = _doc(sb, args[0])
+        t = text_of(sb, d)
+        if t["kind"] != "sheets":
+            print("not a workbook")
+            return
+        names = list(t["sheets"])
+        if len(args) < 2:
+            print("sheets:", names)
+            return
+        rows = t["sheets"][args[1]]
+        for r_i, row in enumerate(rows):
+            cells = [f"{col_name(c)}{r_i + 1}={v}" for c, v in enumerate(row) if v not in ("", None)]
+            if cells:
+                print(" | ".join(cells))
+    elif cmd == "grep":
+        rx = re.compile(args[1], re.I)
+        for d in docs_for(sb, args[0]):
+            t = text_of(sb, d)
+            if not t:
+                continue
+            if t["kind"] == "pages":
+                for i, p in enumerate(t["pages"]):
+                    for line in p.splitlines():
+                        if rx.search(line):
+                            print(f"{d['id']} p{i + 1} [{d.get('fiscal_label')} {d['doc_type']}]: {line.strip()[:200]}")
+            else:
+                for sh, rows in t["sheets"].items():
+                    for r_i, row in enumerate(rows):
+                        line = " | ".join(str(v) for v in row if v not in ("", None))
+                        if rx.search(line):
+                            print(f"{d['id']} {sh}!row{r_i + 1} [{d.get('fiscal_label')}]: {line[:200]}")
+    elif cmd == "periods":
+        b = sb.get_json(f"companies/{args[0]}.json") or {}
+        from .fundamentals import fy_label
+        fye = (b.get("profile") or {}).get("fiscalYearEnd") or "1231"
+        ends = set()
+        for rows in (b.get("statements") or {}).values():
+            for r in rows:
+                for x in r.get("quarterly", []):
+                    ends.add(("Q", x["end"], x.get("start")))
+                for x in r.get("annual", []):
+                    ends.add(("A", x["end"], x.get("start")))
+        print(f"fiscal year end (MMDD): {fye}")
+        for k, e, st in sorted(ends, key=lambda t: (t[1], t[0]))[-40:]:
+            print(f"{k} {fy_label(fye, e, k):9} start={st} end={e}")
+    elif cmd == "xbrl":
+        b = sb.get_json(f"segments/{args[0]}.json") or {}
+        for t in b.get("tables", []):
+            print(f"{t['metric']} by {t['category_label']}{' (summary)' if t.get('view') else ''}: " + ", ".join(r["label"] for r in t["rows"]))
+    elif cmd in ("validate", "publish"):
+        data = json.load(open(args[0]))
+        if cmd == "validate":
+            report, _ = validate(sb, data)
+        else:
+            report = publish(sb, data)
+        print(json.dumps({k: (v if not isinstance(v, list) else v[:40]) for k, v in report.items()}, indent=1, default=str))
+        print(f"\nvalues={report['values']} rejected={len(report['bad_values'])} ties={len(report['ties'])} tie_failures={len(report['tie_failures'])} derived_bad={len(report['derived_bad'])}")
+
+
+def _doc(sb, did):
+    r = sb.select("ir_documents", f"select=*&id=eq.{did}")
+    if not r:
+        raise SystemExit(f"no document {did}")
+    return r[0]
+
+
+if __name__ == "__main__":
+    main()

@@ -421,3 +421,48 @@ table.scr tbody tr:hover td{background:var(--rail)}
 .spin{width:22px;height:22px;border-radius:50%;border:2px solid var(--line2);border-top-color:var(--ink);animation:fu-spin .8s linear infinite}
 @keyframes fu-spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion: reduce){.spin{animation-duration:2.4s}}
+
+/* segments and KPIs */
+.seg-head{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap}
+table.segt{width:100%;border-collapse:collapse;font-size:13px}
+table.segt th,table.segt td{padding:6px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+table.segt thead th{font-size:11.5px;color:var(--muted);font-weight:600;background:var(--surface);position:sticky;top:0;z-index:2}
+table.segt .nm{text-align:left;position:sticky;left:0;background:var(--surface);min-width:240px;max-width:340px;white-space:normal;color:var(--ink);font-weight:500;z-index:1}
+table.segt thead .nm{z-index:3}
+table.segt tr.sub .nm{font-weight:400;color:var(--ink2)}
+table.segt tr.sub td{font-size:12.5px}
+table.segt tr.recon .nm,table.segt tr.memo .nm{color:var(--muted);font-weight:400}
+table.segt tr.memo td{color:var(--muted);font-style:italic}
+table.segt tr.resid td,table.segt td.resid{color:var(--warn);font-style:italic}
+table.segt tr.total td{font-weight:700;border-top:1.5px solid var(--ink);border-bottom:2px solid var(--line2)}
+table.segt td.c{cursor:pointer;position:relative}
+table.segt td.c:hover{background:var(--accent-soft)}
+table.segt td.c.sel{background:var(--accent-soft);box-shadow:inset 0 0 0 1.5px var(--accent)}
+table.segt .dq{position:absolute;top:6px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--warn)}
+.tie{display:inline-block;margin-left:5px;font-size:10px;font-weight:700;border-radius:4px;padding:0 4px;line-height:15px;vertical-align:1px}
+.tie.ok{color:var(--up);background:var(--up-soft)}
+.tie.bad{color:var(--warn);background:var(--warn-soft)}
+.tie.part{color:var(--faint)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11.5px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+/* document viewer */
+.viewer.docv{display:flex;flex-direction:column;background:var(--sunk)}
+.pdf-scroll{overflow:auto;flex:1;padding:12px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.pdf-page{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:200px}
+.pdf-num{font-size:11px;color:var(--faint);font-family:var(--f-mono);align-self:flex-start}
+.pdf-box{position:relative;background:#fff;box-shadow:0 1px 3px rgba(16,24,40,.12)}
+.pdf-hit{position:absolute;background:rgba(255,214,0,.38);outline:2px solid #f2b600;border-radius:2px;pointer-events:none}
+.sheet-tabs{display:flex;gap:4px;overflow-x:auto;padding:8px 8px 0;border-bottom:1px solid var(--line2);background:var(--surface);flex:none}
+.sheet-tabs button{border:1px solid var(--line2);border-bottom:0;background:var(--sunk);padding:5px 10px;font-size:12px;border-radius:6px 6px 0 0;cursor:pointer;white-space:nowrap}
+.sheet-tabs button.on{background:#fff;font-weight:600}
+.sheet-grid{overflow:auto;flex:1;background:#fff}
+.sheet-grid table{border-collapse:collapse;font-size:12px;font-family:var(--f-mono)}
+.sheet-grid th{position:sticky;top:0;background:var(--sunk);color:var(--faint);font-weight:500;font-size:10.5px;border:1px solid var(--line);padding:2px 6px;z-index:1}
+.sheet-grid tbody th{position:sticky;left:0;z-index:1}
+.sheet-grid td{border:1px solid var(--line);padding:2px 8px;white-space:nowrap;max-width:420px;overflow:hidden;text-overflow:ellipsis}
+.sheet-grid td.n{text-align:right}
+.sheet-grid tr.hl td{background:#fffbe3}
+.sheet-grid td.hit{background:#ffe766 !important;outline:2px solid #f2b600}
+.textdoc{overflow:auto;flex:1;background:#fff;padding:16px 20px}
+.textdoc pre{white-space:pre-wrap;font-family:var(--f-mono);font-size:12px;line-height:1.55;margin:0 0 18px}
+.textdoc mark.fu-hit{background:#ffe766;outline:2px solid #f2b600;border-radius:2px}

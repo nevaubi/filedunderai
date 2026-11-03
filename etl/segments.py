@@ -152,7 +152,7 @@ def label_linkbase(cik, accession, primary_doc):
                 roles = ((v.get("lang") or {}).get("en-us") or {}).get("role") or {}
                 t = roles.get("terseLabel") or roles.get("label")
                 if t:
-                    out[el.replace("_", ":", 1)] = re.sub(r"\s*\[(Member|Axis|Domain)\]\s*$", "", t)
+                    out[el.replace("_", ":", 1)] = re.sub(r"\s*\[(Member|Axis|Domain)\]\s*$", "", htmllib.unescape(t)).strip()
         if out:
             return out
     except Exception:

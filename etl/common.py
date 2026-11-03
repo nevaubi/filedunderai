@@ -88,8 +88,9 @@ _sec_lock = threading.Lock()
 _sec_last = [0.0]
 
 
-def sec_throttle(min_gap=0.13):
+def sec_throttle(min_gap=None):
     """Keeps the process under SEC's 10 requests per second across threads."""
+    min_gap = min_gap if min_gap is not None else float(os.environ.get("SEC_GAP", "0.13"))
     with _sec_lock:
         wait = _sec_last[0] + min_gap - time.time()
         if wait > 0:
@@ -100,6 +101,12 @@ def sec_throttle(min_gap=0.13):
 def sec_json(url):
     sec_throttle()
     return get_json(url, headers={"User-Agent": SEC_UA}, timeout=60, retries=4)
+
+
+def sec_get_raw(url, timeout=90):
+    """Raw bytes from sec.gov (binary exhibits)."""
+    sec_throttle()
+    return request(url, headers={"User-Agent": SEC_UA}, timeout=timeout, retries=3, raw=True)
 
 
 def sec_get(url, timeout=60):

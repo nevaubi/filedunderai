@@ -356,13 +356,14 @@ function colHeader(key) {
 const fmtCell = c => c.unit === "pct" ? fpct(c.v) : c.unit === "x" ? fx(c.v) : fmtMoney(c.v, c.unit);
 const periodText = c => c.kind === "TTM" ? "TTM to " + fdate(c.end) : plabel(c.tk, c.end, c.kind);
 function siblings(cell) {
+  if (cell?.sib) return cell.sib();
   if (!cell || cell.kind === "TTM" || !cell.end) return [];
   return model(cell.tk).series(cell.label, cell.kind).map(x => x.cell);
 }
 function citation(cell) {
   if (cell.calc) return `${cell.tk} ${cell.label}, ${periodText(cell)}: ${fmtCell(cell)}. Calculated as ${cell.calc.formula} from SEC filings (Filed Under).`;
   const f = D.filings[cell.rec.accn];
-  return `${cell.tk} ${cell.label}, ${periodText(cell)}: ${fmtCell(cell)}${cell.derived ? " (derived from cumulative figures)" : ""}. Source: ${cell.rec.form} filed ${fdate(cell.rec.filed)}, accession ${cell.rec.accn}, us-gaap:${cell.concept}. ${f?.primary || f?.index || ""}`;
+  return `${cell.tk} ${cell.label}, ${periodText(cell)}: ${fmtCell(cell)}${cell.derived ? " (derived from cumulative figures)" : ""}. Source: ${cell.rec.form} filed ${fdate(cell.rec.filed)}, accession ${cell.rec.accn}, ${cell.conceptFull || "us-gaap:" + cell.concept}${cell.dimText ? " (" + cell.dimText + ")" : ""}. ${f?.primary || f?.index || ""}`;
 }
 function openSource(cell, tab) {
   if (!cell) return;
@@ -414,7 +415,8 @@ function renderDetails(body, cell) {
     el("dt", {}, "Accession no."), el("dd", { class: "mono" }, rec.accn),
     el("dt", {}, "Filed"), el("dd", {}, fdate(rec.filed)),
     el("dt", {}, "Period"), el("dd", {}, rec.start ? `${fdate(rec.start)} – ${fdate(rec.end)} (${dayDiff(rec.start, rec.end)} days)` : `Instant, ${fdate(rec.end)}`),
-    el("dt", {}, "XBRL element"), el("dd", { class: "mono" }, "us-gaap:" + cell.concept),
+    el("dt", {}, "XBRL element"), el("dd", { class: "mono" }, cell.conceptFull || "us-gaap:" + cell.concept),
+    cell.dimText ? el("dt", {}, "Breakdown") : null, cell.dimText ? el("dd", {}, cell.dimText) : null,
     el("dt", {}, "Reported value"), el("dd", { class: "mono" }, rec.v.toLocaleString("en-US") + " " + cell.unit),
     el("dt", {}, "Selection rule"), el("dd", {}, "First filing that reported this period. Later restatements are kept in the facts store."),
     el("dt", {}, "Links"), el("dd", {}, f?.primary ? el("a", { href: f.primary, target: "_blank", rel: "noopener" }, "Document ↗") : "–", " · ", el("a", { href: f?.index || "#", target: "_blank", rel: "noopener" }, "Filing index ↗"), " · ", el("a", { href: `https://data.sec.gov/api/xbrl/companyconcept/CIK${String(c.cik).padStart(10, "0")}/us-gaap/${cell.concept}.json`, target: "_blank", rel: "noopener" }, "Concept API ↗"))));
@@ -480,7 +482,11 @@ function ixNumber(node) {
   if (node.getAttribute("sign") === "-") v = -v;
   return v;
 }
-function locateFact(doc, concept, period, value) {
+function locateFact(doc, concept, period, value, anchorId) {
+  if (anchorId) {
+    const byId = doc.getElementById(anchorId);
+    if (byId) return { hits: [byId], how: "id", total: 1 };
+  }
   const ctx = {};
   for (const c of doc.getElementsByTagName("xbrli:context")) {
     const g = n => c.getElementsByTagName(n)[0]?.textContent.trim() || null;
@@ -556,7 +562,7 @@ function renderFiling(db, cell, c) {
       const setZoom = z => { zoom = Math.min(2, Math.max(0.4, Math.round(z * 100) / 100)); doc.documentElement.style.zoom = zoom; go(i); };
       zoomOut.onclick = () => setZoom(zoom - 0.1);
       zoomIn.onclick = () => setZoom(zoom + 0.1);
-      const { hits, how } = locateFact(doc, cell.concept, target, target.v);
+      const { hits, how } = locateFact(doc, cell.concept, target, target.v, cell.ix?.id);
       let i = 0;
       const go = k => {
         if (!hits.length) return;
@@ -574,7 +580,7 @@ function renderFiling(db, cell, c) {
       if (hits.length) {
         jumpB.disabled = false; prevB.disabled = nextB.disabled = hits.length < 2;
         jumpB.onclick = () => go(i); prevB.onclick = () => go(i - 1); nextB.onclick = () => go(i + 1);
-        status.textContent = how === "tag" ? `Tagged ${cell.concept}` : how === "value" ? "Matched by period and value" : how === "text" ? "Matched by printed figure" : "Matched by value";
+        status.textContent = how === "id" ? `Tagged ${cell.conceptFull || cell.concept}` : how === "tag" ? `Tagged ${cell.concept}` : how === "value" ? "Matched by period and value" : how === "text" ? "Matched by printed figure" : "Matched by value";
         requestAnimationFrame(() => go(0));
         // a second pass after images settle the layout
         win.addEventListener("load", () => go(i), { once: true });
@@ -916,7 +922,7 @@ function paletteItems(v) {
   if (tk && parts.length > 1) {
     const rest = parts.slice(1).join(" ");
     allMetricLabels().filter(m => m.toLowerCase().includes(rest)).slice(0, 6).forEach(mt => add("Metrics", `${tk} ${mt}`, "latest quarter, opens the source", tk[0], async () => { await ensureCompany(tk); const m = model(tk); const cell = m.metric(mt, "Q", m.latestQ()) || m.metric(mt, "A", m.latestA()); STATE.coTab = "financials"; if (location.hash !== "#company-" + tk.toLowerCase()) { location.hash = "company-" + tk.toLowerCase(); await new Promise(r => setTimeout(r, 400)); } if (cell) openSource(cell, "filing"); else toast(`${tk} doesn't report ${mt}`); }));
-    [["financials", "Financials"], ["news", "News & narratives"], ["earnings", "Earnings & IR"], ["filings", "Filings"]].filter(([, n]) => n.toLowerCase().includes(rest)).forEach(([id, n]) => add("Companies", `${tk} · ${n}`, SHORT[tk], tk[0], () => { STATE.coTab = id; location.hash === "#company-" + tk.toLowerCase() ? route() : location.hash = "company-" + tk.toLowerCase(); }));
+    [["financials", "Financials"], ["segments", "Segments & KPIs"], ["news", "News & narratives"], ["earnings", "Earnings & IR"], ["filings", "Filings"]].filter(([, n]) => n.toLowerCase().includes(rest)).forEach(([id, n]) => add("Companies", `${tk} · ${n}`, SHORT[tk], tk[0], () => { STATE.coTab = id; location.hash === "#company-" + tk.toLowerCase() ? route() : location.hash = "company-" + tk.toLowerCase(); }));
   }
   const matches = TICKERS.filter(t => { const c = IDX[t]; return !v || t.toLowerCase().startsWith(v) || (c.name || "").toLowerCase().includes(v) || (c.legal_name || "").toLowerCase().includes(v); });
   (v ? matches : watchlist()).slice(0, v ? 10 : 8).forEach(t => { const c = IDX[t]; add("Companies", `${t} · ${c.name}`, `${fnum(c.price)} · ${fsgn(c.chg_1d, 2)}`, miniLogo(t, 20), () => location.hash = "company-" + t.toLowerCase()); });
@@ -1236,10 +1242,10 @@ async function pCompany(tk) {
     stat("Market cap", fmtMoney(s.mcap)), stat("Revenue TTM", fmtMoney(s.rev?.v), s.rev), stat("Net income TTM", fmtMoney(s.ni?.v), s.ni), stat("EPS TTM", s.eps ? "$" + s.eps.v.toFixed(2) : "–", s.eps),
     stat("P/E TTM", s.pe ? s.pe.toFixed(1) : "–"), stat("P/S TTM", s.ps ? s.ps.toFixed(1) : "–"), stat("FCF yield", fpct(s.fcfy), s.fcf), stat("Gross margin LQ", fpct(s.gm?.v), s.gm), stat("Rev growth LQ", fsgn(s.growth?.v), s.growth),
     el("div", {}, el("div", { class: "l" }, "52-week range"), el("div", { class: "num", style: "font-size:12.5px;display:flex;justify-content:space-between;margin-top:4px" }, el("span", {}, fnum(st.lo52)), el("span", {}, fnum(st.hi52))), rng)));
-  const tabsDef = [["overview", "Overview"], ["financials", "Financials"], ["news", "News & narratives"], ["earnings", "Earnings & IR"], ["filings", "Filings"], ["insiders", "Insiders"]];
+  const tabsDef = [["overview", "Overview"], ["financials", "Financials"], ["segments", "Segments & KPIs"], ["news", "News & narratives"], ["earnings", "Earnings & IR"], ["filings", "Filings"], ["insiders", "Insiders"]];
   const tabs = el("div", { class: "tabs", role: "tablist" });
   const body = el("div", { style: "display:flex;flex-direction:column;gap:16px" });
-  const show = id => { if (!tabsDef.find(t => t[0] === id)) id = "overview"; STATE.coTab = id; store.set("coTab", id); $("#crumb-tab").textContent = tabsDef.find(t => t[0] === id)[1]; tabs.querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.id === id); b.setAttribute("aria-selected", b.dataset.id === id); }); body.innerHTML = ""; ({ overview: coOverview, financials: coFinancials, news: coNews, filings: coFilings, earnings: coEarnings, insiders: coInsiders })[id](body, tk); };
+  const show = id => { if (!tabsDef.find(t => t[0] === id)) id = "overview"; STATE.coTab = id; store.set("coTab", id); $("#crumb-tab").textContent = tabsDef.find(t => t[0] === id)[1]; tabs.querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.id === id); b.setAttribute("aria-selected", b.dataset.id === id); }); body.innerHTML = ""; ({ overview: coOverview, financials: coFinancials, segments: coSegments, news: coNews, filings: coFilings, earnings: coEarnings, insiders: coInsiders })[id](body, tk); };
   tabsDef.forEach(([id, n], i) => tabs.append(el("button", { "data-id": id, role: "tab", title: `${n} (${i + 1})`, onclick: () => show(id) }, n)));
   page.append(tabs, body);
   show(STATE.coTab);
@@ -1511,6 +1517,392 @@ function insiderChart(host, tk, rows) {
     .on("mousemove", (ev, d) => showTip(ev, `<b>${esc(d.owner)}</b><br><span class="faint">${esc(d.role || "")}</span><br>${d.code === "P" ? "Bought" : "Sold"} ${Math.round(d.shares).toLocaleString("en-US")} @ $${fnum(d.price)}<br>${fmtMoney(d.v)} · ${fdate(d.tx_date)}${d.plan_10b5 ? " · 10b5-1" : ""}`))
     .on("mouseleave", () => { tip.hidden = true; });
   if (!trades.length) host.append(el("div", { class: "faint", style: "font-size:12px;padding:4px 0 0" }, "No open-market insider trades in the last 12 months. Most insider activity here is grants, exercises and tax withholding."));
+}
+
+/* ---------- segments, KPIs and IR documents ---------- */
+const IRPUB = PUB.replace(/public-data\/$/, "ir/");
+const SEG = {};
+async function ensureSegments(tk) {
+  if (SEG[tk]) return SEG[tk];
+  const [seg, ir, kpi] = await Promise.all([getJSON(`segments/${tk}.json`).catch(() => null), getJSON(`ir/${tk}.json`).catch(() => null), getJSON(`kpis/${tk}.json`).catch(() => null)]);
+  SEG[tk] = { seg, ir, kpi };
+  return SEG[tk];
+}
+function segCell(tk, t, r, K, c, rowSeries) {
+  const base = c.derived ? c.derived.from : c;
+  const cell = {
+    tk, stmt: "segment", seg: true, label: `${r.label}`, metric: t.metric, concept: (c.name || t.concept).split(":").pop(), conceptFull: c.name || t.concept,
+    dimText: `${t.category_label}${r.parent ? " › " + (t.rows.find(x => x.key === r.parent)?.label || "") : ""} › ${r.label}`,
+    unit: "USD", kind: K === "I" ? "Q" : K, end: c.end, start: c.start, v: c.v,
+    rec: { v: base.v, accn: base.accn, form: c.form, filed: c.filed, start: base.start || c.start, end: base.end || c.end },
+    ix: { id: base.id, ctx: base.ctx },
+    derived: c.derived ? { from: c.derived.from, minus: { ...c.derived.minus, form: c.derived.minus.form || "" } } : null,
+  };
+  cell.sib = () => Object.keys(rowSeries).sort().map(e => segCell(tk, t, r, K, rowSeries[e], rowSeries));
+  if (c.residual) {
+    const tops = t.rows.filter(x => !x.parent && !x.residual && !x.memo);
+    const tc = t.total[K][c.end];
+    cell.calc = { formula: `${t.total.label} − sum of reported lines`, inputs: [tc ? segCell(tk, t, { label: t.total.label }, K, tc, t.total[K]) : null, ...tops.map(x => x[K][c.end] ? segCell(tk, t, x, K, x[K][c.end], x[K]) : null)].filter(Boolean) };
+    cell.label = r.label;
+  }
+  return cell;
+}
+function coSegments(body, tk) {
+  const host = el("div", { style: "display:flex;flex-direction:column;gap:16px" }, el("div", { class: "muted", style: "padding:16px 4px" }, "Loading segment data…"));
+  body.append(host);
+  ensureSegments(tk).then(({ seg, ir, kpi }) => { host.innerHTML = ""; renderSegments(host, tk, seg, ir, kpi); }).catch(e => { host.innerHTML = ""; host.append(el("div", { class: "empty" }, "Segment data is not available yet for this company.")); });
+}
+function segPeriods(t, K, n) {
+  const ends = new Set();
+  t.rows.forEach(r => Object.keys(r[K] || {}).forEach(e => ends.add(e)));
+  Object.keys(t.total[K] || {}).forEach(e => ends.add(e));
+  return [...ends].sort().slice(-n);
+}
+function renderSegments(host, tk, seg, ir, kpi) {
+  const st = STATE.segK || "Q";
+  const tables = (seg?.tables || []).filter(t => t.rows.length);
+  const kindSeg = seg_wrap(st, v => { STATE.segK = v; host.innerHTML = ""; renderSegments(host, tk, seg, ir, kpi); });
+  const recAll = tables.flatMap(t => Object.values(t.recon).filter(x => !x.partial));
+  const nAll = recAll.length, nOk = recAll.filter(x => x.ok || x.residual != null).length;
+  host.append(el("div", { class: "seg-head" },
+    el("div", {}, el("div", { class: "eyebrow" }, "Segments and breakdowns"), el("div", { class: "muted", style: "font-size:12.5px;max-width:760px" },
+      "Every figure is read from the inline XBRL in the 10-K and 10-Q filings and opens the filed document at the exact number. Quarters missing from the filings are derived from year-to-date figures. Each table is checked against the consolidated total for the same period.")),
+    el("div", { style: "display:flex;gap:10px;align-items:center;margin-left:auto" }, nAll ? el("span", { class: "chip " + (nOk === nAll ? "up" : ""), title: "Periods where the lines add up to the consolidated total, counting an explicit derived line for unallocated items" }, `${nOk} of ${nAll} period totals tie out`) : null, kindSeg)));
+  if (kpi?.groups?.length) renderKpiGroups(host, tk, kpi, st);
+  if (!tables.length) host.append(el("div", { class: "empty" }, el("h3", {}, "No segment breakdown tagged"), el("p", { class: "muted" }, "This company's filings do not tag a segment, product or geographic breakdown with dimensions, or it reports a single segment.")));
+  tables.forEach(t => host.append(segTable(tk, t, st)));
+  renderIrDocs(host, tk, ir);
+}
+function seg_wrap(value, onChange) { return seg([["Q", "Quarterly"], ["A", "Annual"]], value, onChange); }
+function segTable(tk, t, K0) {
+  let K = K0;
+  if (!segPeriods(t, K, 1).length) K = K === "Q" ? (segPeriods(t, "A", 1).length ? "A" : "I") : (segPeriods(t, "Q", 1).length ? "Q" : "I");
+  const periods = segPeriods(t, K, K === "A" ? 5 : 8);
+  const title = `${t.metric} by ${t.category_label.toLowerCase()}${t.view === "summary" ? " (summary view)" : ""}`;
+  const recon = periods.map(e => t.recon[`${K}:${e}`]).filter(Boolean);
+  const okN = recon.filter(r => r.ok).length, resN = recon.filter(r => !r.ok && r.residual != null).length, partN = recon.filter(r => !r.ok && r.partial).length;
+  const badge = !recon.length ? el("span", { class: "chip" }, "No consolidated total tagged")
+    : okN === recon.length ? el("span", { class: "chip up", title: "Reported lines add up to the consolidated total in every period shown" }, "Ties to total")
+    : okN + resN === recon.length ? el("span", { class: "chip up", title: "Reported lines plus a derived line for unallocated items add up to the consolidated total" }, "Ties to total with unallocated line")
+    : el("span", { class: "chip warn", title: "Some periods report only part of the breakdown" }, `${okN + resN} of ${recon.length} periods tie${partN ? `; ${partN} partially reported` : ""}`);
+  const tbl = el("table", { class: "segt" });
+  tbl.append(el("thead", {}, el("tr", {}, el("th", { class: "nm" }, t.category_label), ...periods.map(e => el("th", { class: "r" }, plabel(tk, e, K === "A" ? "A" : "Q"), el("div", { class: "faint mono", style: "font-size:10.5px" }, e))))));
+  const tb = el("tbody");
+  const cellTd = (r, c, series) => {
+    if (!c) return el("td", { class: "c r faint" }, "–");
+    const cell = segCell(tk, t, r, K, c, series);
+    const td = el("td", { class: "c r num" + (c.residual ? " resid" : ""), tabindex: 0, title: c.residual ? "Derived: total minus reported lines" : c.derived ? "Derived quarter: year-to-date figure minus the prior year-to-date figure" : `${c.form} filed ${fdate(c.filed)}` }, fmtM(c.v, "USD"));
+    if (c.derived) td.append(el("span", { class: "dq", "aria-hidden": "true" }));
+    td.onclick = () => { document.querySelectorAll("td.c.sel").forEach(x => x.classList.remove("sel")); td.classList.add("sel"); openSource(cell, "filing"); };
+    td.onkeydown = e => { if (e.key === "Enter") td.click(); };
+    return td;
+  };
+  t.rows.filter(r => periods.some(e => r[K]?.[e])).forEach(r => {
+    const tr = el("tr", { class: (r.depth ? "sub " : "") + (r.recon ? "recon " : "") + (r.memo ? "memo " : "") + (r.residual ? "resid " : "") },
+      el("td", { class: "nm", style: `padding-left:${12 + r.depth * 18}px` }, r.label, r.memo ? el("span", { class: "faint", style: "font-size:11px;margin-left:6px" }, "of which, included above") : null));
+    periods.forEach(e => tr.append(cellTd(r, r[K]?.[e], r[K] || {})));
+    tb.append(tr);
+  });
+  const tr = el("tr", { class: "total" }, el("td", { class: "nm" }, t.total.label));
+  periods.forEach(e => {
+    const c = t.total[K]?.[e], rc = t.recon[`${K}:${e}`];
+    const td = cellTd({ label: t.total.label, key: "__total__" }, c, t.total[K] || {});
+    if (rc) td.append(el("span", { class: "tie " + (rc.ok || rc.residual != null ? "ok" : rc.partial ? "part" : "bad"), title: rc.ok ? "Reported lines sum to this total" : rc.residual != null ? `Reported lines sum to ${fmtM(rc.sum, "USD")}; the derived line carries the ${fmtM(rc.diff, "USD")} difference` : rc.partial ? "Not every line is reported for this period" : `Reported lines sum to ${fmtM(rc.sum, "USD")}` }, rc.ok ? "✓" : rc.residual != null ? "=" : rc.partial ? "·" : "Δ"));
+    tr.append(td);
+  });
+  tb.append(tr);
+  // children tie-out
+  tbl.append(tb);
+  const chart = el("div", { class: "bd", style: "padding-top:0" });
+  const p = panel(title, badge, el("div", { class: "scroll" }, tbl), chart, el("div", { class: "src" }, `${t.conceptFull || t.concept} on ${t.axis}. Click any number to open the filing at that value.`));
+  requestAnimationFrame(() => segChart(chart, tk, t, K, periods));
+  return p;
+}
+function segChart(host, tk, t, K, periods) {
+  const tops = t.rows.filter(r => !r.parent && !r.recon && !r.memo && !r.residual);
+  if (tops.length < 2 || periods.length < 2) return;
+  const data = periods.map(e => ({ k: plabel(tk, e, K === "A" ? "A" : "Q"), vals: tops.map((r, i) => ({ v: r[K]?.[e]?.v ?? 0, name: r.label, color: SEG_COLORS[i % SEG_COLORS.length] })) }));
+  if (data.some(d => d.vals.some(v => v.v < 0))) return;
+  stackChart(host, data, { height: 170 });
+}
+const SEG_COLORS = ["#2F6FEB", "#12A37B", "#E8A33D", "#8E5BD9", "#E2577A", "#2BB0C4", "#7C8B9C", "#B5872F", "#5A6CDB", "#3E9E5A"];
+function stackChart(host, data, o = {}) {
+  const W = host.clientWidth || 700, H = o.height || 180, m = { t: 8, r: 8, b: 22, l: 52 };
+  const keys = data[0].vals.map(v => v.name);
+  const x = d3.scaleBand().domain(data.map(d => d.k)).range([m.l, W - m.r]).padding(0.28);
+  const tot = d => d.vals.reduce((a, v) => a + v.v, 0);
+  const y = d3.scaleLinear().domain([0, d3.max(data, tot) || 1]).nice().range([H - m.b, m.t]);
+  const svg = d3.select(host).append("svg").attr("width", W).attr("height", H);
+  svg.append("g").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickFormat(v => fmtMoney(v)).tickSize(-(W - m.l - m.r))).call(g => { g.select(".domain").remove(); g.selectAll("line").attr("stroke", css("--line")); g.selectAll("text").attr("fill", css("--muted")).attr("font-size", 10.5); });
+  svg.append("g").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).tickSize(0)).call(g => { g.select(".domain").remove(); g.selectAll("text").attr("fill", css("--muted")).attr("font-size", 10.5); });
+  data.forEach(d => { let acc = 0; d.vals.forEach(v => { const y0 = acc; acc += v.v; svg.append("rect").attr("x", x(d.k)).attr("width", x.bandwidth()).attr("y", y(acc)).attr("height", Math.max(0, y(y0) - y(acc))).attr("fill", v.color).attr("rx", 1.5).on("mousemove", ev => showTip(ev, `<b>${esc(v.name)}</b><br>${esc(d.k)} · ${fmtMoney(v.v)} (${fpct(v.v / (tot(d) || 1))})`)).on("mouseleave", hideTip); }); });
+  const lg = el("div", { class: "legend" }, ...keys.map((k, i) => el("span", {}, el("i", { style: `background:${SEG_COLORS[i % SEG_COLORS.length]}` }), k)));
+  host.append(lg);
+}
+
+/* ---------- KPIs extracted from IR documents ---------- */
+function renderKpiGroups(host, tk, kpi, K0) {
+  (kpi.groups || []).forEach(g => {
+    let K = K0;
+    const ends = new Set();
+    g.items.forEach(it => Object.keys(it.values?.[K] || {}).forEach(e => ends.add(e)));
+    if (!ends.size) { K = K === "Q" ? "A" : "Q"; g.items.forEach(it => Object.keys(it.values?.[K] || {}).forEach(e => ends.add(e))); }
+    const periods = [...ends].sort().slice(-(K === "A" ? 5 : 8));
+    if (!periods.length) return;
+    const tbl = el("table", { class: "segt" });
+    tbl.append(el("thead", {}, el("tr", {}, el("th", { class: "nm" }, g.subcategory ? `${g.category} › ${g.subcategory}` : g.category), ...periods.map(e => el("th", { class: "r" }, kpiPeriodLabel(tk, e, K), el("div", { class: "faint mono", style: "font-size:10.5px" }, e))))));
+    const tb = el("tbody");
+    g.items.forEach(it => {
+      const tr = el("tr", { class: (it.depth ? "sub " : "") + (it.is_total ? "total " : "") }, el("td", { class: "nm", style: `padding-left:${12 + (it.depth || 0) * 18}px` }, it.name, it.unit && !/^usd$/i.test(it.unit) ? el("span", { class: "faint", style: "font-size:11px;margin-left:6px" }, it.unit) : null));
+      periods.forEach(e => {
+        const v = it.values?.[K]?.[e];
+        if (!v) { tr.append(el("td", { class: "c r faint" }, "–")); return; }
+        const td = el("td", { class: "c r num", tabindex: 0, title: v.derived ? "Derived: " + v.derived.formula : `${v.doc_title || ""}${v.page ? " · page " + v.page : ""}${v.sheet ? " · " + v.sheet + "!" + (v.cell || "") : ""}` }, fmtKpi(v.v, it.unit));
+        if (v.derived) td.append(el("span", { class: "dq" }));
+        if (v.tie === false) td.append(el("span", { class: "tie bad", title: "Components do not sum to this value" }, "Δ"));
+        if (v.tie === true) td.append(el("span", { class: "tie ok", title: "Components sum to this value" }, "✓"));
+        td.onclick = () => { document.querySelectorAll("td.c.sel").forEach(x => x.classList.remove("sel")); td.classList.add("sel"); openKpiSource(tk, it, K, e, v); };
+        tr.append(td);
+      });
+      tb.append(tr);
+    });
+    tbl.append(tb);
+    host.append(panel(g.subcategory ? `${g.category} · ${g.subcategory}` : g.category, el("span", { class: "chip acc" }, "From investor materials"), el("div", { class: "scroll" }, tbl),
+      el("div", { class: "src" }, g.note || "Values are read from the company's investor relations documents. Click any number to open the document at that value.")));
+  });
+}
+function kpiPeriodLabel(tk, e, K) { try { return plabel(tk, e, K === "A" ? "A" : "Q"); } catch { return e; } }
+function fmtKpi(v, unit) {
+  if (v == null) return "–";
+  const u = (unit || "").toLowerCase();
+  if (u === "%" || u === "pct" || u === "percent") return (Math.abs(v) <= 1.5 && u !== "%" ? v * 100 : v).toFixed(1) + "%";
+  if (u === "usd" || u === "$") return fmtM(v, "USD");
+  if (u === "usd_per_unit" || u === "$/unit") return "$" + fnum(v, 2);
+  if (Math.abs(v) >= 1e9) return fnum(v / 1e9, 2) + "B";
+  if (Math.abs(v) >= 1e6) return fnum(v / 1e6, 1) + "M";
+  if (Math.abs(v) >= 1e4) return fnum(v, 0);
+  return fnum(v, Math.abs(v) < 10 ? 2 : 1);
+}
+function openKpiSource(tk, it, K, e, v) {
+  const doc = (SEG[tk]?.ir?.documents || []).find(d => d.id === v.doc) || { id: v.doc, title: v.doc_title, storage_path: v.path, ext: v.ext, url: v.url };
+  openDoc(tk, doc, { page: v.page, quote: v.quote, value: v.v, sheet: v.sheet, cell: v.cell, label: `${it.name} · ${kpiPeriodLabel(tk, e, K)}`, display: fmtKpi(v.v, it.unit), derived: v.derived });
+}
+
+/* ---------- IR document library ---------- */
+const DOC_TYPES = { release: "Earnings release", presentation: "Presentation", supplement: "Supplement / data", remarks: "Prepared remarks / letter", transcript: "Transcript", annual_report: "Annual report", other: "Other" };
+function renderIrDocs(host, tk, ir) {
+  const docs = ir?.documents || [];
+  const wrap = el("div", { class: "bd", style: "padding-top:4px" });
+  if (!docs.length) wrap.append(el("div", { class: "muted" }, "Investor relations documents for this company are being collected."));
+  let type = "";
+  const draw = () => {
+    wrap.innerHTML = "";
+    const list = docs.filter(d => !type || d.doc_type === type).sort((a, b) => String(b.fiscal_label || "").localeCompare(String(a.fiscal_label || "")) || String(b.fetched_at).localeCompare(String(a.fetched_at)));
+    const t = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Period"), el("th", {}, "Type"), el("th", {}, "Document"), el("th", { class: "r" }, "Size"), el("th", {}, ""))));
+    const tb = el("tbody");
+    list.slice(0, 200).forEach(d => tb.append(el("tr", { class: "click", onclick: () => openDoc(tk, d, {}) },
+      el("td", { class: "mono", style: "white-space:nowrap" }, d.fiscal_label || "–"),
+      el("td", {}, el("span", { class: "chip" }, DOC_TYPES[d.doc_type] || d.doc_type || "–")),
+      el("td", { style: "max-width:520px" }, el("div", { style: "overflow:hidden;text-overflow:ellipsis;white-space:nowrap" }, docTitle(d)), el("div", { class: "faint", style: "font-size:11px" }, (d.ext || "").replace(".", "").toUpperCase() + (/sec\.gov/.test(d.url) ? " · SEC exhibit" : " · IR website"))),
+      el("td", { class: "r num faint" }, d.bytes ? (d.bytes > 1e6 ? (d.bytes / 1e6).toFixed(1) + " MB" : Math.round(d.bytes / 1e3) + " KB") : ""),
+      el("td", {}, el("a", { href: IRPUB + d.storage_path, target: "_blank", rel: "noopener", onclick: e => e.stopPropagation(), title: "Download the stored file" }, "File ↓")))));
+    t.append(tb); wrap.append(el("div", { class: "scroll", style: "max-height:520px;overflow:auto" }, t));
+  };
+  const types = [...new Set(docs.map(d => d.doc_type))];
+  const filt = el("select", { class: "btn", onchange: e => { type = e.target.value; draw(); } }, el("option", { value: "" }, `All types (${docs.length})`), ...types.map(x => el("option", { value: x }, `${DOC_TYPES[x] || x} (${docs.filter(d => d.doc_type === x).length})`)));
+  draw();
+  host.append(panel("Investor relations documents", filt, wrap, el("div", { class: "src" }, `Collected from ${ir?.site ? new URL(ir.site).host : "the company's IR site"} and from 8-K exhibits on EDGAR. Every file is stored by Filed Under; open one to read it here.`)));
+}
+function docTitle(d) { return String(d.title || "").split("||")[0].replace(/\(opens in (a )?new (window|tab)\)/gi, "").replace(/\s+/g, " ").trim() || d.storage_path?.split("/").pop() || "Document"; }
+
+/* ---------- document viewer (PDF, workbook, HTML, text) ---------- */
+let PDFJS = null;
+function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => rej(new Error("Could not load " + src)); document.head.append(s); }); }
+async function pdfjs() {
+  if (PDFJS) return PDFJS;
+  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  PDFJS = window.pdfjsLib;
+  return PDFJS;
+}
+function numTokens(hl) {
+  const out = new Set();
+  if (hl.quote) { const m = String(hl.quote).match(/[-(]?\$?\d[\d,]*(\.\d+)?%?\)?/g); (m || []).forEach(x => out.add(x.replace(/[$()]/g, ""))); }
+  if (hl.value != null && isFinite(hl.value)) {
+    const a = Math.abs(hl.value);
+    [a, a / 1e3, a / 1e6, a / 1e9, a * 100].forEach(n => { if (n >= 0.01) { [0, 1, 2].forEach(d => { const s = n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); if (Math.abs(parseFloat(s.replace(/,/g, "")) - n) < Math.max(0.0051, n * 1e-6)) out.add(s); }); } });
+  }
+  return [...out].filter(s => s.replace(/[^0-9]/g, "").length >= 2);
+}
+function openDoc(tk, d, hl) {
+  hideTip();
+  DR.cell = { doc: d.id };
+  const dh = $("#dh"), db = $("#db");
+  dh.innerHTML = ""; db.innerHTML = "";
+  const fileUrl = d.storage_path ? IRPUB + d.storage_path : d.url;
+  dh.append(
+    el("div", { class: "row" }, el("span", { class: "eyebrow" }, hl.label ? "Reported in investor materials" : "Investor relations document"),
+      el("div", { class: "x", style: "display:flex;gap:6px" },
+        fileUrl ? el("a", { class: "btn", href: fileUrl, target: "_blank", rel: "noopener" }, "Stored file", svgUse("i-dl")) : null,
+        d.url ? el("a", { class: "btn", href: d.url, target: "_blank", rel: "noopener" }, "Original", svgUse("i-ext")) : null,
+        el("button", { class: "iconbtn", onclick: closeSource, "aria-label": "Close (Esc)" }, svgUse("i-x")))),
+    el("div", { class: "row" }, el("h2", {}, hl.label || docTitle(d))),
+    el("div", { class: "row" }, hl.display ? el("span", { class: "chip acc mono", style: "font-size:13.5px;height:26px" }, hl.display) : null,
+      el("span", { class: "muted", style: "font-size:12.5px" }, [DOC_TYPES[d.doc_type] || "", d.fiscal_label || "", hl.page ? "page " + hl.page : "", hl.sheet ? `${hl.sheet}${hl.cell ? "!" + hl.cell : ""}` : ""].filter(Boolean).join(" · "))));
+  if (hl.derived) db.append(el("div", { class: "note" }, "Derived value: " + hl.derived.formula + ". The document below shows the reported input."));
+  const status = el("span", { class: "faint", style: "font-size:12px" }, "Loading…");
+  const bar = el("div", { class: "viewer-bar" }, el("span", { class: "badge-src" }, "Original document"), el("span", { class: "eyebrow" }, docTitle(d).slice(0, 80)), el("span", { style: "flex:1" }), status);
+  const view = el("div", { class: "viewer docv" });
+  db.append(bar, view);
+  drawer.classList.add("open"); drawer.setAttribute("aria-hidden", "false");
+  if (innerWidth < 860) scrim.hidden = false;
+  const ext = (d.ext || "").toLowerCase();
+  const fail = e => { status.textContent = ""; view.innerHTML = ""; view.append(el("div", { class: "viewer-load" }, el("div", {}, "This document could not be displayed here."), el("div", { class: "faint", style: "font-size:12px" }, String(e.message || e)), fileUrl ? el("a", { class: "btn", href: fileUrl, target: "_blank", rel: "noopener" }, "Open the stored file") : null)); };
+  if (ext === ".pdf") pdfView(view, fileUrl, hl, status).catch(fail);
+  else if ([".xlsx", ".xlsm", ".xls", ".csv"].includes(ext)) sheetView(view, d, hl, status).catch(fail);
+  else if ([".htm", ".html"].includes(ext)) htmlView(view, fileUrl, d, hl, status).catch(fail);
+  else textView(view, d, hl, status).catch(fail);
+}
+async function pdfView(view, url, hl, status) {
+  const lib = await pdfjs();
+  const pdf = await lib.getDocument({ url, isEvalSupported: false }).promise;
+  const n = pdf.numPages, target = Math.min(Math.max(1, hl.page || 1), n);
+  status.textContent = `${n} page${n === 1 ? "" : "s"}`;
+  const scroller = el("div", { class: "pdf-scroll" });
+  view.innerHTML = ""; view.append(scroller);
+  const width = Math.max(320, scroller.clientWidth - 24);
+  const tokens = numTokens(hl);
+  const slots = [];
+  for (let i = 1; i <= n; i++) { const s = el("div", { class: "pdf-page", "data-p": i }, el("div", { class: "pdf-num" }, `Page ${i}`)); slots.push(s); scroller.append(s); }
+  const rendered = new Set();
+  const render = async i => {
+    if (rendered.has(i)) return; rendered.add(i);
+    const page = await pdf.getPage(i);
+    const vp0 = page.getViewport({ scale: 1 });
+    const scale = width / vp0.width, vp = page.getViewport({ scale });
+    const ratio = window.devicePixelRatio || 1;
+    const canvas = el("canvas", { width: Math.floor(vp.width * ratio), height: Math.floor(vp.height * ratio), style: `width:${vp.width}px;height:${vp.height}px` });
+    const box = el("div", { class: "pdf-box", style: `width:${vp.width}px;height:${vp.height}px` }, canvas);
+    slots[i - 1].append(box);
+    await page.render({ canvasContext: canvas.getContext("2d"), viewport: vp, transform: ratio !== 1 ? [ratio, 0, 0, ratio, 0, 0] : null }).promise;
+    if (tokens.length && (i === target || !hl.page)) {
+      const tc = await page.getTextContent();
+      let first = null;
+      tc.items.forEach(it => {
+        const s = (it.str || "").replace(/[$()]/g, "").trim();
+        if (!s || !tokens.some(t => s === t || s.includes(t) && /[^0-9.,]/.test(s.replace(t, "")) === false || s.split(/\s+/).includes(t))) return;
+        const [x1, y1, x2, y2] = lib.Util.normalizeRect(vp.convertToViewportRectangle([it.transform[4], it.transform[5], it.transform[4] + it.width, it.transform[5] + it.height]));
+        const mark = el("div", { class: "pdf-hit", style: `left:${x1 - 2}px;top:${y1 - 2}px;width:${x2 - x1 + 4}px;height:${y2 - y1 + 4}px` });
+        box.append(mark);
+        if (!first) first = mark;
+      });
+      if (first && i === target) { requestAnimationFrame(() => { scroller.scrollTop = slots[i - 1].offsetTop + first.offsetTop - scroller.clientHeight / 2; }); status.textContent = `Page ${i} of ${n}`; }
+    }
+  };
+  await render(target);
+  requestAnimationFrame(() => { scroller.scrollTop = slots[target - 1].offsetTop - 8; });
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) render(+e.target.dataset.p); }), { root: scroller, rootMargin: "800px 0px" });
+  slots.forEach(s => io.observe(s));
+}
+async function docText(d) {
+  if (!d.text_path) throw new Error("No extracted text for this document");
+  const r = await fetch(IRPUB + d.text_path);
+  if (!r.ok) throw new Error(`Text not available (${r.status})`);
+  return r.json();
+}
+function colName(i) { let s = ""; i++; while (i) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; }
+function parseCell(ref) { const m = /^([A-Z]+)(\d+)$/i.exec(ref || ""); if (!m) return null; let c = 0; for (const ch of m[1].toUpperCase()) c = c * 26 + (ch.charCodeAt(0) - 64); return { r: +m[2] - 1, c: c - 1 }; }
+async function sheetView(view, d, hl, status) {
+  const tx = await docText(d);
+  const names = Object.keys(tx.sheets || {});
+  if (!names.length) throw new Error("Empty workbook");
+  let cur = hl.sheet && names.includes(hl.sheet) ? hl.sheet : names[0];
+  const tabs = el("div", { class: "sheet-tabs" });
+  const grid = el("div", { class: "sheet-grid" });
+  view.innerHTML = ""; view.append(tabs, grid);
+  const tokens = numTokens(hl);
+  const draw = () => {
+    tabs.innerHTML = ""; names.forEach(nm => tabs.append(el("button", { class: nm === cur ? "on" : "", onclick: () => { cur = nm; draw(); } }, nm)));
+    const rows = tx.sheets[cur] || [];
+    const ncol = Math.min(60, Math.max(1, ...rows.map(r => r.length)));
+    const t = el("table");
+    t.append(el("thead", {}, el("tr", {}, el("th", {}, ""), ...Array.from({ length: ncol }, (_, i) => el("th", {}, colName(i))))));
+    const tb = el("tbody");
+    const want = cur === hl.sheet ? parseCell(hl.cell) : null;
+    let hit = null;
+    rows.forEach((r, ri) => {
+      const tr = el("tr", {}, el("th", {}, String(ri + 1)));
+      for (let ci = 0; ci < ncol; ci++) {
+        const v = r[ci];
+        const txt = v === "" || v == null ? "" : typeof v === "number" ? (Math.abs(v) < 1 && v !== 0 ? String(+v.toFixed(6)) : v.toLocaleString("en-US", { maximumFractionDigits: 4 })) : String(v);
+        const td = el("td", { class: typeof v === "number" ? "n" : "" }, txt);
+        const isHit = want ? (want.r === ri && want.c === ci) : (!hit && typeof v === "number" && hl.value != null && Math.abs(Math.abs(v) - Math.abs(hl.value)) <= Math.max(0.5, Math.abs(hl.value) * 1e-4)) || (!want && !hit && tokens.includes(txt));
+        if (isHit) { td.classList.add("hit"); tr.classList.add("hl"); hit = hit || td; }
+        tr.append(td);
+      }
+      tb.append(tr);
+    });
+    t.append(tb); grid.innerHTML = ""; grid.append(t);
+    status.textContent = `${names.length} sheet${names.length === 1 ? "" : "s"}${hit ? " · value highlighted" : ""}`;
+    if (hit) requestAnimationFrame(() => { grid.scrollTop = hit.offsetTop - grid.clientHeight / 2; grid.scrollLeft = Math.max(0, hit.offsetLeft - grid.clientWidth / 2); });
+  };
+  draw();
+}
+async function htmlView(view, url, d, hl, status) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`Could not load (${r.status})`);
+  let html = await r.text();
+  const base = d.source_page && /sec\.gov/.test(d.url) ? d.url.replace(/[^/]+$/, "") : d.url;
+  html = html.replace(/<script\b[\s\S]*?<\/script>/gi, "");
+  html = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, m => m + `<base href="${esc(base)}" target="_blank">`) : `<base href="${esc(base)}" target="_blank">` + html;
+  const iframe = el("iframe", { sandbox: "allow-same-origin allow-popups allow-popups-to-escape-sandbox", referrerpolicy: "no-referrer", title: docTitle(d) });
+  iframe.srcdoc = html + VIEWER_CSS;
+  view.innerHTML = ""; view.append(iframe);
+  iframe.addEventListener("load", () => {
+    const doc = iframe.contentDocument; if (!doc) return;
+    let hits = [];
+    if (hl.quote) hits = textFindQuote(doc, hl.quote);
+    if (!hits.length && hl.value != null) hits = textFind(doc, hl.value);
+    if (hits.length) { hits[0].classList.add("fu-hit"); hits[0].closest("tr")?.classList.add("fu-row"); const outer = $("#db"), keep = outer.scrollTop; hits[0].scrollIntoView({ block: "center" }); outer.scrollTop = keep; status.textContent = hits.length > 1 ? `${hits.length} matches` : "Value highlighted"; }
+    else status.textContent = hl.label ? "Value not found on this page" : "";
+  }, { once: true });
+}
+function textFindQuote(doc, quote) {
+  const q = String(quote).replace(/\s+/g, " ").trim();
+  const nums = (q.match(/\d[\d,]*(\.\d+)?/g) || []).sort((a, b) => b.length - a.length);
+  if (!nums.length) return [];
+  const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT), out = [];
+  while (walker.nextNode() && out.length < 20) {
+    const node = walker.currentNode, i = node.nodeValue.indexOf(nums[0]);
+    if (i < 0) continue;
+    const ctx = (node.parentElement?.closest("tr,p,div")?.textContent || "").replace(/\s+/g, " ");
+    const words = q.replace(/[\d,.$%()]/g, " ").split(/\s+/).filter(w => w.length > 3);
+    if (words.length && !words.some(w => ctx.toLowerCase().includes(w.toLowerCase()))) continue;
+    const mid = node.splitText(i); mid.splitText(nums[0].length);
+    const span = doc.createElement("span"); mid.parentNode.replaceChild(span, mid); span.append(mid); out.push(span);
+  }
+  return out;
+}
+async function textView(view, d, hl, status) {
+  const tx = await docText(d);
+  const pages = tx.pages || [];
+  const pre = el("div", { class: "textdoc" });
+  view.innerHTML = ""; view.append(pre);
+  const tokens = numTokens(hl);
+  let hit = null;
+  pages.forEach((p, i) => {
+    const sec = el("section", {}, pages.length > 1 ? el("div", { class: "pdf-num" }, `Page ${i + 1}`) : null);
+    let html = esc(p);
+    if (tokens.length && (!hl.page || hl.page === i + 1)) {
+      const rx = new RegExp(`(^|[^0-9.,])(${tokens.map(t => t.replace(/[.,]/g, m => "\\" + m)).join("|")})(?![0-9]|,[0-9]|\\.[0-9])`);
+      html = html.replace(rx, (m, a, b) => `${a}<mark class="fu-hit">${b}</mark>`);
+    }
+    sec.innerHTML += `<pre>${html}</pre>`;
+    pre.append(sec);
+  });
+  hit = pre.querySelector("mark.fu-hit");
+  status.textContent = d.ext === ".md" ? "Text copy (the host does not allow file downloads)" : "";
+  if (hit) requestAnimationFrame(() => { pre.scrollTop = hit.offsetTop - pre.clientHeight / 2; });
 }
 
 async function pFeed() {

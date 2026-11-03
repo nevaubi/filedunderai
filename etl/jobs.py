@@ -425,7 +425,7 @@ def insiders_job(sb, tickers=None, days=365, per_company=120, workers=4, time_bu
     t0 = time.time()
     with Run(sb, "insiders") as run:
         cut = (dt.date.today() - dt.timedelta(days=days)).isoformat()
-        q = f"select=ticker,accession,primary_doc,filed&form=eq.4&filed=gte.{cut}&order=filed.desc"
+        q = f"select=ticker,accession,primary_doc,filed&form=eq.4&filed=gte.{cut}&order=filed.desc,accession.desc"
         if tickers:
             q += "&ticker=in.(" + ",".join(tickers) + ")"
         filings = sb.select("filings", q)
@@ -434,6 +434,7 @@ def insiders_job(sb, tickers=None, days=365, per_company=120, workers=4, time_bu
         for f in filings:
             if f["accession"] in known or not f.get("primary_doc"):
                 continue
+            known.add(f["accession"])
             if per.get(f["ticker"], 0) >= per_company:
                 continue
             per[f["ticker"]] = per.get(f["ticker"], 0) + 1
@@ -462,10 +463,10 @@ def insiders_job(sb, tickers=None, days=365, per_company=120, workers=4, time_bu
                     failed += 1
                     print("form4", f["ticker"], f["accession"], str(e)[:160])
                 if len(buf) >= 400:
-                    sb.upsert("insider_transactions", buf, "accession,seq")
+                    sb.upsert("insider_transactions", list({(r["accession"], r["seq"]): r for r in buf}.values()), "accession,seq")
                     buf = []
         if buf:
-            sb.upsert("insider_transactions", buf, "accession,seq")
+            sb.upsert("insider_transactions", list({(r["accession"], r["seq"]): r for r in buf}.values()), "accession,seq")
         index = _cache(sb, "meta/insiders.json", {"companies": {}})
         for tk in sorted(touched):
             rows = sb.select("insider_transactions", f"select=*&ticker=eq.{tk}&filed=gte.{cut}&order=tx_date.desc")
@@ -630,5 +631,34 @@ def segments_job(sb, tickers=None, workers=5, time_budget=None):
         idx["companies"].update(done)
         idx["generated"] = now_iso()
         sb.put_json("meta/segments.json", idx, cache="max-age=600")
+        run.stats.update({"done": len(done), "failed": failed})
+        return done, failed
+
+
+# ---------------------------------------------------------------- investor relations documents
+def ir_job(sb, tickers=None, workers=4, time_budget=None, refresh_site=False):
+    from . import ir
+    t0 = time.time()
+    with Run(sb, "ir") as run:
+        tickers = tickers or [t for t, *_ in UNIVERSE]
+        done, failed = {}, {}
+
+        def one(tk):
+            if time_budget and time.time() - t0 > time_budget:
+                return tk, None, "skipped: time budget"
+            try:
+                fye = ((_cache(sb, f"companies/{tk}.json", {}) or {}).get("profile") or {}).get("fiscalYearEnd") or "1231"
+                return tk, ir.process_company(sb, tk, BY_TICKER[tk]["name"], BY_TICKER[tk]["cik"], refresh_site=refresh_site, fye=fye), None
+            except Exception as e:
+                return tk, None, str(e)[:300]
+
+        with ThreadPoolExecutor(workers) as ex:
+            for tk, res, err in ex.map(one, tickers):
+                if res:
+                    done[tk] = res
+                    print("ok", tk, res, flush=True)
+                else:
+                    failed[tk] = err
+                    print("fail", tk, err, flush=True)
         run.stats.update({"done": len(done), "failed": failed})
         return done, failed
