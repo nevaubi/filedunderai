@@ -349,7 +349,7 @@ def first_page_period(text):
     return label, year
 
 
-def process_company(sb, ticker, name, cik, since_year=None, max_docs=90, refresh_site=False, sec_years=3, log=print, fye="1231"):
+def process_company(sb, ticker, name, cik, since_year=None, max_docs=90, refresh_site=False, sec_years=3, log=print, fye="1231", web=True):
     """Collects a company's results documents from two places and stores every file in the `ir` bucket:
     8-K exhibits on EDGAR (earnings releases, supplements, slides; full history for sec_years) and the company's IR
     website (presentations, supplementary workbooks, prepared remarks and transcripts that are not filed)."""
@@ -373,7 +373,7 @@ def process_company(sb, ticker, name, cik, since_year=None, max_docs=90, refresh
         site = {"ticker": ticker, "ir_url": cands[0] if cands else None, "discovered_at": now_iso(), "notes": json.dumps({"candidates": cands[:5]})}
         sb.upsert("ir_sites", [site], "ticker")
     pages = []
-    if site.get("ir_url"):
+    if site.get("ir_url") and web:
         docs, pages = discover_documents(site["ir_url"], log=log)
         if pages:
             sb.upsert("ir_sites", [{"ticker": ticker, "ir_url": site["ir_url"], "results_url": pages[0]}], "ticker")
@@ -489,15 +489,19 @@ def sec_exhibits(sb, ticker, cik, filings, have_ids, have_hashes, log=print, fye
     for f in filings:
         folder = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{f['a'].replace('-', '')}/"
         try:
-            idx = json.loads(sec_get(folder + "index.json", timeout=40))
+            page = sec_get(folder + f"{f['a']}-index.htm", timeout=40)
         except Exception as e:
             log(f"  {ticker} 8-K index {f['a']} failed: {str(e)[:100]}")
             continue
-        for it in idx.get("directory", {}).get("item", []):
-            name = it["name"]
+        # the filing index lists each document with its exhibit type; take every EX-99 exhibit
+        names = []
+        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S | re.I):
+            cells = [re.sub(r"<[^>]+>", "", c).replace("&nbsp;", " ").strip() for c in re.findall(r"<td[^>]*>(.*?)</td>", row, re.S | re.I)]
+            href = re.findall(r'href="([^"]+)"', row)
+            if len(cells) >= 4 and cells[3].upper().startswith("EX-99") and href:
+                names.append(href[0].rsplit("/", 1)[-1])
+        for name in names:
             low = name.lower()
-            if not (EX99.search(low) or (low.endswith((".pdf", ".xlsx", ".xls")) and "ex" in low)):
-                continue
             if not low.endswith((".htm", ".html", ".pdf", ".xlsx", ".xls", ".pptx")):
                 continue
             url = folder + name

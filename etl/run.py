@@ -18,6 +18,7 @@ def main():
     ap.add_argument("--part", type=int)
     ap.add_argument("--parts", type=int, default=1)
     ap.add_argument("--changed", action="store_true", help="only companies with new 10-K/10-Q/8-K filings")
+    ap.add_argument("--sec-only", action="store_true", help="IR job: EDGAR exhibits only, skip the IR website")
     a = ap.parse_args()
     sb = Supabase()
     if a.job in ("prices", "all"):
@@ -32,7 +33,7 @@ def main():
     if a.job in ("insiders", "all"):
         print("insiders", jobs.insiders_job(sb, a.tickers, workers=a.workers))
     if a.job == "ir":
-        done, failed = jobs.ir_job(sb, a.tickers, workers=a.workers)
+        done, failed = jobs.ir_job(sb, a.tickers, workers=a.workers, web=not a.sec_only)
         print("ir", len(done), "failed", failed)
     if a.job == "segments":
         done, failed = jobs.segments_job(sb, a.tickers, workers=a.workers)
