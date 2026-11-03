@@ -1557,6 +1557,12 @@ function coSegments(body, tk) {
   body.append(host);
   ensureSegments(tk).then(({ seg, ir, kpi }) => { host.innerHTML = ""; renderSegments(host, tk, seg, ir, kpi); }).catch(e => { host.innerHTML = ""; host.append(el("div", { class: "empty" }, "Segment data is not available yet for this company.")); });
 }
+function segRangeN(K) {
+  const r = STATE.segRange || "all";
+  if (r === "all") return 1e9;
+  return K === "A" ? { short: 5, mid: 10 }[r] : { short: 8, mid: 20 }[r];
+}
+function anchorRight(node) { requestAnimationFrame(() => node.querySelectorAll(".scroll").forEach(s => { s.scrollLeft = s.scrollWidth; })); }
 function segPeriods(t, K, n) {
   const ends = new Set();
   t.rows.forEach(r => Object.keys(r[K] || {}).forEach(e => ends.add(e)));
@@ -1567,22 +1573,25 @@ function renderSegments(host, tk, seg, ir, kpi) {
   const st = STATE.segK || "Q";
   const tables = (seg?.tables || []).filter(t => t.rows.length);
   const kindSeg = seg_wrap(st, v => { STATE.segK = v; host.innerHTML = ""; renderSegments(host, tk, seg, ir, kpi); });
+  const rangeSeg = seg(st === "A" ? [["short", "5Y"], ["mid", "10Y"], ["all", "All"]] : [["short", "8Q"], ["mid", "20Q"], ["all", "All"]], STATE.segRange || "all",
+    v => { STATE.segRange = v; host.innerHTML = ""; renderSegments(host, tk, seg, ir, kpi); });
   const recAll = tables.flatMap(t => Object.values(t.recon).filter(x => !x.partial));
   const nAll = recAll.length, nOk = recAll.filter(x => x.ok || x.residual != null).length;
   host.append(el("div", { class: "seg-head" },
     el("div", {}, el("div", { class: "eyebrow" }, "Segments and breakdowns"), el("div", { class: "muted", style: "font-size:12.5px;max-width:760px" },
       "Operating KPIs come from the company's investor materials (supplements, slides, letters, releases); breakdowns come from the inline XBRL in its 10-K and 10-Q filings. Every number opens the stored source document at that value. Missing quarters are derived from year-to-date figures, and every breakdown is checked against its total.")),
-    el("div", { style: "display:flex;gap:10px;align-items:center;margin-left:auto" }, nAll ? el("span", { class: "chip " + (nOk === nAll ? "up" : ""), title: "Periods where the lines add up to the consolidated total, counting an explicit derived line for unallocated items" }, `${nOk} of ${nAll} period totals tie out`) : null, kindSeg)));
+    el("div", { style: "display:flex;gap:10px;align-items:center;margin-left:auto" }, nAll ? el("span", { class: "chip " + (nOk === nAll ? "up" : ""), title: "Periods where the lines add up to the consolidated total, counting an explicit derived line for unallocated items" }, `${nOk} of ${nAll} period totals tie out`) : null, rangeSeg, kindSeg)));
   if (kpi?.groups?.length) renderKpiGroups(host, tk, kpi, st);
   if (!tables.length) host.append(el("div", { class: "empty" }, el("h3", {}, "No segment breakdown tagged"), el("p", { class: "muted" }, "This company's filings do not tag a segment, product or geographic breakdown with dimensions, or it reports a single segment.")));
   tables.forEach(t => host.append(segTable(tk, t, st)));
   renderIrDocs(host, tk, ir);
+  anchorRight(host);
 }
 function seg_wrap(value, onChange) { return seg([["Q", "Quarterly"], ["A", "Annual"]], value, onChange); }
 function segTable(tk, t, K0) {
   let K = K0;
   if (!segPeriods(t, K, 1).length) K = K === "Q" ? (segPeriods(t, "A", 1).length ? "A" : "I") : (segPeriods(t, "Q", 1).length ? "Q" : "I");
-  const periods = segPeriods(t, K, K === "A" ? 5 : 8);
+  const periods = segPeriods(t, K, segRangeN(K));
   const title = `${t.metric} by ${t.category_label.toLowerCase()}${t.view === "summary" ? " (summary view)" : ""}`;
   const recon = periods.map(e => t.recon[`${K}:${e}`]).filter(Boolean);
   const okN = recon.filter(r => r.ok).length, resN = recon.filter(r => !r.ok && r.residual != null).length, partN = recon.filter(r => !r.ok && r.partial).length;
@@ -1661,7 +1670,7 @@ function renderKpiGroups(host, tk, kpi, K0) {
     const ends = new Set();
     g.items.forEach(it => Object.keys(kpiVals(it, K, aEnds)).forEach(e => ends.add(e)));
     if (!ends.size) { K = K === "Q" ? "A" : "Q"; g.items.forEach(it => Object.keys(kpiVals(it, K, aEnds)).forEach(e => ends.add(e))); }
-    const periods = [...ends].sort().slice(-(K === "A" ? 5 : 8));
+    const periods = [...ends].sort().slice(-segRangeN(K));
     if (!periods.length) return;
     const tbl = el("table", { class: "segt" });
     tbl.append(el("thead", {}, el("tr", {}, el("th", { class: "nm" }, g.subcategory ? `${g.category} › ${g.subcategory}` : g.category), ...periods.map(e => el("th", { class: "r" }, kpiPeriodLabel(tk, e, K), el("div", { class: "faint mono", style: "font-size:10.5px" }, e))))));
