@@ -241,3 +241,70 @@ def profile(sub, facts):
         "fiscalYearEnd": norm_fye(sub.get("fiscalYearEnd")), "stateOfIncorporation": sub.get("stateOfIncorporation"), "phone": sub.get("phone"),
         "website": sub.get("website") or "", "address": {k: ba.get(k) for k in ("street1", "street2", "city", "stateOrCountry", "zipCode")}, "sharesOutstanding": shares,
     }
+
+
+PERIODIC = ("10-K", "10-Q", "10-K/A", "10-Q/A", "10-KT")
+
+
+def latest_filed(facts):
+    """Most recent 'filed' date across all companyfacts entries."""
+    best = ""
+    for ns in facts.values():
+        for f in ns.values():
+            for rows in f.get("units", {}).values():
+                for r in rows:
+                    if r.get("filed", "") > best:
+                        best = r["filed"]
+    return best
+
+
+def fill_gaps(cik, facts, sub, max_filings=4, log=print):
+    """SEC's companyfacts API can lag the filings themselves by weeks or months. Periodic reports (10-Q/10-K) listed in
+    the submissions feed but missing from companyfacts are read from their inline XBRL and merged in the same shape,
+    so the statements include the latest quarter. Only facts without dimensions are merged. Returns the accessions added."""
+    from .common import sec_get
+    from .segments import parse_ixbrl
+    have = latest_filed(facts)
+    known = set()
+    for ns in facts.values():
+        for f in ns.values():
+            for rows in f.get("units", {}).values():
+                for r in rows:
+                    known.add(r.get("accn"))
+    todo = [f for f in filing_list(sub) if f["f"] in PERIODIC and f["d"] >= (have or "0000") and f["a"] not in known and f["p"].lower().endswith((".htm", ".html"))]
+    added = []
+    for f in sorted(todo, key=lambda x: x["d"])[-max_filings:]:
+        try:
+            html = sec_get(filing_url(cik, f["a"], f["p"]), timeout=120)
+        except Exception as e:
+            log(f"  gap filler: {f['a']} fetch failed: {str(e)[:120]}")
+            continue
+        ctx, ixf = parse_ixbrl(html)
+        if not ixf:
+            continue
+        form = f["f"]
+        n = 0
+        seen = set()
+        for x in ixf:
+            c = ctx.get(x["ctx"])
+            if not c or c["dims"] or c.get("typed") or not c.get("end"):
+                continue
+            prefix, _, local = x["name"].partition(":")
+            if prefix not in ("us-gaap", "dei", "ifrs-full"):
+                continue
+            ul = (x["unit"] or "").lower()
+            unit = "USD/shares" if ("usd" in ul and "share" in ul) else "USD" if "usd" in ul else "shares" if "share" in ul else "pure"
+            key = (x["name"], c.get("start"), c["end"], unit)
+            if key in seen:
+                continue
+            seen.add(key)
+            row = {"end": c["end"], "val": x["v"], "accn": f["a"], "form": form, "filed": f["d"],
+                   "fp": "FY" if form.startswith("10-K") else None, "frame": None, "src": "ixbrl"}
+            if c.get("start"):
+                row["start"] = c["start"]
+            facts.setdefault(prefix, {}).setdefault(local, {"label": local, "units": {}})["units"].setdefault(unit, []).append(row)
+            n += 1
+        if n:
+            added.append(f["a"])
+            log(f"  gap filler: merged {n} facts from {form} {f['a']} filed {f['d']}")
+    return added

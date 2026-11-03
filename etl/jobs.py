@@ -46,6 +46,10 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
     if store_raw:
         sb.put_raw(f"sec/companyfacts/CIK{cik:010d}.json", json.dumps(cf), ticker=tk, kind="companyfacts", source_url=f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json")
     filings = sec.filing_list(sub)
+    try:
+        sec.fill_gaps(cik, facts, sub, log=log)
+    except Exception as e:
+        log(f"  {tk} gap filler failed: {str(e)[:200]}")
     statements = {k: sec.build_series(facts, k) for k in sec.CONCEPTS}
     prof = sec.profile(sub, facts)
     ftables = sec.filing_tables(facts, statements, filings, cik)
