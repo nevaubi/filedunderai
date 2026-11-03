@@ -254,6 +254,8 @@ def qualifier(quote, printed):
     quote say so ("over $4.4 billion", "nearly 19 billion", "approximately $2 billion"); None for an exact figure."""
     if not quote or not printed:
         return None
+    if str(printed).strip() in ("-", "—", "–") and re.search(r"\b(flat|stable|unchanged|even|in line)\b", quote, re.I):
+        return "~"
     num = re.escape(str(printed).strip()).replace("\\,", ",?")
     m = re.search(r"(?:\$\s*)?" + num, quote)
     if not m:
