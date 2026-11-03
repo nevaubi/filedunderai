@@ -1676,7 +1676,8 @@ function renderKpiGroups(host, tk, kpi, K0) {
       periods.forEach(e => {
         const v = iv[e];
         if (!v) { tr.append(el("td", { class: "c r faint" }, "–")); return; }
-        const td = el("td", { class: "c r num", tabindex: 0, title: v.derived ? "Derived: " + v.derived.formula : `${v.doc_title || ""}${v.page ? " · page " + v.page : ""}${v.sheet ? " · " + v.sheet + "!" + (v.cell || "") : ""}` }, fmtKpi(v.v, it.unit));
+        const td = el("td", { class: "c r num", tabindex: 0, title: v.derived ? "Derived: " + v.derived.formula : `${v.doc_title || ""}${v.page ? " · page " + v.page : ""}${v.sheet ? " · " + v.sheet + "!" + (v.cell || "") : ""}` }, (QMARK[v.q] || "") + fmtKpi(v.v, it.unit));
+        if (v.q) td.title = `${QWORD[v.q]} as stated by the company. ` + td.title;
         if (v.derived) td.append(el("span", { class: "dq" }));
         if (v.tie === false) td.append(el("span", { class: "tie bad", title: "Components do not sum to this value" }, "Δ"));
         if (v.tie === true) td.append(el("span", { class: "tie ok", title: "Components sum to this value" }, "✓"));
@@ -1690,6 +1691,8 @@ function renderKpiGroups(host, tk, kpi, K0) {
       el("div", { class: "src" }, g.note || "Values are read from the company's investor relations documents. Click any number to open the document at that value.")));
   });
 }
+const QMARK = { ">": ">", "<": "<", "~": "~" };
+const QWORD = { ">": "Lower bound (\"more than\")", "<": "Upper bound (\"nearly\")", "~": "Approximate" };
 function kpiPeriodLabel(tk, e, K) { try { return plabel(tk, e, K === "A" ? "A" : "Q"); } catch { return e; } }
 function fmtKpi(v, unit) {
   if (v == null) return "–";
@@ -1704,7 +1707,7 @@ function fmtKpi(v, unit) {
 }
 function openKpiSource(tk, it, K, e, v) {
   const doc = (SEG[tk]?.ir?.documents || []).find(d => d.id === v.doc) || { id: v.doc, title: v.doc_title, storage_path: v.path, ext: v.ext, url: v.url };
-  openDoc(tk, doc, { page: v.page, quote: v.quote, printed: v.printed, value: v.v, sheet: v.sheet, cell: v.cell, label: `${it.name} · ${kpiPeriodLabel(tk, e, K)}`, display: fmtKpi(v.v, it.unit), derived: v.derived });
+  openDoc(tk, doc, { page: v.page, quote: v.quote, printed: v.printed, value: v.v, sheet: v.sheet, cell: v.cell, label: `${it.name} · ${kpiPeriodLabel(tk, e, K)}`, display: (QMARK[v.q] || "") + fmtKpi(v.v, it.unit), derived: v.derived });
 }
 
 /* ---------- IR document library ---------- */

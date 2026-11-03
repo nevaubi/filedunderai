@@ -244,6 +244,28 @@ def validate(sb, data, fix=False):
     return report, data
 
 
+_QUAL = [(re.compile(r"(more than|over|at least|in excess of|exceed(?:ed|ing)?|above|upwards of|north of)\s*$", re.I), ">"),
+         (re.compile(r"(nearly|almost|just under|close to|under|below|less than)\s*$", re.I), "<"),
+         (re.compile(r"(approximately|approx\.?|about|around|roughly|some|~|≈|an estimated|estimated)\s*$", re.I), "~")]
+
+
+def qualifier(quote, printed):
+    """">" (lower bound), "<" (upper bound) or "~" (approximate) when the words right before the printed figure in the
+    quote say so ("over $4.4 billion", "nearly 19 billion", "approximately $2 billion"); None for an exact figure."""
+    if not quote or not printed:
+        return None
+    num = re.escape(str(printed).strip()).replace("\\,", ",?")
+    m = re.search(r"(?:\$\s*)?" + num, quote)
+    if not m:
+        return None
+    before = re.sub(r"[$\s]+$", "", quote[:m.start()])[-40:] + " "
+    before = before.rstrip()
+    for rx, q in _QUAL:
+        if rx.search(before):
+            return q
+    return None
+
+
 def _label(fye, end, kind):
     """Fiscal label; "Y" (year to date through a quarter end) reads e.g. "9M FY25"."""
     from .fundamentals import fy_label
@@ -309,7 +331,7 @@ def publish(sb, data, fye="1231"):
         for v in k.get("values", []):
             d = docs.get(v["doc"], {})
             vals[v["kind"]][v["period_end"]] = {"v": v["value"], "doc": v["doc"], "page": v.get("page"), "sheet": v.get("sheet"), "cell": v.get("cell"),
-                                                "quote": v.get("quote"), "printed": v.get("printed"), "doc_title": (d.get("title") or "").split("||")[0][:120], "path": d.get("storage_path"),
+                                                "quote": v.get("quote"), "printed": v.get("printed"), "q": qualifier(v.get("quote"), v.get("printed")), "doc_title": (d.get("title") or "").split("||")[0][:120], "path": d.get("storage_path"),
                                                 "ext": d.get("ext"), "url": d.get("url"), "label": v.get("fiscal_label"),
                                                 "tie": tie.get((k["id"], v["kind"], v["period_end"]))}
             rows.append({"ticker": tk, "kpi_id": k["id"], "period_kind": v["kind"], "period_end": v["period_end"], "fiscal_label": v.get("fiscal_label"),
