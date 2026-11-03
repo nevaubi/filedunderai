@@ -2,6 +2,7 @@
 import datetime as dt
 
 from .common import sec_json
+from .fundamentals import norm_fye
 
 CONCEPTS = {
     "income": [
@@ -237,6 +238,6 @@ def profile(sub, facts):
     ba = sub.get("addresses", {}).get("business", {})
     return {
         "name": sub["name"], "sic": sub.get("sic"), "sicDescription": sub.get("sicDescription"), "exchanges": sub.get("exchanges") or [],
-        "fiscalYearEnd": sub.get("fiscalYearEnd") or "1231", "stateOfIncorporation": sub.get("stateOfIncorporation"), "phone": sub.get("phone"),
+        "fiscalYearEnd": norm_fye(sub.get("fiscalYearEnd")), "stateOfIncorporation": sub.get("stateOfIncorporation"), "phone": sub.get("phone"),
         "website": sub.get("website") or "", "address": {k: ba.get(k) for k in ("street1", "street2", "city", "stateOrCountry", "zipCode")}, "sharesOutstanding": shares,
     }

@@ -6,16 +6,31 @@ def _d(s):
     return dt.date.fromisoformat(s)
 
 
+def norm_fye(fye):
+    """52/53-week years that end in the first days of January (SEC reports e.g. 0103) are named for the calendar
+    year they mostly cover, so they are treated as December year ends."""
+    fye = fye or "1231"
+    if fye[:2] == "01" and int(fye[2:]) <= 10:
+        return "1231"
+    return fye
+
+
 def fy_label(fye, end, kind):
+    fye = norm_fye(fye)
     fm, fd = int(fye[:2]), int(fye[2:])
     e = _d(end)
+
+    def fy_end_of(y):
+        try:
+            return dt.date(y, fm, fd)
+        except ValueError:
+            return dt.date(y, fm, 28)
+
     fy = e.year
-    try:
-        fy_end_this = dt.date(fy, fm, fd)
-    except ValueError:
-        fy_end_this = dt.date(fy, fm, 28)
-    if e > fy_end_this + dt.timedelta(days=10):
+    if e > fy_end_of(fy) + dt.timedelta(days=10):
         fy += 1
+    elif e <= fy_end_of(fy - 1) + dt.timedelta(days=10):
+        fy -= 1
     try:
         fy_end = dt.date(fy, fm, fd)
     except ValueError:

@@ -176,12 +176,13 @@ const SUBS = new Set(["Research & development", "SG&A", "D&A", "Stock-based comp
 const CACHE = {};
 
 function fyInfo(tk, end) {
-  const fye = D.companies[tk].fiscalYearEnd || "1231";
+  let fye = D.companies[tk].fiscalYearEnd || "1231";
+  if (fye.slice(0, 2) === "01" && +fye.slice(2) <= 10) fye = "1231";
   const fm = +fye.slice(0, 2), fd = +fye.slice(2);
   const e = pd(end);
   let fy = e.getUTCFullYear();
-  const fyEndThis = Date.UTC(fy, fm - 1, fd);
-  if (e.getTime() > fyEndThis + 10 * 864e5) fy += 1;
+  if (e.getTime() > Date.UTC(fy, fm - 1, fd) + 10 * 864e5) fy += 1;
+  else if (e.getTime() <= Date.UTC(fy - 1, fm - 1, fd) + 10 * 864e5) fy -= 1;
   const fyEnd = Date.UTC(fy, fm - 1, fd);
   const monthsLeft = Math.round((fyEnd - e.getTime()) / (30.44 * 864e5));
   const q = Math.max(1, Math.min(4, 4 - Math.round(monthsLeft / 3)));

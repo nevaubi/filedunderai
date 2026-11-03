@@ -308,7 +308,8 @@ PERIOD_ENDS = {}
 def quarter_for_date(fye, d, ends_known=None):
     """(label, quarter end) of the latest fiscal quarter that ended at least three days before date d. Uses the
     company's actual period end dates when known (52/53-week years), else calendar quarter ends from the FYE."""
-    from .fundamentals import fy_label
+    from .fundamentals import fy_label, norm_fye
+    fye = norm_fye(fye)
     if ends_known:
         cands = [e for e in ends_known if e <= d - dt.timedelta(days=3)]
         if cands:

@@ -237,6 +237,15 @@ def publish(sb, data, fye="1231"):
     """Writes kpis/{T}.json (grouped for display) and kpi_definitions / kpi_values rows. Only validated values."""
     report, data = validate(sb, data, fix=True)
     tk = data["ticker"]
+    # fiscal labels are always recomputed from the company's fiscal year end, never taken from the input file
+    from .fundamentals import fy_label
+    co = sb.select("companies", f"select=fiscal_year_end&ticker=eq.{tk}")
+    fye = (co[0].get("fiscal_year_end") if co else None) or fye
+    for k in data.get("kpis", []):
+        for v in k.get("values", []):
+            v["fiscal_label"] = fy_label(fye, v["period_end"], "A" if v["kind"] == "A" else "Q")
+    for d in data.get("derived", []):
+        d["fiscal_label"] = fy_label(fye, d["period_end"], "A" if d["kind"] == "A" else "Q")
     docs = {d["id"]: d for d in docs_for(sb, tk)}
     tie = {(t["parent"], t["kind"], t["period_end"]): True for t in report["ties"]}
     tie.update({(t["parent"], t["kind"], t["period_end"]): False for t in report["tie_failures"]})
