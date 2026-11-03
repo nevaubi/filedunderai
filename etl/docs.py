@@ -1,4 +1,5 @@
 """Original documents via Firecrawl: statement tables with inline XBRL anchors, and earnings releases."""
+import gzip
 import json
 import os
 import re
@@ -127,3 +128,22 @@ def release_markdown(index_url, primary_doc):
     lines = md.split("\n")
     start = next((i for i, l in enumerate(lines) if len(l.split()) >= 4 and ".htm" not in l), 0)
     return url, "\n".join(lines[start:])[:16000]
+
+
+def viewer_html(html, cik, accession):
+    """The filed document as served to the source panel: scripts removed and a base URL added so images and
+    links resolve to EDGAR. The content is otherwise the original filing."""
+    base = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession.replace('-', '')}/"
+    html = re.sub(r"(?is)<script\b.*?</script>", "", html)
+    tag = f'<base href="{base}" target="_blank">'
+    m = re.search(r"(?i)<head[^>]*>", html)
+    if m:
+        return html[:m.end()] + tag + html[m.end():]
+    return tag + html
+
+
+def publish_filing(sb, html, cik, accession):
+    """Stores the gzipped viewer copy at public-data/filings/{accession}.html.gz (immutable; the browser inflates it)."""
+    body = gzip.compress(viewer_html(html, cik, accession).encode("utf-8"), 6)
+    sb.put_object("public-data", f"filings/{accession}.html.gz", body, "application/gzip", "public, max-age=31536000, immutable")
+    return len(body)

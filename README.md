@@ -41,6 +41,8 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | | `feed.json` | Latest filings across the universe |
 | | `companies/{T}.json` | Statements, filing tables, original tables, release, news, summary |
 | | `prices/{SYMBOL}.json` | 2y daily + 5d 5-minute bars (`^VIX` → `IDX_VIX`, `CL=F` → `CL_F`) |
+| | `filings/{accession}.html.gz` | Full filed documents for the source panel (scripts removed, EDGAR base URL added), gzipped and inflated in the browser |
+| | `logos/{T}.png` | Company logos (497 of 500) |
 | | `insiders/{T}.json` | Form 4 transactions, open-market summaries, largest traders |
 | | `meta/*.json` | Job caches and status (fundamentals, price stats per part, rotation and check cursors, insiders index, pipeline status) |
 | `raw` (private) | `sec/companyfacts/*.json.gz`, `sec/filings/{accn}/*.htm.gz`, `sec/releases/*.md.gz` | Archived source documents, indexed in `documents` |
@@ -83,6 +85,10 @@ python -m etl.run news                           # next slice of the news rotati
 
 Adding a company: append it to `etl/universe.py` and run `python -m etl.run companies --tickers NEW` then `python -m etl.run prices`.
 
+## Source panel
+
+Clicking a value opens the actual filed document in a sandboxed frame and scrolls to it. The panel finds the inline XBRL element whose concept and context period match the value; for filings without inline XBRL it finds the printed figure. Latest 10-K and 10-Q copies are published by the ETL; any other filing is fetched once by `/api/filing?accn=` (only accessions present in the site's data), stored, and served from storage after that.
+
 ## API guard
 
-`/api/ai`, `/api/search` and `/api/scrape` only answer requests from filedunder.ai or this project's Vercel domains, and count calls per IP and globally per day in `api_usage` via `bump_usage()`.
+`/api/ai`, `/api/search`, `/api/scrape` and `/api/filing` only answer requests from filedunder.ai or this project's Vercel domains, and count calls per IP and globally per day in `api_usage` via `bump_usage()`.

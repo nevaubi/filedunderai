@@ -15,6 +15,9 @@
     "api/cron/*.py": {
       "maxDuration": 300,
       "includeFiles": "{etl/**,api/cron/_common.py}"
+    },
+    "api/filing.js": {
+      "maxDuration": 60
     }
   },
   "crons": [

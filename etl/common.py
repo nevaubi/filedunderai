@@ -24,6 +24,9 @@ def load_env(path=None):
 load_env()
 
 SEC_UA = os.environ.get("SEC_USER_AGENT") or "FiledUnder research contact@filedunder.ai"
+if "@" not in SEC_UA:
+    # sec.gov Archives rejects agents without a contact address.
+    SEC_UA = SEC_UA + " contact@filedunder.ai"
 WEB_UA = "FiledUnder/1.0 (+https://filedunder.ai)"
 
 

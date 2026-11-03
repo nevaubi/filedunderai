@@ -65,6 +65,11 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
                 html = docs.filing_html(url)
                 if store_raw and html:
                     sb.put_raw(f"sec/filings/{f['a']}/{f['p']}", html, ticker=tk, accession=f["a"], kind="filing_html", source_url=url)
+                if html:
+                    try:
+                        docs.publish_filing(sb, html, cik, f["a"])
+                    except Exception as e:
+                        log(f"  {tk} publish {f['a']} failed: {str(e)[:160]}")
                 tabs = docs.ix_tables(html)
                 if tabs:
                     ix[f["a"]] = {"form": f["f"], "url": url, "tables": tabs}
@@ -322,6 +327,7 @@ def build_index(sb, pstats=None):
     fund = _cache(sb, "meta/fundamentals.json", {})
     pstats = pstats or load_pricestats(sb)
     ins = (_cache(sb, "meta/insiders.json", {}) or {}).get("companies", {})
+    logos = (_cache(sb, "meta/logos.json", {}) or {}).get("tickers", {})
     rows, metrics = [], []
     for tk, *_ in UNIVERSE:
         f = fund.get(tk)
@@ -346,7 +352,7 @@ def build_index(sb, pstats=None):
             m["buyback_yield"] = f["bb_ttm"] / mcap
         metrics.append({k: (None if isinstance(v, float) and v != v else v) for k, v in m.items()})
         rows.append({**{k: v for k, v in m.items() if k not in ("updated_at",)}, "name": f["name"], "legal_name": f.get("legal_name"), "sector": f["sector"], "sic": f.get("sic"),
-                     "exchange": f.get("exchange"), "fye": f.get("fye"), "latest_filing": f.get("latest_filing"), "has_source_tables": f.get("has_source_tables"), "sp100": tk in SP100, "insider_net_90d": _ins_net(ins.get(tk)), "spark": ps.get("spark", [])})
+                     "exchange": f.get("exchange"), "fye": f.get("fye"), "latest_filing": f.get("latest_filing"), "has_source_tables": f.get("has_source_tables"), "sp100": tk in SP100, "logo": tk in logos, "insider_net_90d": _ins_net(ins.get(tk)), "spark": ps.get("spark", [])})
     if metrics:
         sb.upsert("company_metrics", metrics, "ticker")
     sb.put_json("index.json", {"generated": now_iso(), "sectors": SECTOR_ETF, "companies": rows}, cache="max-age=120")
@@ -472,3 +478,37 @@ def insiders_job(sb, tickers=None, days=365, per_company=120, workers=4, time_bu
         sb.put_json("meta/insiders.json", index, cache="max-age=600")
         run.stats.update({"parsed": done, "failed": failed, "companies": len(touched)})
         return done, failed
+
+
+# ---------------------------------------------------------------- filing viewer copies
+def publish_filings_job(sb, tickers=None, workers=6):
+    """Publishes viewer copies of each company's latest 10-K and 10-Q from the archived originals."""
+    import gzip as _gz
+    tickers = tickers or [t for t, *_ in UNIVERSE]
+
+    def one(tk):
+        b = _cache(sb, f"companies/{tk}.json", {})
+        cik = BY_TICKER[tk]["cik"]
+        n = 0
+        for accn, meta in (b.get("ix") or {}).items():
+            f = next((x for x in b.get("filings", []) if x["a"] == accn), None)
+            if not f:
+                continue
+            raw = sb.get_object("raw", f"sec/filings/{accn}/{f['p']}.gz")
+            if raw:
+                try:
+                    html = _gz.decompress(raw).decode("utf-8", "replace")
+                except OSError:
+                    html = raw.decode("utf-8", "replace")
+            else:
+                html = docs.filing_html(sec.filing_url(cik, accn, f["p"]))
+            if html:
+                docs.publish_filing(sb, html, cik, accn)
+                n += 1
+        return tk, n
+
+    total = 0
+    with ThreadPoolExecutor(workers) as ex:
+        for tk, n in ex.map(one, tickers):
+            total += n
+    return total

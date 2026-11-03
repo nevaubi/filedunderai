@@ -438,7 +438,163 @@ function renderHistory(body, cell, sib) {
   recent.slice().reverse().forEach((c, i, arr) => { const p = arr[i + 1]; const ch = p && p.v ? c.v / Math.abs(p.v) - Math.sign(p.v) : null; tb.append(el("tr", { class: "click", onclick: () => openSource(c, "filing") }, el("td", { class: c.end === cell.end ? "" : "muted" }, el("b", {}, plabel(c.tk, c.end, c.kind))), el("td", { class: "r num" }, fmtCell(c)), el("td", { class: "r num " + cls(ch) }, cell.unit === "pct" ? (p ? ((c.v - p.v) * 1e4 >= 0 ? "+" : "−") + Math.abs((c.v - p.v) * 1e4).toFixed(0) + " bp" : "") : fsgn(ch)), el("td", { class: "mono faint", style: "font-size:11.5px" }, c.calc ? "calc" : `${c.rec.form}${c.derived ? " · derived" : ""}`))); });
   t.append(tb); body.append(t);
 }
+/* ---------- full filing viewer ---------- */
+const FILING_CACHE = new Map();
+async function inflate(resp) {
+  if (typeof DecompressionStream === "undefined") throw new Error("This browser cannot open compressed filings");
+  return new Response(resp.body.pipeThrough(new DecompressionStream("gzip"))).text();
+}
+async function loadFilingDoc(accn) {
+  if (FILING_CACHE.has(accn)) return FILING_CACHE.get(accn);
+  const p = (async () => {
+    const url = `${PUB}filings/${accn}.html.gz`;
+    let r = await fetch(url);
+    if (!r.ok) {
+      const q = await fetch(`/api/filing?accn=${encodeURIComponent(accn)}`);
+      const j = await q.json().catch(() => ({}));
+      if (!q.ok) throw new Error(j.error || `Could not load the filing (${q.status})`);
+      r = await fetch(`${PUB}${j.path}`, { cache: "reload" });
+      if (!r.ok) throw new Error(`Could not load the filing (${r.status})`);
+    }
+    return inflate(r);
+  })();
+  FILING_CACHE.set(accn, p);
+  p.catch(() => FILING_CACHE.delete(accn));
+  if (FILING_CACHE.size > 6) FILING_CACHE.delete(FILING_CACHE.keys().next().value);
+  return p;
+}
+const VIEWER_CSS = `<style id="fu-viewer">
+html{scroll-behavior:auto}
+body{margin:0 auto !important;padding:24px 28px 120px !important;background:#fff}
+.fu-hit{background:#ffe766 !important;box-shadow:0 0 0 2px #f2b600 !important;border-radius:2px;color:#000 !important}
+.fu-alt{background:#fff6c2 !important;border-radius:2px}
+tr.fu-row>td{background:#fffbe3 !important}
+ix\\:header{display:none !important}
+</style>`;
+function ixNumber(node) {
+  const raw = (node.textContent || "").replace(/[^0-9.]/g, "");
+  if (!raw) return node.getAttribute("format")?.includes("zerodash") ? 0 : null;
+  let v = parseFloat(raw);
+  const scale = parseInt(node.getAttribute("scale") || "0", 10);
+  if (scale) v *= Math.pow(10, scale);
+  if (node.getAttribute("sign") === "-") v = -v;
+  return v;
+}
+function locateFact(doc, concept, period, value) {
+  const ctx = {};
+  for (const c of doc.getElementsByTagName("xbrli:context")) {
+    const g = n => c.getElementsByTagName(n)[0]?.textContent.trim() || null;
+    ctx[c.getAttribute("id")] = { start: g("xbrli:startdate"), end: g("xbrli:enddate") || g("xbrli:instant"), dims: c.getElementsByTagName("xbrli:segment").length > 0 };
+  }
+  const header = doc.getElementsByTagName("ix:header")[0];
+  const facts = [...doc.getElementsByTagName("ix:nonfraction")].filter(n => !header || !header.contains(n));
+  const near = (a, b) => a != null && b != null && Math.abs(Math.abs(a) - Math.abs(b)) <= Math.max(1, Math.abs(b) * 0.005);
+  const ctxOk = n => { const k = ctx[n.getAttribute("contextref")]; if (!k || k.dims) return false; return period.start ? k.start === period.start && k.end === period.end : !k.start && k.end === period.end; };
+  const nameOk = n => (n.getAttribute("name") || "").split(":").pop() === concept;
+  const inTable = n => !!n.closest("table");
+  const rank = arr => arr.sort((a, b) => (inTable(b) - inTable(a)) || (a.compareDocumentPosition(b) & 4 ? -1 : 1));
+  let hits = facts.filter(n => nameOk(n) && ctxOk(n));
+  let how = "tag";
+  if (!hits.length) { hits = facts.filter(n => ctxOk(n) && near(ixNumber(n), value)); how = "value"; }
+  if (!hits.length) { hits = facts.filter(n => nameOk(n) && near(ixNumber(n), value) && !ctx[n.getAttribute("contextref")]?.dims); how = "tag-value"; }
+  if (!hits.length) { hits = facts.filter(n => near(ixNumber(n), value)); how = "number"; }
+  if (!hits.length && value != null) { hits = textFind(doc, value); how = "text"; }
+  return { hits: rank(hits), how, total: facts.length };
+}
+// Older filings have no inline XBRL: find the printed figure (in units, thousands or millions) and wrap it.
+function textFind(doc, value) {
+  const a = Math.abs(value), tokens = [];
+  if (a < 1000) tokens.push(a.toFixed(2));
+  for (const sc of [1e6, 1e3, 1]) { const n = a / sc; if (n >= 1 && Math.abs(n - Math.round(n)) < 0.02) tokens.push(Math.round(n).toLocaleString("en-US")); }
+  if (!tokens.length) return [];
+  const rx = new RegExp(`(^|[^0-9.,])(${[...new Set(tokens)].map(t => t.replace(/[.,]/g, m => "\\" + m)).join("|")})(?![0-9]|,[0-9]|\\.[0-9])`);
+  const out = [], walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) { if (rx.test(walker.currentNode.nodeValue)) nodes.push(walker.currentNode); if (nodes.length > 60) break; }
+  for (const node of nodes) {
+    const m = node.nodeValue.match(rx);
+    if (!m) continue;
+    const start = m.index + m[1].length, mid = node.splitText(start);
+    mid.splitText(m[2].length);
+    const span = doc.createElement("span");
+    mid.parentNode.replaceChild(span, mid);
+    span.append(mid);
+    out.push(span);
+  }
+  return out;
+}
 function renderFiling(db, cell, c) {
+  const rec = cell.rec, f = D.filings[rec.accn];
+  const target = cell.derived ? { start: cell.derived.from.start, end: cell.derived.from.end, v: cell.derived.from.v } : { start: rec.start || null, end: rec.end, v: rec.v };
+  if (cell.derived) db.append(el("div", { class: "note" }, "This quarter is derived: the filing reports a cumulative period. The highlighted figure is the cumulative value it starts from. See Details for the subtraction."));
+  const status = el("span", { class: "faint", style: "font-size:12px" }, "Loading the filing…");
+  const counter = el("span", { class: "mono faint", style: "font-size:12px" });
+  const prevB = el("button", { class: "iconbtn", title: "Previous occurrence", "aria-label": "Previous occurrence", disabled: true }, svgUse("i-left"));
+  const nextB = el("button", { class: "iconbtn", title: "Next occurrence", "aria-label": "Next occurrence", disabled: true }, svgUse("i-right"));
+  const jumpB = el("button", { class: "btn", disabled: true, title: "Scroll back to the value" }, "Jump to value");
+  const zoomOut = el("button", { class: "iconbtn", title: "Zoom out", "aria-label": "Zoom out" }, el("span", { class: "mono", style: "font-size:15px" }, "−"));
+  const zoomIn = el("button", { class: "iconbtn", title: "Zoom in", "aria-label": "Zoom in" }, el("span", { class: "mono", style: "font-size:15px" }, "+"));
+  db.append(el("div", { style: "display:flex;gap:8px;align-items:center;flex-wrap:wrap" },
+    el("span", { class: "badge-src" }, "Original filing"), el("span", { class: "eyebrow" }, `${rec.form} · filed ${fdate(rec.filed)}`),
+    f?.primary ? el("a", { href: f.primary, target: "_blank", rel: "noopener", style: "margin-left:auto;font-size:12px" }, "Open on EDGAR ↗") : null));
+  const bar = el("div", { class: "viewer-bar" }, jumpB, prevB, counter, nextB, el("span", { style: "flex:1" }), status, zoomOut, zoomIn);
+  const frameWrap = el("div", { class: "viewer" }, el("div", { class: "viewer-load" }, el("div", { class: "spin" }), el("div", {}, "Opening the full filing"), el("div", { class: "faint", style: "font-size:12px" }, `${rec.form} · accession ${rec.accn}`)));
+  db.append(bar, frameWrap);
+  const myCell = DR.cell;
+  loadFilingDoc(rec.accn).then(html => {
+    if (DR.cell !== myCell) return;
+    const iframe = el("iframe", { title: `${rec.form} filed ${fdate(rec.filed)}`, sandbox: "allow-same-origin allow-popups allow-popups-to-escape-sandbox", referrerpolicy: "no-referrer" });
+    iframe.srcdoc = html + VIEWER_CSS;
+    frameWrap.append(iframe);
+    iframe.addEventListener("load", () => {
+      const doc = iframe.contentDocument, win = iframe.contentWindow;
+      if (!doc) return;
+      frameWrap.querySelector(".viewer-load")?.remove();
+      let zoom = 1;
+      const fit = () => { const w = doc.documentElement.scrollWidth, avail = iframe.clientWidth; zoom = w > avail + 4 ? Math.max(0.5, Math.floor((avail / w) * 100) / 100) : 1; doc.documentElement.style.zoom = zoom; };
+      fit();
+      const setZoom = z => { zoom = Math.min(2, Math.max(0.4, Math.round(z * 100) / 100)); doc.documentElement.style.zoom = zoom; go(i); };
+      zoomOut.onclick = () => setZoom(zoom - 0.1);
+      zoomIn.onclick = () => setZoom(zoom + 0.1);
+      const { hits, how } = locateFact(doc, cell.concept, target, target.v);
+      let i = 0;
+      const go = k => {
+        if (!hits.length) return;
+        i = (k + hits.length) % hits.length;
+        hits.forEach(h => { h.classList.remove("fu-hit"); h.classList.add("fu-alt"); });
+        doc.querySelectorAll("tr.fu-row").forEach(r => r.classList.remove("fu-row"));
+        const h = hits[i];
+        h.classList.remove("fu-alt"); h.classList.add("fu-hit");
+        h.closest("tr")?.classList.add("fu-row");
+        const outer = $("#db"), keep = outer.scrollTop;
+        h.scrollIntoView({ block: "center", inline: "center" });
+        outer.scrollTop = keep;
+        counter.textContent = hits.length > 1 ? `${i + 1} of ${hits.length}` : "";
+      };
+      if (hits.length) {
+        jumpB.disabled = false; prevB.disabled = nextB.disabled = hits.length < 2;
+        jumpB.onclick = () => go(i); prevB.onclick = () => go(i - 1); nextB.onclick = () => go(i + 1);
+        status.textContent = how === "tag" ? `Tagged ${cell.concept}` : how === "value" ? "Matched by period and value" : how === "text" ? "Matched by printed figure" : "Matched by value";
+        requestAnimationFrame(() => go(0));
+        // a second pass after images settle the layout
+        win.addEventListener("load", () => go(i), { once: true });
+        setTimeout(() => go(i), 900);
+      } else {
+        status.textContent = "Value not tagged in this document";
+        db.append(el("div", { class: "note" }, "The full filing is shown, but this value is not tagged in its inline XBRL (common for older filings and some derived items). The statement table below shows the reported figure."));
+        renderFilingTable(db, cell, c);
+      }
+      doc.addEventListener("keydown", e => { if (e.key === "Escape") closeSource(); });
+    }, { once: true });
+  }).catch(err => {
+    if (DR.cell !== myCell) return;
+    frameWrap.remove(); bar.remove();
+    db.append(el("div", { class: "note" }, `The full filing could not be opened here (${err.message}). Showing the statement from the same filing instead.`));
+    renderFilingTable(db, cell, c);
+  });
+}
+
+function renderFilingTable(db, cell, c) {
   const rec = cell.rec, f = D.filings[rec.accn];
   const targetKey = cell.stmt === "balance" ? rec.end : `${rec.start}|${rec.end}`;
   if (cell.derived) db.append(el("div", { class: "note" }, "This quarter is derived: the filing reports a cumulative period. The highlighted figure below is the cumulative value it starts from. See Details for the subtraction."));
@@ -689,7 +845,7 @@ function toggleWatch(t) { const w = store.get("watch", WATCH_DEFAULT); const i =
 const STATE = { coTab: store.get("coTab", "overview"), finStmt: "income", finKind: "A", finView: "values", finRange: "all", finDense: store.get("dense", false), taSym: "NVDA", taRange: "1Y", taInd: { sma: true, bb: false, vol: true }, cmp: ["AAPL", "MSFT", "NVDA", "GOOGL"], cmpMetric: "Revenue", cmpKind: "Q", scr: store.get("scr", { sector: "", sort: "market_cap", desc: true, q: "" }) };
 function renderRail() {
   const wl = $("#wl"); wl.innerHTML = "";
-  watchlist().forEach(t => { const c = IDX[t]; wl.append(el("a", { href: "#company-" + t.toLowerCase(), "data-t": t, title: `${c.name} · ${fnum(c.price)}` }, el("span", { class: "t" }, t), sparkSVG((c.spark || []).slice(-30), c.chg_1d >= 0 ? css("--up") : css("--down"), 80, 20), el("span", { class: "p num " + cls(c.chg_1d) }, fsgn(c.chg_1d)))); });
+  watchlist().forEach(t => { const c = IDX[t]; wl.append(el("a", { href: "#company-" + t.toLowerCase(), "data-t": t, title: `${c.name} · ${fnum(c.price)}` }, el("span", { class: "t" }, miniLogo(t, 16), t), sparkSVG((c.spark || []).slice(-30), c.chg_1d >= 0 ? css("--up") : css("--down"), 80, 20), el("span", { class: "p num " + cls(c.chg_1d) }, fsgn(c.chg_1d)))); });
   if (!watchlist().length) wl.append(el("div", { class: "faint", style: "padding:6px 10px;font-size:12px" }, "Star a company to add it."));
 }
 function buildShell() {
@@ -763,7 +919,7 @@ function paletteItems(v) {
     [["financials", "Financials"], ["news", "News & narratives"], ["earnings", "Earnings & IR"], ["filings", "Filings"]].filter(([, n]) => n.toLowerCase().includes(rest)).forEach(([id, n]) => add("Companies", `${tk} · ${n}`, SHORT[tk], tk[0], () => { STATE.coTab = id; location.hash === "#company-" + tk.toLowerCase() ? route() : location.hash = "company-" + tk.toLowerCase(); }));
   }
   const matches = TICKERS.filter(t => { const c = IDX[t]; return !v || t.toLowerCase().startsWith(v) || (c.name || "").toLowerCase().includes(v) || (c.legal_name || "").toLowerCase().includes(v); });
-  (v ? matches : watchlist()).slice(0, v ? 10 : 8).forEach(t => { const c = IDX[t]; add("Companies", `${t} · ${c.name}`, `${fnum(c.price)} · ${fsgn(c.chg_1d, 2)}`, t[0], () => location.hash = "company-" + t.toLowerCase()); });
+  (v ? matches : watchlist()).slice(0, v ? 10 : 8).forEach(t => { const c = IDX[t]; add("Companies", `${t} · ${c.name}`, `${fnum(c.price)} · ${fsgn(c.chg_1d, 2)}`, miniLogo(t, 20), () => location.hash = "company-" + t.toLowerCase()); });
   if (v) { const sec = [...new Set(Object.values(IDX).map(c => c.sector))].filter(s => s.toLowerCase().includes(v)); sec.forEach(s => add("Screener", `${s} sector`, "screener", "▤", () => { STATE.scr.sector = s; store.set("scr", STATE.scr); location.hash === "#screener" ? route() : location.hash = "screener"; })); }
   for (const p of PAGES) if (!v || p.name.toLowerCase().includes(v)) add("Pages", p.name, `g ${p.key}`, "→", () => location.hash = p.id);
   if (v) for (const s of Object.keys(SYMNAME)) if (s.toLowerCase().replace("^", "").startsWith(v) || SYMNAME[s].toLowerCase().includes(v)) add("Charts", `${s.replace("^", "")} · ${SYMNAME[s]}`, "technicals", "↗", () => { STATE.taSym = s; location.hash === "#technicals" ? route() : location.hash = "technicals"; });
@@ -860,7 +1016,7 @@ function pMarkets() {
   g0.append(panel("Market brief", aiCredit(mb?.meta), brief));
   const mv = el("div", { class: "bd movers", style: "padding-top:4px" });
   const movers = [...U.map(c => ({ s: c.ticker, ch: c.chg_1d, px: c.price, nm: c.name, co: true })), ...SECTORS.filter(s => PX[s]).map(s => ({ s, ch: dayChg(s), px: last(s).c, nm: SYMNAME[s] }))].sort((a, b) => Math.abs(b.ch) - Math.abs(a.ch)).slice(0, 9);
-  movers.forEach(x => mv.append(el("div", { class: "r", onclick: () => x.co ? location.hash = "company-" + x.s.toLowerCase() : (STATE.taSym = x.s, location.hash = "technicals") }, el("b", { class: "mono" }, x.s), el("span", { class: "muted", style: "overflow:hidden;text-overflow:ellipsis;white-space:nowrap" }, x.nm), el("span", { class: "num", style: "text-align:right" }, fnum(x.px)), el("span", { class: "chip " + cls(x.ch), style: "justify-self:end" }, fsgn(x.ch, 2)))));
+  movers.forEach(x => mv.append(el("div", { class: "r", onclick: () => x.co ? location.hash = "company-" + x.s.toLowerCase() : (STATE.taSym = x.s, location.hash = "technicals") }, el("b", { class: "mono tkc" }, x.co ? miniLogo(x.s, 18) : null, x.s), el("span", { class: "muted", style: "overflow:hidden;text-overflow:ellipsis;white-space:nowrap" }, x.nm), el("span", { class: "num", style: "text-align:right" }, fnum(x.px)), el("span", { class: "chip " + cls(x.ch), style: "justify-self:end" }, fsgn(x.ch, 2)))));
   g0.append(panel("Biggest moves today", el("a", { href: "#screener" }, "Screener"), mv));
   page.append(g0);
 
@@ -868,7 +1024,7 @@ function pMarkets() {
   const wl = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Watchlist"), el("th", { class: "r" }, "Price"), el("th", { class: "r" }, "1D"), el("th", { class: "r" }, "YTD"), el("th", { class: "r" }, "Mkt cap"), el("th", { class: "r" }, "P/E"), el("th", { class: "r" }, "Rev growth"), el("th", {}, "3M"))));
   const tb = el("tbody");
   watchlist().forEach(t => { const c = IDX[t]; tb.append(el("tr", { class: "click", onclick: () => location.hash = "company-" + t.toLowerCase() },
-    el("td", {}, el("b", {}, t), " ", el("span", { class: "muted" }, c.name)),
+    el("td", {}, el("span", { class: "tkc" }, miniLogo(t, 20), el("b", {}, t), el("span", { class: "muted" }, c.name))),
     el("td", { class: "r num" }, fnum(c.price)), el("td", { class: "r num " + cls(c.chg_1d) }, fsgn(c.chg_1d, 2)), el("td", { class: "r num " + cls(c.ret_ytd) }, fsgn(c.ret_ytd)),
     el("td", { class: "r num" }, fmtMoney(c.market_cap)), el("td", { class: "r num" }, c.pe_ttm ? c.pe_ttm.toFixed(1) : "–"), el("td", { class: "r num " + cls(c.rev_growth_lq) }, c.rev_growth_lq != null ? fsgn(c.rev_growth_lq) : "–"),
     el("td", { style: "width:90px" }, sparkSVG((c.spark || []).slice(-63), css("--c1"), 90, 22)))); });
@@ -906,7 +1062,7 @@ function pMarkets() {
     const sells = rows.filter(r => r.sells).sort((a, b) => b.sell_value - a.sell_value).slice(0, 6);
     const list = (title, arr, key, cnt, who, c) => el("div", {}, el("div", { class: "eyebrow", style: "margin:6px 0" }, title),
       arr.length ? el("div", { class: "movers" }, ...arr.map(r => el("div", { class: "r", onclick: () => { STATE.coTab = "insiders"; store.set("coTab", "insiders"); location.hash = "company-" + r.t.toLowerCase(); } },
-        el("b", { class: "mono" }, r.t), el("span", { class: "muted", style: "overflow:hidden;text-overflow:ellipsis;white-space:nowrap" }, `${r[cnt]} trade${r[cnt] === 1 ? "" : "s"} · ${r[who]} insider${r[who] === 1 ? "" : "s"}`), el("span", {}), el("span", { class: "chip " + c, style: "justify-self:end" }, fmtMoney(r[key]))))) : el("div", { class: "muted" }, "None in the window."));
+        el("b", { class: "mono tkc" }, miniLogo(r.t, 18), r.t), el("span", { class: "muted", style: "overflow:hidden;text-overflow:ellipsis;white-space:nowrap" }, `${r[cnt]} trade${r[cnt] === 1 ? "" : "s"} · ${r[who]} insider${r[who] === 1 ? "" : "s"}`), el("span", {}), el("span", { class: "chip " + c, style: "justify-self:end" }, fmtMoney(r[key]))))) : el("div", { class: "muted" }, "None in the window."));
     insHost.append(el("div", { class: "grid g2", style: "gap:24px" }, list("Largest buying", buys, "buy_value", "buys", "buyers", "up"), list("Largest selling", sells, "sell_value", "sells", "sellers", "down")));
   }).catch(() => { insHost.innerHTML = ""; insHost.append(el("div", { class: "muted" }, "Insider data is being processed.")); });
 }
@@ -925,14 +1081,14 @@ function filingDesc(f) {
 }
 const filingUrl = (t, f) => f.url || `https://www.sec.gov/Archives/edgar/data/${D.companies[t]?.cik || ""}/${f.a.replace(/-/g, "")}/${f.p || ""}`;
 function filingRow(f) {
-  return el("div", { style: "display:grid;grid-template-columns:72px 44px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)" },
-    el("span", { class: "form " + formCls(f.f) }, f.f), el("b", {}, f.t),
+  return el("div", { style: "display:grid;grid-template-columns:72px 70px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)" },
+    el("span", { class: "form " + formCls(f.f) }, f.f), el("b", { class: "tkc" }, IDX[f.t] ? miniLogo(f.t, 16) : null, f.t),
     el("span", { style: "min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" }, filingDesc(f)),
     el("a", { class: "mono faint", style: "font-size:11.5px", href: filingUrl(f.t, f), target: "_blank", rel: "noopener" }, fdate(f.d)));
 }
 
 const SCR_COLS = [
-  { k: "ticker", n: "Ticker", f: (c, v) => el("b", { class: "mono" }, v) },
+  { k: "ticker", n: "Ticker", f: (c, v) => el("span", { class: "tkc" }, miniLogo(v, 22), el("b", { class: "mono" }, v)) },
   { k: "name", n: "Company", f: (c, v) => el("span", {}, v, el("div", { class: "faint", style: "font-size:11px" }, c.sector)) },
   { k: "price", n: "Price", r: 1, f: v => fnum(v) },
   { k: "chg_1d", n: "1D", r: 1, f: v => fsgn(v, 2), c: 1 },
@@ -1027,7 +1183,24 @@ function sectorConstituents() {
   });
   return panel("S&P 500 by sector", el("a", { href: "#screener" }, "Screener"), grid, el("div", { class: "src" }, "Sector move is weighted by market cap. Largest six companies shown per sector."));
 }
-function logoTile(t, size = 56) { return el("div", { class: "logo", style: `background:${logoColor(t)};width:${size}px;height:${size}px;font-size:${size * (t.length > 3 ? .26 : .32)}px`, "aria-hidden": "true" }, t.replace("-", ".")); }
+const logoUrl = t => IDX[t]?.logo ? `${PUB}logos/${encodeURIComponent(t)}.png` : null;
+function logoTile(t, size = 56) {
+  const mono = () => el("div", { class: "logo", style: `background:${logoColor(t)};width:${size}px;height:${size}px;font-size:${size * (t.length > 3 ? .26 : .32)}px`, "aria-hidden": "true" }, t.replace("-", "."));
+  const u = logoUrl(t);
+  if (!u) return mono();
+  const box = el("div", { class: "logo img", style: `width:${size}px;height:${size}px`, "aria-hidden": "true" });
+  const im = el("img", { src: u, alt: "", width: size, height: size, loading: "lazy", decoding: "async" });
+  im.onerror = () => box.replaceWith(mono());
+  box.append(im);
+  return box;
+}
+function miniLogo(t, size = 18) {
+  const u = logoUrl(t);
+  if (!u) return el("span", { class: "mlogo mono", style: `width:${size}px;height:${size}px;background:${logoColor(t)};font-size:${Math.round(size * .42)}px`, "aria-hidden": "true" }, t[0]);
+  const im = el("img", { class: "mlogo", src: u, alt: "", width: size, height: size, loading: "lazy", decoding: "async" });
+  im.onerror = () => im.replaceWith(el("span", { class: "mlogo mono", style: `width:${size}px;height:${size}px;background:${logoColor(t)};font-size:${Math.round(size * .42)}px` }, t[0]));
+  return im;
+}
 
 pCompany.prep = null;
 async function pCompany(tk) {
@@ -1040,7 +1213,7 @@ async function pCompany(tk) {
   const head = el("div", { class: "co-head" },
     logoTile(tk),
     el("div", { style: "min-width:0" },
-      el("div", { class: "eyebrow" }, `${tk} · ${(c.exchanges || []).join(", ")} · ${IDX[tk].sector} · CIK ${String(c.cik).padStart(10, "0")}`),
+      el("div", { class: "eyebrow" }, `${tk} · ${[...new Set((c.exchanges || []).filter(Boolean))].join(", ")} · ${IDX[tk].sector} · CIK ${String(c.cik).padStart(10, "0")}`),
       el("h1", {}, c.name.replace(/\b([A-Z])([A-Z]+)\b/g, (w, a, b) => w.length <= 3 ? w : a + b.toLowerCase()).replace(/ \/[A-Z]{2}\/?$/, "")),
       el("div", { class: "co-meta" },
         el("span", {}, el("b", {}, c.sicDescription || "–"), ` (SIC ${c.sic || "–"})`),
