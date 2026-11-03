@@ -180,13 +180,13 @@ def _negative_ok(printed, quote):
     """A negative value needs a sign in the printed figure ((1.2), -1.2, −1.2) or a word around it in the quote
     ("down 4 percent", "3% lower", "losses of $7.0 billion", "(0.09)")."""
     p = printed.strip()
-    if p.startswith(("(", "-", "−", "$(")) or p.endswith(")"):
+    if p.startswith(("(", "-", "−", "–", "$(", "$-", "$–")) or p.endswith(")"):
         return True
     core = re.escape(p.replace("$", "").strip("() "))
     for m in re.finditer(r"(?<![\d.])" + core + r"(?![\d])", quote):
         i, j = m.start(), m.end()
         pre = quote[max(0, i - 3):i]
-        if "(" in pre or pre.rstrip().endswith(("-", "−")):
+        if "(" in pre or pre.rstrip().endswith(("-", "−", "–")):
             return True
         if _NEG_BEFORE.search(quote[:i]) or _NEG_AFTER.search(quote[j:]):
             return True
