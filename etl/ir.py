@@ -302,9 +302,18 @@ def safe_name(url, ext):
 MONTHS = {m: i + 1 for i, m in enumerate(["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"])}
 
 
-def quarter_for_date(fye, d):
-    """(label, quarter end) of the latest fiscal quarter that ended at least five days before date d."""
+PERIOD_ENDS = {}
+
+
+def quarter_for_date(fye, d, ends_known=None):
+    """(label, quarter end) of the latest fiscal quarter that ended at least three days before date d. Uses the
+    company's actual period end dates when known (52/53-week years), else calendar quarter ends from the FYE."""
     from .fundamentals import fy_label
+    if ends_known:
+        cands = [e for e in ends_known if e <= d - dt.timedelta(days=3)]
+        if cands:
+            e = max(cands)
+            return fy_label(fye, e.isoformat(), "Q"), e
     fm, fd = int(fye[:2]), int(fye[2:])
     ends = []
     for y in (d.year - 1, d.year, d.year + 1):
@@ -452,13 +461,13 @@ def store_document(sb, ticker, url, body, ext, title, source_page, have_hashes, 
     period_end = None
     if ref_date and fye:
         # an 8-K exhibit belongs to the latest fiscal quarter that ended before the filing
-        label, pe = quarter_for_date(fye, ref_date)
+        label, pe = quarter_for_date(fye, ref_date, PERIOD_ENDS.get(ticker))
         period_end = pe.isoformat() if pe else None
     else:
         label, year = period_hint(url, title)
         when = date_in(title)
         if not label and when and fye:
-            label, pe = quarter_for_date(fye, when)
+            label, pe = quarter_for_date(fye, when, PERIOD_ENDS.get(ticker))
             period_end = pe.isoformat() if pe else None
         if not label:
             label, _ = first_page_period(first)
