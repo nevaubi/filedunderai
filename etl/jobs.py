@@ -673,7 +673,7 @@ def segments_job(sb, tickers=None, workers=5, time_budget=None):
 
 
 # ---------------------------------------------------------------- investor relations documents
-def ir_job(sb, tickers=None, workers=4, time_budget=None, refresh_site=False, web=True):
+def ir_job(sb, tickers=None, workers=4, time_budget=None, refresh_site=False, web=True, sec_years=3):
     from . import ir
     t0 = time.time()
     with Run(sb, "ir") as run:
@@ -688,7 +688,7 @@ def ir_job(sb, tickers=None, workers=4, time_budget=None, refresh_site=False, we
                 fye = (b.get("profile") or {}).get("fiscalYearEnd") or "1231"
                 ir.PERIOD_ENDS[tk] = sorted({dt.date.fromisoformat(x["end"]) for rows in (b.get("statements") or {}).values() for r in rows
                                              for x in r.get("quarterly", []) + r.get("annual", [])})
-                return tk, ir.process_company(sb, tk, BY_TICKER[tk]["name"], BY_TICKER[tk]["cik"], refresh_site=refresh_site, fye=fye, web=web), None
+                return tk, ir.process_company(sb, tk, BY_TICKER[tk]["name"], BY_TICKER[tk]["cik"], refresh_site=refresh_site, fye=fye, web=web, sec_years=sec_years), None
             except Exception as e:
                 return tk, None, str(e)[:300]
 
