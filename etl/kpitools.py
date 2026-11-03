@@ -167,10 +167,13 @@ def check_value(sb, docs_by_id, v):
 
 
 def _close(a, b):
+    """Equal up to rounding: tight for small numbers (rates, per-share), half a unit for large ones."""
     try:
-        return abs(float(a) - float(b)) <= max(0.5, abs(float(b)) * 0.0015)
+        a, b = float(a), float(b)
     except (TypeError, ValueError):
         return False
+    floor = 0.005 if abs(b) < 1000 else 0.5
+    return abs(a - b) <= max(floor, abs(b) * 0.0015)
 
 
 def validate(sb, data, fix=False):
