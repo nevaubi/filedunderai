@@ -296,12 +296,25 @@ def qualifier(quote, printed):
     return None
 
 
-def _label(fye, end, kind):
-    """Fiscal label; "Y" (year to date through a quarter end) reads e.g. "9M FY25"."""
-    from .fundamentals import fy_label
+def _kpi_label(tk, fye, kpi_fye, end, kind):
+    """Label for a KPI value. A KPI with its own calendar-year basis ("fye": "1231" on a non-December filer) reads
+    "Q1 CY24" / "CY2024" so it is not mistaken for the company's fiscal periods."""
+    if not kpi_fye:
+        return _label(fye, end, kind, tk)
+    lab = _label(kpi_fye, end, kind)
+    if kpi_fye == "1231" and (fye or "1231") != "1231":
+        lab = lab.replace(" FY", " CY").replace("FY", "CY", 1) if lab.startswith("FY") else lab.replace(" FY", " CY")
+    return lab
+
+
+def _label(fye, end, kind, ticker=None):
+    """Fiscal label; "Y" (year to date through a quarter end) reads e.g. "9M FY25". With a ticker, the company's
+    year-end history and transition periods apply (a KPI's own "fye" is passed as fye with ticker None)."""
+    from .fundamentals import fy_label, period_label
+    lab = (lambda k: period_label(ticker, fye, end, k)) if ticker else (lambda k: fy_label(fye, end, k))
     if kind == "A":
-        return fy_label(fye, end, "A")
-    q = fy_label(fye, end, "Q")
+        return lab("A")
+    q = lab("Q")
     if kind == "Y":
         n, fy = q.split(" ", 1)
         return f"{int(n[1:]) * 3}M {fy}"
@@ -318,11 +331,12 @@ def publish(sb, data, fye="1231"):
     from .fundamentals import fy_label
     co = sb.select("companies", f"select=fiscal_year_end&ticker=eq.{tk}")
     fye = (co[0].get("fiscal_year_end") if co else None) or fye
+    kfye = {k["id"]: k.get("fye") for k in data.get("kpis", []) if k.get("fye")}
     for k in data.get("kpis", []):
         for v in k.get("values", []):
-            v["fiscal_label"] = _label(fye, v["period_end"], v["kind"])
+            v["fiscal_label"] = _kpi_label(tk, fye, kfye.get(k["id"]), v["period_end"], v["kind"])
     for d in data.get("derived", []):
-        d["fiscal_label"] = _label(fye, d["period_end"], d["kind"])
+        d["fiscal_label"] = _kpi_label(tk, fye, kfye.get(d.get("kpi")), d["period_end"], d["kind"])
     docs = {d["id"]: d for d in docs_for(sb, tk)}
     tie = {(t["parent"], t["kind"], t["period_end"]): True for t in report["ties"]}
     tie.update({(t["parent"], t["kind"], t["period_end"]): False for t in report["tie_failures"]})

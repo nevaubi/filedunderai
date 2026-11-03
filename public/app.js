@@ -52,7 +52,7 @@ async function ensureCompany(tk) {
   if (D.companies[tk]?.statements) return D.companies[tk];
   const [b] = await Promise.all([getJSON(`companies/${tk}.json`), ensurePrices(tk), ensurePrices("SPY")]);
   const p = b.profile || {};
-  D.companies[tk] = { ticker: tk, cik: b.cik, name: p.name, sic: p.sic, sicDescription: p.sicDescription, exchanges: p.exchanges, fiscalYearEnd: p.fiscalYearEnd || "1231", stateOfIncorporation: p.stateOfIncorporation, phone: p.phone, website: p.website, address: p.address, sharesOutstanding: p.sharesOutstanding, filings: (b.filings || []).map(f => ({ ...f })), statements: b.statements, earnings8k: b.earnings8k || [], sector: b.sector, generated: b.generated };
+  D.companies[tk] = { ticker: tk, cik: b.cik, name: p.name, sic: p.sic, sicDescription: p.sicDescription, exchanges: p.exchanges, fiscalYearEnd: p.fiscalYearEnd || "1231", fyeHistory: p.fyeHistory || null, fyTransitions: p.fyTransitions || null, stateOfIncorporation: p.stateOfIncorporation, phone: p.phone, website: p.website, address: p.address, sharesOutstanding: p.sharesOutstanding, filings: (b.filings || []).map(f => ({ ...f })), statements: b.statements, earnings8k: b.earnings8k || [], sector: b.sector, generated: b.generated };
   Object.assign(D.filings, b.filingTables || {});
   Object.assign(E.ix, b.ix || {});
   if (b.release) E.releases[tk] = b.release;
@@ -177,6 +177,8 @@ const CACHE = {};
 
 function fyInfo(tk, end) {
   let fye = D.companies[tk].fiscalYearEnd || "1231";
+  // fiscal year-end changes: [[first period end on the year end, year end], ...]
+  for (const [since, f] of (D.companies[tk].fyeHistory || [])) if (end >= since) fye = f;
   if (fye.slice(0, 2) === "01" && +fye.slice(2) <= 10) fye = "1231";
   const fm = +fye.slice(0, 2), fd = +fye.slice(2);
   const e = pd(end);
@@ -188,7 +190,18 @@ function fyInfo(tk, end) {
   const q = Math.max(1, Math.min(4, 4 - Math.round(monthsLeft / 3)));
   return { fy, q };
 }
-const plabel = (tk, end, kind) => { const { fy, q } = fyInfo(tk, end); return kind === "A" ? `FY${fy}` : `Q${q} FY${String(fy).slice(2)}`; };
+const plabel = (tk, end, kind) => {
+  // transition periods between fiscal years read "Q1 TP26" / "TP2026"
+  for (const [start, stop] of (D.companies[tk].fyTransitions || [])) {
+    if (end >= start && end <= stop) {
+      const s = pd(start), e = pd(end);
+      const months = (e.getUTCFullYear() - s.getUTCFullYear()) * 12 + e.getUTCMonth() - s.getUTCMonth() + 1;
+      return kind === "A" ? `TP${stop.slice(0, 4)}` : `Q${Math.max(1, Math.round(months / 3))} TP${stop.slice(2, 4)}`;
+    }
+  }
+  const { fy, q } = fyInfo(tk, end);
+  return kind === "A" ? `FY${fy}` : `Q${q} FY${String(fy).slice(2)}`;
+};
 
 function model(tk) {
   if (CACHE[tk]) return CACHE[tk];
@@ -1675,7 +1688,9 @@ function renderKpiGroups(host, tk, kpi, K0) {
     const periods = [...ends].sort().slice(-segRangeN(K));
     if (!periods.length) return;
     const tbl = el("table", { class: "segt" });
-    tbl.append(el("thead", {}, el("tr", {}, el("th", { class: "nm" }, g.subcategory ? `${g.category} › ${g.subcategory}` : g.category), ...periods.map(e => el("th", { class: "r" }, kpiPeriodLabel(tk, e, K), el("div", { class: "faint mono", style: "font-size:10.5px" }, e))))));
+    // the published label wins (calendar-basis recasts and transition periods are labelled server-side)
+    const pubLabel = e => { for (const it of g.items) { const v = ((it.values || {})[K === "Q" ? "Q" : "A"] || {})[e]; if (v && v.label) return v.label; } return null; };
+    tbl.append(el("thead", {}, el("tr", {}, el("th", { class: "nm" }, g.subcategory ? `${g.category} › ${g.subcategory}` : g.category), ...periods.map(e => el("th", { class: "r" }, pubLabel(e) || kpiPeriodLabel(tk, e, K), el("div", { class: "faint mono", style: "font-size:10.5px" }, e))))));
     const tb = el("tbody");
     let lastSub = null;
     g.items.forEach(it => {

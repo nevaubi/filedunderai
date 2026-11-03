@@ -109,6 +109,10 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
         except Exception as e:
             log(f"  {tk} summary failed: {str(e)[:160]}")
 
+    if fundamentals.FYE_HISTORY.get(tk):
+        prof["fyeHistory"] = fundamentals.FYE_HISTORY[tk]
+    if fundamentals.TRANSITIONS.get(tk):
+        prof["fyTransitions"] = fundamentals.TRANSITIONS[tk]
     bundle = {
         "ticker": tk, "cik": cik, "displayName": u["name"], "sector": u["sector"], "irUrl": IR_URLS.get(tk), "generated": now_iso(),
         "profile": prof, "statements": statements, "filings": [f for f in filings][:250], "filingTables": ftables,
@@ -633,7 +637,9 @@ def segments_for(sb, tk, years=None, log=print):
         except Exception as e:
             log(f"  {tk} labels {f['a']} failed: {str(e)[:120]}")
     obs, totals = S.collect(parsed)
-    tables = S.pick_tables(S.add_residuals(S.build_tables(obs, totals, fye, labels, fundamentals.fy_label)))
+    def _fyl(f, e, k):
+        return fundamentals.period_label(tk, f, e, k)
+    tables = S.pick_tables(S.add_residuals(S.build_tables(obs, totals, fye, labels, _fyl)))
     bundle = {"ticker": tk, "generated": now_iso(), "fye": fye, "filings": len(parsed), "tables": tables}
     sb.put_json(f"segments/{tk}.json", bundle, cache="max-age=600")
     rows = []

@@ -15,6 +15,37 @@ def norm_fye(fye):
     return fye
 
 
+# fiscal year-end changes: (first period end on the year end, year end). Periods ending on or after a date use its year end.
+FYE_HISTORY = {
+    # FedEx moved from a May 31 to a December 31 year end effective June 1, 2026
+    "FDX": [("0000-00-00", "0531"), ("2026-06-01", "1231")],
+}
+# transition periods between two fiscal years: (start, end, short name). Quarters inside read "Q1 TP26", the period "TP2026".
+TRANSITIONS = {
+    "FDX": [("2026-06-01", "2026-12-31")],
+}
+
+
+def fye_at(ticker, fye, end):
+    """Year end in effect for a period ending on `end` (ISO date), honoring FYE_HISTORY."""
+    out = fye
+    for since, new in FYE_HISTORY.get(ticker or "", []):
+        if end and end >= since:
+            out = new
+    return out
+
+
+def period_label(ticker, fye, end, kind):
+    """fy_label with the company's year-end history and transition periods applied."""
+    for start, stop in TRANSITIONS.get(ticker or "", []):
+        if start <= end <= stop:
+            s, e = _d(start), _d(end)
+            months = (e.year - s.year) * 12 + e.month - s.month + 1
+            yy = stop[:4]
+            return f"TP{yy}" if kind == "A" else f"Q{max(1, round(months / 3))} TP{yy[2:]}"
+    return fy_label(fye_at(ticker, fye, end), end, kind)
+
+
 def fy_label(fye, end, kind):
     fye = norm_fye(fye)
     fm, fd = int(fye[:2]), int(fye[2:])

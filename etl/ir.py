@@ -518,6 +518,8 @@ def store_document(sb, ticker, url, body, ext, title, source_page, have_hashes, 
             first = json.dumps(list(text["sheets"].items())[:1], default=str)[:3000]
     period_end = None
     if ref_date and fye:
+        from .fundamentals import fye_at
+        fye = fye_at(ticker, fye, ref_date.isoformat())
         # an 8-K exhibit belongs to the latest fiscal quarter that ended before the filing, unless its file name
         # names an earlier quarter (recast tables such as "q32024pressreleasetables.htm" filed after the quarter)
         label, pe = named_quarter(fye, url.rsplit("/", 1)[-1], ref_date, PERIOD_ENDS.get(ticker)) or \
