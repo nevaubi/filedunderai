@@ -1645,12 +1645,21 @@ function stackChart(host, data, o = {}) {
 }
 
 /* ---------- KPIs extracted from IR documents ---------- */
+function kpiVals(it, K, aEnds) {
+  const v = it.values || {};
+  if (K === "Q") return { ...(v.I || {}), ...(v.Q || {}) };
+  const out = { ...(v.A || {}) };
+  Object.entries(v.I || {}).forEach(([e, c]) => { if (aEnds.has(e) && !out[e]) out[e] = c; });
+  return out;
+}
 function renderKpiGroups(host, tk, kpi, K0) {
+  const aEnds = new Set();
+  (kpi.groups || []).forEach(g => g.items.forEach(it => Object.keys(it.values?.A || {}).forEach(e => aEnds.add(e))));
   (kpi.groups || []).forEach(g => {
     let K = K0;
     const ends = new Set();
-    g.items.forEach(it => Object.keys(it.values?.[K] || {}).forEach(e => ends.add(e)));
-    if (!ends.size) { K = K === "Q" ? "A" : "Q"; g.items.forEach(it => Object.keys(it.values?.[K] || {}).forEach(e => ends.add(e))); }
+    g.items.forEach(it => Object.keys(kpiVals(it, K, aEnds)).forEach(e => ends.add(e)));
+    if (!ends.size) { K = K === "Q" ? "A" : "Q"; g.items.forEach(it => Object.keys(kpiVals(it, K, aEnds)).forEach(e => ends.add(e))); }
     const periods = [...ends].sort().slice(-(K === "A" ? 5 : 8));
     if (!periods.length) return;
     const tbl = el("table", { class: "segt" });
@@ -1661,8 +1670,10 @@ function renderKpiGroups(host, tk, kpi, K0) {
       if (it.subcategory && it.subcategory !== lastSub && !it.depth) { tb.append(el("tr", { class: "grp" }, el("td", { class: "nm", colspan: periods.length + 1 }, it.subcategory))); }
       if (!it.depth) lastSub = it.subcategory || null;
       const tr = el("tr", { class: (it.depth ? "sub " : "") + (it.is_total ? "total " : "") }, el("td", { class: "nm", style: `padding-left:${12 + (it.depth || 0) * 18}px` }, it.name, it.unit && !/^usd$/i.test(it.unit) ? el("span", { class: "faint", style: "font-size:11px;margin-left:6px" }, it.unit) : null));
+      const iv = kpiVals(it, K, aEnds);
+      if (!periods.some(e => iv[e])) return;
       periods.forEach(e => {
-        const v = it.values?.[K]?.[e];
+        const v = iv[e];
         if (!v) { tr.append(el("td", { class: "c r faint" }, "–")); return; }
         const td = el("td", { class: "c r num", tabindex: 0, title: v.derived ? "Derived: " + v.derived.formula : `${v.doc_title || ""}${v.page ? " · page " + v.page : ""}${v.sheet ? " · " + v.sheet + "!" + (v.cell || "") : ""}` }, fmtKpi(v.v, it.unit));
         if (v.derived) td.append(el("span", { class: "dq" }));
