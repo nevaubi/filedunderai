@@ -662,3 +662,36 @@ def ir_job(sb, tickers=None, workers=4, time_budget=None, refresh_site=False):
                     print("fail", tk, err, flush=True)
         run.stats.update({"done": len(done), "failed": failed})
         return done, failed
+
+
+def segments_changed_job(sb, time_budget=240, workers=4):
+    """Recomputes segment tables for companies whose latest 10-K/10-Q differs from the one last processed."""
+    fund = _cache(sb, "meta/fundamentals.json", {})
+    idx = _cache(sb, "meta/segments.json", {"companies": {}})
+    todo = [tk for tk, *_ in UNIVERSE if (fund.get(tk) or {}).get("material_accession") and
+            (idx["companies"].get(tk) or {}).get("material_accession") != fund[tk]["material_accession"]]
+    done, failed = segments_job(sb, todo[:12], workers=workers, time_budget=time_budget)
+    idx = _cache(sb, "meta/segments.json", {"companies": {}})
+    for tk in done:
+        idx["companies"].setdefault(tk, {})["material_accession"] = (fund.get(tk) or {}).get("material_accession")
+    sb.put_json("meta/segments.json", idx, cache="max-age=600")
+    return done, failed
+
+
+def ir_rotation_job(sb, per_run=8, time_budget=240):
+    """Collects IR documents: companies that reported earnings in the last four days first, then a rolling cursor."""
+    recent = sb.select("filings", "select=ticker,items,filed&form=eq.8-K&filed=gte." + (dt.date.today() - dt.timedelta(days=4)).isoformat())
+    hot = [r["ticker"] for r in recent if "2.02" in (r.get("items") or "")]
+    state = _cache(sb, "meta/ir_rotation.json", {"cursor": 0, "done_hot": {}})
+    tickers = [t for t, *_ in UNIVERSE]
+    hot = [t for t in dict.fromkeys(hot) if state["done_hot"].get(t) != dt.date.today().isoformat()][:per_run]
+    start = state.get("cursor", 0) % len(tickers)
+    rest = [t for t in (tickers[start:] + tickers[:start]) if t not in hot][:max(0, per_run - len(hot))]
+    done, failed = ir_job(sb, hot + rest, workers=4, time_budget=time_budget)
+    for t in hot:
+        if t in done:
+            state["done_hot"][t] = dt.date.today().isoformat()
+    state["cursor"] = (start + len(rest)) % len(tickers)
+    state["updated_at"] = now_iso()
+    sb.put_json("meta/ir_rotation.json", state, cache="no-store")
+    return done, failed

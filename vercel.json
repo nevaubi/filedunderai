@@ -96,6 +96,26 @@
     {
       "path": "/api/cron/insiders?run=2",
       "schedule": "30 15 * * *"
+    },
+    {
+      "path": "/api/cron/segments",
+      "schedule": "50 12 * * *"
+    },
+    {
+      "path": "/api/cron/segments?run=2",
+      "schedule": "50 0 * * *"
+    },
+    {
+      "path": "/api/cron/ir",
+      "schedule": "40 14 * * *"
+    },
+    {
+      "path": "/api/cron/ir?run=2",
+      "schedule": "40 22 * * *"
+    },
+    {
+      "path": "/api/cron/ir?run=3",
+      "schedule": "40 4 * * *"
     }
   ],
   "headers": [

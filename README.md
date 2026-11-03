@@ -55,6 +55,8 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | `/api/cron/macro` | 12:10 daily | Curve, FRED, fed funds, macro news and brief |
 | `/api/cron/companies` | six runs a day | Checks SEC submissions for all 500 (rotating cursor). New 10-K/10-Q/8-K: full reprocess, up to 15 per run. Other new filings (Form 4, 144, proxies) are written straight to `filings` |
 | `/api/cron/news` | 13:00, 19:00 | Rolling news + summary refresh, 14 companies per run |
+| `/api/cron/segments` | 12:50, 00:50 | Recomputes XBRL segment tables for companies with a new 10-K or 10-Q |
+| `/api/cron/ir` | 14:40, 22:40, 04:40 | Collects IR documents: companies that just reported earnings first, then a rolling cursor (8 per run) |
 | `/api/cron/insiders` | 15:30, 23:30 | Parses new Form 4 filings into `insider_transactions`, rewrites `insiders/{T}.json` and `meta/insiders.json` |
 
 Every run is logged in `etl_runs`; the latest runs are published to `meta/status.json` for the Data status page.
