@@ -169,7 +169,7 @@ def check_value(sb, docs_by_id, v):
     return errs
 
 
-_NEG_BEFORE = re.compile(r"\b(down|declin\w*|decreas\w*|lower|fell|fall\w*|drop\w*|negative|loss\w*|reduc\w*|contract\w*|headwind\w*|unfavorabl\w*|outflow\w*|minus|deficit|shrank|below|less|offset by)\b[^.;]{0,60}$", re.I)
+_NEG_BEFORE = re.compile(r"\b(down|declin\w*|decreas\w*|lower|fell|fall\w*|drop\w*|negative|loss\w*|reduc\w*|contract\w*|headwind\w*|unfavorabl\w*|outflow\w*|minus|deficit|shrank|below|less|offset by)\b(?:(?!\.\s+[A-Z])[^;]){0,110}$", re.I)
 _NEG_AFTER = re.compile(r"^[\s%$a-z]{0,12}\b(lower|less|decline|decrease|drop|down|loss|losses|headwind|unfavorable|negative|reduction|contraction|below)\b", re.I)
 
 
