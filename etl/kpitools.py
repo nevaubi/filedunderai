@@ -15,7 +15,7 @@ Extraction file schema (JSON):
   "kpis": [
     {"id": "paid_memberships_total", "name": "Paid memberships", "category": "Members", "subcategory": null,
      "unit": "count" | "USD" | "%" | "USD_per_unit" | "x" | "days" | "units" | text,
-     "parent": null | "<kpi id>", "sums_to_parent": false, "is_total": false, "description": "...",
+     "parent": null | "<kpi id>", "sums_to_parent": false, "group": null | "by_region", "is_total": false, "description": "...",
      "values": [
         {"kind": "Q" | "A" | "I", "period_end": "2026-09-30", "fiscal_label": "Q3 FY26", "value": 301630000,
          "doc": "<document id>", "page": 7, "sheet": null, "cell": null,
@@ -148,6 +148,8 @@ def check_value(sb, docs_by_id, v):
             errs.append(f"quote not found on page {page}: {v.get('quote')[:80]!r}")
     printed = v.get("printed")
     scale = v.get("scale") or 1
+    if printed is not None and str(printed).strip() in ("—", "–", "-", "— ", "nm", "NM") and value == 0:
+        return errs
     if printed is not None:
         nums = numbers_in(str(printed))
         if not nums:
@@ -210,16 +212,21 @@ def validate(sb, data, fix=False):
     children = {}
     for k in data.get("kpis", []):
         if k.get("parent") and k.get("sums_to_parent"):
-            children.setdefault(k["parent"], []).append(k["id"])
-    for parent, kids in children.items():
+            # several complete breakdowns of one parent are allowed: give each its own "group"
+            children.setdefault((k["parent"], k.get("group")), []).append(k["id"])
+    report.setdefault("tie_incomplete", [])
+    for (parent, grp), kids in children.items():
         periods = {(kind, pe) for (kid, kind, pe) in idx if kid == parent}
         for kind, pe in sorted(periods):
             parts = [idx.get((c, kind, pe)) for c in kids]
             if any(p is None for p in parts):
+                if any(p is not None for p in parts):
+                    report["tie_incomplete"].append({"parent": parent, "group": grp, "kind": kind, "period_end": pe,
+                                                     "missing": [c for c, p in zip(kids, parts) if p is None]})
                 continue
             s, tot = sum(parts), idx[(parent, kind, pe)]
             ok = _close(s, tot) or abs(s - tot) <= max(1.0, abs(tot) * 0.006)
-            (report["ties"] if ok else report["tie_failures"]).append({"parent": parent, "kind": kind, "period_end": pe, "sum": s, "total": tot})
+            (report["ties"] if ok else report["tie_failures"]).append({"parent": parent, "group": grp, "kind": kind, "period_end": pe, "sum": s, "total": tot})
     return report, data
 
 
@@ -376,7 +383,10 @@ def main():
         else:
             report = publish(sb, data)
         print(json.dumps({k: (v if not isinstance(v, list) else v[:40]) for k, v in report.items()}, indent=1, default=str))
-        print(f"\nvalues={report['values']} rejected={len(report['bad_values'])} ties={len(report['ties'])} tie_failures={len(report['tie_failures'])} derived_bad={len(report['derived_bad'])}")
+        print(f"\nvalues={report['values']} rejected={len(report['bad_values'])} ties={len(report['ties'])} tie_failures={len(report['tie_failures'])} "
+              f"tie_incomplete={len(report.get('tie_incomplete', []))} derived_bad={len(report['derived_bad'])}")
+        if cmd == "publish":
+            print(f"PUBLISHED kpis/{data['ticker']}.json and kpi rows")
 
 
 def _doc(sb, did):
