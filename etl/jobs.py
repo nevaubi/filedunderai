@@ -4,7 +4,7 @@ import json
 import time
 from concurrent.futures import ThreadPoolExecutor
 
-from . import docs, fundamentals, macro, news, prices, sec, summaries
+from . import docs, fundamentals, insiders, macro, news, prices, sec, summaries
 from .common import Run, Supabase, now_iso
 from .universe import BY_TICKER, MARKET_SYMBOLS, SECTOR_ETF, UNIVERSE
 
@@ -316,3 +316,64 @@ def news_rotation_job(sb, per_run=12, workers=4, time_budget=240):
     state["updated_at"] = now_iso()
     sb.put_json("meta/rotation.json", state, cache="no-store")
     return done, failed
+
+
+# ---------------------------------------------------------------- insiders
+def insiders_job(sb, tickers=None, days=365, per_company=120, workers=4, time_budget=None):
+    """Parses new Form 4 filings into insider_transactions and rewrites insiders/{T}.json for touched companies."""
+    t0 = time.time()
+    with Run(sb, "insiders") as run:
+        cut = (dt.date.today() - dt.timedelta(days=days)).isoformat()
+        q = f"select=ticker,accession,primary_doc,filed&form=eq.4&filed=gte.{cut}&order=filed.desc"
+        if tickers:
+            q += "&ticker=in.(" + ",".join(tickers) + ")"
+        filings = sb.select("filings", q)
+        known = {r["accession"] for r in sb.select("insider_transactions", f"select=accession&filed=gte.{cut}")}
+        per, todo = {}, []
+        for f in filings:
+            if f["accession"] in known or not f.get("primary_doc"):
+                continue
+            if per.get(f["ticker"], 0) >= per_company:
+                continue
+            per[f["ticker"]] = per.get(f["ticker"], 0) + 1
+            todo.append(f)
+        run.stats["pending"] = len(todo)
+        done, failed, buf, touched = 0, 0, [], set(tickers or [])
+
+        def one(f):
+            return insiders.fetch(f["ticker"], BY_TICKER[f["ticker"]][0], f)
+
+        with ThreadPoolExecutor(workers) as ex:
+            futs = []
+            for f in todo:
+                if f["ticker"] not in BY_TICKER:
+                    continue
+                futs.append((f, ex.submit(one, f)))
+            for f, fu in futs:
+                if time_budget and time.time() - t0 > time_budget:
+                    fu.cancel()
+                    continue
+                try:
+                    buf += fu.result()
+                    done += 1
+                    touched.add(f["ticker"])
+                except Exception as e:
+                    failed += 1
+                    print("form4", f["ticker"], f["accession"], str(e)[:160])
+                if len(buf) >= 400:
+                    sb.upsert("insider_transactions", buf, "accession,seq")
+                    buf = []
+        if buf:
+            sb.upsert("insider_transactions", buf, "accession,seq")
+        index = _cache(sb, "meta/insiders.json", {"companies": {}})
+        for tk in sorted(touched):
+            rows = sb.select("insider_transactions", f"select=*&ticker=eq.{tk}&filed=gte.{cut}&order=tx_date.desc")
+            bundle = insiders.summarize(rows)
+            bundle.update({"ticker": tk, "generated": now_iso(), "codes": insiders.CODES})
+            sb.put_json(f"insiders/{tk}.json", bundle, cache="max-age=600")
+            index["companies"][tk] = {"w90": bundle["w90"], "w365": bundle["w365"],
+                                      "last": bundle["rows"][0]["tx_date"] if bundle["rows"] else None}
+        index["generated"] = now_iso()
+        sb.put_json("meta/insiders.json", index, cache="max-age=600")
+        run.stats.update({"parsed": done, "failed": failed, "companies": len(touched)})
+        return done, failed

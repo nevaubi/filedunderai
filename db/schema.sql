@@ -114,6 +114,31 @@ create table if not exists news_items (
 );
 create index if not exists news_ticker_pub on news_items (ticker, published_at desc);
 
+create table if not exists insider_transactions (
+  accession         text not null,
+  seq               integer not null,
+  ticker            text not null references companies(ticker) on delete cascade,
+  cik               bigint,
+  filed             date not null,
+  owner             text,
+  owner_cik         text,
+  role              text,
+  tx_date           date,
+  code              text,
+  security          text,
+  shares            numeric,
+  price             numeric,
+  acq_disp          text,
+  owned_after       numeric,
+  ownership         text,
+  derivative        boolean not null default false,
+  plan_10b5         boolean not null default false,
+  primary key (accession, seq)
+);
+create index if not exists insider_ticker_date on insider_transactions (ticker, tx_date desc);
+create index if not exists insider_filed on insider_transactions (filed desc);
+create index if not exists insider_code on insider_transactions (code, tx_date desc);
+
 create table if not exists summaries (
   id                text primary key,
   kind              text not null,
@@ -168,7 +193,7 @@ revoke all on function bump_usage(text, integer) from public, anon, authenticate
 do $$
 declare t text;
 begin
-  foreach t in array array['companies','company_metrics','filings','facts','prices_daily','macro_observations','news_items','summaries','documents'] loop
+  foreach t in array array['companies','company_metrics','filings','facts','prices_daily','macro_observations','news_items','summaries','documents','insider_transactions'] loop
     execute format('alter table %I enable row level security', t);
     if not exists (select 1 from pg_policies where tablename = t and policyname = 'public read') then
       execute format('create policy "public read" on %I for select to anon, authenticated using (true)', t);

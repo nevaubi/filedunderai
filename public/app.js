@@ -1239,16 +1239,88 @@ function srcCard(title, sub, status, note) {
 }
 function coInsiders(body, tk) {
   const c = D.companies[tk];
+  const host = el("div", {}, el("div", { class: "muted", style: "padding:16px 4px" }, "Loading insider transactions…"));
+  body.append(host);
+  getJSON(`insiders/${tk}.json`).then(ins => { host.innerHTML = ""; renderInsiders(host, tk, ins); }).catch(() => { host.innerHTML = ""; renderInsiderFilings(host, tk, c); });
+}
+function renderInsiderFilings(host, tk, c) {
   const f4 = c.filings.filter(f => ["4", "144", "3", "5"].includes(f.f));
-  const ch = el("div", { class: "bd" });
-  body.append(panel("Insider filing activity by month", null, ch, el("div", { class: "src" }, `${f4.length} Forms 3/4/5/144 in the latest ${c.filings.length} filings. Transaction-level parsing (shares, price, buy/sell code) is part of the production pipeline.`)));
-  const months = {}; f4.forEach(f => { const k = f.d.slice(0, 7); months[k] = months[k] || { 4: 0, 144: 0 }; months[k][f.f === "144" ? 144 : 4]++; });
-  const ks = Object.keys(months).sort();
-  const t = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Form"), el("th", {}, "Filed"), el("th", {}, "Transaction date"), el("th", {}, "Accession no."), el("th", {}, ""))));
-  const tb = el("tbody"); f4.slice(0, 40).forEach(f => tb.append(el("tr", {}, el("td", {}, el("span", { class: "form i" }, f.f)), el("td", { class: "num" }, fdate(f.d)), el("td", { class: "num muted" }, f.r ? fdate(f.r) : "–"), el("td", { class: "mono faint", style: "font-size:12px" }, f.a), el("td", {}, el("a", { href: filingUrl(tk, f), target: "_blank", rel: "noopener" }, "Open ↗")))));
+  const t = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Form"), el("th", {}, "Filed"), el("th", {}, "Accession no."), el("th", {}, ""))));
+  const tb = el("tbody");
+  f4.slice(0, 40).forEach(f => tb.append(el("tr", {}, el("td", {}, el("span", { class: "form i" }, f.f)), el("td", { class: "num" }, fdate(f.d)), el("td", { class: "mono faint", style: "font-size:12px" }, f.a), el("td", {}, el("a", { href: filingUrl(tk, f), target: "_blank", rel: "noopener" }, "Open ↗")))));
   t.append(tb);
-  body.append(panel("Recent insider filings", null, el("div", { class: "scroll" }, t)));
-  requestAnimationFrame(() => ks.length ? barChart(ch, ks.map(k => ({ k: fmon(k + "-01"), vals: [{ v: months[k][4], name: "Form 4" }, { v: months[k][144], name: "Form 144" }] })), { yfmt: d3.format("d"), height: 180, legend: ["Form 4", "Form 144"] }) : ch.append(el("div", { class: "empty" }, "No insider filings in the recent window.")));
+  host.append(panel("Insider filings", null, el("div", { class: "src" }, "Transaction details for this company are still being processed. The filings are listed below."), el("div", { class: "scroll" }, t)));
+}
+function renderInsiders(host, tk, ins) {
+  const codes = ins.codes || {};
+  const money = v => v ? fmtMoney(v) : "–";
+  const w = ins.w90 || {}, y = ins.w365 || {};
+  host.append(el("div", { class: "stats" }, ...[
+    ["Open-market buys, 90d", String(w.buys || 0), w.buys ? `${money(w.buy_value)} · ${w.buyers} insider${w.buyers === 1 ? "" : "s"}` : "none"],
+    ["Open-market sales, 90d", String(w.sells || 0), w.sells ? `${money(w.sell_value)} · ${w.sellers} insider${w.sellers === 1 ? "" : "s"}` : "none"],
+    ["Sales under 10b5-1 plans, 90d", w.sells ? `${Math.round(100 * (w.plan_sells || 0) / w.sells)}%` : "–", "pre-scheduled trading plans"],
+    ["Net open-market, 12m", money((y.buy_value || 0) - (y.sell_value || 0)), `${y.buys || 0} buys · ${y.sells || 0} sales`],
+  ].map(([l, v, d]) => el("div", {}, el("div", { class: "l" }, l), el("div", { class: "v num" }, v), el("div", { class: "faint", style: "font-size:11px" }, d)))));
+
+  const ch = el("div", { class: "bd", style: "position:relative" });
+  host.append(panel("Price with open-market insider trades", el("span", { class: "faint", style: "font-size:12px" }, "Dot size = trade value · last 12 months"), ch));
+  requestAnimationFrame(() => insiderChart(ch, tk, ins.rows || []));
+
+  const grid = el("div", { class: "grid g64" });
+  let mode = "market";
+  const tableHost = el("div", { class: "scroll", style: "max-height:560px;overflow:auto" });
+  const draw = () => {
+    const rows = (ins.rows || []).filter(r => mode === "all" ? true : mode === "market" ? ["P", "S"].includes(r.code) && !r.derivative : ["A", "M", "F", "X", "C", "G"].includes(r.code));
+    const t = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Date"), el("th", {}, "Insider"), el("th", {}, "Type"), el("th", { class: "r" }, "Shares"), el("th", { class: "r" }, "Price"), el("th", { class: "r" }, "Value"), el("th", { class: "r" }, "Owned after"), el("th", {}, ""))));
+    const tb = el("tbody");
+    rows.slice(0, 150).forEach(r => {
+      const val = r.shares && r.price ? r.shares * r.price : null;
+      const dirCls = r.code === "P" ? "up" : r.code === "S" ? "down" : "";
+      tb.append(el("tr", {},
+        el("td", { class: "num" }, fdate(r.tx_date)),
+        el("td", {}, el("div", {}, r.owner), el("div", { class: "faint", style: "font-size:11px" }, r.role || "")),
+        el("td", {}, el("span", { class: "chip " + dirCls, title: `Code ${r.code}${r.derivative ? " · derivative" : ""}` }, codes[r.code] || r.code || "–"), r.plan_10b5 && r.code === "S" ? el("span", { class: "chip", style: "margin-left:4px", title: "Executed under a Rule 10b5-1 trading plan" }, "10b5-1") : null, r.derivative ? el("div", { class: "faint", style: "font-size:11px" }, r.security || "Derivative") : null),
+        el("td", { class: "r num" }, r.shares != null ? Math.round(r.shares).toLocaleString("en-US") : "–"),
+        el("td", { class: "r num" }, r.price ? "$" + fnum(r.price) : "–"),
+        el("td", { class: "r num " + dirCls }, val ? fmtMoney(val) : "–"),
+        el("td", { class: "r num muted" }, r.owned_after != null ? Math.round(r.owned_after).toLocaleString("en-US") : "–"),
+        el("td", {}, el("a", { href: `https://www.sec.gov/Archives/edgar/data/${D.companies[tk]?.cik || ""}/${r.accession.replace(/-/g, "")}/`, target: "_blank", rel: "noopener", title: "Open the Form 4 on EDGAR" }, "Form 4 ↗"))));
+    });
+    if (!rows.length) tb.append(el("tr", {}, el("td", { colspan: 8, class: "muted" }, "No transactions of this type in the last 12 months.")));
+    t.append(tb);
+    tableHost.innerHTML = "";
+    tableHost.append(t);
+  };
+  draw();
+  grid.append(panel("Transactions", seg([["market", "Buys & sales"], ["comp", "Grants & exercises"], ["all", "All"]], mode, v => { mode = v; draw(); }), tableHost,
+    el("div", { class: "src" }, `Parsed from ${new Set((ins.rows || []).map(r => r.accession)).size} Form 4 filings over the last 12 months. Updated ${relTime(ins.generated)}.`)));
+  const ot = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Insider"), el("th", { class: "r" }, "Bought"), el("th", { class: "r" }, "Sold"))));
+  const ob = el("tbody");
+  (ins.owners || []).forEach(o => ob.append(el("tr", {}, el("td", {}, el("div", {}, o.owner), el("div", { class: "faint", style: "font-size:11px" }, o.role || "")), el("td", { class: "r num up" }, o.buy_value ? fmtMoney(o.buy_value) : "–"), el("td", { class: "r num down" }, o.sell_value ? fmtMoney(o.sell_value) : "–"))));
+  if (!(ins.owners || []).length) ob.append(el("tr", {}, el("td", { colspan: 3, class: "muted" }, "No open-market trades in the last 12 months.")));
+  ot.append(ob);
+  grid.append(panel("Largest traders, 12 months", null, el("div", { class: "scroll" }, ot), el("div", { class: "src" }, "Open-market purchases (code P) and sales (code S) of common stock. Grants, option exercises and tax withholding are excluded.")));
+  host.append(grid);
+}
+function insiderChart(host, tk, rows) {
+  const bars = (PX[tk]?.bars || []).filter(b => b.t >= new Date(Date.now() - 372 * 864e5));
+  if (bars.length < 5) { host.append(el("div", { class: "muted" }, "Price history is loading.")); return; }
+  const trades = rows.filter(r => ["P", "S"].includes(r.code) && !r.derivative && r.tx_date && r.shares && r.price).map(r => ({ ...r, t: pd(r.tx_date), v: r.shares * r.price }));
+  const W = host.clientWidth || 800, H = 240, m = { t: 12, r: 16, b: 24, l: 48 };
+  const x = d3.scaleUtc().domain(d3.extent(bars, b => b.t)).range([m.l, W - m.r]);
+  const y = d3.scaleLinear().domain(d3.extent(bars, b => b.c)).nice().range([H - m.b, m.t]);
+  const r = d3.scaleSqrt().domain([0, d3.max(trades, d => d.v) || 1]).range([3, 16]);
+  const svg = d3.select(host).append("svg").attr("width", W).attr("height", H).attr("role", "img").attr("aria-label", `${tk} price with insider trades`);
+  svg.append("g").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(6).tickSizeOuter(0)).call(g => g.selectAll("text").attr("fill", css("--muted")));
+  svg.append("g").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - m.l - m.r))).call(g => { g.select(".domain").remove(); g.selectAll("line").attr("stroke", css("--line")).attr("stroke-opacity", .6); g.selectAll("text").attr("fill", css("--muted")); });
+  svg.append("path").datum(bars).attr("fill", "none").attr("stroke", css("--ink") || "#222").attr("stroke-width", 1.4).attr("d", d3.line().x(b => x(b.t)).y(b => y(b.c)));
+  const near = t => { const i = d3.bisector(b => b.t).left(bars, t); return bars[Math.min(i, bars.length - 1)]; };
+  svg.append("g").selectAll("circle").data(trades.filter(d => d.t >= bars[0].t).sort((a, b) => b.v - a.v)).join("circle")
+    .attr("cx", d => x(d.t)).attr("cy", d => y(near(d.t).c)).attr("r", d => r(d.v))
+    .attr("fill", d => d.code === "P" ? css("--up") : css("--down")).attr("fill-opacity", .35).attr("stroke", d => d.code === "P" ? css("--up") : css("--down")).attr("stroke-width", 1)
+    .on("mousemove", (ev, d) => showTip(ev, `<b>${esc(d.owner)}</b><br><span class="faint">${esc(d.role || "")}</span><br>${d.code === "P" ? "Bought" : "Sold"} ${Math.round(d.shares).toLocaleString("en-US")} @ $${fnum(d.price)}<br>${fmtMoney(d.v)} · ${fdate(d.tx_date)}${d.plan_10b5 ? " · 10b5-1" : ""}`))
+    .on("mouseleave", () => { tip.hidden = true; });
+  if (!trades.length) host.append(el("div", { class: "faint", style: "font-size:12px;padding:4px 0 0" }, "No open-market insider trades in the last 12 months. Most insider activity here is grants, exercises and tax withholding."));
 }
 
 async function pFeed() {
@@ -1735,7 +1807,7 @@ async function pCoverage() {
     srcCard("Treasury yield curve", "home.treasury.gov", "live", "Daily par yield curve, 1 month to 30 years."),
     srcCard("CPI, unemployment, payrolls, fed funds", "BLS and Federal Reserve via FRED", "live", "Monthly CPI-U, core CPI, unemployment, payrolls, daily effective fed funds."),
     srcCard("News and summaries", "News search", "live", "Recent coverage per company on a rolling schedule, with written summaries that link to sources."),
-    srcCard("Insider transactions", "Form 4 XML", "partial", "Filings are listed. Transaction-level parsing (code, shares, price) is next."),
+    srcCard("Insider transactions", "Form 4 XML", "live", "Every Form 4 from the last 12 months parsed to transaction level: insider, role, code, shares, price, holdings after, 10b5-1 flag."),
     srcCard("13F holdings", "SEC 13F-HR", "planned", "Institutional positions by quarter."),
     srcCard("Segments and KPIs", "XBRL dimensions", "planned", "Segment revenue and operating KPIs, each with a source anchor."),
     srcCard("Earnings call transcripts", "IR event pages", "planned", "Speaker-tagged, searchable, citable."))));

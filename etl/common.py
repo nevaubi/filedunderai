@@ -22,7 +22,7 @@ def load_env(path=None):
 
 load_env()
 
-SEC_UA = os.environ.get("SEC_USER_AGENT", "FiledUnder/1.0 research (filedunder.ai)")
+SEC_UA = os.environ.get("SEC_USER_AGENT") or "FiledUnder research contact@filedunder.ai"
 WEB_UA = "FiledUnder/1.0 (+https://filedunder.ai)"
 
 

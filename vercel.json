@@ -15,7 +15,8 @@
     { "path": "/api/cron/companies?run=2", "schedule": "20 16 * * *" },
     { "path": "/api/cron/companies?run=3", "schedule": "20 23 * * *" },
     { "path": "/api/cron/news", "schedule": "0 13 * * *" },
-    { "path": "/api/cron/news?run=2", "schedule": "0 19 * * *" }
+    { "path": "/api/cron/news?run=2", "schedule": "0 19 * * *" },
+    { "path": "/api/cron/insiders", "schedule": "30 23 * * *" }
   ],
   "headers": [
     { "source": "/(.*)", "headers": [
