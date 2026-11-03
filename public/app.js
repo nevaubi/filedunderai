@@ -1539,6 +1539,10 @@ function segCell(tk, t, r, K, c, rowSeries) {
     derived: c.derived ? { from: c.derived.from, minus: { ...c.derived.minus, form: c.derived.minus.form || "" } } : null,
   };
   cell.sib = () => Object.keys(rowSeries).sort().map(e => segCell(tk, t, r, K, rowSeries[e], rowSeries));
+  if (c.synth && c.components) {
+    const kids = c.components.map(k => t.rows.find(x => x.key === k)).filter(Boolean);
+    cell.calc = { formula: `Sum of ${kids.map(x => x.label).join(" + ")}`, inputs: kids.map(x => x[K][c.end] ? segCell(tk, t, x, K, x[K][c.end], x[K]) : null).filter(Boolean) };
+  }
   if (c.residual) {
     const tops = t.rows.filter(x => !x.parent && !x.residual && !x.memo);
     const tc = t.total[K][c.end];
@@ -1566,7 +1570,7 @@ function renderSegments(host, tk, seg, ir, kpi) {
   const nAll = recAll.length, nOk = recAll.filter(x => x.ok || x.residual != null).length;
   host.append(el("div", { class: "seg-head" },
     el("div", {}, el("div", { class: "eyebrow" }, "Segments and breakdowns"), el("div", { class: "muted", style: "font-size:12.5px;max-width:760px" },
-      "Every figure is read from the inline XBRL in the 10-K and 10-Q filings and opens the filed document at the exact number. Quarters missing from the filings are derived from year-to-date figures. Each table is checked against the consolidated total for the same period.")),
+      "Operating KPIs come from the company's investor materials (supplements, slides, letters, releases); breakdowns come from the inline XBRL in its 10-K and 10-Q filings. Every number opens the stored source document at that value. Missing quarters are derived from year-to-date figures, and every breakdown is checked against its total.")),
     el("div", { style: "display:flex;gap:10px;align-items:center;margin-left:auto" }, nAll ? el("span", { class: "chip " + (nOk === nAll ? "up" : ""), title: "Periods where the lines add up to the consolidated total, counting an explicit derived line for unallocated items" }, `${nOk} of ${nAll} period totals tie out`) : null, kindSeg)));
   if (kpi?.groups?.length) renderKpiGroups(host, tk, kpi, st);
   if (!tables.length) host.append(el("div", { class: "empty" }, el("h3", {}, "No segment breakdown tagged"), el("p", { class: "muted" }, "This company's filings do not tag a segment, product or geographic breakdown with dimensions, or it reports a single segment.")));
@@ -1652,7 +1656,10 @@ function renderKpiGroups(host, tk, kpi, K0) {
     const tbl = el("table", { class: "segt" });
     tbl.append(el("thead", {}, el("tr", {}, el("th", { class: "nm" }, g.subcategory ? `${g.category} › ${g.subcategory}` : g.category), ...periods.map(e => el("th", { class: "r" }, kpiPeriodLabel(tk, e, K), el("div", { class: "faint mono", style: "font-size:10.5px" }, e))))));
     const tb = el("tbody");
+    let lastSub = null;
     g.items.forEach(it => {
+      if (it.subcategory && it.subcategory !== lastSub && !it.depth) { tb.append(el("tr", { class: "grp" }, el("td", { class: "nm", colspan: periods.length + 1 }, it.subcategory))); }
+      if (!it.depth) lastSub = it.subcategory || null;
       const tr = el("tr", { class: (it.depth ? "sub " : "") + (it.is_total ? "total " : "") }, el("td", { class: "nm", style: `padding-left:${12 + (it.depth || 0) * 18}px` }, it.name, it.unit && !/^usd$/i.test(it.unit) ? el("span", { class: "faint", style: "font-size:11px;margin-left:6px" }, it.unit) : null));
       periods.forEach(e => {
         const v = it.values?.[K]?.[e];
@@ -1685,7 +1692,7 @@ function fmtKpi(v, unit) {
 }
 function openKpiSource(tk, it, K, e, v) {
   const doc = (SEG[tk]?.ir?.documents || []).find(d => d.id === v.doc) || { id: v.doc, title: v.doc_title, storage_path: v.path, ext: v.ext, url: v.url };
-  openDoc(tk, doc, { page: v.page, quote: v.quote, value: v.v, sheet: v.sheet, cell: v.cell, label: `${it.name} · ${kpiPeriodLabel(tk, e, K)}`, display: fmtKpi(v.v, it.unit), derived: v.derived });
+  openDoc(tk, doc, { page: v.page, quote: v.quote, printed: v.printed, value: v.v, sheet: v.sheet, cell: v.cell, label: `${it.name} · ${kpiPeriodLabel(tk, e, K)}`, display: fmtKpi(v.v, it.unit), derived: v.derived });
 }
 
 /* ---------- IR document library ---------- */
@@ -1727,6 +1734,10 @@ async function pdfjs() {
 }
 function numTokens(hl) {
   const out = new Set();
+  if (hl.printed != null && String(hl.printed).replace(/[^0-9]/g, "").length) {
+    const p = String(hl.printed).replace(/[$()\s]/g, "");
+    return [p, p.replace(/^-/, "")].filter((x, i, a) => a.indexOf(x) === i);
+  }
   if (hl.quote) { const m = String(hl.quote).match(/[-(]?\$?\d[\d,]*(\.\d+)?%?\)?/g); (m || []).forEach(x => out.add(x.replace(/[$()]/g, ""))); }
   if (hl.value != null && isFinite(hl.value)) {
     const a = Math.abs(hl.value);
@@ -1861,15 +1872,16 @@ async function htmlView(view, url, d, hl, status) {
   iframe.addEventListener("load", () => {
     const doc = iframe.contentDocument; if (!doc) return;
     let hits = [];
-    if (hl.quote) hits = textFindQuote(doc, hl.quote);
+    if (hl.quote) hits = textFindQuote(doc, hl.quote, hl.printed);
     if (!hits.length && hl.value != null) hits = textFind(doc, hl.value);
     if (hits.length) { hits[0].classList.add("fu-hit"); hits[0].closest("tr")?.classList.add("fu-row"); const outer = $("#db"), keep = outer.scrollTop; hits[0].scrollIntoView({ block: "center" }); outer.scrollTop = keep; status.textContent = hits.length > 1 ? `${hits.length} matches` : "Value highlighted"; }
     else status.textContent = hl.label ? "Value not found on this page" : "";
   }, { once: true });
 }
-function textFindQuote(doc, quote) {
+function textFindQuote(doc, quote, printed) {
   const q = String(quote).replace(/\s+/g, " ").trim();
-  const nums = (q.match(/\d[\d,]*(\.\d+)?/g) || []).sort((a, b) => b.length - a.length);
+  const pr = printed != null ? String(printed).replace(/[$()\s-]/g, "") : null;
+  const nums = pr ? [pr] : (q.match(/\d[\d,]*(\.\d+)?/g) || []).sort((a, b) => b.length - a.length);
   if (!nums.length) return [];
   const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT), out = [];
   while (walker.nextNode() && out.length < 20) {

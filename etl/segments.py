@@ -304,6 +304,8 @@ def build_tables(obs, totals, fye, labels, fy_label):
         tot = {(s, e): rec for (f2, c2, s, e), rec in totals.items() if f2 == fam and c2 == concept}
         total_series = _quarterize(tot, fye, fy_label)
         _nest(rows, series)
+        _drop_total_alias(rows, series, total_series)
+        _synth_parents(rows, series)
         for part_rows, suffix in _partitions(rows, series, total_series):
             t = _finish_table(fam, concept, axis, cat_key, cat_label, fam_label, part_rows, series, total_series)
             if t:
@@ -387,6 +389,46 @@ def _nest(rows, series):
             r["drop"] = True
     for k in [k for k, r in rows.items() if r.get("drop")]:
         rows.pop(k)
+
+
+def _drop_total_alias(rows, series, total_series):
+    """A member that equals the consolidated total in every period (for example "Total products and services") is the
+    total itself, not a line of the breakdown."""
+    tot = _vals(total_series)
+    for k, r in list(rows.items()):
+        if r["parent"] or r["recon"]:
+            continue
+        rv = _vals(series[k])
+        common = [p for p in rv if p in tot]
+        if len(common) >= 2 and all(_close(rv[p], tot[p]) for p in common):
+            for c in [c for c in rows.values() if c["parent"] == k]:
+                c["parent"] = None
+            rows.pop(k)
+
+
+def _synth_parents(rows, series):
+    """Parents reported only through their components (no fact of their own) get a value equal to the sum of one
+    complete group of components, marked as computed and linked to the components."""
+    for k, r in rows.items():
+        if not r.get("implied"):
+            continue
+        kids = [c for c in rows.values() if c["parent"] == k]
+        if not kids:
+            continue
+        groups = defaultdict(list)
+        for c in kids:
+            groups[c.get("axis2")].append(c)
+        grp = max(groups.values(), key=len)
+        out = {"A": {}, "Q": {}, "I": {}}
+        for kind in ("A", "Q", "I"):
+            ends = set.intersection(*[set(series[c["key"]][kind]) for c in grp]) if grp else set()
+            for e in ends:
+                cells = [series[c["key"]][kind][e] for c in grp]
+                first = cells[0]
+                out[kind][e] = {**first, "v": sum(x["v"] for x in cells), "synth": True, "components": [c["key"] for c in grp], "derived": None}
+        series[k] = out
+        r["implied"] = False
+        r["synth"] = True
 
 
 def _partitions(rows, series, total_series):
@@ -533,7 +575,7 @@ def _latest_abs(s):
 
 def _row_out(r, s, depth):
     return {"key": r["key"], "label": r["label"], "member": r["member"], "parent": r["parent"], "depth": depth, "recon": r["recon"],
-            "implied": r.get("implied", False), "memo": bool(r.get("memo")), "A": s["A"], "Q": s["Q"], "I": s["I"]}
+            "implied": r.get("implied", False), "memo": bool(r.get("memo")), "synth": bool(r.get("synth")), "A": s["A"], "Q": s["Q"], "I": s["I"]}
 
 
 def add_residuals(tables):

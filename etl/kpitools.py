@@ -244,13 +244,30 @@ def publish(sb, data, fye="1231"):
 
     groups = {}
     defs, rows = [], []
+    # tree order inside each category: each root followed by its descendants
+    ordered, seen = [], set()
+
+    def walk(k):
+        if k["id"] in seen:
+            return
+        seen.add(k["id"])
+        ordered.append(k)
+        for c in kpis:
+            if c.get("parent") == k["id"]:
+                walk(c)
     for k in kpis:
-        g = groups.setdefault((k.get("category") or "Operating metrics", k.get("subcategory")), [])
+        if not k.get("parent") or not any(x["id"] == k.get("parent") for x in kpis):
+            walk(k)
+    for k in kpis:
+        walk(k)
+    kpis = ordered
+    for k in kpis:
+        g = groups.setdefault((k.get("category") or "Operating metrics", None), [])
         vals = {"Q": {}, "A": {}, "I": {}}
         for v in k.get("values", []):
             d = docs.get(v["doc"], {})
             vals[v["kind"]][v["period_end"]] = {"v": v["value"], "doc": v["doc"], "page": v.get("page"), "sheet": v.get("sheet"), "cell": v.get("cell"),
-                                                "quote": v.get("quote"), "doc_title": (d.get("title") or "").split("||")[0][:120], "path": d.get("storage_path"),
+                                                "quote": v.get("quote"), "printed": v.get("printed"), "doc_title": (d.get("title") or "").split("||")[0][:120], "path": d.get("storage_path"),
                                                 "ext": d.get("ext"), "url": d.get("url"), "label": v.get("fiscal_label"),
                                                 "tie": tie.get((k["id"], v["kind"], v["period_end"]))}
             rows.append({"ticker": tk, "kpi_id": k["id"], "period_kind": v["kind"], "period_end": v["period_end"], "fiscal_label": v.get("fiscal_label"),
@@ -266,7 +283,7 @@ def publish(sb, data, fye="1231"):
             rows.append({"ticker": tk, "kpi_id": k["id"], "period_kind": kind, "period_end": pe, "fiscal_label": dv.get("fiscal_label"), "value": dv["value"],
                          "unit": k.get("unit"), "source_kind": "ir", "source_id": "derived", "anchor": None, "derived": {"formula": dv["formula"], "inputs": dv["inputs"]},
                          "reconciled": tie.get((k["id"], kind, pe)), "updated_at": now_iso()})
-        g.append({"id": k["id"], "name": k["name"], "unit": k.get("unit"), "parent": k.get("parent"), "depth": dep(k), "is_total": bool(k.get("is_total")),
+        g.append({"id": k["id"], "name": k["name"], "unit": k.get("unit"), "parent": k.get("parent"), "depth": dep(k), "subcategory": k.get("subcategory"), "is_total": bool(k.get("is_total")),
                   "sums_to_parent": bool(k.get("sums_to_parent")), "description": k.get("description"), "values": vals})
         defs.append({"ticker": tk, "kpi_id": k["id"], "name": k["name"], "category": k.get("category"), "subcategory": k.get("subcategory"), "unit": k.get("unit"),
                      "parent_id": k.get("parent"), "sums_to_parent": bool(k.get("sums_to_parent")), "source_kind": "ir", "description": k.get("description"),

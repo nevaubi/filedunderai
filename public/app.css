@@ -466,3 +466,5 @@ table.segt .dq{position:absolute;top:6px;right:4px;width:5px;height:5px;border-r
 .textdoc{overflow:auto;flex:1;background:#fff;padding:16px 20px}
 .textdoc pre{white-space:pre-wrap;font-family:var(--f-mono);font-size:12px;line-height:1.55;margin:0 0 18px}
 .textdoc mark.fu-hit{background:#ffe766;outline:2px solid #f2b600;border-radius:2px}
+table.segt tr.grp td{background:var(--sunk);font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);font-weight:600;text-align:left}
+table.segt tr.grp td.nm{background:var(--sunk)}
