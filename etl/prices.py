@@ -58,6 +58,18 @@ def fetch_many(symbols, rng="2y", interval="1d", workers=3, pause=0.35):
                 out[s] = d
             else:
                 errors[s] = err or "no bars"
+    # rate-limited symbols get a slower second pass
+    retry = [s for s, e in errors.items() if "429" in e]
+    if retry:
+        time.sleep(20)
+        for s in retry:
+            time.sleep(2.5)
+            s_, d, err = one(s)
+            if d and d["bars"]:
+                out[s] = d
+                errors.pop(s, None)
+            else:
+                errors[s] = err or "no bars"
     return out, errors
 
 

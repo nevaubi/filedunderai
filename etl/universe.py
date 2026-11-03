@@ -16,7 +16,7 @@ UNIVERSE = [
     ("AXP", 4962, "American Express", "Financials"),
     ("BA", 12927, "Boeing", "Industrials"),
     ("BAC", 70858, "Bank of America", "Financials"),
-    ("BK", 1390777, "BNY", "Financials"),
+    ("BNY", 1390777, "BNY", "Financials"),
     ("BKNG", 1075531, "Booking Holdings", "Consumer Discretionary"),
     ("BLK", 2012383, "BlackRock", "Financials"),
     ("BMY", 14272, "Bristol Myers Squibb", "Health Care"),
@@ -106,7 +106,7 @@ UNIVERSE = [
     ("XOM", 2115436, "Exxon Mobil", "Energy"),
 ]
 
-MARKET_SYMBOLS = ["SPY", "QQQ", "IWM", "DIA", "SMH", "^VIX", "^TNX", "^IRX", "^TYX", "DX-Y.NYB", "CL=F", "GC=F", "HG=F", "BTC-USD",
+MARKET_SYMBOLS = ["SPY", "QQQ", "IWM", "DIA", "SMH", "^VIX", "^TNX", "^IRX", "^TYX", "DX=F", "CL=F", "GC=F", "HG=F", "BTC-USD",
                   "XLK", "XLF", "XLE", "XLV", "XLY", "XLP", "XLI", "XLU", "XLB", "XLRE", "XLC"]
 
 SECTOR_ETF = {"Information Technology": "XLK", "Financials": "XLF", "Energy": "XLE", "Health Care": "XLV", "Consumer Discretionary": "XLY",

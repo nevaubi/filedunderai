@@ -1,5 +1,4 @@
 "use strict";
-"use strict";
 const CFG = window.FU_CONFIG || {};
 const PUB = CFG.dataBase;
 /* Global stores, filled lazily from the public data bucket. */
@@ -117,8 +116,7 @@ const cls = v => v > 0 ? "up" : v < 0 ? "down" : "";
 
 /* ---------- prices ---------- */
 const PX = {};
-for (const [s, p] of Object.entries(D.prices)) PX[s] = { meta: p.meta, bars: p.bars.map(b => ({ t: new Date(b[0] * 1000), o: b[1], h: b[2], l: b[3], c: b[4], v: b[5] })) };
-const SYMNAME = { SPY: "S&P 500", QQQ: "Nasdaq 100", IWM: "Russell 2000", DIA: "Dow 30", SMH: "Semiconductors", "^VIX": "VIX", "^TNX": "10Y yield", "^IRX": "13W T-bill", "^TYX": "30Y yield", "DX-Y.NYB": "US dollar", "CL=F": "WTI crude", "GC=F": "Gold", "HG=F": "Copper", "BTC-USD": "Bitcoin", XLK: "Technology", XLF: "Financials", XLE: "Energy", XLV: "Health care", XLY: "Cons. discretionary", XLP: "Cons. staples", XLI: "Industrials", XLU: "Utilities", XLB: "Materials", XLRE: "Real estate", XLC: "Communication" };
+const SYMNAME = { SPY: "S&P 500", QQQ: "Nasdaq 100", IWM: "Russell 2000", DIA: "Dow 30", SMH: "Semiconductors", "^VIX": "VIX", "^TNX": "10Y yield", "^IRX": "13W T-bill", "^TYX": "30Y yield", "DX=F": "US dollar", "CL=F": "WTI crude", "GC=F": "Gold", "HG=F": "Copper", "BTC-USD": "Bitcoin", XLK: "Technology", XLF: "Financials", XLE: "Energy", XLV: "Health care", XLY: "Cons. discretionary", XLP: "Cons. staples", XLI: "Industrials", XLU: "Utilities", XLB: "Materials", XLRE: "Real estate", XLC: "Communication" };
 const SECTORS = ["XLK", "XLC", "XLY", "XLF", "XLI", "XLV", "XLP", "XLE", "XLU", "XLB", "XLRE"];
 const last = s => PX[s]?.bars.at(-1);
 const prev = s => PX[s]?.bars.at(-2);
@@ -526,7 +524,7 @@ function baseTools(trace) {
       execute: wrap("screen_companies", i => { let rows = (INDEX?.companies || []).filter(c => !i.sector || c.sector === i.sector); if (i.sort) rows = rows.filter(c => c[i.sort] != null).sort((a, b) => (i.desc === false ? 1 : -1) * (a[i.sort] - b[i.sort])); return rows.slice(0, Math.min(102, Number(i.limit) || 25)).map(c => ({ ticker: c.ticker, name: c.name, sector: c.sector, price: c.price, market_cap: c.market_cap, pe_ttm: c.pe_ttm && +c.pe_ttm.toFixed(1), ps_ttm: c.ps_ttm && +c.ps_ttm.toFixed(1), revenue_ttm: c.revenue_ttm, net_income_ttm: c.net_income_ttm, fcf_ttm: c.fcf_ttm, fcf_yield: c.fcf_yield && +(c.fcf_yield * 100).toFixed(2), gross_margin_lq: c.gross_margin_lq && +(c.gross_margin_lq * 100).toFixed(1), op_margin_lq: c.op_margin_lq && +(c.op_margin_lq * 100).toFixed(1), rev_growth_lq: c.rev_growth_lq && +(c.rev_growth_lq * 100).toFixed(1), dividend_yield: c.dividend_yield && +(c.dividend_yield * 100).toFixed(2), ret_ytd: c.ret_ytd && +(c.ret_ytd * 100).toFixed(1), ret_1y: c.ret_1y && +(c.ret_1y * 100).toFixed(1), beta_1y: c.beta_1y && +c.beta_1y.toFixed(2), latest_quarter: c.latest_quarter })); }) },
     { name: "get_financials", description: "Return a reported or calculated metric series for one company from its SEC filings. period is 'annual' or 'quarterly'. Each point has a period label (e.g. 'FY2025', 'Q3 FY26'), value, unit and the filing it came from. Percent metrics are in percent. Metric labels: " + METRIC_LABELS.join(", "), inputSchema: { type: "object", properties: { ticker: { type: "string" }, metric: { type: "string" }, period: { type: "string", enum: ["annual", "quarterly"] }, last: { type: "number", description: "How many most recent periods (default 8, max 40)" } }, required: ["ticker", "metric"] },
       execute: wrap("get_financials", async i => { const tk = String(i.ticker).toUpperCase(); await ensureCompany(tk); const m = model(tk); const lab = resolveLabel(m, i.metric); if (!lab) throw new Error("Unknown metric for " + tk + ". Valid: " + Object.keys(m.byLabel).concat(m.ratioDefs.map(d => d.label)).join(", ")); return { ticker: tk, metric: lab, points: compactSeries(tk, lab, i.period === "annual" ? "A" : "Q", Math.min(40, Number(i.last) || 8)), ttm: m.ttm(lab)?.v ?? null }; }) },
-    { name: "get_price_stats", description: "Price statistics for a symbol from daily bars: last close, 1D/1W/1M/3M/YTD/1Y returns, 20/60-day annualized volatility, 52-week range, beta and correlation to SPY over 1 year, max drawdown, RSI14, 50/200-day moving averages. Symbols: any covered ticker plus SPY, QQQ, IWM, DIA, SMH, sector SPDRs, ^VIX, ^TNX, DX-Y.NYB, CL=F, GC=F, HG=F, BTC-USD.", inputSchema: { type: "object", properties: { symbol: { type: "string" } }, required: ["symbol"] },
+    { name: "get_price_stats", description: "Price statistics for a symbol from daily bars: last close, 1D/1W/1M/3M/YTD/1Y returns, 20/60-day annualized volatility, 52-week range, beta and correlation to SPY over 1 year, max drawdown, RSI14, 50/200-day moving averages. Symbols: any covered ticker plus SPY, QQQ, IWM, DIA, SMH, sector SPDRs, ^VIX, ^TNX, DX=F, CL=F, GC=F, HG=F, BTC-USD.", inputSchema: { type: "object", properties: { symbol: { type: "string" } }, required: ["symbol"] },
       execute: wrap("get_price_stats", async i => { const s = String(i.symbol).toUpperCase(); await Promise.all([ensurePrices(s), ensurePrices("SPY")]); const st = priceStats(s); if (!st) throw new Error("No price data for " + i.symbol); return Object.fromEntries(Object.entries(st).map(([k, v]) => [k, typeof v === "number" ? +v.toFixed(4) : v])); }) },
     { name: "get_earnings_reactions", description: "For one company, list earnings-release dates (8-K Item 2.02) with the stock's next-session return, the same-day SPY return, and the 5-session drift.", inputSchema: { type: "object", properties: { ticker: { type: "string" } }, required: ["ticker"] }, execute: wrap("get_earnings_reactions", async i => { const tk = String(i.ticker).toUpperCase(); await ensureCompany(tk); return earningsReactions(tk).map(r => ({ filed: r.date, next1d: +(r.r1 * 100).toFixed(2), spy1d: r.s1 == null ? null : +(r.s1 * 100).toFixed(2), drift5d: r.r5 == null ? null : +(r.r5 * 100).toFixed(2) })); }) },
     { name: "get_macro", description: "Macro series. Names: CPI, CORE_CPI, UNRATE (%), PAYEMS (thousands), EFFR (%), CURVE (latest Treasury curve), SPREAD_2S10S (daily, %). Returns the last n observations (default 24).", inputSchema: { type: "object", properties: { name: { type: "string" }, n: { type: "number" } }, required: ["name"] }, execute: wrap("get_macro", i => macroSeries(String(i.name).toUpperCase(), Math.min(120, Number(i.n) || 24))) },
@@ -818,7 +816,7 @@ function aiCredit(meta) {
   if (!meta?.at) return null;
   return el("div", { class: "aimeta", title: "Generated from the filings, the latest release and recent coverage. Check figures against the linked sources." }, el("span", { class: "chip acc" }, svgUse("i-spark"), "Summary"), el("span", {}, `Updated ${relTime(meta.at)}`));
 }
-function relTime(s) { if (!s) return ""; const t = new Date(s); if (isNaN(t)) return ""; if (Date.now() - t < 6e4) return "just now"; const h = Math.max(0, (Date.now() - t) / 36e5); return h < 1 ? "just now" : h < 24 ? `${Math.round(h)}h ago` : `${Math.round(h / 24)}d ago`; }
+function relTime(s) { if (!s) return ""; const t = new Date(s); if (isNaN(t)) return ""; const m = Math.max(0, (Date.now() - t) / 6e4); return m < 1 ? "just now" : m < 60 ? `${Math.round(m)}m ago` : m < 1440 ? `${Math.round(m / 60)}h ago` : `${Math.round(m / 1440)}d ago`; }
 const domainOf = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; } };
 function newsList(items, lines, n = 10) {
   const box = el("div", { class: "news" });
@@ -830,7 +828,7 @@ function newsList(items, lines, n = 10) {
 }
 function pMarkets() {
   page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Markets · " + d3.utcFormat("%A, %B %d")(last("SPY").t)), el("h1", {}, "Today across the tape"), el("div", { class: "sub" }, "Indexes, rates, commodities, the S&P 100 and your watchlist. Every tile opens its chart.")), el("div", { class: "right" }, el("button", { class: "btn", onclick: () => openPalette() }, svgUse("i-search"), "Search", el("span", { class: "kbd" }, "⌘K")))));
-  const syms = ["SPY", "QQQ", "IWM", "DIA", "SMH", "^VIX", "^TNX", "DX-Y.NYB", "CL=F", "GC=F", "HG=F", "BTC-USD"];
+  const syms = ["SPY", "QQQ", "IWM", "DIA", "SMH", "^VIX", "^TNX", "DX=F", "CL=F", "GC=F", "HG=F", "BTC-USD"];
   page.append(el("div", { class: "tiles" }, syms.filter(s => PX[s]).map(s => {
     const ch = s === "^TNX" ? (last(s).c - prev(s).c) / 100 : dayChg(s);
     return el("button", { class: "tile", onclick: () => { STATE.taSym = s; location.hash = "technicals"; }, title: `Open ${SYMNAME[s]} chart` },
@@ -1441,7 +1439,7 @@ async function pMacro() {
   g.append(panel("Effective federal funds rate", null, ffH, el("div", { class: "src" }, el("a", { href: "https://www.federalreserve.gov/releases/h15/", target: "_blank", rel: "noopener" }, "Federal Reserve H.15 ↗"), " · monthly average via DBnomics")));
   g.append(panel("Nonfarm payrolls, monthly change", null, pyH, el("div", { class: "src" }, el("a", { href: "https://fred.stlouisfed.org/series/PAYEMS", target: "_blank", rel: "noopener" }, "BLS via FRED (PAYEMS) ↗"))));
   page.append(g);
-  const mk = ["DX-Y.NYB", "CL=F", "GC=F", "HG=F", "^VIX", "BTC-USD"];
+  const mk = ["DX=F", "CL=F", "GC=F", "HG=F", "^VIX", "BTC-USD"];
   const mg = el("div", { class: "grid g3" });
   mk.forEach(s => { if (!PX[s]) return; const host = el("div", { class: "bd" }); mg.append(panel(SYMNAME[s], el("span", { class: "num " + cls(retOver(s, 30)) }, fnum(last(s).c) + " · 1M " + fsgn(retOver(s, 30))), host)); requestAnimationFrame(() => lineChart(host, [{ pts: PX[s].bars.slice(-252).map(b => [b.t, b.c]) }], { height: 130, area: true, yfmt: d3.format(",.0f") })); });
   page.append(el("div", { class: "eyebrow" }, "Market-implied macro, Yahoo Finance"), mg);
@@ -1715,6 +1713,19 @@ async function pCoverage() {
   rows.forEach(([n, f, at, d]) => tb.append(el("tr", {}, el("td", {}, el("span", { class: "status-dot", style: `background:${dot(at)}` }), n, el("div", { class: "faint mono", style: "font-size:11px" }, f)), el("td", { class: "num" }, at ? `${age(at)} · ${new Date(at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}` : "–"), el("td", { class: "muted" }, d))));
   t.append(tb);
   page.append(panel("Datasets", null, el("div", { class: "scroll" }, t)));
+  if (status?.recent?.length) {
+    const JOBN = { prices: "Prices and stats", companies: "Company filings", macro: "Macro", news: "News and summaries", index: "Index rebuild", feed: "Filings feed" };
+    const jt = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Job"), el("th", {}, "Started"), el("th", { class: "r" }, "Duration"), el("th", {}, "Result"), el("th", {}, "Detail"))));
+    const jb = el("tbody");
+    status.recent.slice(0, 15).forEach(r => {
+      const st = r.stats || {};
+      const detail = r.error ? r.error : Object.entries(st).filter(([k]) => k !== "seconds").slice(0, 4).map(([k, v]) => `${k.replace(/_/g, " ")}: ${Array.isArray(v) ? v.length : typeof v === "object" && v ? Object.keys(v).length : v}`).join(" · ");
+      const res = !r.finished_at ? el("span", { class: "chip warn" }, "Running") : r.status === "ok" ? el("span", { class: "chip up" }, "OK") : el("span", { class: "chip down" }, "Error");
+      jb.append(el("tr", {}, el("td", {}, JOBN[r.job] || r.job), el("td", { class: "num" }, `${relTime(r.started_at)} · ${new Date(r.started_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}`), el("td", { class: "r num" }, st.seconds != null ? `${Math.round(st.seconds)}s` : "–"), el("td", {}, res), el("td", { class: "muted", style: "max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap", title: detail }, detail || "–")));
+    });
+    jt.append(jb);
+    page.append(panel("Pipeline runs", el("span", { class: "faint" }, `Updated ${relTime(status.generated)}`), el("div", { class: "scroll" }, jt)));
+  }
   page.append(panel("Sources", null, el("div", { class: "bd cover" },
     srcCard("SEC XBRL company facts", "data.sec.gov/api/xbrl/companyfacts", "live", "Every tagged value in every 10-K and 10-Q, with accession numbers. Feeds the financial tables and the source panel."),
     srcCard("SEC submissions", "data.sec.gov/submissions", "live", "Company profile, addresses, SIC, fiscal year end, and the filing index used by the feed."),
@@ -1737,10 +1748,11 @@ async function pCoverage() {
 
 async function boot() {
   try {
-    const [ix, mk] = await Promise.all([getJSON("index.json"), getJSON("market.json")]);
+    const soft = p => Promise.race([p.catch(() => null), new Promise(r => setTimeout(() => r(null), 4000))]);
+    const [ix, mk, mc, fd] = await Promise.all([getJSON("index.json"), getJSON("market.json"), soft(getJSON("macro.json")), soft(getJSON("feed.json"))]);
     applyIndex(ix); applyMarket(mk);
-    getJSON("macro.json").then(applyMacro).catch(() => {});
-    getJSON("feed.json").then(f => { FEED = f; }).catch(() => {});
+    if (mc) applyMacro(mc); else getJSON("macro.json").then(applyMacro).catch(() => {});
+    if (fd) FEED = fd; else getJSON("feed.json").then(f => { FEED = f; }).catch(() => {});
   } catch (e) {
     page.innerHTML = ""; page.append(el("div", { class: "empty" }, el("h2", {}, "Data is temporarily unavailable"), el("p", { class: "muted" }, String(e.message || e)), el("button", { class: "btn", onclick: () => location.reload() }, "Reload")));
     return;

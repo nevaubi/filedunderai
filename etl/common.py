@@ -179,4 +179,26 @@ class Run:
                 self.sb.update("etl_runs", {"id": self.id}, {"finished_at": now_iso(), "status": "error" if ev else "ok", "stats": self.stats, "error": str(ev)[:2000] if ev else None})
             except Exception as e:
                 print("etl_runs update failed:", e)
+        publish_status(self.sb)
         return False
+
+
+def publish_status(sb):
+    """Writes meta/status.json: the latest runs per job, for the Data status page."""
+    try:
+        rows = sb.select("etl_runs", "select=job,started_at,finished_at,status,stats,error&order=started_at.desc&limit=200")
+        latest, recent = {}, []
+        for r in rows:
+            if r.get("error"):
+                r["error"] = r["error"][:300]
+            if r["job"] not in latest:
+                latest[r["job"]] = r
+            if len(recent) < 30:
+                recent.append(r)
+        last_ok = {}
+        for r in rows:
+            if r.get("status") == "ok" and r["job"] not in last_ok:
+                last_ok[r["job"]] = r.get("finished_at")
+        sb.put_json("meta/status.json", {"generated": now_iso(), "latest": latest, "last_ok": last_ok, "recent": recent}, cache="max-age=60")
+    except Exception as e:
+        print("status publish failed:", e)
