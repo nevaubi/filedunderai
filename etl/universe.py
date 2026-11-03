@@ -531,4 +531,16 @@ PREDECESSORS = {
     "DOW": [(29915, "2019-04-01")],      # The Dow Chemical Company before Dow Inc.
     "JCI": [(53669, "2016-09-02")],      # Johnson Controls, Inc. before the Tyco merger
     "XOM": [(34088, "2026-07-01")],      # Exxon Mobil Corporation before the 2026 holding-company reorganization
+    "AVGO": [(1649338, "2018-04-04"),    # Broadcom Limited (now Broadcom Pte. Ltd.) before the Delaware redomiciliation
+             (1441634, "2016-02-01")],   # Avago Technologies Ltd before the Broadcom Corporation combination
+    "CI": [(701221, "2018-12-20")],      # Cigna Corporation (now Cigna Holding Co) before the Express Scripts holdco
+    "APA": [(6769, "2021-03-01")],       # Apache Corporation before the APA holding-company reorganization
+    "BG": [(1144519, "2023-11-01")],     # Bunge Limited (Bermuda) before the Swiss redomiciliation
+    "ICE": [(1174746, "2013-11-13")],    # IntercontinentalExchange, Inc. before the NYSE Euronext holdco
+    "MRVL": [(1058057, "2021-04-20")],   # Marvell Technology Group Ltd before the Delaware redomiciliation
+    "STE": [(1624899, "2019-03-28"),     # STERIS plc (UK) before the Irish redomiciliation
+            (815065, "2015-11-02")],     # STERIS Corporation before the Synergy combination
+    "VTRS": [(1623613, "2020-11-16"),    # Mylan N.V. before the Upjohn combination
+             (69499, "2015-02-27")],     # Mylan Inc. before the Dutch reorganization
+    "TPL": [(97517, "2021-01-11")],      # Texas Pacific Land Trust before the corporate reorganization
 }
