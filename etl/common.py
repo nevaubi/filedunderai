@@ -88,9 +88,34 @@ _sec_lock = threading.Lock()
 _sec_last = [0.0]
 
 
+def _shared_throttle(path, min_gap):
+    """Rate limit shared by every process on the machine (SEC_SHARED=path): the last request time lives in a locked file."""
+    import fcntl
+    with open(path, "a+") as fh:
+        fcntl.flock(fh, fcntl.LOCK_EX)
+        fh.seek(0)
+        try:
+            last = float(fh.read().strip() or 0)
+        except ValueError:
+            last = 0.0
+        wait = last + min_gap - time.time()
+        if wait > 0:
+            time.sleep(wait)
+        fh.seek(0)
+        fh.truncate()
+        fh.write(repr(time.time()))
+        fh.flush()
+        fcntl.flock(fh, fcntl.LOCK_UN)
+
+
 def sec_throttle(min_gap=None):
-    """Keeps the process under SEC's 10 requests per second across threads."""
+    """Keeps the process under SEC's 10 requests per second across threads (and across processes with SEC_SHARED)."""
     min_gap = min_gap if min_gap is not None else float(os.environ.get("SEC_GAP", "0.13"))
+    shared = os.environ.get("SEC_SHARED")
+    if shared:
+        with _sec_lock:
+            _shared_throttle(shared, min_gap)
+        return
     with _sec_lock:
         wait = _sec_last[0] + min_gap - time.time()
         if wait > 0:
