@@ -19,6 +19,9 @@ def norm_fye(fye):
 FYE_HISTORY = {
     # FedEx moved from a May 31 to a December 31 year end effective June 1, 2026
     "FDX": [("0000-00-00", "0531"), ("2026-06-01", "1231")],
+    # Morgan Stanley and Goldman Sachs moved from November to December year ends after fiscal 2008
+    "MS": [("0000-00-00", "1130"), ("2008-12-01", "1231")],
+    "GS": [("0000-00-00", "1130"), ("2008-12-27", "1231")],
 }
 # companies that name a fiscal year after the calendar year in which it mostly falls, although it ends in January or
 # early February of the next year (Home Depot's "fiscal 2024" ended February 2, 2025). Their labels are one year lower.
