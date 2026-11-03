@@ -694,4 +694,9 @@ def ir_rotation_job(sb, per_run=8, time_budget=240):
     state["cursor"] = (start + len(rest)) % len(tickers)
     state["updated_at"] = now_iso()
     sb.put_json("meta/ir_rotation.json", state, cache="no-store")
+    try:
+        from .kpitools import build_index
+        build_index(sb)
+    except Exception as e:
+        print("coverage index failed", e)
     return done, failed

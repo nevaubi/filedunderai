@@ -358,6 +358,8 @@ def main():
                         line = " | ".join(str(v) for v in row if v not in ("", None))
                         if rx.search(line):
                             print(f"{d['id']} {sh}!row{r_i + 1} [{d.get('fiscal_label')}]: {line[:200]}")
+    elif cmd == "index":
+        print(build_index(sb))
     elif cmd == "periods":
         b = sb.get_json(f"companies/{args[0]}.json") or {}
         from .fundamentals import fy_label
@@ -387,6 +389,37 @@ def main():
               f"tie_incomplete={len(report.get('tie_incomplete', []))} derived_bad={len(report['derived_bad'])}")
         if cmd == "publish":
             print(f"PUBLISHED kpis/{data['ticker']}.json and kpi rows")
+
+
+def build_index(sb):
+    """meta/coverage_ir.json: IR documents, KPI and segment coverage per company, for the Data status page."""
+    import collections
+    docs = sb.select("ir_documents", "select=ticker,doc_type,bytes")
+    defs = sb.select("kpi_definitions", "select=ticker,kpi_id")
+    vals = sb.select("kpi_values", "select=ticker&source_kind=eq.ir")
+    seg = (sb.get_json("meta/segments.json") or {}).get("companies", {})
+    by = collections.defaultdict(lambda: {"docs": 0, "bytes": 0, "kpis": 0, "kpi_values": 0, "types": collections.Counter()})
+    for d in docs:
+        b = by[d["ticker"]]
+        b["docs"] += 1
+        b["bytes"] += d.get("bytes") or 0
+        b["types"][d.get("doc_type") or "other"] += 1
+    for d in defs:
+        by[d["ticker"]]["kpis"] += 1
+    for v in vals:
+        by[v["ticker"]]["kpi_values"] += 1
+    out = {}
+    for tk, b in by.items():
+        out[tk] = {**b, "types": dict(b["types"])}
+    for tk, sg in seg.items():
+        out.setdefault(tk, {"docs": 0, "bytes": 0, "kpis": 0, "kpi_values": 0, "types": {}})
+        out[tk]["segment_tables"] = sg.get("tables")
+        out[tk]["segment_ties"] = sg.get("recon_ok")
+    summary = {"companies_with_docs": sum(1 for v in out.values() if v["docs"]), "documents": len(docs), "bytes": sum(v["bytes"] for v in out.values()),
+               "companies_with_kpis": sum(1 for v in out.values() if v["kpis"]), "kpis": len(defs), "kpi_values": len(vals),
+               "companies_with_segments": sum(1 for v in out.values() if v.get("segment_tables")), "segment_tables": sum(v.get("segment_tables") or 0 for v in out.values())}
+    sb.put_json("meta/coverage_ir.json", {"generated": now_iso(), "summary": summary, "companies": out}, cache="max-age=300")
+    return summary
 
 
 def _doc(sb, did):

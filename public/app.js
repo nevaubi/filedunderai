@@ -2360,7 +2360,7 @@ async function pResearch() {
 
 /* ---------- coverage ---------- */
 async function pCoverage() {
-  const [meta, status] = await Promise.all([getJSON("meta/fundamentals.json").catch(() => ({})), getJSON("meta/status.json", { fresh: true }).catch(() => null)]);
+  const [meta, status, irc] = await Promise.all([getJSON("meta/fundamentals.json").catch(() => ({})), getJSON("meta/status.json", { fresh: true }).catch(() => null), getJSON("meta/coverage_ir.json", { fresh: true }).catch(() => null)]);
   if (!MACRO) await getJSON("macro.json").then(applyMacro).catch(() => {});
   if (!FEED) FEED = await getJSON("feed.json").catch(() => null);
   page.innerHTML = "";
@@ -2373,6 +2373,11 @@ async function pCoverage() {
     ["Macro: curve, CPI, jobs, fed funds", "macro.json", MACRO?.generated, `${MACRO?.curve?.length || 0} curve days`],
     ["Market brief", "macro.json", MACRO?.brief?.generated_at, MACRO?.brief ? "available" : "pending"],
     ["Filings feed", "feed.json", FEED?.generated, `${FEED?.filings?.length || 0} recent filings`],
+    ...(irc ? [
+      ["Segment breakdowns (XBRL)", "segments/*", irc.generated, `${irc.summary.segment_tables} tables across ${irc.summary.companies_with_segments} companies`],
+      ["Investor relations documents", "ir bucket", irc.generated, `${irc.summary.documents.toLocaleString("en-US")} files for ${irc.summary.companies_with_docs} companies, ${(irc.summary.bytes / 1e9).toFixed(2)} GB stored`],
+      ["KPIs from investor materials", "kpis/*", irc.generated, `${irc.summary.kpis.toLocaleString("en-US")} KPIs, ${irc.summary.kpi_values.toLocaleString("en-US")} values for ${irc.summary.companies_with_kpis} companies`],
+    ] : []),
   ];
   const t = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Dataset"), el("th", {}, "Updated"), el("th", {}, "Detail"))));
   const tb = el("tbody");
