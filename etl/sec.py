@@ -271,7 +271,10 @@ def fill_gaps(cik, facts, sub, max_filings=4, log=print):
             for rows in f.get("units", {}).values():
                 for r in rows:
                     known.add(r.get("accn"))
-    todo = [f for f in filing_list(sub) if f["f"] in PERIODIC and f["d"] >= (have or "0000") and f["a"] not in known and f["p"].lower().endswith((".htm", ".html"))]
+    # any recent periodic report whose accession companyfacts does not carry yet (the latest "filed" date in companyfacts
+    # can come from an unrelated later filing, so dates alone do not tell what is missing)
+    horizon = (dt.date.today() - dt.timedelta(days=420)).isoformat()
+    todo = [f for f in filing_list(sub) if f["f"] in PERIODIC and f["d"] >= horizon and f["a"] not in known and f["p"].lower().endswith((".htm", ".html"))]
     added = []
     for f in sorted(todo, key=lambda x: x["d"])[-max_filings:]:
         try:
