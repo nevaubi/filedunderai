@@ -1573,8 +1573,7 @@ function renderSegments(host, tk, seg, ir, kpi) {
   const st = STATE.segK || "Q";
   const tables = (seg?.tables || []).filter(t => t.rows.length);
   const kindSeg = seg_wrap(st, v => { STATE.segK = v; host.innerHTML = ""; renderSegments(host, tk, seg, ir, kpi); });
-  const rangeSeg = seg(st === "A" ? [["short", "5Y"], ["mid", "10Y"], ["all", "All"]] : [["short", "8Q"], ["mid", "20Q"], ["all", "All"]], STATE.segRange || "all",
-    v => { STATE.segRange = v; host.innerHTML = ""; renderSegments(host, tk, seg, ir, kpi); });
+  const rangeSeg = seg_range(st, v => { STATE.segRange = v; host.innerHTML = ""; renderSegments(host, tk, seg, ir, kpi); });
   const recAll = tables.flatMap(t => Object.values(t.recon).filter(x => !x.partial));
   const nAll = recAll.length, nOk = recAll.filter(x => x.ok || x.residual != null).length;
   host.append(el("div", { class: "seg-head" },
@@ -1588,6 +1587,9 @@ function renderSegments(host, tk, seg, ir, kpi) {
   anchorRight(host);
 }
 function seg_wrap(value, onChange) { return seg([["Q", "Quarterly"], ["A", "Annual"]], value, onChange); }
+function seg_range(K, onChange) {
+  return seg(K === "A" ? [["short", "5Y"], ["mid", "10Y"], ["all", "All"]] : [["short", "8Q"], ["mid", "20Q"], ["all", "All"]], STATE.segRange || "all", onChange);
+}
 function segTable(tk, t, K0) {
   let K = K0;
   if (!segPeriods(t, K, 1).length) K = K === "Q" ? (segPeriods(t, "A", 1).length ? "A" : "I") : (segPeriods(t, "Q", 1).length ? "Q" : "I");
