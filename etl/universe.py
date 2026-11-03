@@ -106,7 +106,7 @@ UNIVERSE = [
     ("XOM", 2115436, "Exxon Mobil", "Energy"),
 ]
 
-MARKET_SYMBOLS = ["SPY", "QQQ", "IWM", "DIA", "SMH", "^VIX", "^TNX", "^IRX", "^TYX", "DX=F", "CL=F", "GC=F", "HG=F", "BTC-USD",
+MARKET_SYMBOLS = ["SPY", "QQQ", "IWM", "DIA", "SMH", "^VIX", "^TNX", "^IRX", "^TYX", "UUP", "CL=F", "GC=F", "HG=F", "BTC-USD",
                   "XLK", "XLF", "XLE", "XLV", "XLY", "XLP", "XLI", "XLU", "XLB", "XLRE", "XLC"]
 
 SECTOR_ETF = {"Information Technology": "XLK", "Financials": "XLF", "Energy": "XLE", "Health Care": "XLV", "Consumer Discretionary": "XLY",

@@ -116,7 +116,7 @@ const cls = v => v > 0 ? "up" : v < 0 ? "down" : "";
 
 /* ---------- prices ---------- */
 const PX = {};
-const SYMNAME = { SPY: "S&P 500", QQQ: "Nasdaq 100", IWM: "Russell 2000", DIA: "Dow 30", SMH: "Semiconductors", "^VIX": "VIX", "^TNX": "10Y yield", "^IRX": "13W T-bill", "^TYX": "30Y yield", "DX=F": "US dollar", "CL=F": "WTI crude", "GC=F": "Gold", "HG=F": "Copper", "BTC-USD": "Bitcoin", XLK: "Technology", XLF: "Financials", XLE: "Energy", XLV: "Health care", XLY: "Cons. discretionary", XLP: "Cons. staples", XLI: "Industrials", XLU: "Utilities", XLB: "Materials", XLRE: "Real estate", XLC: "Communication" };
+const SYMNAME = { SPY: "S&P 500", QQQ: "Nasdaq 100", IWM: "Russell 2000", DIA: "Dow 30", SMH: "Semiconductors", "^VIX": "VIX", "^TNX": "10Y yield", "^IRX": "13W T-bill", "^TYX": "30Y yield", UUP: "US dollar", "CL=F": "WTI crude", "GC=F": "Gold", "HG=F": "Copper", "BTC-USD": "Bitcoin", XLK: "Technology", XLF: "Financials", XLE: "Energy", XLV: "Health care", XLY: "Cons. discretionary", XLP: "Cons. staples", XLI: "Industrials", XLU: "Utilities", XLB: "Materials", XLRE: "Real estate", XLC: "Communication" };
 const SECTORS = ["XLK", "XLC", "XLY", "XLF", "XLI", "XLV", "XLP", "XLE", "XLU", "XLB", "XLRE"];
 const last = s => PX[s]?.bars.at(-1);
 const prev = s => PX[s]?.bars.at(-2);
@@ -828,7 +828,7 @@ function newsList(items, lines, n = 10) {
 }
 function pMarkets() {
   page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Markets · " + d3.utcFormat("%A, %B %d")(last("SPY").t)), el("h1", {}, "Today across the tape"), el("div", { class: "sub" }, "Indexes, rates, commodities, the S&P 100 and your watchlist. Every tile opens its chart.")), el("div", { class: "right" }, el("button", { class: "btn", onclick: () => openPalette() }, svgUse("i-search"), "Search", el("span", { class: "kbd" }, "⌘K")))));
-  const syms = ["SPY", "QQQ", "IWM", "DIA", "SMH", "^VIX", "^TNX", "DX=F", "CL=F", "GC=F", "HG=F", "BTC-USD"];
+  const syms = ["SPY", "QQQ", "IWM", "DIA", "SMH", "^VIX", "^TNX", "UUP", "CL=F", "GC=F", "HG=F", "BTC-USD"];
   page.append(el("div", { class: "tiles" }, syms.filter(s => PX[s]).map(s => {
     const ch = s === "^TNX" ? (last(s).c - prev(s).c) / 100 : dayChg(s);
     return el("button", { class: "tile", onclick: () => { STATE.taSym = s; location.hash = "technicals"; }, title: `Open ${SYMNAME[s]} chart` },
@@ -1439,7 +1439,7 @@ async function pMacro() {
   g.append(panel("Effective federal funds rate", null, ffH, el("div", { class: "src" }, el("a", { href: "https://www.federalreserve.gov/releases/h15/", target: "_blank", rel: "noopener" }, "Federal Reserve H.15 ↗"), " · monthly average via DBnomics")));
   g.append(panel("Nonfarm payrolls, monthly change", null, pyH, el("div", { class: "src" }, el("a", { href: "https://fred.stlouisfed.org/series/PAYEMS", target: "_blank", rel: "noopener" }, "BLS via FRED (PAYEMS) ↗"))));
   page.append(g);
-  const mk = ["DX=F", "CL=F", "GC=F", "HG=F", "^VIX", "BTC-USD"];
+  const mk = ["UUP", "CL=F", "GC=F", "HG=F", "^VIX", "BTC-USD"];
   const mg = el("div", { class: "grid g3" });
   mk.forEach(s => { if (!PX[s]) return; const host = el("div", { class: "bd" }); mg.append(panel(SYMNAME[s], el("span", { class: "num " + cls(retOver(s, 30)) }, fnum(last(s).c) + " · 1M " + fsgn(retOver(s, 30))), host)); requestAnimationFrame(() => lineChart(host, [{ pts: PX[s].bars.slice(-252).map(b => [b.t, b.c]) }], { height: 130, area: true, yfmt: d3.format(",.0f") })); });
   page.append(el("div", { class: "eyebrow" }, "Market-implied macro, Yahoo Finance"), mg);
