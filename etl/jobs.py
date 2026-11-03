@@ -570,7 +570,25 @@ def segments_for(sb, tk, years=None, log=print):
     cut = (dt.date.today() - dt.timedelta(days=int(365 * years))).isoformat()
     fl = periodic_filings(cik, cut)
     parsed = []
+    keep_names = {n for _f, _l, _u, names in S.FAMILIES for n in names}
+
+    def slim(ctx, facts):
+        """Only what segment tables use: dimensional facts and the family totals."""
+        fs = [x for x in facts if ctx.get(x["ctx"], {}).get("dims") or x["name"].split(":")[-1] in keep_names or S.EXT_METRIC.search(x["name"])]
+        used = {x["ctx"] for x in fs}
+        return {k: v for k, v in ctx.items() if k in used}, fs
+
+    import gzip as _gz
     for f in fl:
+        cache_path = f"segcache/{f['a']}.json.gz"
+        try:
+            raw = sb.get_object("raw", cache_path)
+            if raw:
+                c = json.loads(_gz.decompress(raw))
+                parsed.append((f, c["ctx"], c["facts"]))
+                continue
+        except Exception:
+            pass
         try:
             facts = None
             # inline XBRL became mandatory for large filers in mid-2019; older reports carry a separate instance file
@@ -583,7 +601,13 @@ def segments_for(sb, tk, years=None, log=print):
                 if url:
                     ctx, facts = S.parse_instance(S.sec_get(url, timeout=120))
             if facts:
+                ctx, facts = slim(ctx, facts)
                 parsed.append((f, ctx, facts))
+                try:
+                    sb.put_object("raw", cache_path, _gz.compress(json.dumps({"ctx": ctx, "facts": facts}, separators=(",", ":")).encode()),
+                                  "application/gzip", cache="max-age=31536000")
+                except Exception as e:
+                    log(f"  {tk} cache write {f['a']} failed: {str(e)[:100]}")
         except Exception as e:
             log(f"  {tk} {f['a']} parse failed: {str(e)[:140]}")
     labels = {}
