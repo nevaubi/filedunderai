@@ -196,6 +196,14 @@ def validate(sb, data, fix=False):
             k["values"] = good
     # derived values: recompute from inputs
     idx = {(k["id"], v["kind"], v["period_end"]): v["value"] for k in data.get("kpis", []) for v in k.get("values", [])}
+
+    def _unit(v):
+        """Rounding unit of a printed figure: scale x 10^-decimals (e.g. "1,234.5" in millions -> 100,000)."""
+        pr = re.sub(r"[^0-9.]", "", str(v.get("printed") or ""))
+        dec = len(pr.split(".")[1]) if "." in pr else 0
+        return float(v.get("scale") or 1) * 10 ** -dec
+
+    unit = {(k["id"], v["kind"], v["period_end"]): _unit(v) for k in data.get("kpis", []) for v in k.get("values", [])}
     for dv in data.get("derived", []):
         ins = []
         for inp in dv.get("inputs", []):
@@ -228,7 +236,9 @@ def validate(sb, data, fix=False):
                                                      "missing": [c for c, p in zip(kids, parts) if p is None]})
                 continue
             s, tot = sum(parts), idx[(parent, kind, pe)]
-            ok = _close(s, tot) or abs(s - tot) <= max(1.0, abs(tot) * 0.006)
+            # each printed figure carries up to half a rounding unit of error, so the sum may drift by that much per line
+            slack = 0.5 * sum(unit.get((c, kind, pe), 0) for c in kids) + 0.5 * unit.get((parent, kind, pe), 0)
+            ok = _close(s, tot) or abs(s - tot) <= max(1.0, abs(tot) * 0.006, slack * 1.0001)
             (report["ties"] if ok else report["tie_failures"]).append({"parent": parent, "group": grp, "kind": kind, "period_end": pe, "sum": s, "total": tot})
     return report, data
 
