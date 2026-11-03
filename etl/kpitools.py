@@ -17,7 +17,7 @@ Extraction file schema (JSON):
      "unit": "count" | "USD" | "%" | "USD_per_unit" | "x" | "days" | "units" | text,
      "parent": null | "<kpi id>", "sums_to_parent": false, "group": null | "by_region", "is_total": false, "description": "...",
      "values": [
-        {"kind": "Q" | "A" | "I", "period_end": "2026-09-30", "fiscal_label": "Q3 FY26", "value": 301630000,
+        {"kind": "Q" | "A" | "I" | "Y", "period_end": "2026-09-30", "fiscal_label": "Q3 FY26", "value": 301630000,
          "doc": "<document id>", "page": 7, "sheet": null, "cell": null,
          "quote": "exact text copied from that page that contains the printed number",
          "printed": "301.63", "scale": 1000000}
@@ -243,6 +243,18 @@ def validate(sb, data, fix=False):
     return report, data
 
 
+def _label(fye, end, kind):
+    """Fiscal label; "Y" (year to date through a quarter end) reads e.g. "9M FY25"."""
+    from .fundamentals import fy_label
+    if kind == "A":
+        return fy_label(fye, end, "A")
+    q = fy_label(fye, end, "Q")
+    if kind == "Y":
+        n, fy = q.split(" ", 1)
+        return f"{int(n[1:]) * 3}M {fy}"
+    return q
+
+
 def publish(sb, data, fye="1231"):
     """Writes kpis/{T}.json (grouped for display) and kpi_definitions / kpi_values rows. Only validated values."""
     report, data = validate(sb, data, fix=True)
@@ -253,9 +265,9 @@ def publish(sb, data, fye="1231"):
     fye = (co[0].get("fiscal_year_end") if co else None) or fye
     for k in data.get("kpis", []):
         for v in k.get("values", []):
-            v["fiscal_label"] = fy_label(fye, v["period_end"], "A" if v["kind"] == "A" else "Q")
+            v["fiscal_label"] = _label(fye, v["period_end"], v["kind"])
     for d in data.get("derived", []):
-        d["fiscal_label"] = fy_label(fye, d["period_end"], "A" if d["kind"] == "A" else "Q")
+        d["fiscal_label"] = _label(fye, d["period_end"], d["kind"])
     docs = {d["id"]: d for d in docs_for(sb, tk)}
     tie = {(t["parent"], t["kind"], t["period_end"]): True for t in report["ties"]}
     tie.update({(t["parent"], t["kind"], t["period_end"]): False for t in report["tie_failures"]})
@@ -292,7 +304,7 @@ def publish(sb, data, fye="1231"):
     kpis = ordered
     for k in kpis:
         g = groups.setdefault((k.get("category") or "Operating metrics", None), [])
-        vals = {"Q": {}, "A": {}, "I": {}}
+        vals = {"Q": {}, "A": {}, "I": {}, "Y": {}}
         for v in k.get("values", []):
             d = docs.get(v["doc"], {})
             vals[v["kind"]][v["period_end"]] = {"v": v["value"], "doc": v["doc"], "page": v.get("page"), "sheet": v.get("sheet"), "cell": v.get("cell"),
