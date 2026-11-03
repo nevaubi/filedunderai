@@ -228,6 +228,8 @@ def companies_job(sb, tickers=None, workers=4, refresh_news=False, refresh_summa
                     fund[tk] = res
                     done.append(tk)
                     print("ok", tk, flush=True)
+                    if len(done) % 20 == 0:
+                        sb.put_json("meta/fundamentals.json", fund, cache="no-store")
                 else:
                     failed[tk] = err
                     print("fail", tk, err, flush=True)

@@ -40,7 +40,7 @@ def _bool(s):
 
 
 def parse(xml_text):
-    """Returns (owners, rows) from a Form 4 XML document."""
+    """Returns (issuer_cik, owners, rows) from a Form 4 XML document."""
     root = ET.fromstring(xml_text.encode() if isinstance(xml_text, str) else xml_text)
     owners = []
     for ro in root.findall("reportingOwner"):
@@ -74,13 +74,17 @@ def parse(xml_text):
                 "derivative": deriv,
                 "plan_10b5": plan,
             })
-    return owners, rows
+    issuer = _t(root, "issuer/issuerCik")
+    return (int(issuer) if issuer and issuer.isdigit() else None), owners, rows
 
 
 def fetch(ticker, cik, filing):
     """Fetches and flattens one Form 4 filing into insider_transactions rows."""
     txt = sec_get(xml_url(cik, filing["accession"], filing["primary_doc"]), timeout=40)
-    owners, rows = parse(txt)
+    issuer, owners, rows = parse(txt)
+    if issuer and issuer != int(cik):
+        # The company is the reporting owner here (a stake it holds in another issuer), not the issuer.
+        rows = []
     owner = owners[0] if owners else {"name": "", "cik": None, "role": ""}
     if len(owners) > 1:
         owner = {"name": owner["name"] + f" (+{len(owners) - 1})", "cik": owner["cik"], "role": owner["role"]}
