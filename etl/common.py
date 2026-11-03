@@ -142,6 +142,12 @@ class Supabase:
         q = "&".join(f"{k}=eq.{urllib.parse.quote(str(v))}" for k, v in match.items())
         request(f"{self.url}/rest/v1/{table}?{q}", method="PATCH", data=values, headers=self._h({"Prefer": "return=minimal"}))
 
+    def delete(self, table, query):
+        """Deletes rows matching a PostgREST filter query (e.g. "ticker=eq.MDLZ&source_kind=eq.ir")."""
+        if not query:
+            raise ValueError("delete needs a filter")
+        request(f"{self.url}/rest/v1/{table}?{query}", method="DELETE", headers=self._h({"Prefer": "return=minimal"}))
+
     def select(self, table, query="select=*"):
         out, offset = [], 0
         while True:

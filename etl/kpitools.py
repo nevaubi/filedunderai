@@ -36,6 +36,7 @@ import json
 import os
 import re
 import sys
+import urllib.parse
 import urllib.request
 
 from .common import Supabase, load_env, now_iso
@@ -338,6 +339,16 @@ def publish(sb, data, fye="1231"):
     if rows:
         uniq = {(r["kpi_id"], r["period_kind"], r["period_end"]): r for r in rows}
         sb.upsert("kpi_values", list(uniq.values()), "ticker,kpi_id,period_kind,period_end,source_kind", batch=1000)
+        # drop rows from earlier publishes that are no longer in the file (renamed ids, changed kinds, removed periods)
+        existing = sb.select("kpi_values", f"select=kpi_id,period_kind,period_end&ticker=eq.{tk}&source_kind=eq.ir")
+        for r in existing:
+            if (r["kpi_id"], r["period_kind"], r["period_end"]) not in uniq:
+                sb.delete("kpi_values", f"ticker=eq.{tk}&source_kind=eq.ir&kpi_id=eq.{urllib.parse.quote(r['kpi_id'])}"
+                                        f"&period_kind=eq.{r['period_kind']}&period_end=eq.{r['period_end']}")
+        live = {k["id"] for k in kpis}
+        for d in sb.select("kpi_definitions", f"select=kpi_id&ticker=eq.{tk}&source_kind=eq.ir"):
+            if d["kpi_id"] not in live:
+                sb.delete("kpi_definitions", f"ticker=eq.{tk}&source_kind=eq.ir&kpi_id=eq.{urllib.parse.quote(d['kpi_id'])}")
     return report
 
 
