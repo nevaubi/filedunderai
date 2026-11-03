@@ -20,6 +20,9 @@ FYE_HISTORY = {
     # FedEx moved from a May 31 to a December 31 year end effective June 1, 2026
     "FDX": [("0000-00-00", "0531"), ("2026-06-01", "1231")],
 }
+# companies that name a fiscal year after the calendar year in which it mostly falls, although it ends in January or
+# early February of the next year (Home Depot's "fiscal 2024" ended February 2, 2025). Their labels are one year lower.
+FY_NAME_PRIOR = {"HD", "LOW", "TGT", "DG", "DLTR", "ROST", "KR", "ULTA", "LULU", "BURL"}
 # transition periods between two fiscal years: (start, end, short name). Quarters inside read "Q1 TP26", the period "TP2026".
 TRANSITIONS = {
     "FDX": [("2026-06-01", "2026-12-31")],
@@ -43,7 +46,22 @@ def period_label(ticker, fye, end, kind):
             months = (e.year - s.year) * 12 + e.month - s.month + 1
             yy = stop[:4]
             return f"TP{yy}" if kind == "A" else f"Q{max(1, round(months / 3))} TP{yy[2:]}"
-    return fy_label(fye_at(ticker, fye, end), end, kind)
+    lab = fy_label(fye_at(ticker, fye, end), end, kind)
+    if ticker in FY_NAME_PRIOR:
+        lab = _shift_fy(lab, -1)
+    return lab
+
+
+def _shift_fy(label, n):
+    """Moves the fiscal year in "FY2025" / "Q3 FY25" by n years."""
+    import re
+    m = re.match(r"^FY(\d{4})$", label)
+    if m:
+        return f"FY{int(m.group(1)) + n}"
+    m = re.match(r"^(Q\d) FY(\d\d)$", label)
+    if m:
+        return f"{m.group(1)} FY{(int(m.group(2)) + n) % 100:02d}"
+    return label
 
 
 def fy_label(fye, end, kind):
@@ -102,7 +120,10 @@ def compute(statements, profile, px):
     fye = profile.get("fiscalYearEnd") or "1231"
     rev_q = series(statements, "Revenue", "quarterly")
     lq = rev_q[-1]["end"] if rev_q else None
-    out = {"latest_quarter": fy_label(fye, lq, "Q") if lq else None, "latest_quarter_end": lq}
+    lq_label = fy_label(fye, lq, "Q") if lq else None
+    if lq_label and profile.get("fyNameOffset"):
+        lq_label = _shift_fy(lq_label, profile["fyNameOffset"])
+    out = {"latest_quarter": lq_label, "latest_quarter_end": lq}
     rev, ni = ttm(statements, "Revenue"), ttm(statements, "Net income")
     eps = ttm(statements, "EPS diluted")
     ocf, capex = ttm(statements, "Operating cash flow", ("cashflow",)), ttm(statements, "Capex", ("cashflow",))

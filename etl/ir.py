@@ -525,6 +525,9 @@ def store_document(sb, ticker, url, body, ext, title, source_page, have_hashes, 
         label, pe = named_quarter(fye, url.rsplit("/", 1)[-1], ref_date, PERIOD_ENDS.get(ticker)) or \
             quarter_for_date(fye, ref_date, PERIOD_ENDS.get(ticker))
         period_end = pe.isoformat() if pe else None
+        if pe:
+            from .fundamentals import period_label
+            label = period_label(ticker, fye, period_end, "Q")
     else:
         label, year = period_hint(url, title)
         when = date_in(title)

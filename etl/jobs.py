@@ -111,6 +111,8 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
 
     if fundamentals.FYE_HISTORY.get(tk):
         prof["fyeHistory"] = fundamentals.FYE_HISTORY[tk]
+    if tk in fundamentals.FY_NAME_PRIOR:
+        prof["fyNameOffset"] = -1
     if fundamentals.TRANSITIONS.get(tk):
         prof["fyTransitions"] = fundamentals.TRANSITIONS[tk]
     bundle = {

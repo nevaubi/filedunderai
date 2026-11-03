@@ -52,7 +52,7 @@ async function ensureCompany(tk) {
   if (D.companies[tk]?.statements) return D.companies[tk];
   const [b] = await Promise.all([getJSON(`companies/${tk}.json`), ensurePrices(tk), ensurePrices("SPY")]);
   const p = b.profile || {};
-  D.companies[tk] = { ticker: tk, cik: b.cik, name: p.name, sic: p.sic, sicDescription: p.sicDescription, exchanges: p.exchanges, fiscalYearEnd: p.fiscalYearEnd || "1231", fyeHistory: p.fyeHistory || null, fyTransitions: p.fyTransitions || null, stateOfIncorporation: p.stateOfIncorporation, phone: p.phone, website: p.website, address: p.address, sharesOutstanding: p.sharesOutstanding, filings: (b.filings || []).map(f => ({ ...f })), statements: b.statements, earnings8k: b.earnings8k || [], sector: b.sector, generated: b.generated };
+  D.companies[tk] = { ticker: tk, cik: b.cik, name: p.name, sic: p.sic, sicDescription: p.sicDescription, exchanges: p.exchanges, fiscalYearEnd: p.fiscalYearEnd || "1231", fyeHistory: p.fyeHistory || null, fyTransitions: p.fyTransitions || null, fyNameOffset: p.fyNameOffset || 0, stateOfIncorporation: p.stateOfIncorporation, phone: p.phone, website: p.website, address: p.address, sharesOutstanding: p.sharesOutstanding, filings: (b.filings || []).map(f => ({ ...f })), statements: b.statements, earnings8k: b.earnings8k || [], sector: b.sector, generated: b.generated };
   Object.assign(D.filings, b.filingTables || {});
   Object.assign(E.ix, b.ix || {});
   if (b.release) E.releases[tk] = b.release;
@@ -199,7 +199,9 @@ const plabel = (tk, end, kind) => {
       return kind === "A" ? `TP${stop.slice(0, 4)}` : `Q${Math.max(1, Math.round(months / 3))} TP${stop.slice(2, 4)}`;
     }
   }
-  const { fy, q } = fyInfo(tk, end);
+  let { fy, q } = fyInfo(tk, end);
+  // retailers that name a January year end after the prior calendar year (Home Depot "fiscal 2024" ended Feb 2025)
+  fy += D.companies[tk].fyNameOffset || 0;
   return kind === "A" ? `FY${fy}` : `Q${q} FY${String(fy).slice(2)}`;
 };
 
