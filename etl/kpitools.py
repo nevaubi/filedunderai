@@ -15,7 +15,7 @@ Extraction file schema (JSON):
   "kpis": [
     {"id": "paid_memberships_total", "name": "Paid memberships", "category": "Members", "subcategory": null,
      "unit": "count" | "USD" | "%" | "USD_per_unit" | "x" | "days" | "units" | text,
-     "parent": null | "<kpi id>", "sums_to_parent": false, "group": null | "by_region", "is_total": false, "description": "...",
+     "parent": null | "<kpi id>", "sums_to_parent": false, "subtracts": false, "group": null | "by_region", "is_total": false, "description": "...",
      "values": [
         {"kind": "Q" | "A" | "I" | "Y" | "T", "period_end": "2026-09-30", "fiscal_label": "Q3 FY26", "value": 301630000,
          "doc": "<document id>", "page": 7, "sheet": null, "cell": null,
@@ -269,6 +269,9 @@ def validate(sb, data, fix=False):
             idx[(dv["kpi"], dv["kind"], dv["period_end"])] = dv["value"]
     # sums: children flagged sums_to_parent must add up to the parent
     children = {}
+    # a child marked "subtracts": true enters its parent's sum with a minus sign
+    # (e.g. capital expenditures stored as a positive outflow under free cash flow)
+    minus = {k["id"] for k in data.get("kpis", []) if k.get("subtracts")}
     for k in data.get("kpis", []):
         if k.get("parent") and k.get("sums_to_parent"):
             # several complete breakdowns of one parent are allowed: give each its own "group"
@@ -283,7 +286,7 @@ def validate(sb, data, fix=False):
                     report["tie_incomplete"].append({"parent": parent, "group": grp, "kind": kind, "period_end": pe,
                                                      "missing": [c for c, p in zip(kids, parts) if p is None]})
                 continue
-            s, tot = sum(parts), idx[(parent, kind, pe)]
+            s, tot = sum(-p if c in minus else p for c, p in zip(kids, parts)), idx[(parent, kind, pe)]
             # each printed figure carries up to half a rounding unit of error, so the sum may drift by that much per line
             slack = 0.5 * sum(unit.get((c, kind, pe), 0) for c in kids) + 0.5 * unit.get((parent, kind, pe), 0)
             ok = _close(s, tot) or abs(s - tot) <= max(1.0, abs(tot) * TIE_REL, slack * 1.0001)
