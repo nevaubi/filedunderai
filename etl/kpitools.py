@@ -214,7 +214,18 @@ def validate(sb, data, fix=False):
     kpis = {k["id"]: k for k in data.get("kpis", [])}
     for k in data.get("kpis", []):
         good = []
+        seen = {}
         for v in k.get("values", []):
+            # one value per (kind, period end): an exact repeat is dropped, a conflicting repeat is rejected
+            key = (v.get("kind"), v.get("period_end"))
+            if key in seen:
+                if _close(seen[key], v.get("value")):
+                    continue
+                report["values"] += 1
+                report["bad_values"].append({"kpi": k["id"], "period_end": key[1], "kind": key[0],
+                                             "errors": [f"duplicate period with a different value ({seen[key]} vs {v.get('value')})"]})
+                continue
+            seen[key] = v.get("value")
             report["values"] += 1
             errs = check_value(sb, docs, v)
             if errs:
