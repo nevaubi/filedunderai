@@ -43,13 +43,13 @@ FAMILIES = [
     ("assets", "Total assets", "USD", ["Assets"]),
 ]
 EXT_METRIC = re.compile(r"(SegmentOperatingIncome|SegmentProfit|SegmentEBITDA|AdjustedEBITDA|SegmentIncome|SegmentEarnings|OperatingProfit|SegmentContribution|SegmentAdjustedOperatingIncome)", re.I)
-TABLE_YEARS = 3.4
+TABLE_YEARS = 18.5  # back to 2008 where filings exist
 
 
 # ---------------------------------------------------------------- parsing
-_CTX = re.compile(r"<xbrli:context\b[^>]*\bid=\"([^\"]+)\"[^>]*>(.*?)</xbrli:context>", re.I | re.S)
-_DIM = re.compile(r"<xbrldi:explicitmember\b[^>]*dimension=\"([^\"]+)\"[^>]*>\s*([^<\s]+)\s*</xbrldi:explicitmember>", re.I)
-_TYPED = re.compile(r"<xbrldi:typedmember\b", re.I)
+_CTX = re.compile(r"<(?:xbrli:)?context\b[^>]*\bid=\"([^\"]+)\"[^>]*>(.*?)</(?:xbrli:)?context>", re.I | re.S)
+_DIM = re.compile(r"<(?:xbrldi:)?explicitmember\b[^>]*dimension=\"([^\"]+)\"[^>]*>\s*([^<\s]+)\s*</(?:xbrldi:)?explicitmember>", re.I)
+_TYPED = re.compile(r"<(?:xbrldi:)?typedmember\b", re.I)
 _FACT = re.compile(r"<ix:nonfraction\b([^>]*)>(.*?)</ix:nonfraction>", re.I | re.S)
 _ATTR = re.compile(r"([\w:.-]+)\s*=\s*\"([^\"]*)\"")
 _TAG = re.compile(r"<[^>]+>")
@@ -57,7 +57,7 @@ _TAG = re.compile(r"<[^>]+>")
 
 def _period(body):
     def g(tag):
-        m = re.search(rf"<xbrli:{tag}>\s*([0-9-]+)\s*</xbrli:{tag}>", body, re.I)
+        m = re.search(rf"<(?:xbrli:)?{tag}>\s*([0-9-]+)\s*</(?:xbrli:)?{tag}>", body, re.I)
         return m.group(1) if m else None
     return g("startdate"), g("enddate") or g("instant")
 
@@ -98,6 +98,43 @@ def parse_ixbrl(html):
             val = -val
         facts.append({"id": a.get("id"), "name": name, "ctx": cref, "unit": (a.get("unitref") or "").lower(), "v": val})
     return ctx, facts
+
+
+_IFACT = re.compile(r"<([A-Za-z][\w.-]*:[A-Za-z][\w.-]*)\b([^>]*\bcontextRef=\"[^\"]+\"[^>]*)>([^<]*)</\1>", re.S)
+
+
+def parse_instance(xml):
+    """Same output as parse_ixbrl for a classic XBRL instance document (filings before inline XBRL, roughly 2009-2019).
+    Only numeric facts (those with a unitRef) are returned; values are already in units in an instance document."""
+    ctx = {}
+    for cid, body in _CTX.findall(xml):
+        start, end = _period(body)
+        dims = {d: m for d, m in _DIM.findall(body)}
+        ctx[cid] = {"start": start, "end": end, "dims": dims, "typed": bool(_TYPED.search(body))}
+    facts = []
+    for name, attrs, txt in _IFACT.findall(xml):
+        a = {k.lower(): v for k, v in _ATTR.findall(attrs)}
+        cref = a.get("contextref")
+        if cref not in ctx or not a.get("unitref") or a.get("xsi:nil") == "true":
+            continue
+        try:
+            val = float(txt.strip())
+        except ValueError:
+            continue
+        facts.append({"id": a.get("id"), "name": name, "ctx": cref, "unit": (a.get("unitref") or "").lower(), "v": val})
+    return ctx, facts
+
+
+def instance_url(cik, accn):
+    """URL of the XBRL instance document in a filing folder (classic, non-inline XBRL)."""
+    folder = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accn.replace('-', '')}/"
+    idx = json.loads(sec_get(folder + "index.json", timeout=40))
+    items = idx.get("directory", {}).get("item", [])
+    cands = [i for i in items if i["name"].lower().endswith(".xml") and not re.search(r"_(cal|def|lab|pre|ref)\.xml$|filingsummary|^r\d+\.xml$", i["name"].lower())]
+    if not cands:
+        return None
+    best = max(cands, key=lambda i: (i["name"].lower().endswith("_htm.xml"), int(i.get("size") or 0)))
+    return folder + best["name"]
 
 
 def humanize(qname):
@@ -263,11 +300,17 @@ def _norm(label):
 def build_tables(obs, totals, fye, labels, fy_label):
     """Groups observations into tables (family, concept, primary axis), applies the latest presentation for each
     period, merges renamed members, nests subtotals, splits alternative breakdowns and marks memo lines."""
+    # one table per (family, axis): a company that moved from SalesRevenueNet to RevenueFromContract... (ASC 606) keeps
+    # one continuous history; for each period the concept with the most reported lines (then family order) is used
+    prio = {}
+    for fam_id, _l, _u, names in FAMILIES:
+        for i, n in enumerate(names):
+            prio[(fam_id, n)] = i
     groups = defaultdict(list)
     for (fam, concept, start, end, path), rec in obs.items():
-        groups[(fam, concept, path[0][2])].append((start, end, path, rec))
+        groups[(fam, path[0][2])].append((start, end, path, dict(rec, _concept=concept)))
     tables = []
-    for (fam, concept, axis), items in groups.items():
+    for (fam, axis), items in groups.items():
         cat_key, cat_label = items[0][2][0][0], items[0][2][0][1]
         fam_label = items[0][3]["fam_label"]
         # 1. latest presentation wins per period: when a later filing recasts segments, older members drop out
@@ -277,6 +320,16 @@ def build_tables(obs, totals, fye, labels, fy_label):
             if k not in newest or (rec["filed"], rec["accn"]) > newest[k]:
                 newest[k] = (rec["filed"], rec["accn"])
         items = [it for it in items if (it[3]["filed"], it[3]["accn"]) == newest[(it[0], it[1])]]
+        count = defaultdict(int)
+        for start, end, path, rec in items:
+            count[(start, end, rec["_concept"])] += 1
+        chosen = {}
+        for (start, end, c), n in count.items():
+            key = (n, -prio.get((fam, c), 99))
+            if (start, end) not in chosen or key > chosen[(start, end)][0]:
+                chosen[(start, end)] = (key, c)
+        items = [it for it in items if it[3]["_concept"] == chosen[(it[0], it[1])][1]]
+        concept = max(items, key=lambda it: it[1])[3]["_concept"]
         if cat_key == "segment" and all(is_recon(p[0][3]) for _, _, p, _ in items):
             continue
         # 2. rows, merging members that carry the same label (renamed element, same line)
@@ -301,7 +354,13 @@ def build_tables(obs, totals, fye, labels, fy_label):
             if not r["obs"] and not r["parent"]:
                 r["implied"] = True
         series = {rk: _quarterize(r["obs"], fye, fy_label) for rk, r in rows.items()}
-        tot = {(s, e): rec for (f2, c2, s, e), rec in totals.items() if f2 == fam and c2 == concept}
+        tot = {}
+        for (f2, c2, s_, e_), rec in sorted(totals.items(), key=lambda kv: -prio.get((kv[0][0], kv[0][1]), 99)):
+            if f2 != fam:
+                continue
+            want = chosen.get((s_, e_), (None, None))[1]
+            if (s_, e_) not in tot or c2 == want:
+                tot[(s_, e_)] = rec
         total_series = _quarterize(tot, fye, fy_label)
         _nest(rows, series)
         _drop_total_alias(rows, series, total_series)

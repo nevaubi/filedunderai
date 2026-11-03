@@ -572,16 +572,25 @@ def segments_for(sb, tk, years=None, log=print):
     parsed = []
     for f in fl:
         try:
-            html = _viewer_or_fetch(sb, cik, f)
-            if not html:
-                continue
-            ctx, facts = S.parse_ixbrl(html)
+            facts = None
+            # inline XBRL became mandatory for large filers in mid-2019; older reports carry a separate instance file
+            if f["d"] >= "2019-06-01":
+                html = _viewer_or_fetch(sb, cik, f)
+                if html:
+                    ctx, facts = S.parse_ixbrl(html)
+            if not facts:
+                url = S.instance_url(cik, f["a"])
+                if url:
+                    ctx, facts = S.parse_instance(S.sec_get(url, timeout=120))
             if facts:
                 parsed.append((f, ctx, facts))
         except Exception as e:
             log(f"  {tk} {f['a']} parse failed: {str(e)[:140]}")
     labels = {}
-    for f in [x for x in fl if x["f"] == "10-K"][:1] + [x for x in fl if x["f"] == "10-Q"][:1]:
+    tenks = [x for x in fl if x["f"] == "10-K"]
+    # member labels from older 10-Ks first (members dropped later), then the latest filings override
+    older = [next((x for x in tenks if x["d"] < cutoff), None) for cutoff in ("2013-06-01", "2016-06-01", "2019-06-01")]
+    for f in [x for x in older if x] + tenks[:1] + [x for x in fl if x["f"] == "10-Q"][:1]:
         try:
             labels.update(S.label_linkbase(cik, f["a"], f["p"]))
         except Exception as e:
