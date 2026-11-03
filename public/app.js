@@ -1648,7 +1648,7 @@ function stackChart(host, data, o = {}) {
 /* ---------- KPIs extracted from IR documents ---------- */
 function kpiVals(it, K, aEnds) {
   const v = it.values || {};
-  if (K === "Q") return { ...(v.I || {}), ...(v.Q || {}) };
+  if (K === "Q") return { ...Object.fromEntries(Object.entries(v.T || {}).map(([e, c]) => [e, { ...c, ttm: true }])), ...(v.I || {}), ...(v.Q || {}) };
   const out = { ...(v.A || {}) };
   Object.entries(v.I || {}).forEach(([e, c]) => { if (aEnds.has(e) && !out[e]) out[e] = c; });
   return out;
@@ -1678,6 +1678,7 @@ function renderKpiGroups(host, tk, kpi, K0) {
         if (!v) { tr.append(el("td", { class: "c r faint" }, "–")); return; }
         const td = el("td", { class: "c r num", tabindex: 0, title: v.derived ? "Derived: " + v.derived.formula : `${v.doc_title || ""}${v.page ? " · page " + v.page : ""}${v.sheet ? " · " + v.sheet + "!" + (v.cell || "") : ""}` }, (QMARK[v.q] || "") + fmtKpi(v.v, it.unit));
         if (v.q) td.title = `${QWORD[v.q]} as stated by the company. ` + td.title;
+        if (v.ttm) { td.append(el("span", { class: "faint", style: "font-size:9.5px;margin-left:3px" }, "TTM")); td.title = "Trailing twelve months to this quarter end. " + td.title; }
         if (v.derived) td.append(el("span", { class: "dq" }));
         if (v.tie === false) td.append(el("span", { class: "tie bad", title: "Components do not sum to this value" }, "Δ"));
         if (v.tie === true) td.append(el("span", { class: "tie ok", title: "Components sum to this value" }, "✓"));

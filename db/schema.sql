@@ -191,7 +191,7 @@ create table if not exists kpi_definitions (
 create table if not exists kpi_values (
   ticker            text not null references companies(ticker) on delete cascade,
   kpi_id            text not null,
-  period_kind       text not null check (period_kind in ('Q','A','I','Y')),
+  period_kind       text not null check (period_kind in ('Q','A','I','Y','T')),
   period_end        date not null,
   fiscal_label      text,
   value             numeric not null,
@@ -282,4 +282,4 @@ notify pgrst, 'reload schema';
 
 -- year-to-date values (6M / 9M) for KPIs that companies only print cumulatively
 alter table kpi_values drop constraint if exists kpi_values_period_kind_check;
-alter table kpi_values add constraint kpi_values_period_kind_check check (period_kind in ('Q','A','I','Y'));
+alter table kpi_values add constraint kpi_values_period_kind_check check (period_kind in ('Q','A','I','Y','T'));

@@ -17,7 +17,7 @@ Extraction file schema (JSON):
      "unit": "count" | "USD" | "%" | "USD_per_unit" | "x" | "days" | "units" | text,
      "parent": null | "<kpi id>", "sums_to_parent": false, "group": null | "by_region", "is_total": false, "description": "...",
      "values": [
-        {"kind": "Q" | "A" | "I" | "Y", "period_end": "2026-09-30", "fiscal_label": "Q3 FY26", "value": 301630000,
+        {"kind": "Q" | "A" | "I" | "Y" | "T", "period_end": "2026-09-30", "fiscal_label": "Q3 FY26", "value": 301630000,
          "doc": "<document id>", "page": 7, "sheet": null, "cell": null,
          "quote": "exact text copied from that page that contains the printed number",
          "printed": "301.63", "scale": 1000000}
@@ -303,6 +303,8 @@ def _label(fye, end, kind):
     if kind == "Y":
         n, fy = q.split(" ", 1)
         return f"{int(n[1:]) * 3}M {fy}"
+    if kind == "T":
+        return f"TTM {q}"
     return q
 
 
@@ -355,7 +357,7 @@ def publish(sb, data, fye="1231"):
     kpis = ordered
     for k in kpis:
         g = groups.setdefault((k.get("category") or "Operating metrics", None), [])
-        vals = {"Q": {}, "A": {}, "I": {}, "Y": {}}
+        vals = {"Q": {}, "A": {}, "I": {}, "Y": {}, "T": {}}
         for v in k.get("values", []):
             d = docs.get(v["doc"], {})
             vals[v["kind"]][v["period_end"]] = {"v": v["value"], "doc": v["doc"], "page": v.get("page"), "sheet": v.get("sheet"), "cell": v.get("cell"),
@@ -381,7 +383,7 @@ def publish(sb, data, fye="1231"):
                      "parent_id": k.get("parent"), "sums_to_parent": bool(k.get("sums_to_parent")), "source_kind": "ir", "description": k.get("description"),
                      "sort": order[k["id"]], "updated_at": now_iso()})
     bundle = {"ticker": tk, "generated": now_iso(), "notes": data.get("notes"),
-              "groups": [{"category": c, "subcategory": s, "items": items} for (c, s), items in groups.items() if any(any(it["values"][x]) for it in items for x in "QAI")],
+              "groups": [{"category": c, "subcategory": s, "items": items} for (c, s), items in groups.items() if any(any(it["values"][x]) for it in items for x in "QAIT")],
               "check": {"values": report["values"], "rejected": len(report["bad_values"]), "ties": len(report["ties"]), "tie_failures": len(report["tie_failures"])}}
     sb.put_json(f"kpis/{tk}.json", bundle, cache="max-age=600")
     if defs:
