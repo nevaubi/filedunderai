@@ -233,7 +233,12 @@ def validate(sb, data, fix=False):
         return float(v.get("scale") or 1) * 10 ** -dec
 
     unit = {(k["id"], v["kind"], v["period_end"]): _unit(v) for k in data.get("kpis", []) for v in k.get("values", [])}
+    kunit = {k["id"]: (k.get("unit") or "").strip().lower() for k in data.get("kpis", [])}
     for dv in data.get("derived", []):
+        # ratios, percentages and per-unit figures are not additive: a quarter cannot be derived by subtraction
+        if kunit.get(dv["kpi"]) in ("%", "pct", "percent", "ratio", "x", "bp", "usd_per_unit", "$/unit", "per_share", "usd_per_share"):
+            report["derived_bad"].append({**dv, "error": f"unit {kunit.get(dv['kpi'])} is not additive"})
+            continue
         ins = []
         for inp in dv.get("inputs", []):
             ins.append(idx.get((dv["kpi"], inp["kind"], inp["period_end"])))
