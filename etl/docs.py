@@ -3,9 +3,13 @@ import json
 import os
 import re
 
-from bs4 import BeautifulSoup
+import warnings
 
-from .common import request
+from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
+
+warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+
+from .common import request, sec_get
 
 try:
     import lxml  # noqa: F401
@@ -87,8 +91,28 @@ def ix_tables(html):
     return out
 
 
+def filing_html(url):
+    """Filing HTML straight from sec.gov, with Firecrawl as the fallback."""
+    try:
+        html = sec_get(url, timeout=90)
+        if html and len(html) > 2000:
+            return html
+    except Exception as e:
+        print("sec direct failed, using firecrawl:", url, str(e)[:120])
+    return firecrawl(url, "rawHtml").get("rawHtml", "")
+
+
+def index_links(index_url):
+    try:
+        html = sec_get(index_url, timeout=40)
+        hrefs = re.findall(r'href="([^"]+)"', html)
+        return [h if h.startswith("http") else "https://www.sec.gov" + h for h in hrefs if h.startswith(("/", "http"))]
+    except Exception:
+        return firecrawl(index_url, "links").get("links", [])
+
+
 def release_markdown(index_url, primary_doc):
-    links = firecrawl(index_url, "links").get("links", [])
+    links = index_links(index_url)
     acc = index_url.rstrip("/").rsplit("/", 1)[-1]
     htm = [l for l in links if l.lower().endswith((".htm", ".html")) and acc in l.replace("-", "")]
     pick = [l for l in htm if re.search(r"(?i)ex-?99|ex99|exhibit99|991|pr", l.rsplit("/", 1)[-1]) and not l.endswith(primary_doc)]

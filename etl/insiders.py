@@ -1,10 +1,8 @@
 """Form 4 insider transactions: fetch the XML behind each filing and flatten it to rows."""
 import datetime as dt
-import threading
-import time
 import xml.etree.ElementTree as ET
 
-from .common import SEC_UA, request
+from .common import sec_get
 
 CODES = {
     "P": "Open-market buy", "S": "Open-market sale", "A": "Grant or award", "M": "Option exercise", "F": "Tax withholding",
@@ -12,19 +10,6 @@ CODES = {
     "I": "Discretionary", "K": "Equity swap", "L": "Small acquisition", "U": "Tender of shares", "E": "Expiration", "H": "Expiration",
     "O": "Out-of-money exercise", "Z": "Voting trust", "V": "Voluntary report",
 }
-
-_lock = threading.Lock()
-_last = [0.0]
-
-
-def _throttle(min_gap=0.13):
-    """Keeps the process under SEC's 10 requests per second."""
-    with _lock:
-        wait = _last[0] + min_gap - time.time()
-        if wait > 0:
-            time.sleep(wait)
-        _last[0] = time.time()
-
 
 def xml_url(cik, accession, primary_doc):
     doc = (primary_doc or "").split("/")[-1]
@@ -94,8 +79,7 @@ def parse(xml_text):
 
 def fetch(ticker, cik, filing):
     """Fetches and flattens one Form 4 filing into insider_transactions rows."""
-    _throttle()
-    txt = request(xml_url(cik, filing["accession"], filing["primary_doc"]), headers={"User-Agent": SEC_UA}, timeout=40, retries=3)
+    txt = sec_get(xml_url(cik, filing["accession"], filing["primary_doc"]), timeout=40)
     owners, rows = parse(txt)
     owner = owners[0] if owners else {"name": "", "cik": None, "role": ""}
     if len(owners) > 1:

@@ -2,7 +2,9 @@
 import json
 import os
 import sys
+import inspect
 import traceback
+import urllib.parse
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if ROOT not in sys.path:
@@ -25,7 +27,8 @@ def serve(req, run):
         return send(req, 401, {"error": "unauthorized"})
     try:
         from etl.common import Supabase
-        result = run(Supabase())
+        query = {k: v[-1] for k, v in urllib.parse.parse_qs(urllib.parse.urlparse(req.path).query).items()}
+        result = run(Supabase(), query) if len(inspect.signature(run).parameters) > 1 else run(Supabase())
         return send(req, 200, {"ok": True, "result": result})
     except Exception as e:
         traceback.print_exc()

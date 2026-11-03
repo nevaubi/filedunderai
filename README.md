@@ -2,7 +2,7 @@
 
 Source-attributed research on US equities. Financials come from SEC filings and every number links to the filing, table and XBRL fact it came from. Prices, macro series, filings, news and a research assistant sit around that core.
 
-Coverage today: the S&P 100.
+Coverage today: the S&P 500 (S&P 100 flagged in the index).
 
 ## How it fits together
 
@@ -16,7 +16,7 @@ Coverage today: the S&P 100.
    │   public JSON (CDN)                       ▼
    └────────────────────────────▶  Supabase: Storage `public-data` (site bundles)
                                              Storage `raw` (archived source docs)
-                                             Postgres (companies, filings, facts, prices, macro, news, summaries, runs)
+                                             Postgres (companies, filings, facts, prices, insiders, macro, news, runs)
 ```
 
 - **`etl/`** pulls and normalizes data and writes both Postgres rows and the JSON bundles the site reads.
@@ -25,6 +25,7 @@ Coverage today: the S&P 100.
   - `prices.py` daily and 5-minute bars, return/volatility/beta stats.
   - `fundamentals.py` TTM and latest-quarter metrics for screening.
   - `macro.py` Treasury par curve, FRED series (CPI, core CPI, unemployment, payrolls, fed funds, 2s10s), H.15.
+  - `insiders.py` Form 4 XML parsing (owner, role, code, shares, price, holdings after, 10b5-1).
   - `news.py`, `summaries.py` recent coverage and written summaries.
   - `jobs.py` the jobs: `companies_job`, `prices_job`, `macro_job`, `news_rotation_job`, `build_index`, `build_feed`.
 - **`public/`** is a dependency-free single-page app (D3 for charts). It reads `index.json`, `market.json`, `macro.json`, `feed.json`, `companies/{TICKER}.json` and `prices/{SYMBOL}.json` from the public bucket.
@@ -40,19 +41,23 @@ Coverage today: the S&P 100.
 | | `feed.json` | Latest filings across the universe |
 | | `companies/{T}.json` | Statements, filing tables, original tables, release, news, summary |
 | | `prices/{SYMBOL}.json` | 2y daily + 5d 5-minute bars (`^VIX` → `IDX_VIX`, `CL=F` → `CL_F`) |
-| | `meta/*.json` | Job caches (fundamentals, price stats, rotation cursor) |
+| | `insiders/{T}.json` | Form 4 transactions, open-market summaries, largest traders |
+| | `meta/*.json` | Job caches and status (fundamentals, price stats per part, rotation and check cursors, insiders index, pipeline status) |
 | `raw` (private) | `sec/companyfacts/*.json.gz`, `sec/filings/{accn}/*.htm.gz`, `sec/releases/*.md.gz` | Archived source documents, indexed in `documents` |
 
 ## Schedules (UTC, `vercel.json`)
 
 | Job | When | What |
 |---|---|---|
-| `/api/cron/prices` | 21:40 Mon–Fri | Bars for all symbols, stats, index rebuild |
+| `/api/cron/prices?part=N&parts=4` | 21:40-21:55 Mon-Fri | Bars and stats for a quarter of the stocks each (part 0 adds index, rate and commodity symbols); every part rebuilds the index |
 | `/api/cron/macro` | 12:10 daily | Curve, FRED, fed funds, macro news and brief |
-| `/api/cron/companies` | 11:20, 16:20, 23:20 | Re-process companies with new SEC filings (up to 6 per run) |
-| `/api/cron/news` | 13:00, 19:00 | Rolling news + summary refresh, 10 companies per run |
+| `/api/cron/companies` | six runs a day | Checks SEC submissions for all 500 (rotating cursor). New 10-K/10-Q/8-K: full reprocess, up to 15 per run. Other new filings (Form 4, 144, proxies) are written straight to `filings` |
+| `/api/cron/news` | 13:00, 19:00 | Rolling news + summary refresh, 14 companies per run |
+| `/api/cron/insiders` | 15:30, 23:30 | Parses new Form 4 filings into `insider_transactions`, rewrites `insiders/{T}.json` and `meta/insiders.json` |
 
-Every run is logged in `etl_runs`.
+Every run is logged in `etl_runs`; the latest runs are published to `meta/status.json` for the Data status page.
+
+Vercel Hobby runs each cron entry once a day within the scheduled hour, which is why the jobs are split into several entries.
 
 ## Environment
 
@@ -69,7 +74,9 @@ pip install beautifulsoup4 lxml
 export FU_ENV_FILE=.env.local        # same keys as above
 python -m etl.run prices --full-history
 python -m etl.run macro
-python -m etl.run companies --workers 5          # all 102 companies
+python -m etl.run companies --workers 5          # all 500 companies
+python -m etl.run companies --changed            # only those with new reports
+python -m etl.run insiders                       # Form 4 backfill / refresh
 python -m etl.run companies --tickers AAPL MSFT  # a subset
 python -m etl.run news                           # next slice of the news rotation
 ```

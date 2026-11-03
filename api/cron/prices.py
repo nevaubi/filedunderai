@@ -6,10 +6,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _common import serve  # noqa: E402
 
 
-def run(sb):
+def run(sb, query):
     from etl import jobs
-    n, errors = jobs.prices_job(sb, intraday=True)
-    return {"symbols": n, "errors": errors}
+    parts = int(query.get("parts", 4))
+    part = int(query.get("part", 0))
+    n, errors = jobs.prices_job(sb, intraday=True, part=part, parts=parts)
+    return {"part": part, "symbols": n, "errors": len(errors)}
 
 
 class handler(BaseHTTPRequestHandler):

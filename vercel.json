@@ -3,28 +3,112 @@
   "buildCommand": "npm run build",
   "outputDirectory": "public",
   "functions": {
-    "api/ai.js": { "maxDuration": 300 },
-    "api/search.js": { "maxDuration": 60 },
-    "api/scrape.js": { "maxDuration": 90 },
-    "api/cron/*.py": { "maxDuration": 300, "includeFiles": "{etl/**,api/cron/_common.py}" }
+    "api/ai.js": {
+      "maxDuration": 300
+    },
+    "api/search.js": {
+      "maxDuration": 60
+    },
+    "api/scrape.js": {
+      "maxDuration": 90
+    },
+    "api/cron/*.py": {
+      "maxDuration": 300,
+      "includeFiles": "{etl/**,api/cron/_common.py}"
+    }
   },
   "crons": [
-    { "path": "/api/cron/prices", "schedule": "40 21 * * 1-5" },
-    { "path": "/api/cron/macro", "schedule": "10 12 * * *" },
-    { "path": "/api/cron/companies", "schedule": "20 11 * * *" },
-    { "path": "/api/cron/companies?run=2", "schedule": "20 16 * * *" },
-    { "path": "/api/cron/companies?run=3", "schedule": "20 23 * * *" },
-    { "path": "/api/cron/news", "schedule": "0 13 * * *" },
-    { "path": "/api/cron/news?run=2", "schedule": "0 19 * * *" },
-    { "path": "/api/cron/insiders", "schedule": "30 23 * * *" }
+    {
+      "path": "/api/cron/prices?part=0&parts=4",
+      "schedule": "40 21 * * 1-5"
+    },
+    {
+      "path": "/api/cron/prices?part=1&parts=4",
+      "schedule": "45 21 * * 1-5"
+    },
+    {
+      "path": "/api/cron/prices?part=2&parts=4",
+      "schedule": "50 21 * * 1-5"
+    },
+    {
+      "path": "/api/cron/prices?part=3&parts=4",
+      "schedule": "55 21 * * 1-5"
+    },
+    {
+      "path": "/api/cron/macro",
+      "schedule": "10 12 * * *"
+    },
+    {
+      "path": "/api/cron/companies",
+      "schedule": "20 11 * * *"
+    },
+    {
+      "path": "/api/cron/companies?run=2",
+      "schedule": "20 14 * * *"
+    },
+    {
+      "path": "/api/cron/companies?run=3",
+      "schedule": "20 17 * * *"
+    },
+    {
+      "path": "/api/cron/companies?run=4",
+      "schedule": "20 20 * * *"
+    },
+    {
+      "path": "/api/cron/companies?run=5",
+      "schedule": "20 23 * * *"
+    },
+    {
+      "path": "/api/cron/companies?run=6",
+      "schedule": "20 2 * * *"
+    },
+    {
+      "path": "/api/cron/news",
+      "schedule": "0 13 * * *"
+    },
+    {
+      "path": "/api/cron/news?run=2",
+      "schedule": "0 19 * * *"
+    },
+    {
+      "path": "/api/cron/insiders",
+      "schedule": "30 23 * * *"
+    },
+    {
+      "path": "/api/cron/insiders?run=2",
+      "schedule": "30 15 * * *"
+    }
   ],
   "headers": [
-    { "source": "/(.*)", "headers": [
-      { "key": "X-Content-Type-Options", "value": "nosniff" },
-      { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-      { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-      { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
-    ] },
-    { "source": "/app.(js|css)", "headers": [ { "key": "Cache-Control", "value": "public, max-age=300, stale-while-revalidate=86400" } ] }
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    },
+    {
+      "source": "/app.(js|css)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, stale-while-revalidate=86400"
+        }
+      ]
+    }
   ]
 }

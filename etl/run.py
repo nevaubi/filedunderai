@@ -15,15 +15,18 @@ def main():
     ap.add_argument("--summary", action="store_true", help="regenerate summaries")
     ap.add_argument("--no-docs", action="store_true")
     ap.add_argument("--full-history", action="store_true")
+    ap.add_argument("--part", type=int)
+    ap.add_argument("--parts", type=int, default=1)
+    ap.add_argument("--changed", action="store_true", help="only companies with new 10-K/10-Q/8-K filings")
     a = ap.parse_args()
     sb = Supabase()
     if a.job in ("prices", "all"):
-        print("prices", jobs.prices_job(sb, full_history=a.full_history))
+        print("prices", jobs.prices_job(sb, full_history=a.full_history, part=a.part, parts=a.parts))
     if a.job in ("macro", "all"):
         jobs.macro_job(sb)
         print("macro ok")
     if a.job in ("companies", "all"):
-        print(json.dumps(jobs.companies_job(sb, a.tickers, workers=a.workers, refresh_news=a.news, refresh_summary=a.summary, fetch_docs=not a.no_docs), default=str)[:2000])
+        print(json.dumps(jobs.companies_job(sb, a.tickers, workers=a.workers, refresh_news=a.news, refresh_summary=a.summary, fetch_docs=not a.no_docs, only_changed=a.changed), default=str)[:2000])
     if a.job == "news":
         print(jobs.news_rotation_job(sb))
     if a.job in ("insiders", "all"):

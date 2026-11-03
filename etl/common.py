@@ -4,6 +4,7 @@ import gzip
 import hashlib
 import json
 import os
+import threading
 import time
 import urllib.error
 import urllib.parse
@@ -80,8 +81,28 @@ def get_json(url, headers=None, timeout=60, retries=3):
     return json.loads(request(url, headers=headers, timeout=timeout, retries=retries))
 
 
+_sec_lock = threading.Lock()
+_sec_last = [0.0]
+
+
+def sec_throttle(min_gap=0.13):
+    """Keeps the process under SEC's 10 requests per second across threads."""
+    with _sec_lock:
+        wait = _sec_last[0] + min_gap - time.time()
+        if wait > 0:
+            time.sleep(wait)
+        _sec_last[0] = time.time()
+
+
 def sec_json(url):
+    sec_throttle()
     return get_json(url, headers={"User-Agent": SEC_UA}, timeout=60, retries=4)
+
+
+def sec_get(url, timeout=60):
+    """Fetches a document from sec.gov with a declared user agent."""
+    sec_throttle()
+    return request(url, headers={"User-Agent": SEC_UA}, timeout=timeout, retries=3)
 
 
 class Supabase:

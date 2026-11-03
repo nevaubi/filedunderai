@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from . import docs, fundamentals, insiders, macro, news, prices, sec, summaries
 from .common import Run, Supabase, now_iso
-from .universe import BY_TICKER, MARKET_SYMBOLS, SECTOR_ETF, UNIVERSE
+from .universe import BY_TICKER, MARKET_SYMBOLS, SECTOR_ETF, SP100, UNIVERSE
 
 IR_URLS = {
     "AAPL": "https://investor.apple.com/", "MSFT": "https://www.microsoft.com/en-us/investor", "NVDA": "https://investor.nvidia.com/",
@@ -62,7 +62,7 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
                 continue
             url = sec.filing_url(cik, f["a"], f["p"])
             try:
-                html = docs.firecrawl(url, "rawHtml").get("rawHtml", "")
+                html = docs.filing_html(url)
                 if store_raw and html:
                     sb.put_raw(f"sec/filings/{f['a']}/{f['p']}", html, ticker=tk, accession=f["a"], kind="filing_html", source_url=url)
                 tabs = docs.ix_tables(html)
@@ -135,7 +135,7 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
     fund = fundamentals.compute(statements, prof, None)
     return {"ticker": tk, "name": u["name"], "legal_name": prof["name"], "sector": u["sector"], "sic": prof["sicDescription"], "exchange": (prof["exchanges"] or [None])[0],
             "fye": prof["fiscalYearEnd"], "shares": (prof["sharesOutstanding"] or {}).get("val"), "latest_filing": filings[0]["d"] if filings else None,
-            "latest_accession": filings[0]["a"] if filings else None, "fund": fund, "has_source_tables": bool(ix), "has_release": bool(release),
+            "latest_accession": filings[0]["a"] if filings else None, "material_accession": material_accession(filings), "fund": fund, "has_source_tables": bool(ix), "has_release": bool(release),
             "div_ttm": fundamentals.ttm(statements, "Dividends paid", ("cashflow",)), "bb_ttm": fundamentals.ttm(statements, "Buybacks", ("cashflow",))}
 
 
@@ -149,24 +149,67 @@ def _ts(s):
         return s if "T" in s else None
 
 
+MATERIAL = ("10-K", "10-Q", "10-K/A", "10-Q/A", "8-K", "20-F", "40-F", "6-K")
+
+
+def material_accession(filings):
+    return next((f["a"] for f in filings if f["f"] in MATERIAL), None)
+
+
+def detect_changes(sb, tickers, fund, deadline):
+    """Checks SEC submissions for each ticker. New material filings (10-K, 10-Q, 8-K) mark the company for
+    reprocessing; every other new filing (Form 4, 144, proxies) is written straight to the filings table."""
+    state = _cache(sb, "meta/check_cursor.json", {"cursor": 0})
+    start = state.get("cursor", 0) % max(len(tickers), 1)
+    order = tickers[start:] + tickers[:start]
+    changed, checked, light = [], 0, []
+
+    def check(tk):
+        if time.time() > deadline:
+            return tk, None, None
+        try:
+            sub = sec.submissions(BY_TICKER[tk]["cik"])
+            return tk, sec.filing_list(sub), None
+        except Exception as e:
+            return tk, None, str(e)[:160]
+
+    with ThreadPoolExecutor(4) as ex:
+        for tk, fl, err in ex.map(check, order):
+            if fl is None:
+                if err:
+                    print("submissions check failed", tk, err)
+                continue
+            checked += 1
+            prev = fund.get(tk) or {}
+            mat = material_accession(fl)
+            known = prev.get("material_accession") or prev.get("latest_accession")
+            if not prev or (mat and mat != known):
+                changed.append(tk)
+            elif fl and fl[0]["a"] != prev.get("latest_accession"):
+                cik = BY_TICKER[tk]["cik"]
+                for f in fl[:40]:
+                    if f["a"] == prev.get("latest_accession"):
+                        break
+                    light.append({"accession": f["a"], "ticker": tk, "form": f["f"], "filed": f["d"], "report_date": f["r"] or None, "primary_doc": f["p"],
+                                  "items": f["i"], "description": describe(f), "url": sec.filing_url(cik, f["a"], f["p"]), "updated_at": now_iso()})
+                prev["latest_accession"] = fl[0]["a"]
+                prev["latest_filing"] = fl[0]["d"]
+    if light:
+        sb.upsert("filings", light, "accession")
+    state["cursor"] = (start + checked) % max(len(tickers), 1)
+    state["updated_at"] = now_iso()
+    sb.put_json("meta/check_cursor.json", state, cache="no-store")
+    print(f"checked {checked}/{len(tickers)}, {len(changed)} with new reports, {len(light)} other filings synced")
+    return changed
+
+
 def companies_job(sb, tickers=None, workers=4, refresh_news=False, refresh_summary=False, fetch_docs=True, time_budget=None, only_changed=False, max_companies=None):
     with Run(sb, "companies") as run:
         t0 = time.time()
         fund = _cache(sb, "meta/fundamentals.json", {})
         tickers = tickers or [t for t, *_ in UNIVERSE]
         if only_changed:
-            changed = []
-            for tk in tickers:
-                try:
-                    sub = sec.submissions(BY_TICKER[tk]["cik"])
-                    latest = sub["filings"]["recent"]["accessionNumber"][0]
-                    if (fund.get(tk) or {}).get("latest_accession") != latest:
-                        changed.append(tk)
-                except Exception as e:
-                    print("submissions check failed", tk, e)
-                if time_budget and time.time() - t0 > time_budget * 0.25:
-                    break
-            tickers = changed
+            tickers = detect_changes(sb, tickers, fund, deadline=t0 + (time_budget or 600) * 0.4)
         if max_companies:
             tickers = tickers[:max_companies]
         done, failed = [], {}
@@ -190,43 +233,80 @@ def companies_job(sb, tickers=None, workers=4, refresh_news=False, refresh_summa
                     print("fail", tk, err, flush=True)
         sb.put_json("meta/fundamentals.json", fund, cache="no-store")
         run.stats.update({"done": len(done), "failed": failed, "tickers": done})
-        if done:
-            build_index(sb)
-            build_feed(sb)
+        build_index(sb)
+        build_feed(sb)
         return done, failed
 
 
 # ---------------------------------------------------------------- prices
-def prices_job(sb, intraday=True, full_history=False):
+def prices_job(sb, intraday=True, full_history=False, part=None, parts=1):
+    """Daily and 5-minute bars. With parts > 1 the stock list is split so each run fits a function time limit;
+    part 0 also carries the market symbols. Each part writes its own stats file, merged by build_index."""
     with Run(sb, "prices") as run:
         comp = [t for t, *_ in UNIVERSE]
-        syms = MARKET_SYMBOLS + comp
+        if part is not None and parts > 1:
+            comp = comp[part::parts]
+        with_market = part in (None, 0)
+        syms = (MARKET_SYMBOLS if with_market else []) + comp
         daily, err1 = prices.fetch_many(syms, "2y", "1d")
-        intra, err2 = prices.fetch_many(["SPY", "QQQ"] + comp, "5d", "5m") if intraday else ({}, {})
+        intra, err2 = prices.fetch_many((["SPY", "QQQ"] if with_market else []) + comp, "5d", "5m") if intraday else ({}, {})
         spy = daily.get("SPY", {}).get("bars")
-        pstats = {}
-        for s, d in daily.items():
-            sb.put_json(f"prices/{prices.path_key(s)}.json", {"meta": d["meta"], "d": d["bars"], "i": (intra.get(s) or {}).get("bars", [])}, cache="max-age=300")
-            pstats[s] = prices.stats(d["bars"], spy if s != "SPY" else None)
-            pstats[s]["spark"] = [round(b[4], 2) for b in d["bars"][-63:]]
+        if not spy:
+            try:
+                spy = prices.chart("SPY", "2y", "1d")["bars"]
+            except Exception:
+                spy = None
+        pstats, db_rows = {}, []
+        for s_, d in daily.items():
+            pstats[s_] = prices.stats(d["bars"], spy if s_ != "SPY" else None)
+            pstats[s_]["spark"] = [round(b[4], 2) for b in d["bars"][-63:]]
             rows = d["bars"] if full_history else d["bars"][-7:]
-            sb.upsert("prices_daily", [{"symbol": s, "d": dt.datetime.fromtimestamp(b[0], dt.timezone.utc).date().isoformat(), "o": b[1], "h": b[2], "l": b[3], "c": b[4], "v": b[5]} for b in rows], "symbol,d", batch=1000)
-        market = {"generated": now_iso(), "symbols": {}}
-        for s in MARKET_SYMBOLS:
-            if s in daily:
-                b = daily[s]["bars"]
-                market["symbols"][s] = {"bars": [[x[0], x[4]] for x in b[-270:]], "o": b[-1][1], "h": b[-1][2], "l": b[-1][3]}
-        sb.put_json("market.json", market, cache="max-age=300")
-        sb.put_json("meta/pricestats.json", pstats, cache="no-store")
-        run.stats.update({"symbols": len(daily), "errors": {**err1, **{k + "@5m": v for k, v in err2.items()}}})
-        build_index(sb, pstats=pstats)
+            db_rows += [{"symbol": s_, "d": dt.datetime.fromtimestamp(b[0], dt.timezone.utc).date().isoformat(), "o": b[1], "h": b[2], "l": b[3], "c": b[4], "v": b[5]} for b in rows]
+
+        def put(item):
+            s_, d = item
+            sb.put_json(f"prices/{prices.path_key(s_)}.json", {"meta": d["meta"], "d": d["bars"], "i": (intra.get(s_) or {}).get("bars", [])}, cache="max-age=300")
+
+        with ThreadPoolExecutor(8) as ex:
+            list(ex.map(put, daily.items()))
+        if db_rows:
+            sb.upsert("prices_daily", db_rows, "symbol,d", batch=2000)
+        if with_market:
+            market = {"generated": now_iso(), "symbols": {}}
+            for s_ in MARKET_SYMBOLS:
+                if s_ in daily:
+                    b = daily[s_]["bars"]
+                    market["symbols"][s_] = {"bars": [[x[0], x[4]] for x in b[-270:]], "o": b[-1][1], "h": b[-1][2], "l": b[-1][3]}
+            sb.put_json("market.json", market, cache="max-age=300")
+        key = "all" if part is None or parts <= 1 else f"p{part}"
+        sb.put_json(f"meta/pricestats/{key}.json", {"generated": now_iso(), "parts": parts, "stats": pstats}, cache="no-store")
+        run.stats.update({"part": key, "symbols": len(daily), "errors": {**err1, **{k + "@5m": v for k, v in err2.items()}}})
+        build_index(sb)
         return len(daily), {**err1, **err2}
+
+
+def load_pricestats(sb):
+    """Merges per-part stats files, keeping the newest bar date per symbol."""
+    merged = {}
+    sources = [_cache(sb, "meta/pricestats.json", {})]
+    for key in ["all"] + [f"p{i}" for i in range(8)]:
+        doc = _cache(sb, f"meta/pricestats/{key}.json", None)
+        if doc:
+            sources.append(doc.get("stats") or {})
+    for src in sources:
+        for sym, st in src.items():
+            if not isinstance(st, dict):
+                continue
+            cur = merged.get(sym)
+            if not cur or (st.get("as_of") or "") >= (cur.get("as_of") or ""):
+                merged[sym] = st
+    return merged
 
 
 # ---------------------------------------------------------------- index + feed
 def build_index(sb, pstats=None):
     fund = _cache(sb, "meta/fundamentals.json", {})
-    pstats = pstats or _cache(sb, "meta/pricestats.json", {})
+    pstats = pstats or load_pricestats(sb)
     rows, metrics = [], []
     for tk, *_ in UNIVERSE:
         f = fund.get(tk)
@@ -251,7 +331,7 @@ def build_index(sb, pstats=None):
             m["buyback_yield"] = f["bb_ttm"] / mcap
         metrics.append({k: (None if isinstance(v, float) and v != v else v) for k, v in m.items()})
         rows.append({**{k: v for k, v in m.items() if k not in ("updated_at",)}, "name": f["name"], "legal_name": f.get("legal_name"), "sector": f["sector"], "sic": f.get("sic"),
-                     "exchange": f.get("exchange"), "fye": f.get("fye"), "latest_filing": f.get("latest_filing"), "has_source_tables": f.get("has_source_tables"), "spark": ps.get("spark", [])})
+                     "exchange": f.get("exchange"), "fye": f.get("fye"), "latest_filing": f.get("latest_filing"), "has_source_tables": f.get("has_source_tables"), "sp100": tk in SP100, "spark": ps.get("spark", [])})
     if metrics:
         sb.upsert("company_metrics", metrics, "ticker")
     sb.put_json("index.json", {"generated": now_iso(), "sectors": SECTOR_ETF, "companies": rows}, cache="max-age=120")
@@ -341,7 +421,7 @@ def insiders_job(sb, tickers=None, days=365, per_company=120, workers=4, time_bu
         done, failed, buf, touched = 0, 0, [], set(tickers or [])
 
         def one(f):
-            return insiders.fetch(f["ticker"], BY_TICKER[f["ticker"]][0], f)
+            return insiders.fetch(f["ticker"], BY_TICKER[f["ticker"]]["cik"], f)
 
         with ThreadPoolExecutor(workers) as ex:
             futs = []
