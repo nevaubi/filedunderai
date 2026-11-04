@@ -892,6 +892,7 @@ async function route() {
   const h = (location.hash || "#markets").slice(1);
   let pid = h, arg = null;
   if (h.startsWith("company-")) { pid = "company"; arg = h.slice(8).toUpperCase(); }
+  else { const i = h.indexOf("-"); if (i > 0 && window.FU_PAGES && window.FU_PAGES[h.slice(0, i)]) { pid = h.slice(0, i); arg = decodeURIComponent(h.slice(i + 1)); } }
   if (pid === "companies") pid = "screener";
   document.querySelectorAll("[data-p]").forEach(a => a.classList.toggle("on", a.dataset.p === pid || (pid === "company" && a.dataset.p === "screener")));
   document.querySelectorAll("#wl a").forEach(a => a.classList.toggle("on", a.dataset.t === arg));
