@@ -137,6 +137,22 @@
       "schedule": "15 12 * * 1"
     },
     {
+      "path": "/api/cron/kpistd",
+      "schedule": "5 22 * * *"
+    },
+    {
+      "path": "/api/cron/kpistd?run=2",
+      "schedule": "5 16 * * *"
+    },
+    {
+      "path": "/api/cron/kpistd?run=3",
+      "schedule": "5 10 * * *"
+    },
+    {
+      "path": "/api/cron/kpistd?run=4",
+      "schedule": "5 4 * * *"
+    },
+    {
       "path": "/api/cron/screener",
       "schedule": "55 22 * * *"
     }

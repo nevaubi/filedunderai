@@ -28,6 +28,7 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
   - `insiders.py` Form 4 XML parsing (owner, role, code, shares, price, holdings after, 10b5-1).
   - `news.py`, `summaries.py` recent coverage and written summaries.
   - `screener.py` the screener factor table: 189 fields per company (valuation and 5-year percentiles, growth, quality, balance sheet, Piotroski components, technicals, correlations to market, rates, commodities, the dollar, bitcoin and macro series, insider and filing activity, KPI families, segments), each with a definition, unit, source and per-company provenance.
+  - `kpi_taxonomy.py`, `kpistd.py` standardized KPIs: a canonical taxonomy (about 75 measures: comparable sales, organic growth, ARR, net revenue retention, RPO, backlog, book-to-bill, subscribers, ARPU, NIM, CET1, ROTCE, combined ratio, FFO per share, occupancy, RevPAR, load factor, ASMs, production, adjusted EBITDA and EPS, free cash flow, capex, segment revenue and operating income, ...) and the mapping of every company KPI id onto it. Rules on name, unit, category and parent decide most ids; the ones they leave open with a plausible match go to a Fireworks model, and a proposal is kept only if it passes the rule review (candidate list, unit, exclusions, segment qualifiers, value range). Each mapping stores scope (total, segment, variant), confidence, method and the reason. Each reporting-basis id is mapped on its own; per company and measure one total-company id is the compared series and other bases stay separate series, never joined.
   - `jobs.py` the jobs: `companies_job`, `prices_job`, `macro_job`, `news_rotation_job`, `build_index`, `build_feed`.
 - **`public/`** is a dependency-free single-page app (D3 for charts). It reads `index.json`, `market.json`, `macro.json`, `feed.json`, `companies/{TICKER}.json` and `prices/{SYMBOL}.json` from the public bucket.
 - **`db/schema.sql`** is applied on every deploy by `scripts/migrate.mjs` (idempotent). Public tables are read-only for `anon` via RLS.
@@ -49,6 +50,11 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | | `sectors/{slug}.json` | One sector or industry: quarterly aggregates since 2008, valuation vs 10-year range, performance, breadth, macro sensitivity, KPIs, constituents, segment exposure, insiders, filings |
 | | `sectors/{slug}.comp.json` | Per-company inputs (with accessions) behind every aggregate, for the derivation panel |
 | | `sectors/notes.json` | Weekly sector notes (numbers inserted from computed facts) |
+| | `kpistd/taxonomy.json` | Canonical KPI taxonomy with coverage per measure and industry |
+| | `kpistd/map.json` | Per company: the compared KPI id for each canonical measure, ids of other bases, unit factors |
+| | `kpistd/t/{T}.json` | One company's mapping (scope, role, confidence, method, reason per KPI id) and its standardized series with source documents |
+| | `kpistd/series/{id}.json` | Every company's series for one canonical measure (quarterly and annual points, each with document, page and quote) |
+| | `kpistd/latest.json` | Latest value and year-over-year change per measure and company (company panels) |
 | | `screener.json` | Screener field catalogue (id, group, name, unit, definition, source, distribution) and one compact row per company |
 | | `screener/src/{T}.json` | Provenance per screener field: the filed facts behind it (statement line, period, value, accession, form, filing date, XBRL concept), price dates and closes, KPI document ids, Form 4 windows |
 | | `screener/corr.json` | Pairwise one-year daily return correlations (int8, upper triangle) for correlation clusters |
@@ -69,6 +75,7 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | `/api/cron/sectors?step=prices` | 21:05 Mon-Fri | Refreshes monthly price histories (20 years, with splits) older than six days |
 | `/api/cron/sectors` | 22:35 Mon-Fri | Rebuilds every sector and industry file from facts, prices, macro_observations, FRED, KPIs, segments, insiders, filings; writes `sector_metrics` |
 | `/api/cron/sectors?step=notes` | 12:15 Mon | Weekly sector notes, validated so every figure comes from the data (`sector_notes`) |
+| `/api/cron/kpistd` | 04:05, 10:05, 16:05, 22:05 | Maps the KPI ids of companies whose KPI definitions changed since the last run (rules, then reviewed model proposals), republishes their `kpistd/t` files and the series files they touch; 230s budget, unfinished companies continue on the next run |
 | `/api/cron/screener` | 22:55 daily | Rebuilds `screener.json` after the price runs: extends the close history from the prices files, re-extracts facts only for companies with a new report, recomputes every field, correlations and provenance |
 | `/api/cron/insiders` | 15:30, 23:30 | Parses new Form 4 filings into `insider_transactions`, rewrites `insiders/{T}.json` and `meta/insiders.json` |
 
@@ -99,6 +106,7 @@ python -m etl.run news                           # next slice of the news rotati
 python -m etl.run sectors --step prices          # monthly price cache for sector valuation history
 python -m etl.run sectors                        # sector and industry files (etl/sectors.py, mapping in etl/sector_map.py)
 python -m etl.run sectors --step notes           # weekly sector notes
+python -m etl.run kpistd                         # standardized KPI mapping (incremental); --full-history remaps every company, --no-llm rules only
 python -m etl.run screener --full-history        # screener table; --full-history refetches 10y closes and every company
 node scripts/test_screen_prompts.mjs             # screen agent accuracy on tests/screener_prompts.json
 ```

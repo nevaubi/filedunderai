@@ -218,13 +218,13 @@ kpi("trasm", "Total revenue per ASM", "Airlines", "cents", r"^(trasm|total reven
 kpi("production_boe", "Total production (BOE/d)", "Energy", "boe_d",
     r"^(total |net )?(production|production volumes?|oil equivalent production)(,|:| -)? ?(oil equivalent|boe|total)?(,|:| -)? ?(total)?( \(boe/d\)| \(mboe/d\))?$|^production, oil equivalent, total$|^total production - total$|^total production$",
     "Total oil-equivalent production per day.", var=r"\b(total|oil equivalent|boe|reported|net|average|daily)\b",
-    excl=r"\b(oil|natural gas|ngl|liquids|gas)\b(?!.*equivalent)|\b(adjusted|excluding|growth|change)\b", how="sum", ind=["Energy"])
+    excl=r"\b(oil|natural gas|ngl|liquids|gas)\b(?!.*equivalent)|\b(adjusted|excluding|growth|change)\b", how="sum", ind=["Oil & Gas Exploration & Production", "Integrated Oil & Refining"])
 kpi("oil_production", "Oil production (bbl/d)", "Energy", "bbl_d",
     r"^(crude )?oil production( - total|, total)?$|^production, oil, total$|^(total )?oil( production)?$|^crude oil( and condensate)?( production)?$",
-    "Crude oil (and condensate) production per day.", excl=r"\b(equivalent|adjusted|growth)\b", how="sum", ind=["Energy"])
+    "Crude oil (and condensate) production per day.", excl=r"\b(equivalent|adjusted|growth)\b", how="sum", ind=["Oil & Gas Exploration & Production", "Integrated Oil & Refining"])
 kpi("gas_production", "Natural gas production (cf/d)", "Energy", "cf_d",
     r"^(natural )?gas production( - total|, total)?$|^production, natural gas, total$|^natural gas( production)?$",
-    "Natural gas production per day.", excl=r"\b(liquids|ngl|adjusted|growth)\b", how="sum", ind=["Energy"])
+    "Natural gas production per day.", excl=r"\b(liquids|ngl|adjusted|growth)\b", how="sum", ind=["Oil & Gas Exploration & Production", "Integrated Oil & Refining"])
 
 # ---- telecom
 kpi("postpaid_phone_net_adds", "Postpaid phone net additions", "Telecom", "count",

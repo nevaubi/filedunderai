@@ -921,6 +921,15 @@ table.cmpx td.c.der::after{content:"";position:absolute;right:3px;top:5px;width:
     const status = el("div", { class: "muted", style: "padding:12px 4px" }, `Loading investor-materials KPIs and XBRL breakdowns for ${tks.length} companies…`);
     body.append(status);
     const data = Object.fromEntries(await Promise.all(tks.map(async tk => [tk, await ensureSegments(tk).catch(() => ({}))])));
+    // standardized KPI ids (etl/kpistd.py): the company's one total-company series per canonical measure
+    const [std, stdTax] = await Promise.all([getJSON("kpistd/map.json").catch(() => null), getJSON("kpistd/taxonomy.json").catch(() => null)]);
+    const stdName = Object.fromEntries((stdTax?.kpis || []).map(k => [k.id, k.name]));
+    tks.forEach(tk => {
+      const kp = data[tk]?.kpi, pm = std?.primary?.[tk];
+      if (!kp || !pm) return;
+      kp.canonical = Object.fromEntries(Object.entries(pm).map(([c, id]) => [id, c]));
+      (kp.groups || []).forEach(g => g.items.forEach(it => { const c = kp.canonical[it.id]; if (c && stdName[c]) it.canonical_label = stdName[c]; }));
+    });
     if (!body.isConnected) return;
     status.remove();
     kpiPanel(body, tks, data);

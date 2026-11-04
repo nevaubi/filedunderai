@@ -849,7 +849,17 @@ def load_kpis(sb, uni, F, CQ, quarters, log=print):
     """{industry: [kpi block]} following KPI_SPECS."""
     defs = fetch_all(sb, "kpi_definitions", "select=ticker,kpi_id,name,unit&source_kind=eq.ir&order=ticker,kpi_id", workers=4)
     picks = {}   # spec id -> {ticker: [kpi defs]}
+    from .kpistd import primary_map
+    std, std_f = primary_map(sb, with_factors=True)   # standardized KPI ids: {ticker: {canonical: kpi_id}}
+    dby = {(d["ticker"], d["kpi_id"]): d for d in defs} if std else {}
     for spec in KPI_SPECS:
+        if spec.get("canonical") and std:
+            # one total-company series per company from the standardized mapping (never several bases joined)
+            for t, cm in std.items():
+                c, kid = uni.get(t), cm.get(spec["canonical"])
+                if c and kid and c["industry"] in spec["industries"] and (t, kid) in dby:
+                    picks.setdefault(spec["id"], {})[t] = [dby[(t, kid)]]
+            continue
         if not spec.get("match"):
             continue
         rx = re.compile(spec["match"], re.I)
@@ -880,7 +890,8 @@ def load_kpis(sb, uni, F, CQ, quarters, log=print):
     for spec in KPI_SPECS:
         comps = {}
         defs_used = {}
-        if spec.get("match"):
+        if spec.get("match") or spec.get("canonical"):
+            fac = {t: (std_f.get(t) or {}).get(spec["canonical"], 1) for t in (picks.get(spec["id"]) or {})} if spec.get("canonical") and std else {}
             for t, ds in (picks.get(spec["id"]) or {}).items():
                 # one definition per company: the one with the most quarters, then the shortest id
                 best = max(ds, key=lambda d: (len(values.get((t, d["kpi_id"]), [])), -len(d["kpi_id"])))
@@ -888,11 +899,13 @@ def load_kpis(sb, uni, F, CQ, quarters, log=print):
                 if not rows:
                     continue
                 defs_used[t] = {"kpi_id": best["kpi_id"], "name": best["name"], "unit": best.get("unit")}
+                if t in fac:
+                    defs_used[t]["canonical"] = spec["canonical"]
                 ser = {}
                 for r in rows:
                     k = qkey(r["period_end"])
                     a = r.get("anchor") or {}
-                    ser[k] = [_r(float(r["value"])), r["period_end"], r.get("fiscal_label"), r.get("source_id"), a.get("page"), (a.get("quote") or "")[:300], a.get("sheet"), a.get("cell"),
+                    ser[k] = [_r(float(r["value"]) * fac.get(t, 1)), r["period_end"], r.get("fiscal_label"), r.get("source_id"), a.get("page"), (a.get("quote") or "")[:300], a.get("sheet"), a.get("cell"),
                               bool(r.get("derived"))]
                 comps[t] = ser
         elif spec.get("fact"):

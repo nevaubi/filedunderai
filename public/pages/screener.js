@@ -25,7 +25,7 @@ window.FU_PAGES = window.FU_PAGES || {};
   addEventListener("hashchange", takeSharedHash, true);
 
   /* ---------- formatting ---------- */
-  const SIGNED = /(_g_|_cagr|_accel|_chg3|^ret_|^rs_|^dist_|^ins_net|^shr_chg|^kpi_.*_yoy$|^macd_hist$)/;
+  const SIGNED = /(_g_|_cagr|_accel|_chg3|^ret_|^rs_|^dist_|^ins_net|^shr_chg|^kpi_.*_yoy$|^std_.*_yoy$|^macd_hist$)/;
   const fieldOf = id => SCR.fields[id];
   function fmtV(id, v) {
     const f = fieldOf(id);

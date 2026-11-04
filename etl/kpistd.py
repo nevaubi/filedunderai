@@ -282,12 +282,21 @@ def _fye_match(end, fye):
 def build_series(rows, factor, fye):
     """{"Q": [...], "A": [...]} with values in canonical units. Point: [end, value, label, doc, page, quote, sheet, cell, formula, printed-unit value]."""
     q, a = {}, {}
+    idx = {(r["period_kind"], r["period_end"]): r for r in rows}
     for r in rows:
         k = r["period_kind"]
         anc = r.get("anchor") or {}
         der = r.get("derived")
         v = float(r["value"])
-        pt = [r["period_end"], round(v * factor, 6), r.get("fiscal_label"), r.get("source_id"), anc.get("page"), (anc.get("quote") or "")[:220],
+        src = r.get("source_id")
+        if der and src == "derived":
+            # a derived value (e.g. Q4 = FY - 9M) opens the document of its first printed input
+            for inp in der.get("inputs") or []:
+                x = idx.get((inp.get("kind"), inp.get("period_end")))
+                if x and x.get("source_id") not in (None, "derived"):
+                    src, anc = x["source_id"], x.get("anchor") or {}
+                    break
+        pt = [r["period_end"], round(v * factor, 6), r.get("fiscal_label"), src, anc.get("page"), (anc.get("quote") or "")[:220],
               anc.get("sheet"), anc.get("cell"), (der or {}).get("formula") if der else None, v]
         if k == "Q":
             q[r["period_end"]] = pt
@@ -446,6 +455,22 @@ def map_job(sb, tickers=None, full=False, use_llm=True, time_budget=None, log=lo
     return stats
 
 
+def _last_yoy(pts, uclass):
+    """[end, value, label, yoy] for the latest point; yoy is a change in points for percentages, a ratio otherwise."""
+    if not pts:
+        return None
+    p = pts[-1]
+    e = dt.date.fromisoformat(p[0])
+    prior = next((x for x in reversed(pts[:-1]) if abs((e - dt.date.fromisoformat(x[0])).days - 365) <= 25), None)
+    yoy = None
+    if prior and prior[1] is not None and p[1] is not None:
+        if uclass in ("pct", "pp"):
+            yoy = round(p[1] - prior[1], 4)
+        elif prior[1] > 0:
+            yoy = round(p[1] / prior[1] - 1, 6)
+    return [p[0], p[1], p[2], yoy]
+
+
 def publish(sb, uni, old_map, tfiles, touched, gone, run_ts, log=log_):
     """map.json, taxonomy.json and the series files of every canonical id whose members changed."""
     prim = dict(old_map.get("primary") or {})
@@ -469,7 +494,16 @@ def publish(sb, uni, old_map, tfiles, touched, gone, run_ts, log=log_):
         seg_counts[tk] = sc
     for tk in gone:
         seg_counts.pop(tk, None)
-    mp = {"generated": run_ts, "taxonomy_version": K.VERSION, "primary": prim, "alts": alts, "segment_counts": seg_counts}
+    factors = dict(old_map.get("factors") or {})
+    for tk in gone:
+        factors.pop(tk, None)
+    for tk, tf in tfiles.items():
+        f = {cid: s["factor"] for cid, s in tf["series"].items() if s.get("factor") not in (None, 1, 1.0)}
+        if f:
+            factors[tk] = f
+        else:
+            factors.pop(tk, None)
+    mp = {"generated": run_ts, "taxonomy_version": K.VERSION, "primary": prim, "alts": alts, "factors": factors, "segment_counts": seg_counts}
     sb.put_json("kpistd/map.json", mp, cache="max-age=600")
     # series files: every company carrying the canonical id, read from its company file
     by_c = {}
@@ -505,6 +539,24 @@ def publish(sb, uni, old_map, tfiles, touched, gone, run_ts, log=log_):
                                                    "definition": t["definition"], "higher_is_better": t["higher_is_better"], "generated": run_ts,
                                                    "companies": comps, "docs": docs}, cache="max-age=600")
         written += 1
+    # latest value and year-over-year change per company and canonical id (company panels, landing page)
+    latest = (_pub_get(sb, "kpistd/latest.json") or {}).get("kpis") or {}
+    if not latest:
+        with ThreadPoolExecutor(8) as ex:
+            for tk, tf in ex.map(get_tf, sorted(t for t in prim if t not in tfiles)):
+                if tf:
+                    tfiles[tk] = tf
+    for cid in list(latest):
+        for tk in list(latest[cid]):
+            if tk in gone or tk in tfiles and cid not in tfiles[tk]["series"]:
+                latest[cid].pop(tk)
+    for tk, tf in tfiles.items():
+        for cid, s in tf["series"].items():
+            t = K.BY_ID.get(cid)
+            if t:
+                latest.setdefault(cid, {})[tk] = {"q": _last_yoy(s["Q"], t["uclass"]), "a": _last_yoy(s["A"], t["uclass"]),
+                                                  "ind": tf.get("industry"), "sec": tf.get("sector"), "kpi_id": s["kpi_id"]}
+    sb.put_json("kpistd/latest.json", {"generated": run_ts, "kpis": {c: v for c, v in latest.items() if v}}, cache="max-age=600")
     # taxonomy with coverage
     cov = {}
     for cid, tks in by_c.items():
@@ -527,7 +579,8 @@ def publish(sb, uni, old_map, tfiles, touched, gone, run_ts, log=log_):
     return {"series_files": written, "companies_with_series": len(prim), "canonical_ids_covered": len(by_c)}
 
 
-def primary_map(sb):
-    """{ticker: {canonical: kpi_id}} for consumers (sectors, screener); empty when the mapping has not run."""
+def primary_map(sb, with_factors=False):
+    """{ticker: {canonical: kpi_id}} for consumers (sectors, screener); empty when the mapping has not run.
+    with_factors also returns {ticker: {canonical: factor}} for series printed in another scale (e.g. thousands of boe/d)."""
     m = _pub_get(sb, "kpistd/map.json") or {}
-    return m.get("primary") or {}
+    return (m.get("primary") or {}, m.get("factors") or {}) if with_factors else (m.get("primary") or {})

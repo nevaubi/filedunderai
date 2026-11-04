@@ -854,6 +854,7 @@ const PAGES = [
   { id: "feed", name: "Filings feed", icon: "i-feed", key: "f", hidden: true },
   { id: "technicals", name: "Technicals", icon: "i-ta", key: "t" },
   { id: "sectors", name: "Sectors", icon: "i-sec", key: "s" },
+  { id: "kpis", name: "KPI peers", icon: "i-cmp", key: "k" },
   { id: "macro", name: "Macro", icon: "i-mac", key: "x" },
   { id: "theses", name: "Theses", icon: "i-th", key: "h" },
   { id: "workbench", name: "Workbench", icon: "i-wb", key: "w" },
@@ -1599,6 +1600,7 @@ function renderSegments(host, tk, seg, ir, kpi) {
     el("div", {}, el("div", { class: "eyebrow" }, "Segments and breakdowns"), el("div", { class: "muted", style: "font-size:12.5px;max-width:760px" },
       "Operating KPIs come from the company's investor materials (supplements, slides, letters, releases); breakdowns come from the inline XBRL in its 10-K and 10-Q filings. Every number opens the stored source document at that value. Missing quarters are derived from year-to-date figures, and every breakdown is checked against its total.")),
     el("div", { style: "display:flex;gap:10px;align-items:center;margin-left:auto" }, nAll ? el("span", { class: "chip " + (nOk === nAll ? "up" : ""), title: "Periods where the lines add up to the consolidated total, counting an explicit derived line for unallocated items" }, `${nOk} of ${nAll} period totals tie out`) : null, showSeg, rangeSeg, kindSeg)));
+  if (window.FU_KPISTD) window.FU_KPISTD.companyPanel(host, tk);
   if (kpi?.groups?.length) renderKpiGroups(host, tk, kpi, st);
   if (!tables.length) host.append(el("div", { class: "empty" }, el("h3", {}, "No segment breakdown tagged"), el("p", { class: "muted" }, "This company's filings do not tag a segment, product or geographic breakdown with dimensions, or it reports a single segment.")));
   let shown = tables;
