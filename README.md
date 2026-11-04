@@ -52,6 +52,9 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | | `screener.json` | Screener field catalogue (id, group, name, unit, definition, source, distribution) and one compact row per company |
 | | `screener/src/{T}.json` | Provenance per screener field: the filed facts behind it (statement line, period, value, accession, form, filing date, XBRL concept), price dates and closes, KPI document ids, Form 4 windows |
 | | `screener/corr.json` | Pairwise one-year daily return correlations (int8, upper triangle) for correlation clusters |
+| | `tech/bars/{SYMBOL}.json` | Daily split-adjusted OHLCV since 2008-01-01 (or listing) plus cash dividends, for every stock and market symbol; source URL and retrieval time in `meta` |
+| | `tech/events/{T}.json` | EDGAR 8-K (with items), 10-K and 10-Q filings since 2008, and parsed open-market Form 4 trades |
+| | `tech/signals.json`, `tech/breadth.json`, `tech/states.json` | S&P 500 signal statistics (forward 5/20/60-day returns vs base rate), daily breadth since 2009, current technical state per name |
 | | `meta/*.json` | Job caches and status (fundamentals, price stats per part, rotation and check cursors, insiders index, pipeline status) |
 | `raw` (private) | `screener/closes.json.gz`, `screener/fund.json.gz`, `screener/kpi.json.gz` | Screener caches: 6 years of split-adjusted daily closes and split dates, extracted quarterly facts per company (re-extracted when a new 10-K/10-Q arrives), KPI and segment extracts |
 | | `sec/companyfacts/*.json.gz`, `sec/filings/{accn}/*.htm.gz`, `sec/releases/*.md.gz` | Archived source documents, indexed in `documents` |
@@ -70,6 +73,8 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | `/api/cron/sectors` | 22:35 Mon-Fri | Rebuilds every sector and industry file from facts, prices, macro_observations, FRED, KPIs, segments, insiders, filings; writes `sector_metrics` |
 | `/api/cron/sectors?step=notes` | 12:15 Mon | Weekly sector notes, validated so every figure comes from the data (`sector_notes`) |
 | `/api/cron/screener` | 22:55 daily | Rebuilds `screener.json` after the price runs: extends the close history from the prices files, re-extracts facts only for companies with a new report, recomputes every field, correlations and provenance |
+| `/api/cron/technicals?part=N&parts=4` | 22:05-22:26 Mon-Fri | Appends the day's bars from `prices/` to `tech/bars/` (no extra Yahoo calls; a split is detected from the overlap and rescales history), refreshes `tech/events/`, computes signals, breadth and state for a quarter of the names |
+| `/api/cron/technicals?merge=1` | 23:10 Mon-Fri | Combines the parts into `tech/signals.json`, `tech/breadth.json`, `tech/states.json` |
 | `/api/cron/insiders` | 15:30, 23:30 | Parses new Form 4 filings into `insider_transactions`, rewrites `insiders/{T}.json` and `meta/insiders.json` |
 
 Every run is logged in `etl_runs`; the latest runs are published to `meta/status.json` for the Data status page.
@@ -101,6 +106,11 @@ python -m etl.run sectors                        # sector and industry files (et
 python -m etl.run sectors --step notes           # weekly sector notes
 python -m etl.run screener --full-history        # screener table; --full-history refetches 10y closes and every company
 node scripts/test_screen_prompts.mjs             # screen agent accuracy on tests/screener_prompts.json
+python -m etl.run technicals --backfill          # tech/bars history since 2008 (resumable; skips symbols already stored)
+python -m etl.run technicals --events            # tech/events from EDGAR submissions (resumable)
+python -m etl.run technicals                     # all four parts, then the merge
+node --test tests/technicals/*.test.cjs          # indicator tests (TA-Lib reference values and worked examples)
+python3 tests/technicals/test_parity.py          # JS and Python signal definitions find identical events
 ```
 
 Adding a company: append it to `etl/universe.py` and run `python -m etl.run companies --tickers NEW` then `python -m etl.run prices`.

@@ -287,7 +287,7 @@ def prices_job(sb, intraday=True, full_history=False, part=None, parts=1, time_b
             if i_bars is None and intraday:
                 prev = _cache(sb, f"prices/{prices.path_key(s_)}.json", {}) or {}
                 i_bars = prev.get("i", [])
-            sb.put_json(f"prices/{prices.path_key(s_)}.json", {"meta": d["meta"], "d": d["bars"], "i": i_bars or []}, cache="max-age=300")
+            sb.put_json(f"prices/{prices.path_key(s_)}.json", {"meta": d["meta"], "d": d["bars"], "i": i_bars or [], "dv": d.get("dv", [])}, cache="max-age=300")
 
         with ThreadPoolExecutor(8) as ex:
             list(ex.map(put, daily.items()))
@@ -323,6 +323,28 @@ def load_pricestats(sb):
             if not cur or (st.get("as_of") or "") >= (cur.get("as_of") or ""):
                 merged[sym] = st
     return merged
+
+
+# ---------------------------------------------------------------- technicals
+def technicals_job(sb, part=None, parts=4, merge=None, time_budget=None):
+    """Long-history technicals. With a part: update that slice's history files from the prices job's bars and compute its
+    partial statistics. Merge combines the parts into tech/signals.json, tech/breadth.json and tech/states.json.
+    Without a part (local runs) every part runs and then the merge."""
+    from . import technicals
+    with Run(sb, "technicals") as run:
+        deadline = time.time() + time_budget if time_budget else None
+        if part is not None:
+            out = technicals.run_part(sb, part, parts, deadline=deadline)
+            run.stats.update({"part": part, "stocks": len(out["symbols"]), "errors": out["errors"], "notes": out["notes"]})
+            if merge:
+                run.stats["merge"] = technicals.merge(sb, parts)
+            return run.stats
+        if merge is None or not merge:
+            for k in range(parts):
+                out = technicals.run_part(sb, k, parts)
+                run.stats[f"p{k}"] = {"stocks": len(out["symbols"]), "errors": len(out["errors"])}
+        run.stats["merge"] = technicals.merge(sb, parts)
+        return run.stats
 
 
 # ---------------------------------------------------------------- index + feed

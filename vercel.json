@@ -139,6 +139,26 @@
     {
       "path": "/api/cron/screener",
       "schedule": "55 22 * * *"
+    },
+    {
+      "path": "/api/cron/technicals?part=0&parts=4",
+      "schedule": "5 22 * * 1-5"
+    },
+    {
+      "path": "/api/cron/technicals?part=1&parts=4",
+      "schedule": "12 22 * * 1-5"
+    },
+    {
+      "path": "/api/cron/technicals?part=2&parts=4",
+      "schedule": "19 22 * * 1-5"
+    },
+    {
+      "path": "/api/cron/technicals?part=3&parts=4",
+      "schedule": "26 22 * * 1-5"
+    },
+    {
+      "path": "/api/cron/technicals?merge=1&parts=4",
+      "schedule": "10 23 * * 1-5"
     }
   ],
   "headers": [

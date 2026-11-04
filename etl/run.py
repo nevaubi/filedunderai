@@ -8,7 +8,7 @@ from .common import Supabase
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "compare", "sectors", "screener", "all"])
+    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "compare", "sectors", "screener", "technicals", "all"])
     ap.add_argument("--tickers", nargs="*")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--news", action="store_true", help="refresh news for each company")
@@ -19,10 +19,14 @@ def main():
     ap.add_argument("--parts", type=int, default=1)
     ap.add_argument("--changed", action="store_true", help="only companies with new 10-K/10-Q/8-K filings")
     ap.add_argument("--sec-only", action="store_true", help="IR job: EDGAR exhibits only, skip the IR website")
-    ap.add_argument("--budget", type=float, help="compare job: time budget in seconds")
+    ap.add_argument("--budget", type=float, help="time budget in seconds (compare, sectors)")
     ap.add_argument("--sec-years", type=float, default=3, help="IR job: years of EDGAR 8-K earnings exhibits to collect")
     ap.add_argument("--step", default="publish", choices=["prices", "publish", "notes"], help="sectors job step")
-    ap.add_argument("--budget", type=float, help="time budget in seconds")
+    ap.add_argument("--backfill", action="store_true", help="technicals job: fetch full daily history for symbols without a history file")
+    ap.add_argument("--force", action="store_true", help="technicals backfill: refetch even when a history file exists")
+    ap.add_argument("--events", action="store_true", help="technicals job: EDGAR 8-K/10-K/10-Q history since 2008 per company")
+    ap.add_argument("--merge", action="store_true", help="technicals job: only merge the part results")
+    ap.add_argument("--pace", type=float, default=2.0, help="technicals backfill: seconds between Yahoo requests")
     a = ap.parse_args()
     sb = Supabase()
     if a.job in ("prices", "all"):
@@ -55,6 +59,19 @@ def main():
         print("compare history", len(done), "errors", errors)
     if a.job == "screener":
         print("screener", jobs.screener_job(sb, full=a.full_history, workers=a.workers))
+    if a.job == "technicals":
+        if a.events:
+            from . import technicals
+            done, failed = technicals.events_backfill(sb, a.tickers, force=a.force)
+            print("technicals events", done, "failed", json.dumps(failed)[:2000])
+        elif a.merge:
+            print("technicals merge", json.dumps(jobs.technicals_job(sb, merge=True), default=str)[:2000])
+        elif a.backfill:
+            from . import technicals
+            done, failed = technicals.backfill(sb, a.tickers, force=a.force, pace=a.pace)
+            print("technicals backfill", len(done), "failed", json.dumps(failed)[:2000])
+        else:
+            print("technicals", json.dumps(jobs.technicals_job(sb, part=a.part, parts=a.parts if a.parts > 1 else 4), default=str)[:3000])
     if a.job == "index":
         print("index", jobs.build_index(sb))
     if a.job == "feed":
