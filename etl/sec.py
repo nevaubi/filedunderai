@@ -52,6 +52,9 @@ CONCEPTS = {
     ],
 }
 INSTANT = {"balance"}
+# Weighted-average share counts are averages over the period, not flows: a quarter cannot be
+# derived by subtracting a shorter year-to-date figure from a longer one.
+NON_ADDITIVE = {"Diluted shares"}
 TABLE_YEARS = 6  # statement tables kept per filing for the source panel
 
 
@@ -137,7 +140,7 @@ def build_series(facts, stmt):
         for rec in quarterly.values():
             if rec["end"] not in Q or rec["filed"] < Q[rec["end"]]["filed"]:
                 Q[rec["end"]] = rec
-        if stmt not in INSTANT:
+        if stmt not in INSTANT and label not in NON_ADDITIVE:
             allper = {}
             for rec in list(Q.values()) + list(ytd.values()) + list(A.values()):
                 allper[(rec["start"], rec["end"])] = rec
