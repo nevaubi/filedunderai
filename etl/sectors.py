@@ -465,14 +465,20 @@ def aggregate(members, CQ, CM, quarters):
         put("roe", *ratio(lambda r, m: r["ni_ttm"], lambda r, m: r["eq"] if r["eq"] and r["eq"] > 0 else None))
         put("nd_ebitda", *ratio(lambda r, m: m["nd"], lambda r, m: m["ebitda"] if m["ebitda"] and m["ebitda"] > 0 else None))
         put("de", *ratio(lambda r, m: r["ltd"], lambda r, m: r["eq"] if r["eq"] and r["eq"] > 0 else None))
-        put("pe", *ratio(lambda r, m: r["mcap"], lambda r, m: r["ni_ttm"]))
+        put("pe", *_nm(ratio(lambda r, m: r["mcap"], lambda r, m: r["ni_ttm"])))
         put("ps", *ratio(lambda r, m: r["mcap"], rev))
-        put("pfcf", *ratio(lambda r, m: r["mcap"], lambda r, m: m["fcf_ttm"]))
+        put("pfcf", *_nm(ratio(lambda r, m: r["mcap"], lambda r, m: m["fcf_ttm"])))
         for name, f in (("rev_ttm", "rev_ttm"), ("ni_ttm", "ni_ttm"), ("mcap", "mcap")):
             vs = [r[f] for _t, r, m in rows if r[f] is not None]
             out[name]["agg"].append(_r(sum(vs)) if vs else None)
             out[name]["cw"].append(None); out[name]["med"].append(_r(median(vs))); out[name]["n"].append(len(vs))
     return out
+
+
+def _nm(res, cap=150):
+    """Aggregate multiples above `cap` mean the group's earnings were close to zero: not meaningful, left out."""
+    v, n = res
+    return (v if v is not None and v <= cap else None), n
 
 
 def current_valuation(members, uni, CQ, CM, quarters):
@@ -964,7 +970,7 @@ def load_segments(sb, uni, log=print):
     by_t = {}
     for (t, kid), r in latest.items():
         by_t.setdefault(t, []).append(r)
-    out = []
+    out, seen = [], set()
     for t, rs in by_t.items():
         if t not in uni:
             continue
@@ -976,6 +982,9 @@ def load_segments(sb, uni, log=print):
             if "|" in member or member.count(":") > 1:
                 continue
             label = humanize_member(member)
+            if (t, label.lower()) in seen or (t, float(r["value"])) in seen:
+                continue
+            seen.update({(t, label.lower()), (t, float(r["value"]))})
             ind, pat = segment_industry(label)
             out.append({"tk": t, "member": member, "label": label, "industry": ind, "rule": pat, "v": _r(float(r["value"])), "end": r["period_end"],
                         "fy": r.get("fiscal_label"), "kpi_id": r["kpi_id"], "accn": r.get("source_id")})
@@ -1122,16 +1131,16 @@ def publish(sb, log=print, time_budget=None):
         }
         comp = {"fields": COMP_FIELDS, "quarters": quarters[-COMP_QUARTERS:],
                 "data": {t: [[_r(CQ[t][k][f]) if f != "end" and f != "end_py" else CQ[t][k][f] for f in COMP_FIELDS] if k in CQ.get(t, {}) else None for k in quarters[-COMP_QUARTERS:]] for t in members},
-                "accn": {t: _accns(F.get(t) or {}, quarters[-COMP_QUARTERS - 4:]) for t in members},
                 "px": {t: {"url": (pxm.get(t) or {}).get("url"), "at": (pxm.get(t) or {}).get("at"), "splits": (pxm.get(t) or {}).get("splits")} for t in members},
                 "mcap_now": {t: _r(uni[t]["mcap"]) for t in members}}
         _put(sb, f"sectors/{g['slug']}.json", doc)
         _put(sb, f"sectors/{g['slug']}.comp.json", comp)
-        li = _last_idx(agg["rev_growth"]["n"])
+        li = _last_idx([a or b for a, b in zip(agg["rev_growth"]["n"], agg["ni_growth"]["n"])])
         head = {k: (agg[k]["agg"][li] if li is not None else None) for k in METRICS}
         lv = {}
+        ref = _last_idx([a or b for a, b in zip(agg["rev_growth"]["n"], agg["ni_growth"]["n"])])
         for k in METRICS:
-            i = _last_idx(agg[k]["n"])
+            i = ref
             if i is not None and agg[k]["agg"][i] is None:
                 i = next((j for j in range(len(quarters) - 1, -1, -1) if agg[k]["agg"][j] is not None), None)
             lv[k] = (quarters[i], agg[k]["agg"][i]) if i is not None else (None, None)
@@ -1154,7 +1163,7 @@ def publish(sb, log=print, time_budget=None):
         "generated": now_iso(), "as_of": dates[-1] if dates else None, "quarters": quarters[-1:], "groups": overview, "metrics": METRICS,
         "mapping": mapping_table(), "overrides": [{"tk": t, "industry": v[0], "why": v[1]} for t, v in OVERRIDES.items()],
         "companies": [{"tk": t, "name": c["name"], "sector": c["sector"], "industry": c["industry"], "sic": c["sic"], "sic_desc": c["sic_desc"], "rule": c["rule"]} for t, c in sorted(uni.items())],
-        "segment_rules": [{"pattern": p, "industry": i} for p, i in SEGMENT_RULES], "kpi_specs": [{k: v for k, v in s.items() if k != "match"} | {"match": s.get("match")} for s in KPI_SPECS],
+        "segment_rules": [{"pattern": p, "industry": i, "exclude": x} for p, i, x in SEGMENT_RULES], "kpi_specs": [{k: v for k, v in s.items() if k != "match"} | {"match": s.get("match")} for s in KPI_SPECS],
         "etf_rrg": etf_rrg, "spy_returns": spy_ret,
         "factors": [{k: f[k] for k in ("id", "name", "unit", "source", "url", "retrieved", "first", "last", "n_obs", "latest")} for f in factors],
         "method": __doc__,
@@ -1163,14 +1172,6 @@ def publish(sb, log=print, time_budget=None):
     stats["db_rows"] = _try_upsert(sb, "sector_metrics", db_rows, "group_id,metric,quarter", log=log)
     stats.update({"groups": len(overview), "quarters": f"{quarters[0]}..{quarters[-1]}", "seconds": round(time.time() - t0, 1)})
     return stats
-
-
-def _accns(Ft, qs):
-    """Accession per (fact label, quarter) for the derivation panel: {label: {qkey: [end, accession, form, derived]}}."""
-    out = {}
-    for lab, d in Ft.items():
-        out[lab] = {k: [v[0], v[2], v[3], v[4]] for k, v in d.items() if k in qs}
-    return out
 
 
 def _last_idx(ns):

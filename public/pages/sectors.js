@@ -62,7 +62,10 @@ details.sx-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
   const isFin = sec => sec === "Financials" || sec === "Real Estate";
   const N = (text, onclick, extra = "") => el("button", { class: "sx-n " + extra, onclick: e => { e.stopPropagation(); onclick(); }, title: "Open derivation" }, text);
   const liIdx = ns => { const ix = []; ns.forEach((n, i) => { if (n) ix.push(i); }); if (!ix.length) return null; const i = ix.at(-1); return ix.length > 1 && ns[i] < .5 * ns[ix.at(-2)] ? ix.at(-2) : i; };
-  const lastOf = (g, k) => { const a = g.agg[k], i = liIdx(a.n); return i == null ? null : { i, q: g.quarters[i], v: a.agg[i], med: a.med[i], cw: a.cw[i], n: a.n[i] }; };
+  // one reference quarter per group (the latest with most of the group reported), so every tile reads the same period
+  const refIdx = g => liIdx(g.agg.rev_growth.n.map((n, i) => n || g.agg.ni_growth.n[i]));
+  const lastOf = (g, k) => { const a = g.agg[k]; let i = refIdx(g); if (i == null) return null; if (a.agg[i] == null && a.med[i] == null) { const j = liIdx(a.n); if (j == null) return null; i = j; } return { i, q: g.quarters[i], v: a.agg[i], med: a.med[i], cw: a.cw[i], n: a.n[i] }; };
+  const fmtBeta = (b, unit) => b == null ? "–" : unit === "bp" ? (b * 100).toFixed(3) + "% per bp" : unit === "%" ? fnum(b, 2) + "× per 1%" : unit === "k" ? (b * 1e4).toFixed(2) + "% per 100k" : fnum(b, 4);
   const tkName = t => SHORT[t] || t;
   const sortRows = (rows, key, desc) => rows.sort((a, b) => { const x = a[key], y = b[key]; if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1; return typeof x === "string" ? (desc ? y.localeCompare(x) : x.localeCompare(y)) : desc ? y - x : x - y; });
 
@@ -93,9 +96,7 @@ details.sx-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
     if (field === "mcap" || field === "px") return openMcap(slug, tk, q);
     const label = FACT[field];
     let end = field === "rev_py" || field === "ni_py" ? row?.end_py : row?.end;
-    const acc = comp.accn[tk]?.[label] || {};
     const qq = field.endsWith("_py") ? qshift(q, -4) : q;
-    if (acc[qq]) end = acc[qq][0];
     try { await ensureCompany(tk); } catch (e) { toast(`${tk}: ${e.message}`); return; }
     const m = model(tk);
     if (field.endsWith("_ttm")) {
@@ -259,14 +260,13 @@ details.sx-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
     const g = await loadGroup(slug); const s = g.macro.find(x => x.id === fid); const f = g.factors.find(x => x.id === fid) || {};
     if (!s) return;
     const x = s[w] || {};
-    const unitTxt = s.unit === "bp" ? "per 1 bp change" : s.unit === "%" ? "per 1% change" : "per unit change";
-    const db = openPanel({ eyebrow: w === "d" ? "Daily, last year" : "Monthly, ten years", title: `${g.name} · ${s.name}`, value: "corr " + fnum(x.corr, 2), sub: `beta ${x.beta == null ? "–" : (x.beta * 100).toFixed(3) + "% " + unitTxt} · ${x.n} ${w === "d" ? "days" : "months"} · ${x.from || ""} to ${x.to || ""}`, links: f.url ? [[f.url, "Series"]] : [] });
+    const db = openPanel({ eyebrow: w === "d" ? "Daily, last year" : "Monthly, ten years", title: `${g.name} · ${s.name}`, value: "corr " + fnum(x.corr, 2), sub: `beta ${fmtBeta(x.beta, s.unit)} · ${x.n} ${w === "d" ? "days" : "months"} · ${x.from || ""} to ${x.to || ""}`, links: f.url ? [[f.url, "Series"]] : [] });
     db.append(el("div", { class: "calc-box" }, el("div", { class: "eyebrow" }, "Method"),
       el("div", {}, w === "d" ? "Pearson correlation and OLS beta of the group's daily cap-weighted price return against the same day's change in the factor." : "Correlation and beta of the group's monthly cap-weighted price return (weights: start-of-month market caps) against the month's change in the factor (month-end values)."),
       el("div", { class: "faint" }, `Factor change: ${s.unit === "bp" ? "difference in basis points" : s.unit === "%" ? "percent change" : "difference"}. Source: ${f.source || "–"}${f.retrieved ? `, retrieved ${fdate(f.retrieved.slice(0, 10))}` : ""}. Observations ${f.first || "–"} to ${f.last || "–"}${f.latest ? `, latest ${f.latest[1]} on ${f.latest[0]}` : ""}.`)));
     if (s.roll?.length) { const host = el("div", { style: "min-height:200px" }); db.append(el("div", { class: "eyebrow" }, "Rolling 63-day correlation (daily)"), host); requestAnimationFrame(() => lineChart(host, [{ name: "Correlation", pts: s.roll.map(([d, v]) => [ddate(d), v]) }], { height: 200, zero: true, yfmt: v => v.toFixed(1), tfmt: v => v.toFixed(2) })); }
     if (s.top?.length) {
-      const tb = el("tbody"); s.top.forEach(t => tb.append(el("tr", { class: "click", onclick: () => location.hash = "company-" + t.tk.toLowerCase() }, el("td", {}, el("b", { class: "mono" }, t.tk), " ", el("span", { class: "muted sx-hide-sm" }, tkName(t.tk))), el("td", { class: "r num" }, fnum(t.corr, 2)), el("td", { class: "r num" }, (t.beta * 100).toFixed(3) + "%"), el("td", { class: "r num" }, t.n))));
+      const tb = el("tbody"); s.top.forEach(t => tb.append(el("tr", { class: "click", onclick: () => location.hash = "company-" + t.tk.toLowerCase() }, el("td", {}, el("b", { class: "mono" }, t.tk), " ", el("span", { class: "muted sx-hide-sm" }, tkName(t.tk))), el("td", { class: "r num" }, fnum(t.corr, 2)), el("td", { class: "r num" }, fmtBeta(t.beta, s.unit)), el("td", { class: "r num" }, t.n))));
       db.append(el("div", { class: "eyebrow" }, "Most sensitive members (monthly, ten years)"), el("table", { class: "t sx-dtbl" }, el("thead", {}, el("tr", {}, el("th", {}, "Company"), el("th", { class: "r" }, "Corr"), el("th", { class: "r" }, "Beta"), el("th", { class: "r" }, "Months"))), tb));
     }
   }
@@ -373,7 +373,7 @@ details.sx-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
     const draw = () => {
       host.innerHTML = "";
       const open = new Set(store.get("sxOpen", []));
-      const t = el("table", { class: "t sx-tbl" }, el("thead", {}, el("tr", {}, el("th", {}, "Group"), el("th", { class: "r sx-hide-sm" }, "Cos"), el("th", { class: "r" }, "Mkt cap"), el("th", {}, "Quarter"), ...cols.map(([, n]) => el("th", { class: "r" }, n)), el("th", { class: "r" }, "P/E"), el("th", { class: "sx-hide-sm" }, "P/E vs 10Y"), el("th", { class: "r" }, "1M"), el("th", { class: "r" }, "YTD"))));
+      const t = el("table", { class: "t sx-tbl" }, el("thead", {}, el("tr", {}, el("th", {}, "Group"), el("th", { class: "r sx-hide-sm" }, "Cos"), el("th", { class: "r" }, "Mkt cap"), ...cols.map(([, n]) => el("th", { class: "r" }, n)), el("th", { class: "r" }, "P/E"), el("th", { class: "sx-hide-sm" }, "P/E vs 10Y"), el("th", { class: "r" }, "1M"), el("th", { class: "r" }, "YTD"))));
       const tb = el("tbody");
       const secs = ov.groups.filter(g => g.kind === "sector").sort((a, b) => b.mcap - a.mcap);
       const row = g => {
@@ -381,8 +381,8 @@ details.sx-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
         const isF = isFin(g.sector);
         const cell = (k) => { const kk = k === "roic" && isF ? "roe" : k; const [q, v, n] = L(kk); if (v == null) return el("td", { class: "r faint" }, "–"); const mode = view.mode; return el("td", { class: "r num" }, N(fmtU(v, ov.metrics[kk].unit), () => openAgg(g.slug, kk, q, mode), /growth/.test(kk) ? cls(v) : ""), kk === "roe" ? el("span", { class: "faint", style: "font-size:10px" }, " ROE") : null); };
         return el("tr", { class: g.kind === "sector" ? "sec" : "ind" },
-          el("td", { class: "nm" }, g.kind === "sector" ? el("button", { class: "sx-tog", "aria-label": open.has(g.slug) ? "Hide industries" : "Show industries", onclick: () => { open.has(g.slug) ? open.delete(g.slug) : open.add(g.slug); store.set("sxOpen", [...open]); draw(); } }, open.has(g.slug) ? "▾" : "▸") : null, el("a", { href: "#sectors-" + g.slug }, g.name)),
-          el("td", { class: "r num faint sx-hide-sm" }, g.n), el("td", { class: "r num" }, N(fmtMoney(g.mcap), () => openValNow(g.slug, "pe"))), el("td", { class: "faint", style: "font-size:11.5px;white-space:nowrap" }, qlab(g.q)),
+          el("td", { class: "nm" }, g.kind === "sector" ? el("button", { class: "sx-tog", "aria-label": open.has(g.slug) ? "Hide industries" : "Show industries", onclick: () => { open.has(g.slug) ? open.delete(g.slug) : open.add(g.slug); store.set("sxOpen", [...open]); draw(); } }, open.has(g.slug) ? "▾" : "▸") : null, el("a", { href: "#sectors-" + g.slug }, g.name), el("span", { class: "faint", style: "font-size:11px;margin-left:6px;white-space:nowrap" }, qlab(g.q))),
+          el("td", { class: "r num faint sx-hide-sm" }, g.n), el("td", { class: "r num" }, N(fmtMoney(g.mcap), () => openValNow(g.slug, "pe"))),
           ...cols.map(([k]) => cell(k)),
           el("td", { class: "r num" }, g.val_now.pe ? N(fx(g.val_now.pe), () => openValNow(g.slug, "pe")) : "–"),
           el("td", { class: "sx-hide-sm" }, rangeBar(g.pe_range, g.val_now.pe, () => openValNow(g.slug, "pe"))),
@@ -466,7 +466,7 @@ details.sx-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
     const cb = el("tbody");
     const drawCos = () => { cb.innerHTML = ""; const v = q.value.trim().toUpperCase(); if (!v) return; ov.companies.filter(c => c.tk.startsWith(v) || c.name.toUpperCase().includes(v)).slice(0, 12).forEach(c => cb.append(el("tr", {}, el("td", { class: "mono" }, c.tk), el("td", {}, c.name), el("td", {}, c.sector), el("td", {}, c.industry), el("td", { class: "muted" }, `SIC ${c.sic || "–"} ${c.sic_desc || ""}; ${c.rule}`)))); };
     const kb = el("tbody"); ov.kpi_specs.forEach(k => kb.append(el("tr", {}, el("td", {}, k.name), el("td", {}, k.industries.join(", ")), el("td", { class: "muted" }, k.definition), el("td", { class: "mono", style: "font-size:11px" }, k.match || k.fact || k.derived))));
-    const sb = el("tbody"); ov.segment_rules.forEach(r => sb.append(el("tr", {}, el("td", { class: "mono", style: "font-size:11px" }, r.pattern), el("td", {}, r.industry))));
+    const sb = el("tbody"); ov.segment_rules.forEach(r => sb.append(el("tr", {}, el("td", { class: "mono", style: "font-size:11px" }, r.pattern + (r.exclude ? `  (not ${r.exclude})` : "")), el("td", {}, r.industry))));
     det.append(el("div", { class: "bd", style: "display:flex;flex-direction:column;gap:16px" },
       el("div", { class: "note" }, "Sectors follow the GICS-style assignment in the coverage list. Industries come from each company's SEC SIC code: the first rule in its sector whose code list contains the SIC code, otherwise the sector's catch-all. A few overrides fix SIC codes that describe a company's history rather than today's business."),
       el("div", { class: "scroll" }, el("table", { class: "t sx-map" }, el("thead", {}, el("tr", {}, el("th", {}, "Sector"), el("th", {}, "Industry"), el("th", {}, "SIC codes"), el("th", { class: "r" }, "Cos"))), tb)),
@@ -619,15 +619,14 @@ details.sx-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
   function macroPanel(g) {
     const tb = el("tbody");
     g.macro.forEach(s => {
-      const u = s.unit === "bp" ? " / bp" : s.unit === "%" ? " / 1%" : "";
-      const b = v => v == null ? "–" : (v * 100).toFixed(s.unit === "bp" ? 3 : 2) + "%" + u;
+      const b = v => fmtBeta(v, s.unit);
       tb.append(el("tr", {}, el("td", {}, s.name),
         el("td", { class: "r num" }, s.d ? N(fnum(s.d.corr, 2), () => openMacro(g.slug, s.id, "d")) : "–"), el("td", { class: "r num sx-hide-sm" }, s.d ? b(s.d.beta) : "–"),
         el("td", { class: "r num" }, s.m ? N(fnum(s.m.corr, 2), () => openMacro(g.slug, s.id, "m")) : "–"), el("td", { class: "r num sx-hide-sm" }, s.m ? b(s.m.beta) : "–"),
         el("td", {}, el("div", { class: "sx-chips" }, ...(s.top || []).slice(0, 4).map(t => el("a", { class: "chip", href: "#company-" + t.tk.toLowerCase(), title: `corr ${t.corr}, ${t.n} months` }, `${t.tk} ${fnum(t.corr, 2)}`))))));
     });
     return panel("Macro sensitivity", null, el("div", { class: "scroll" }, el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Factor"), el("th", { class: "r" }, "Corr 1Y daily"), el("th", { class: "r sx-hide-sm" }, "Beta"), el("th", { class: "r" }, "Corr 10Y monthly"), el("th", { class: "r sx-hide-sm" }, "Beta"), el("th", {}, "Most sensitive members (monthly corr)"))), tb)),
-      el("div", { class: "src" }, "Beta: group price return per factor move (yields and spreads per basis point, dollar and oil per 1%). Factor series: " + g.factors.map(f => `${f.name} (${f.source})`).join("; ") + "."));
+      el("div", { class: "src" }, "Beta: group price return per factor move (yields, spreads and inflation per basis point, dollar and oil per 1%, payrolls per 100,000 jobs). Factor series: " + g.factors.map(f => `${f.name} (${f.source})`).join("; ") + "."));
   }
   function kpiPanel(g) {
     const box = el("div", { class: "bd grid g2" });

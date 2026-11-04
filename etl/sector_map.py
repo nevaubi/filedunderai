@@ -141,33 +141,34 @@ def mapping_table():
 
 
 # Segment names that place part of a company's revenue in another industry. A rule applies only when the parent company
-# sits in a different industry; the first matching pattern wins. Patterns run against the XBRL segment member label.
+# sits in a different industry; the first matching pattern wins. Patterns run against the XBRL segment member label (lower case);
+# whole-name patterns where a word alone is ambiguous ("Pharmaceutical and Specialty Solutions" is distribution).
 SEGMENT_RULES = [
-    (r"\b(cloud|aws|azure|software|saas|intelligent cloud|productivity and business processes|subscription services)\b", "Software"),
-    (r"\b(semiconductor|semiconductors|chips?|foundry|data center group|compute and networking)\b", "Semiconductors & Equipment"),
-    (r"\b(pharmaceuticals?|innovative medicine|biopharma(ceuticals?)?)\b", "Pharmaceuticals"),
-    (r"\b(medical devices?|medtech|surgical|diagnostics?)\b", "Health Care Equipment & Supplies"),
-    (r"\b(pharmacy|health services|health care benefits|optum|pharmacy services|health care services)\b", "Health Care Providers & Services"),
-    (r"\b(reinsurance|insurance|insurance services)\b", "Insurance"),
-    (r"\b(payments?|card services|merchant services|payment network)\b", "Financial Services"),
-    (r"\b(asset management|wealth management|investment management)\b", "Capital Markets"),
-    (r"\b(aerospace|defen[cs]e|aviation|space systems|missiles?)\b", "Aerospace & Defense"),
-    (r"\b(automotive|vehicles?)\b", "Automobiles & Components"),
-    (r"\b(advertising|media|studios?|broadcast(ing)?|cable networks?|content)\b", "Media"),
-    (r"\b(parks|experiences|resorts?|hotels?|casinos?|cruise|restaurants?)\b", "Hotels, Restaurants & Leisure"),
-    (r"\b(upstream|downstream|refining|exploration and production|oil and gas)\b", "Integrated Oil & Refining"),
-    (r"\b(chemicals?|specialty materials|performance materials)\b", "Chemicals"),
-    (r"\b(electric utilit(y|ies)|regulated utilit(y|ies)|utilities)\b", "Electric Utilities"),
-    (r"\b(real estate)\b", "Real Estate Management & Services"),
-    (r"\b(freight|logistics|railroad)\b", "Transportation"),
-    (r"\b(beverages?|snacks?|foods?)\b", "Food, Beverage & Tobacco"),
+    (r"\b(cloud|aws|azure|software|saas|intelligent cloud|productivity and business processes)\b", "Software", r"\b(power|hardware|storage|hybrid cloud|platforms?|sensors)\b"),
+    (r"\b(semiconductors?|foundry|data center group|compute and networking)\b", "Semiconductors & Equipment", r"\b(equipment rental)\b"),
+    (r"^(pharmaceuticals?|innovative medicine|biopharma(ceuticals?)?)$", "Pharmaceuticals", None),
+    (r"^(medical ?tech(nology)?|medtech|medical devices?|medical)$", "Health Care Equipment & Supplies", None),
+    (r"^(pharmacy (services|and consumer wellness)|health services|health care benefits|optum( health| rx)?)$", "Health Care Providers & Services", None),
+    (r"^(insurance|reinsurance|insurance services|property and casualty( insurance)?)$", "Insurance", None),
+    (r"^(payments?|card services|merchant services|payment network|global payments)$", "Financial Services", None),
+    (r"^(asset management|wealth management|investment management|wealth and investment management)$", "Capital Markets", None),
+    (r"\b(aerospace|defen[cs]e|aviation)\b", "Aerospace & Defense", r"\b(services)\b"),
+    (r"^(automotive|automotive products)$", "Automobiles & Components", None),
+    (r"^(media|advertising|studios|broadcasting|cable networks|content( and studios)?|media networks|entertainment|news media)$", "Media", None),
+    (r"^(parks|theme parks|experiences|parks, experiences and products|resorts?|hotels?|casinos?|restaurants?)$", "Hotels, Restaurants & Leisure", None),
+    (r"^(upstream|downstream|refining|exploration and production|oil and gas)$", "Integrated Oil & Refining", None),
+    (r"^(chemicals?|specialty chemicals|performance materials)$", "Chemicals", None),
+    (r"^(electric utilit(y|ies)|regulated utilit(y|ies)|utilities|utility)$", "Electric Utilities", None),
+    (r"^(real estate)$", "Real Estate Management & Services", None),
+    (r"^(freight|logistics|railroad|freight forwarding)$", "Transportation", None),
+    (r"^(beverages?|snacks?|foods?)$", "Food, Beverage & Tobacco", None),
 ]
 
 
 def segment_industry(label):
     s = (label or "").lower()
-    for pat, ind in SEGMENT_RULES:
-        if re.search(pat, s):
+    for pat, ind, excl in SEGMENT_RULES:
+        if re.search(pat, s) and not (excl and re.search(excl, s)):
             return ind, pat
     return None, None
 
