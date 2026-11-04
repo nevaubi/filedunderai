@@ -44,6 +44,9 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | | `filings/{accession}.html.gz` | Full filed documents for the source panel (scripts removed, EDGAR base URL added), gzipped and inflated in the browser |
 | | `logos/{T}.png` | Company logos (497 of 500) |
 | | `insiders/{T}.json` | Form 4 transactions, open-market summaries, largest traders |
+| | `tech/bars/{SYMBOL}.json` | Daily split-adjusted OHLCV since 2008-01-01 (or listing) plus cash dividends, for every stock and market symbol; source URL and retrieval time in `meta` |
+| | `tech/events/{T}.json` | EDGAR 8-K (with items), 10-K and 10-Q filings since 2008, and parsed open-market Form 4 trades |
+| | `tech/signals.json`, `tech/breadth.json`, `tech/states.json` | S&P 500 signal statistics (forward 5/20/60-day returns vs base rate), daily breadth since 2009, current technical state per name |
 | | `meta/*.json` | Job caches and status (fundamentals, price stats per part, rotation and check cursors, insiders index, pipeline status) |
 | `raw` (private) | `sec/companyfacts/*.json.gz`, `sec/filings/{accn}/*.htm.gz`, `sec/releases/*.md.gz` | Archived source documents, indexed in `documents` |
 
@@ -57,6 +60,8 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | `/api/cron/news` | 13:00, 19:00 | Rolling news + summary refresh, 14 companies per run |
 | `/api/cron/segments` | 12:50, 00:50 | Recomputes XBRL segment tables for companies with a new 10-K or 10-Q |
 | `/api/cron/ir` | 14:40, 22:40, 04:40 | Collects IR documents: companies that just reported earnings first, then a rolling cursor (8 per run) |
+| `/api/cron/technicals?part=N&parts=4` | 22:05-22:26 Mon-Fri | Appends the day's bars from `prices/` to `tech/bars/` (no extra Yahoo calls; a split is detected from the overlap and rescales history), refreshes `tech/events/`, computes signals, breadth and state for a quarter of the names |
+| `/api/cron/technicals?merge=1` | 23:10 Mon-Fri | Combines the parts into `tech/signals.json`, `tech/breadth.json`, `tech/states.json` |
 | `/api/cron/insiders` | 15:30, 23:30 | Parses new Form 4 filings into `insider_transactions`, rewrites `insiders/{T}.json` and `meta/insiders.json` |
 
 Every run is logged in `etl_runs`; the latest runs are published to `meta/status.json` for the Data status page.
@@ -83,6 +88,11 @@ python -m etl.run companies --changed            # only those with new reports
 python -m etl.run insiders                       # Form 4 backfill / refresh
 python -m etl.run companies --tickers AAPL MSFT  # a subset
 python -m etl.run news                           # next slice of the news rotation
+python -m etl.run technicals --backfill          # tech/bars history since 2008 (resumable; skips symbols already stored)
+python -m etl.run technicals --events            # tech/events from EDGAR submissions (resumable)
+python -m etl.run technicals                     # all four parts, then the merge
+node --test tests/technicals/*.test.cjs          # indicator tests (TA-Lib reference values and worked examples)
+python3 tests/technicals/test_parity.py          # JS and Python signal definitions find identical events
 ```
 
 Adding a company: append it to `etl/universe.py` and run `python -m etl.run companies --tickers NEW` then `python -m etl.run prices`.
