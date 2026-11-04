@@ -10,13 +10,17 @@ const sources = [
   "public/lib/workspace.js",
   "public/pages/workspace.js",
 ].map((p) => fs.readFileSync(p, "utf8"));
-async function setup({ actualMarkdown = false } = {}) {
+async function setup({ actualMarkdown = false, width = 1024, assistantPreference = null } = {}) {
   const dom = new JSDOM('<main id="page"></main>', {
     url: "https://research.example/#workbench",
     runScripts: "outside-only",
     pretendToBeVisual: true,
   });
   const w = dom.window;
+  w.innerWidth = width;
+  if (assistantPreference !== null) w.localStorage.setItem("fu:workspace:assistant", JSON.stringify(assistantPreference));
+  w.HTMLDialogElement.prototype.showModal = function () { this.setAttribute("open", ""); };
+  w.HTMLDialogElement.prototype.close = function () { this.removeAttribute("open"); this.dispatchEvent(new w.Event("close")); };
   w.Blob = Blob;
   w.ExcelJS = ExcelJS;
   w.docx = docx;
@@ -102,6 +106,100 @@ const click = (w, label) => {
   n.click();
   return n;
 };
+test("compact title row preserves pending input, document selection, Undo and the editor host across controls", async () => {
+  const { w, close } = await setup({ width: 1440 });
+  try {
+    const host = w.document.querySelector(".ws-workspace");
+    assert.equal(host.classList.contains("ws-ai-hidden"), true, "a new wide workspace also defaults closed");
+    assert.equal(host.querySelectorAll(".ws-titlebar [data-mode]").length, 3);
+    assert.equal(host.querySelectorAll(".ws-viewbar [data-mode]").length, 0);
+    const title = host.querySelector('[aria-label="Workspace title"]');
+    title.value = "Pending title input";
+    click(w, "Document");
+    const editor = host.querySelector(".ws-document");
+    const p = w.document.createElement("p");
+    p.textContent = "Pending research observation";
+    editor.append(p);
+    editor.dispatchEvent(new w.InputEvent("input", { bubbles: true, inputType: "insertText" }));
+    const range = w.document.createRange();
+    range.selectNodeContents(p);
+    w.getSelection().removeAllRanges();
+    w.getSelection().addRange(range);
+    editor.dispatchEvent(new w.MouseEvent("mouseup", { bubbles: true }));
+    click(w, "File");
+    click(w, "Assistant");
+    assert.equal(w.document.querySelector(".ws-workspace"), host);
+    assert.equal(host.querySelector(".ws-document"), editor);
+    assert.equal(host.querySelector('[aria-label="Workspace title"]'), title);
+    assert.equal(title.value, "Pending title input");
+    assert.equal(w.getSelection().toString(), "Pending research observation");
+    title.dispatchEvent(new w.Event("change", { bubbles: true }));
+    assert.equal(w.FU_WORKSPACE.getWorkbook().title, "Pending title input");
+    click(w, "Spreadsheet");
+    assert.ok(w.FU_WORKSPACE.getWorkbook().document.html.includes("Pending research observation"), "mode switch flushes pending document input before rebuilding the body");
+    click(w, "Document");
+    assert.ok(host.querySelector(".ws-document").textContent.includes("Pending research observation"));
+    click(w, "Home");
+    click(w, "↶ Undo");
+    assert.ok(!host.querySelector(".ws-document").textContent.includes("Pending research observation"));
+    await new Promise(resolve => w.setTimeout(resolve, 0));
+  } finally { close(); }
+});
+test("saved assistant preference, source, history, file export and build commands remain reachable", async () => {
+  const { w, close } = await setup({ width: 1440, assistantPreference: "visible" });
+  try {
+    assert.equal(w.document.querySelector(".ws-workspace").classList.contains("ws-ai-hidden"), false);
+    await w.FU_WORKSPACE.openModel("TEST");
+    await new Promise(resolve => w.setTimeout(resolve, 0));
+    const title = w.document.querySelector('[aria-label="Workspace title"]');
+    title.value = "Reviewed financial model";
+    title.dispatchEvent(new w.Event("change", { bubbles: true }));
+    w.document.querySelector('[data-cell="C5"]').dispatchEvent(new w.MouseEvent("mousedown", { bubbles: true }));
+    click(w, "Review");
+    click(w, "Cell evidence");
+    assert.ok(w.document.querySelector("dialog[open]").textContent.includes("Revenue"));
+    click(w, "Close");
+    click(w, "Change history");
+    assert.equal(w.document.querySelector("dialog[open]").getAttribute("aria-label"), "Change history");
+    assert.ok(w.document.querySelector(".ws-history").textContent.includes("Rename workspace"));
+    click(w, "Close");
+    click(w, "File");
+    for (const label of ["Excel .xlsx", "Word .docx", "Research backup", "Original imports"])
+      assert.ok([...w.document.querySelectorAll(".ws-ribbon button")].some(n => n.textContent === label));
+    click(w, "Research backup");
+    assert.equal(JSON.parse(await w.captured.at(-1).text()).title, w.FU_WORKSPACE.getWorkbook().title);
+    assert.ok(w.document.querySelector('.ws-titlebar button[aria-label="Create a filed-data financial model"]'));
+  } finally { close(); }
+});
+test("mode transitions preserve an unsubmitted formula draft until Enter commits it through Undo history", async () => {
+  const { w, close } = await setup();
+  try {
+    const formula = w.document.querySelector(".ws-formula");
+    formula.value = "=1+2";
+    formula.dispatchEvent(new w.InputEvent("input", { bubbles: true }));
+    click(w, "Document");
+    assert.equal(w.FU_WORKSPACE.getWorkbook().sheets[0].cells.A1, undefined, "switching views does not commit a draft");
+    click(w, "Spreadsheet");
+    await new Promise(resolve => w.setTimeout(resolve, 0));
+    const restored = w.document.querySelector(".ws-formula");
+    assert.equal(restored.value, "=1+2");
+    restored.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await new Promise(resolve => w.setTimeout(resolve, 0));
+    assert.equal(w.FU_WORKSPACE.getWorkbook().sheets[0].cells.A1.value, "=1+2");
+    assert.equal(w.document.querySelector('[data-cell="A1"]').textContent, "3");
+    click(w, "↶ Undo");
+    assert.equal(w.FU_WORKSPACE.getWorkbook().sheets[0].cells.A1, undefined);
+    click(w, "↷ Redo");
+    assert.equal(w.FU_WORKSPACE.getWorkbook().sheets[0].cells.A1.value, "=1+2");
+    w.document.querySelector(".ws-formula").value = "=9+9";
+    click(w, "Document"); click(w, "Spreadsheet");
+    w.document.querySelector(".ws-formula").dispatchEvent(new w.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    click(w, "Document"); click(w, "Spreadsheet");
+    await new Promise(resolve => w.setTimeout(resolve, 0));
+    assert.equal(w.document.querySelector(".ws-formula").value, "=1+2", "Escape discards the draft across subsequent mode changes");
+    await new Promise(resolve => w.setTimeout(resolve, 0));
+  } finally { close(); }
+});
 test("explicit proposal review reveals a hidden assistant and synchronizes both visibility controls", async () => {
   const { w, close } = await setup();
   try {

@@ -24,6 +24,7 @@ window.FU_PAGES = window.FU_PAGES || {};
     proposal = null,
     docRange = null,
     docTimer = null,
+    formulaDraft = null,
     aiVisible = true,
     saveState = "Saved in this browser";
   const h = (tag, attrs = {}, ...kids) => {
@@ -78,9 +79,7 @@ window.FU_PAGES = window.FU_PAGES || {};
   function init() {
     if (book) return;
     const assistantPreference = storageRead("fu:workspace:assistant", null);
-    aiVisible = assistantPreference === null
-      ? window.innerWidth > 1100
-      : assistantPreference === "visible";
+    aiVisible = assistantPreference === "visible";
     try {
       book = W.load(localStorage);
     } catch (e) {
@@ -510,7 +509,9 @@ window.FU_PAGES = window.FU_PAGES || {};
     if (extend) selection = anchor + ":" + p.ref;
     else selection = anchor = p.ref;
     if (addressInput) addressInput.value = selection;
-    if (formula) formula.value = sheet().cells[p.ref]?.value ?? "";
+    if (formula) formula.value = formulaDraft?.book === book.id && formulaDraft.sheet === book.activeSheet && formulaDraft.address === p.ref
+      ? formulaDraft.value
+      : sheet().cells[p.ref]?.value ?? "";
     const m = ev?.meta[sheet().id + "!" + p.ref];
     if (sourceButton) {
       sourceButton.disabled = !m?.source && !m?.cell;
@@ -599,7 +600,7 @@ window.FU_PAGES = window.FU_PAGES || {};
   function group(label, ...nodes) {
     return h(
       "div",
-      { class: "ws-ribbon-group" },
+      { class: "ws-ribbon-group", role: "group", "aria-label": label },
       h("div", { class: "ws-ribbon-actions" }, nodes),
       h("small", {}, label),
     );
@@ -968,8 +969,19 @@ window.FU_PAGES = window.FU_PAGES || {};
   }
   function switchMode(next) {
     flushDoc();
+    // View changes retain unsubmitted formula text. Enter commits through
+    // commitCell/history; Escape discards it using the existing selection path.
+    if (mode !== "doc" && formula?.isConnected) {
+      const a = selection.split(":").pop();
+      formulaDraft = formula.value === String(sheet().cells[a]?.value ?? "")
+        ? null
+        : { book: book.id, sheet: book.activeSheet, address: a, value: formula.value };
+    }
     mode = next;
     drawBody();
+    if (mode !== "doc" && formulaDraft?.book === book.id && formulaDraft.sheet === book.activeSheet && formulaDraft.address === selection.split(":").pop()) {
+      formula.value = formulaDraft.value;
+    }
     drawRibbon();
     host.querySelectorAll("[data-mode]").forEach((n) => {
       n.classList.toggle("active", n.dataset.mode === mode);
@@ -1021,7 +1033,7 @@ window.FU_PAGES = window.FU_PAGES || {};
       onkeydown: (e) => {
         if (e.key === "Enter")
           guard(() => commitCell(selection.split(":").pop(), formula.value));
-        if (e.key === "Escape") choose(selection.split(":")[0]);
+        if (e.key === "Escape") { formulaDraft = null; choose(selection.split(":")[0]); }
       },
     });
     sourceButton = button(
@@ -1257,6 +1269,7 @@ window.FU_PAGES = window.FU_PAGES || {};
   }
   async function commitCell(a, value) {
     W.put(book, book.activeSheet, a, value);
+    if (formulaDraft?.book === book.id && formulaDraft.sheet === book.activeSheet && formulaDraft.address === a) formulaDraft = null;
     book.audit.push({
       at: new Date().toISOString(),
       action: "Cell " + sheet().name + "!" + a,
@@ -2852,6 +2865,12 @@ window.FU_PAGES = window.FU_PAGES || {};
       role: "tablist",
       "aria-label": "Ribbon",
     });
+    // Modes share the title row. Keep their nodes and the editor host stable
+    // while tabs, assistant visibility and editor modes change.
+    host.querySelector(".ws-titlebar").insertBefore(
+      viewbar.firstChild,
+      host.querySelector(".ws-save"),
+    );
     for (const name of ["File", "Home", "Insert", "Formulas", "Review", "View"])
       tabs.append(
         h(

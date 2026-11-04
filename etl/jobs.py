@@ -800,36 +800,49 @@ def segments_job(sb, tickers=None, workers=5, time_budget=None):
 
 
 # ---------------------------------------------------------------- investor relations documents
-def ir_job(sb, tickers=None, workers=4, time_budget=None, refresh_site=False, web=True, sec_years=3):
+def ir_job(sb, tickers=None, workers=4, time_budget=None, refresh_site=False, web=True, sec_years=3,
+           max_docs=90, max_pages=40, repair_existing=False, publish_only=False, backfill=False):
     from . import ir
-    t0 = time.time()
+    started = time.monotonic()
+    # The total deadline covers storage/leases too; providers stop early for persistence.
+    io_deadline = started + max(0, time_budget) if time_budget is not None else None
+    sb = ir.bounded_client(sb, io_deadline)
+    io_deadline = getattr(sb, "io_deadline", io_deadline)
+    reserve = min(5, max(0, io_deadline - started) / 5) if io_deadline is not None else 0
+    deadline = io_deadline - reserve if io_deadline is not None else None
     with Run(sb, "ir") as run:
-        tickers = tickers or [t for t, *_ in UNIVERSE]
+        tickers = list(dict.fromkeys(tickers if tickers is not None else [t for t, *_ in UNIVERSE]))
         done, failed = {}, {}
 
         def one(tk):
-            if time_budget and time.time() - t0 > time_budget:
+            if deadline is not None and time.monotonic() >= deadline:
                 return tk, None, "skipped: time budget"
             try:
                 b = _cache(sb, f"companies/{tk}.json", {}, strict=True) or {}
                 fye = (b.get("profile") or {}).get("fiscalYearEnd") or "1231"
                 ir.PERIOD_ENDS[tk] = sorted({dt.date.fromisoformat(x["end"]) for rows in (b.get("statements") or {}).values() for r in rows
                                              for x in r.get("quarterly", []) + r.get("annual", [])})
-                return tk, ir.process_company(sb, tk, BY_TICKER[tk]["name"], BY_TICKER[tk]["cik"], refresh_site=refresh_site, fye=fye, web=web, sec_years=sec_years), None
+                result = ir.process_company(sb, tk, BY_TICKER[tk]["name"], BY_TICKER[tk]["cik"], refresh_site=refresh_site,
+                                            fye=fye, web=web, sec_years=sec_years, deadline=deadline, max_docs=max_docs,
+                                            max_pages=max_pages, repair_existing=repair_existing, publish_only=publish_only, backfill=backfill, io_deadline=io_deadline)
+                return tk, result, None
             except Exception as e:
                 return tk, None, str(e)[:300]
 
-        with ThreadPoolExecutor(workers) as ex:
+        with ThreadPoolExecutor(max(1, workers)) as ex:
             for tk, res, err in ex.map(one, tickers):
-                if res:
+                if res is not None:
                     done[tk] = res
-                    print("ok", tk, res, flush=True)
+                    if res.get("failed") or res.get("deferred") or res.get("status") == "partial":
+                        failed[tk] = f"partial: {res.get('failed', 0)} failed attempts, {res.get('deferred', 0)} deferred; see coverage"
+                    print(res.get("status", "processed"), tk, {k:v for k,v in res.items() if k != "coverage"}, flush=True)
                 else:
                     failed[tk] = err
                     print("fail", tk, err, flush=True)
-        run.stats.update({"done": len(done), "failed": failed})
+        run.stats.update({"done": len(done), "failed": failed,
+                          "deferred": sum(r.get("deferred", 0) for r in done.values()),
+                          "coverage": {t: r.get("coverage") for t, r in done.items()}})
         return done, failed
-
 
 def segments_changed_job(sb, time_budget=240, workers=4):
     """Recomputes segment tables for companies whose latest 10-K/10-Q differs from the one last processed."""
@@ -846,28 +859,56 @@ def segments_changed_job(sb, time_budget=240, workers=4):
 
 
 def ir_rotation_job(sb, per_run=8, time_budget=240):
-    """Collects IR documents: companies that reported earnings in the last four days first, then a rolling cursor."""
+    """Start the total I/O budget before acquiring the distributed aggregate lease."""
+    from .ir import IRClient, _timeout, bounded_client
+    started = time.monotonic()
+    deadline = started + max(0, time_budget) if time_budget is not None else None
+    client = bounded_client(sb, deadline)
+    if isinstance(client, IRClient):
+        _timeout(client.io_deadline)
+    return _ir_rotation_job(client, per_run, time_budget, started)
+
+
+@serialized_aggregates
+def _ir_rotation_job(sb, per_run, time_budget, started):
+    """Resume failed/skipped companies fairly alongside recent earnings and the rolling universe."""
+    state = _cache(sb, "meta/ir_rotation.json", {"cursor": 0, "done_hot": {}, "retry": []}, strict=True)
+    if not isinstance(state, dict) or not isinstance(state.get("done_hot"), dict) or not isinstance(state.get("retry", []), list):
+        raise ValueError("Invalid IR rotation checkpoint; refusing replacement")
     recent = sb.select("filings", "select=ticker,items,filed&form=eq.8-K&filed=gte." + (dt.date.today() - dt.timedelta(days=4)).isoformat())
-    hot = [r["ticker"] for r in recent if "2.02" in (r.get("items") or "")]
-    state = _cache(sb, "meta/ir_rotation.json", {"cursor": 0, "done_hot": {}})
     tickers = [t for t, *_ in UNIVERSE]
-    hot = [t for t in dict.fromkeys(hot) if state["done_hot"].get(t) != dt.date.today().isoformat()][:per_run]
+    if not tickers or per_run <= 0:
+        return {}, {}
+    retry = [t for t in dict.fromkeys(state.get("retry", [])) if t in tickers]
+    picked_retry = retry[:max(1, per_run // 2)]
+    hot = [r["ticker"] for r in recent if "2.02" in (r.get("items") or "")]
+    hot = [t for t in dict.fromkeys(hot) if t in tickers and t not in picked_retry and state["done_hot"].get(t) != dt.date.today().isoformat()][:max(0, per_run - len(picked_retry))]
     start = state.get("cursor", 0) % len(tickers)
-    rest = [t for t in (tickers[start:] + tickers[:start]) if t not in hot][:max(0, per_run - len(hot))]
-    done, failed = ir_job(sb, hot + rest, workers=4, time_budget=time_budget)
-    for t in hot:
-        if t in done:
-            state["done_hot"][t] = dt.date.today().isoformat()
-    state["cursor"] = (start + len(rest)) % len(tickers)
+    rest = [t for t in tickers[start:] + tickers[:start] if t not in hot and t not in picked_retry][:max(0, per_run - len(hot) - len(picked_retry))]
+    selected = picked_retry + hot + rest
+    remaining = max(0, time_budget - (time.monotonic() - started)) if time_budget is not None else None
+    done, failed = ir_job(sb, selected, workers=4, time_budget=remaining)
+    for tk in hot:
+        if tk in done and tk not in failed:
+            state["done_hot"][tk] = dt.date.today().isoformat()
+    state["retry"] = [t for t in retry if t not in selected] + [t for t in selected if t in failed or t not in done]
+    if rest:
+        state["cursor"] = (tickers.index(rest[-1]) + 1) % len(tickers)
     state["updated_at"] = now_iso()
+    state["coverage_pending"] = True
     sb.put_json("meta/ir_rotation.json", state, cache="no-store")
+    if time_budget is not None and time.monotonic() - started >= time_budget:
+        failed["coverage_index"] = "skipped: time budget"
+        return done, failed
     try:
         from .kpitools import build_index
-        build_index(sb)
+        build_index(sb, coverage_updates={tk: result.get("coverage") for tk, result in done.items()})
+        state["coverage_pending"] = False
+        sb.put_json("meta/ir_rotation.json", state, cache="no-store")
     except Exception as e:
+        failed["coverage_index"] = str(e)[:300]
         print("coverage index failed", e)
     return done, failed
-
 
 # ---------------------------------------------------------------- sectors
 def sectors_job(sb, step="publish", time_budget=None):

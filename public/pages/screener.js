@@ -131,7 +131,7 @@ window.FU_PAGES = window.FU_PAGES || {};
   const blank = () => ({ ...SPECLIB.empty() });
   function loadState() {
     const s = store.get(KEY, null) || {};
-    return { spec: s.spec || blank(), cols: s.cols || COLSETS.Overview.slice(), colset: s.colset || "Overview", q: s.q || "", preset: s.preset || null, openGroups: s.openGroups || ["val"], filtersOpen: s.filtersOpen ?? false, chatOpen: s.chatOpen ?? (innerWidth >= 860), shown: 150 };
+    return { spec: s.spec || blank(), cols: s.cols || COLSETS.Overview.slice(), colset: s.colset || "Overview", q: s.q || "", preset: s.preset || null, openGroups: s.openGroups || ["val"], filtersOpen: s.filtersOpen ?? false, chatOpen: s.chatOpen ?? false, shown: 150 };
   }
   let ST = null;
   const save = () => store.set(KEY, { spec: ST.spec, cols: ST.cols, colset: ST.colset, q: ST.q, preset: ST.preset, openGroups: ST.openGroups, filtersOpen: ST.filtersOpen, chatOpen: ST.chatOpen });
@@ -254,6 +254,7 @@ window.FU_PAGES = window.FU_PAGES || {};
 
   /* ---------- page ---------- */
   async function page_(arg) {
+    activePopover?.close({ restoreFocus: false });
     await load();
     ST = loadState();
     if (PENDING) {
@@ -291,28 +292,28 @@ window.FU_PAGES = window.FU_PAGES || {};
   /* ---------- main column ---------- */
   function buildMain(main) {
     const U = SCR.ui;
-    // preset strip
-    U.presets = el("div", { class: "sx-presets" });
+    U.presets = el("select", { class: "btn sx-presets", "aria-label": "Preset screen", onchange: () => {
+      const p = PRESETS.find(p => p.id === U.presets.value);
+      if (p) { setSpec({ ...blank(), ...p.spec }); ST.preset = p.id; }
+      else ST.preset = null;
+      save(); renderPresets();
+    } }, el("option", { value: "" }, "Custom screen"), PRESETS.map(p => el("option", { value: p.id }, p.n)));
     U.presetWhy = el("div", { class: "sx-why", hidden: true });
     // toolbar
     U.q = el("input", { type: "search", placeholder: "Filter by ticker, name or industry", value: ST.q, "aria-label": "Filter by ticker, name or industry" });
     U.q.oninput = () => { ST.q = U.q.value; ST.shown = 150; save(); renderResults(); };
-    U.filtersBtn = el("button", { class: "btn", onclick: () => { ST.filtersOpen = !ST.filtersOpen; save(); renderFilters(); } }, svgUse("i-sec"), "Filters");
-    U.colsBtn = el("button", { class: "btn", onclick: openColumns }, svgUse("i-wb"), "Columns");
+    U.filtersBtn = el("button", { class: "btn", "aria-controls": "sx-filters", onclick: () => { ST.filtersOpen = !ST.filtersOpen; save(); renderFilters(); } }, "Filters (0)");
     U.groupSel = el("select", { class: "btn", "aria-label": "Group results", onchange: () => { ST.spec.group_by = U.groupSel.value || null; if (ST.spec.group_by === "quintile") ST.spec.group_by = "quintile:" + (ST.spec.sort?.field && ST.spec.sort.field !== "similarity" ? ST.spec.sort.field : "mcap"); save(); render(); } });
-    U.saveBtn = el("button", { class: "btn", onclick: openSaved }, "Saved");
-    U.shareBtn = el("button", { class: "btn", title: "Copy a link to this screen", onclick: () => copyText(location.origin + location.pathname + "#" + SHARE_PREFIX + b64e(JSON.stringify(compact(ST.spec, true))), "Screen link copied") }, svgUse("i-copy"), "Share");
-    U.csvBtn = el("button", { class: "btn", title: "Download the results as CSV", onclick: csv }, svgUse("i-dl"), "CSV");
-    U.resetBtn = el("button", { class: "btn", title: "Clear every filter", onclick: () => { ST.preset = null; setSpec(blank(), { columns: false }); } }, "Reset");
-    U.chatBtn = el("button", { class: "btn acc sx-chatbtn", onclick: () => { ST.chatOpen = !ST.chatOpen; save(); U.grid.classList.toggle("nochat", !ST.chatOpen); if (ST.chatOpen) setTimeout(() => SCR.ui.ta?.focus(), 50); } }, svgUse("i-spark"), "Agent");
-    const tools = el("div", { class: "scr-tools" }, U.q, U.filtersBtn, U.colsBtn, U.groupSel, U.saveBtn, U.shareBtn, U.csvBtn, U.resetBtn, el("span", { style: "flex:1" }), U.chatBtn);
+    U.actionsBtn = el("button", { class: "btn", "aria-haspopup": "dialog", "aria-expanded": "false", onclick: () => {
+      if (activePopover?.anchor === U.actionsBtn) activePopover.close(); else openActions();
+    } }, "Actions");
+    const tools = el("div", { class: "scr-tools" }, U.q, U.presets, U.filtersBtn, U.actionsBtn);
     U.chips = el("div", { class: "sx-chips" });
-    U.filters = el("div", { class: "sx-filters" });
+    U.filters = el("div", { class: "sx-filters", id: "sx-filters" });
     U.summary = el("div", { class: "sx-summary" });
     U.table = el("div", { class: "sx-table" });
     U.explain = el("div", { class: "sx-explain", hidden: true });
-    main.append(el("section", { class: "panel" }, el("div", { class: "hd" }, el("h3", {}, "Preset screens"), el("div", { class: "r faint", style: "font-size:12px" }, "Each preset is an editable set of filters")), el("div", { class: "bd", style: "padding-top:10px;padding-bottom:10px" }, U.presets, U.presetWhy)),
-      el("section", { class: "panel" }, tools, U.chips, U.explain, U.filters, U.summary, U.table,
+    main.append(el("section", { class: "panel" }, tools, U.presetWhy, U.chips, U.explain, U.filters, U.summary, U.table,
         el("div", { class: "src", style: "padding-top:10px" }, "Fundamentals are the trailing four quarters as filed; prices are daily closes. Click a number to see the filing, dates and inputs behind it. Click a row to open the company.")));
   }
 
@@ -338,8 +339,7 @@ window.FU_PAGES = window.FU_PAGES || {};
   }
   function renderPresets() {
     const U = SCR.ui;
-    U.presets.innerHTML = "";
-    U.presets.append(el("div", { class: "picker" }, PRESETS.map(p => el("button", { class: ST.preset === p.id ? "on" : "", title: p.why, onclick: () => { const spec = { ...blank(), ...p.spec }; setSpec(spec); ST.preset = p.id; save(); renderPresets(); } }, p.n))));
+    U.presets.value = ST.preset || "";
     const p = PRESETS.find(x => x.id === ST.preset);
     U.presetWhy.hidden = !p;
     U.presetWhy.innerHTML = "";
@@ -362,21 +362,57 @@ window.FU_PAGES = window.FU_PAGES || {};
     const add = el("button", { class: "btn sx-add", onclick: e => addFilterMenu(e.currentTarget) }, "+ Add filter");
     U.chips.append(add);
   }
-  function popover(anchor, content, onClose) {
-    document.querySelectorAll(".sx-pop").forEach(p => p.remove());
-    const pop = el("div", { class: "sx-pop", role: "dialog" }, content);
+  let activePopover = null;
+  function popover(anchor, content, onClose, name = "Edit screen filter") {
+    activePopover?.close({ restoreFocus: false });
+    const pop = el("div", { class: "sx-pop", role: "dialog", "aria-label": name, tabindex: "-1" }, content);
     document.body.append(pop);
     const r = anchor.getBoundingClientRect();
     const w = Math.min(360, innerWidth - 16);
     pop.style.width = w + "px";
     pop.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left)) + "px";
     pop.style.top = (r.bottom + 6 + scrollY) + "px";
-    const off = e => { if (!pop.contains(e.target) && e.target !== anchor) { close(); } };
-    const esc = e => { if (e.key === "Escape") close(); };
-    function close() { pop.remove(); document.removeEventListener("mousedown", off, true); document.removeEventListener("keydown", esc, true); onClose && onClose(); }
-    setTimeout(() => { document.addEventListener("mousedown", off, true); document.addEventListener("keydown", esc, true); }, 0);
-    pop.querySelector("input,select")?.focus();
-    return { close, pop };
+    let closed = false;
+    const off = e => { if (!pop.contains(e.target) && !anchor.contains(e.target)) close(); };
+    const esc = e => { if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); close(); } };
+    const route = () => close({ restoreFocus: false });
+    function close({ restoreFocus = true } = {}) {
+      if (closed) return;
+      closed = true;
+      pop.remove();
+      document.removeEventListener("mousedown", off, true);
+      document.removeEventListener("keydown", esc, true);
+      removeEventListener("hashchange", route);
+      anchor.setAttribute("aria-expanded", "false");
+      if (activePopover?.pop === pop) activePopover = null;
+      onClose?.();
+      if (restoreFocus && anchor.isConnected) anchor.focus();
+    }
+    activePopover = { close, pop, anchor };
+    anchor.setAttribute("aria-expanded", "true");
+    document.addEventListener("mousedown", off, true);
+    document.addEventListener("keydown", esc, true);
+    addEventListener("hashchange", route);
+    (pop.querySelector("input,select,button") || pop).focus();
+    return activePopover;
+  }
+  function openActions() {
+    const U = SCR.ui;
+    const action = (label, fn) => el("button", { class: "btn", onclick: () => { activePopover?.close(); fn(); } }, label);
+    const sort = el("select", { class: "btn", "aria-label": "Sort results", onchange: () => { ST.spec.sort = { field: sort.value, dir: dir.value }; save(); renderResults(); } },
+      ["ticker", "name", ...SCR.data.fields.filter(f => f.g !== "id").map(f => f.id)].map(id => el("option", { value: id }, fieldOf(id)?.n || (id === "ticker" ? "Ticker" : "Company"))));
+    if (ST.spec.sort?.field === "similarity") sort.append(el("option", { value: "similarity" }, "Similarity"));
+    sort.value = ST.spec.sort?.field || "ticker";
+    const dir = el("select", { class: "btn", "aria-label": "Sort direction", onchange: () => { ST.spec.sort = { field: sort.value, dir: dir.value }; save(); renderResults(); } }, el("option", { value: "asc" }, "Ascending"), el("option", { value: "desc" }, "Descending"));
+    dir.value = ST.spec.sort?.dir || "asc";
+    popover(U.actionsBtn, el("div", { class: "sx-actions" },
+      el("label", {}, "Sort", sort), dir, el("label", {}, "Group", U.groupSel),
+      action("Columns", () => openColumns({ currentTarget: U.actionsBtn })),
+      action("Saved screens", () => openSaved({ currentTarget: U.actionsBtn })),
+      action("Share screen", () => copyText(location.origin + location.pathname + "#" + SHARE_PREFIX + b64e(JSON.stringify(compact(ST.spec, true))), "Screen link copied")),
+      action("Export CSV", csv),
+      el("button", { class: "btn", "aria-pressed": String(ST.chatOpen), onclick: () => { activePopover?.close(); ST.chatOpen = !ST.chatOpen; save(); U.grid.classList.toggle("nochat", !ST.chatOpen); if (ST.chatOpen) U.ta?.focus(); } }, "Assistant"),
+      action("Reset screen", () => setSpec(blank(), { columns: false }))), null, "Screen actions");
   }
   function filterEditor(f, onApply) {
     const fd = fieldOf(f.field);
@@ -439,18 +475,21 @@ window.FU_PAGES = window.FU_PAGES || {};
   }
   function editFilter(i, anchor) {
     const f = ST.spec.filters[i];
-    const p = popover(anchor, filterEditor(f, nf => { ST.spec.filters[i] = nf; p.close(); setSpec(ST.spec, { columns: false, keepPreset: true }); }));
+    const p = popover(anchor, filterEditor(f, nf => { ST.spec.filters[i] = nf; p.close({ restoreFocus: false }); setSpec(ST.spec, { columns: false, keepPreset: true }); focusFilter(i); }), null, `Edit ${fieldOf(f.field)?.n || f.field} filter`);
+  }
+  function focusFilter(i) {
+    (SCR.ui.chips.querySelectorAll(".sx-chip .t")[i] || SCR.ui.filtersBtn).focus();
   }
   function addFilterMenu(anchor) {
     const q = el("input", { type: "search", placeholder: "Search fields (e.g. margin, oil, insider)", "aria-label": "Search fields" });
     const list = el("div", { class: "sx-flist" });
     const box = el("div", {}, q, list);
-    const p = popover(anchor, box);
+    const p = popover(anchor, box, null, "Add filter");
     const draw = () => {
       list.innerHTML = "";
       const t = q.value.trim().toLowerCase();
       const hits = SCR.data.fields.filter(f => !t || f.n.toLowerCase().includes(t) || f.id.includes(t) || f.d.toLowerCase().includes(t)).slice(0, 60);
-      hits.forEach(f => list.append(el("button", { onclick: () => { p.close(); const nf = f.u === "bool" ? { field: f.id, op: "true" } : { field: f.id, op: "between", value: [null, null] }; const pp = popover(anchor, filterEditor(nf, x => { ST.spec.filters.push(x); pp.close(); if (!ST.cols.includes(x.field)) { ST.cols.push(x.field); } setSpec(ST.spec, { columns: false, keepPreset: true }); })); } },
+      hits.forEach(f => list.append(el("button", { onclick: () => { p.close({ restoreFocus: false }); const nf = f.u === "bool" ? { field: f.id, op: "true" } : { field: f.id, op: "between", value: [null, null] }; const pp = popover(anchor, filterEditor(nf, x => { const i = ST.spec.filters.length; ST.spec.filters.push(x); pp.close({ restoreFocus: false }); if (!ST.cols.includes(x.field)) { ST.cols.push(x.field); } setSpec(ST.spec, { columns: false, keepPreset: true }); focusFilter(i); })); } },
         el("span", {}, f.n), el("span", { class: "faint", style: "font-size:11px" }, (SCR.groups.find(g => g.id === f.g) || {}).n))));
       if (!hits.length) list.append(el("div", { class: "faint", style: "padding:8px" }, "No field matches."));
     };
@@ -463,6 +502,8 @@ window.FU_PAGES = window.FU_PAGES || {};
     U.filters.innerHTML = "";
     U.filters.hidden = !ST.filtersOpen;
     U.filtersBtn.classList.toggle("on", ST.filtersOpen);
+    U.filtersBtn.setAttribute("aria-expanded", String(ST.filtersOpen));
+    U.filtersBtn.textContent = `Filters (${SCR.ui.chips.querySelectorAll(".sx-chip").length})`;
     if (!ST.filtersOpen) return;
     const s = ST.spec;
     // universe: index, sectors, industries, excluded tickers
@@ -539,7 +580,7 @@ window.FU_PAGES = window.FU_PAGES || {};
       setSpec(s, { columns: false, keepPreset: true });
     };
     lo.addEventListener("change", commit); hi.addEventListener("change", commit);
-    const pctBtn = el("button", { class: "btn sx-mini", title: "Top or bottom N% of the index or sector", onclick: e => { const nf = cur && ["top", "bottom"].includes(cur.op) ? cur : { field: f.id, op: "top", pct: 20, scope: "all" }; const p = popover(e.currentTarget, filterEditor(nf, x => { const k = s.filters.findIndex(y => y.field === f.id); if (k >= 0) s.filters[k] = x; else s.filters.push(x); p.close(); setSpec(s, { columns: false, keepPreset: true }); })); } }, cur && ["top", "bottom"].includes(cur.op) ? `${cur.op} ${cur.pct}%` : "N%");
+    const pctBtn = el("button", { class: "btn sx-mini", title: "Top or bottom N% of the index or sector", onclick: e => { const nf = cur && ["top", "bottom"].includes(cur.op) ? cur : { field: f.id, op: "top", pct: 20, scope: "all" }; const p = popover(e.currentTarget, filterEditor(nf, x => { const k = s.filters.findIndex(y => y.field === f.id); if (k >= 0) s.filters[k] = x; else s.filters.push(x); p.close({ restoreFocus: false }); setSpec(s, { columns: false, keepPreset: true }); focusFilter(k >= 0 ? k : s.filters.length - 1); })); } }, cur && ["top", "bottom"].includes(cur.op) ? `${cur.op} ${cur.pct}%` : "N%");
     const slider = rangeSlider(f, lo, hi);
     slider.querySelectorAll("input").forEach(r => r.addEventListener("change", commit));
     row.append(el("div", { class: "sx-range" }, lo, hi, el("span", { class: "faint", style: "min-width:22px" }, inUnit(f)), pctBtn), slider);
@@ -549,7 +590,7 @@ window.FU_PAGES = window.FU_PAGES || {};
   /* ---------- results ---------- */
   function cols() {
     const c = ST.cols.filter(id => fieldOf(id));
-    if (ST.spec.sort?.field && ST.spec.sort.field !== "similarity" && !c.includes(ST.spec.sort.field)) c.unshift(ST.spec.sort.field);
+    if (fieldOf(ST.spec.sort?.field) && !c.includes(ST.spec.sort.field)) c.unshift(ST.spec.sort.field);
     return c;
   }
   function renderResults() {
@@ -685,6 +726,7 @@ window.FU_PAGES = window.FU_PAGES || {};
   const SEC_COLORS = ["--c1", "--c2", "--c3", "--c4", "--c5", "--c6"];
   function renderSummary(res) {
     const U = SCR.ui, rows = res.rows;
+    const statisticsOpen = !!U.summary.querySelector("details")?.open;
     U.summary.innerHTML = "";
     const uniTxt = res.uni.length === SCR.rows.length ? "S&P 500" : `${res.uni.length} in the selected universe`;
     const head = el("div", { class: "sx-count" }, el("b", { class: "num" }, rows.length), el("span", { class: "muted" }, ` of ${SCR.rows.length} companies · ${uniTxt}`));
@@ -698,7 +740,9 @@ window.FU_PAGES = window.FU_PAGES || {};
     const bar = el("div", { class: "sx-mix", role: "img", "aria-label": "Sector mix: " + secs.map(([s, n]) => `${s} ${n}`).join(", ") });
     secs.forEach(([s, n], i) => bar.append(el("span", { style: `width:${(n / Math.max(1, rows.length)) * 100}%;background:var(${SEC_COLORS[i % SEC_COLORS.length]});opacity:${1 - Math.floor(i / SEC_COLORS.length) * 0.45}`, title: `${s}: ${n}`, onmousemove: e => showTip(e, `<b>${esc(s)}</b> · ${n} (${Math.round(n / rows.length * 100)}%)`), onmouseleave: hideTip })));
     const legend = el("div", { class: "legend" }, secs.slice(0, 6).map(([s, n], i) => el("span", {}, el("i", { style: `background:var(${SEC_COLORS[i % SEC_COLORS.length]})` }), `${s} ${n}`)), secs.length > 6 ? el("span", { class: "faint" }, `+${secs.length - 6} more`) : null);
-    U.summary.append(head, stats, rows.length ? bar : null, rows.length ? legend : null);
+    const details = el("details", { class: "sx-statistics" }, el("summary", {}, "Result statistics"), stats, rows.length ? bar : null, rows.length ? legend : null);
+    details.open = statisticsOpen;
+    U.summary.append(head, details);
   }
 
   /* ---------- columns, saved screens, csv ---------- */
@@ -719,7 +763,7 @@ window.FU_PAGES = window.FU_PAGES || {};
     };
     q.oninput = draw; draw();
     box.append(el("div", { class: "eyebrow" }, "Column sets"), sets, q, list);
-    const p = popover(e.currentTarget, box);
+    const p = popover(e.currentTarget, box, null, "Choose columns");
   }
   function openSaved(e) {
     const name = el("input", { type: "text", placeholder: "Name this screen", "aria-label": "Screen name" });
@@ -728,13 +772,13 @@ window.FU_PAGES = window.FU_PAGES || {};
       list.innerHTML = "";
       const cur = store.get(KEY + ":saved", []);
       if (!cur.length) list.append(el("div", { class: "faint", style: "padding:8px" }, "No saved screens yet."));
-      cur.forEach((s, i) => list.append(el("div", { class: "sx-saved" }, el("button", { class: "t", onclick: () => { ST.preset = null; setSpec(s.spec); if (s.cols) { ST.cols = s.cols; ST.colset = "Custom"; save(); renderResults(); } p.close(); toast(`Loaded "${s.name}"`); } }, el("b", {}, s.name), el("span", { class: "faint", style: "font-size:11px" }, ` ${s.spec.filters.length} filters · ${new Date(s.at).toLocaleDateString("en-US")}`)),
+      cur.forEach((s, i) => list.append(el("div", { class: "sx-saved" }, el("button", { class: "t", onclick: () => { ST.preset = null; setSpec(s.spec); if (s.cols) { ST.cols = s.cols; ST.colset = "Custom"; save(); renderResults(); } p.close(); toast(`Loaded "${s.name}"`); } }, el("b", {}, s.name), el("span", { class: "faint", style: "font-size:11px" }, ` ${(s.spec.filters || []).length} filters · ${new Date(s.at).toLocaleDateString("en-US")}`)),
         el("button", { class: "iconbtn", "aria-label": "Delete " + s.name, onclick: () => { const c = store.get(KEY + ":saved", []); c.splice(i, 1); store.set(KEY + ":saved", c); draw(); } }, svgUse("i-x")))));
     };
     const doSave = () => { const n = name.value.trim(); if (!n) return toast("Enter a name"); const c = store.get(KEY + ":saved", []).filter(x => x.name !== n); c.unshift({ name: n, spec: compact(ST.spec, false), cols: ST.cols, at: Date.now() }); store.set(KEY + ":saved", c.slice(0, 50)); name.value = ""; draw(); toast(`Saved "${n}"`); };
     name.addEventListener("keydown", ev => { if (ev.key === "Enter") doSave(); });
     draw();
-    const p = popover(e.currentTarget, el("div", {}, el("div", { class: "eyebrow" }, "Saved screens (this browser)"), el("div", { class: "sx-inline" }, name, el("button", { class: "btn acc", onclick: doSave }, "Save")), list));
+    const p = popover(e.currentTarget, el("div", {}, el("div", { class: "eyebrow" }, "Saved screens (this browser)"), el("div", { class: "sx-inline" }, name, el("button", { class: "btn acc", onclick: doSave }, "Save")), list), null, "Saved screens");
   }
   function csv() {
     const C = cols();
@@ -942,10 +986,15 @@ window.FU_PAGES = window.FU_PAGES || {};
 .sx-chat{position:sticky;top:76px;display:flex;flex-direction:column;max-height:calc(100vh - 96px);min-height:420px}
 .sx-chat .sx-ai{flex:1;min-height:0;display:flex;flex-direction:column}
 .sx-chat .log{min-height:120px}
-.sx-chatbtn.on,.sx-grid:not(.nochat) .sx-chatbtn{display:none}
-.sx-presets .picker{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
-.sx-presets .picker button{font-size:12px;padding:4px 10px;flex:none}
-.sx-why{margin-top:10px;font-size:12.5px;color:var(--muted);max-width:110ch}
+.scr-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.scr-tools input[type=search]{flex:1;min-width:180px}
+.sx-presets{max-width:240px;min-width:0}
+.sx-why{padding:0 16px 10px;font-size:12.5px;color:var(--muted);max-width:110ch}
+.sx-actions{display:flex;flex-direction:column;gap:8px}
+.sx-actions label{display:flex;flex-direction:column;gap:4px;font-size:12px}
+.sx-actions .btn{text-align:left}
+.sx-statistics>summary{cursor:pointer;font-size:12px;color:var(--muted)}
+.sx-statistics[open]{display:flex;flex-direction:column;gap:10px}
 .scr-tools .btn.on{border-color:var(--ink)}
 .sx-chips{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;border-bottom:1px solid var(--line);align-items:center}
 .sx-chip{display:inline-flex;align-items:center;border:1px solid var(--line2);border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:600;overflow:hidden}

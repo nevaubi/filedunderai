@@ -1,16 +1,19 @@
 """Investor relations documents: find each company's IR site, list its result documents (releases, presentations,
 supplementary financial data, prepared remarks, transcripts), download them into the `ir` storage bucket, and extract
 page/sheet text so values can be cited and highlighted at the exact page or cell."""
+import copy
+import csv
 import datetime as dt
 import hashlib
 import io
 import json
 import os
 import re
+import time
 import urllib.parse
+import zipfile
 
-from .common import HTTPError, now_iso, request, sec_get, sec_get_raw
-from .docs import firecrawl
+from .common import AggregateLease, HTTPError, SEC_UA, Supabase, now_iso, request, sec_throttle
 
 DOC_EXT = (".pdf", ".xlsx", ".xls", ".xlsm", ".csv", ".pptx", ".ppt", ".docx", ".doc")
 RESULT_HINT = re.compile(r"(quarter|earning|result|financial-?(info|data|result|report)|supplement|presentation|press-?release|news|events|reports?)", re.I)
@@ -19,28 +22,30 @@ NOISE = re.compile(r"(securities and exchange commission|form 8-?k|form 10|sec f
 UA = "Mozilla/5.0 (compatible; FiledUnder/1.0; +https://filedunder.ai)"
 
 
-def tavily(query, max_results=8, include_domains=None):
+def tavily(query, max_results=8, include_domains=None, deadline=None):
     body = {"api_key": os.environ["TAVILY_API_KEY"], "query": query, "max_results": max_results, "search_depth": "basic"}
     if include_domains:
         body["include_domains"] = include_domains
-    return json.loads(request("https://api.tavily.com/search", method="POST", data=body, timeout=60, retries=2)).get("results", [])
+    return json.loads(request("https://api.tavily.com/search", method="POST", data=body, timeout=_timeout(deadline, 60), retries=1)).get("results", [])
 
 
-def firecrawl_map(url, search=None, limit=400):
+def firecrawl_map(url, search=None, limit=400, deadline=None):
     body = {"url": url, "limit": limit, "includeSubdomains": True}
     if search:
         body["search"] = search
     out = request("https://api.firecrawl.dev/v2/map", method="POST", data=body,
-                  headers={"Authorization": f"Bearer {os.environ['FIRECRAWL_API_KEY']}"}, timeout=180, retries=2)
+                  headers={"Authorization": f"Bearer {os.environ['FIRECRAWL_API_KEY']}"}, timeout=_timeout(deadline, 90), retries=1)
     d = json.loads(out)
+    if d.get("success") is False or not isinstance(d.get("links", (d.get("data") or {}).get("links")), list):
+        raise ValueError("Invalid Firecrawl map response")
     links = d.get("links") or (d.get("data") or {}).get("links") or []
     return [l if isinstance(l, dict) else {"url": l} for l in links]
 
 
-def ir_candidates(name, ticker):
+def ir_candidates(name, ticker, deadline=None):
     """Searches for the company's investor relations site. Returns ranked root URLs whose host matches the company."""
-    res = tavily(f"{name} ({ticker}) investor relations quarterly results", max_results=10)
-    res += tavily(f"{name} investor relations website", max_results=8)
+    res = tavily(f"{name} ({ticker}) investor relations quarterly results", max_results=10, deadline=deadline)
+    res += tavily(f"{name} investor relations website", max_results=8, deadline=deadline)
     score = {}
     for i, r in enumerate(res):
         u = urllib.parse.urlparse(r["url"])
@@ -61,7 +66,7 @@ def ir_candidates(name, ticker):
         root = f"{u.scheme}://{host}"
         m = re.search(r"^(.*?/(?:investors?|investor-relations|ir))(?:/|$)", u.path, re.I)
         if m and not re.search(r"(^|\.)(investors?|ir)\.", host):
-            root += m.group(1)
+            root += m.group(1) + ("/" if u.path[len(m.group(1)):].startswith("/") else "")
         score[root] = score.get(root, 0) + s
     ranked = sorted(score, key=lambda k: -score[k])
     return [r for r in ranked if score[r] > 0]
@@ -124,37 +129,6 @@ def period_hint(url, title=""):
     return (None, int(m.group(1))) if m else (None, None)
 
 
-def discover_documents(ir_root, log=print):
-    """Maps the IR site, then scrapes the result/financials pages for document links. Returns (docs, pages)."""
-    links = []
-    for search in ("quarterly results earnings", "financial information presentation supplement"):
-        try:
-            links += firecrawl_map(ir_root, search=search, limit=300)
-        except Exception as e:
-            log(f"  map {ir_root} failed: {str(e)[:120]}")
-    docs, pages = {}, []
-    for l in links:
-        u = l.get("url") or ""
-        if _ext(u):
-            docs.setdefault(u, l.get("title") or "")
-        elif RESULT_HINT.search(u) and len(pages) < 40:
-            pages.append(u)
-    # rank pages: quarterly-results style pages first
-    pages = sorted(set(pages), key=lambda u: (0 if re.search(r"quarter|earning|result", u, re.I) else 1, len(u)))[:4]
-    for p in pages + [ir_root]:
-        try:
-            d = firecrawl(p, "html")
-            for u, t in anchors(d.get("html", ""), p):
-                if _ext(u):
-                    if t and len(t) > len(docs.get(u, "")):
-                        docs[u] = t
-                    else:
-                        docs.setdefault(u, t)
-        except Exception as e:
-            log(f"  scrape {p} failed: {str(e)[:120]}")
-    return docs, pages
-
-
 def anchors(html, base):
     """(absolute url, descriptive text) for each link: anchor text plus the nearest row/heading context."""
     from bs4 import BeautifulSoup
@@ -190,8 +164,8 @@ def keep_doc(url, title, since_year):
     return year is None or year >= since_year
 
 
-def download(url):
-    body = request(url, headers={"User-Agent": UA, "Accept": "*/*"}, timeout=120, retries=2, raw=True)
+def download(url, deadline=None):
+    body = request(url, headers={"User-Agent": UA, "Accept": "*/*"}, timeout=_timeout(deadline, 90), retries=1, raw=True)
     return body
 
 
@@ -199,7 +173,7 @@ def sniff_ext(body, url):
     if body[:5] == b"%PDF-":
         return ".pdf"
     if body[:2] == b"PK":
-        low = url.lower()
+        low = urllib.parse.urlparse(url).path.lower()
         for e in (".xlsx", ".xlsm", ".pptx", ".docx"):
             if low.endswith(e):
                 return e
@@ -212,8 +186,11 @@ def sniff_ext(body, url):
             return ".docx"
         return ".zip"
     if body[:8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1":
-        return ".xls" if url.lower().endswith(".xls") else ".doc" if url.lower().endswith(".doc") else ".ppt" if url.lower().endswith(".ppt") else ".ole"
-    if url.lower().endswith(".csv"):
+        low = urllib.parse.urlparse(url).path.lower()
+        return ".xls" if low.endswith(".xls") else ".doc" if low.endswith(".doc") else ".ppt" if low.endswith(".ppt") else ".ole"
+    if body.lstrip()[:100].lower().startswith((b"<!doctype html", b"<html")):
+        return ".html"
+    if urllib.parse.urlparse(url).path.lower().endswith(".csv"):
         return ".csv"
     return None
 
@@ -224,67 +201,214 @@ CT = {".pdf": "application/pdf", ".xlsx": "application/vnd.openxmlformats-office
       ".htm": "text/plain; charset=utf-8", ".html": "text/plain; charset=utf-8"}
 
 
-def extract_text(body, ext):
-    """Page or sheet text for citation: {"kind": "pages", "pages": [...]} or {"kind": "sheets", "sheets": {...}}."""
+def _text_result(kind, content, limits=None, errors=None):
+    limits, errors = limits or [], errors or []
+    nonempty = (any(str(p).strip() for p in content) if kind == "pages" else
+                any(v is not None and str(v).strip() for rows in content.values() for row in rows for v in row))
+    status = "empty" if not nonempty else "limited" if limits or errors else "verified"
+    return {"kind": kind, kind: content, "extraction": {"status": status, "limits": limits,
+            "errors": errors, "nonempty": nonempty, "coordinates": "page" if kind == "pages" else "sheet,row,column"}}
+
+
+WORKBOOK_MAX_SHEETS = 256
+WORKBOOK_MAX_CELLS = 1_000_000
+WORKBOOK_ZIP_MAX_BYTES = 128 * 1024 * 1024
+WORKBOOK_ZIP_MAX_MEMBER_BYTES = 32 * 1024 * 1024
+WORKBOOK_ZIP_MAX_MEMBERS = 10000
+
+
+def _workbook_zip(body, deadline=None):
+    """Validate the archive and repair unambiguous Windows separators in memory only.
+
+    Original storage bytes/hash never change. Package XML and relationship targets are
+    untouched; only ZIP member names with backslashes are canonicalized.
+    """
+    if len(body) > WORKBOOK_ZIP_MAX_BYTES:
+        raise ValueError("Workbook ZIP exceeds compressed size limit")
+    with zipfile.ZipFile(io.BytesIO(body)) as source:
+        entries = source.infolist()
+        if len(entries) > WORKBOOK_ZIP_MAX_MEMBERS:
+            raise ValueError("Workbook ZIP exceeds member count limit")
+        total, seen, names, changed = 0, set(), [], False
+        for entry in entries:
+            name = entry.filename.replace(chr(92), "/")
+            parts = name.rstrip("/").split("/")
+            if (not name or name.startswith("/") or "\x00" in name or re.match(r"^[A-Za-z]:", name)
+                    or any(part in ("", ".", "..") for part in parts)):
+                raise ValueError("Unsafe workbook ZIP member path")
+            canonical = name.rstrip("/")
+            if canonical in seen:
+                raise ValueError("Ambiguous workbook ZIP member names")
+            seen.add(canonical)
+            if entry.flag_bits & 1 or (entry.external_attr >> 16) & 0o170000 == 0o120000:
+                raise ValueError("Encrypted or symbolic-link workbook ZIP member")
+            total += entry.file_size
+            if entry.file_size > WORKBOOK_ZIP_MAX_MEMBER_BYTES or total > WORKBOOK_ZIP_MAX_BYTES:
+                raise ValueError("Workbook ZIP exceeds expanded size limit")
+            names.append(name)
+            changed = changed or name != entry.filename
+        if not changed:
+            return body
+        repaired = io.BytesIO()
+        with zipfile.ZipFile(repaired, "w", compression=zipfile.ZIP_DEFLATED) as target:
+            for entry, name in zip(entries, names):
+                _timeout(deadline)
+                with source.open(entry) as member:
+                    data = member.read(WORKBOOK_ZIP_MAX_MEMBER_BYTES + 1)
+                if len(data) > WORKBOOK_ZIP_MAX_MEMBER_BYTES or len(data) != entry.file_size:
+                    raise ValueError("Workbook ZIP member size mismatch")
+                target.writestr(name, data)
+        return repaired.getvalue()
+
+
+def extract_text(body, ext, deadline=None):
+    """Extract a bounded, coordinate-preserving representation; limits never imply complete text.
+
+    'verified' checks machine-readable nonempty content, not OCR accuracy or financial correctness.
+    Empty interior/trailing rows and columns are retained so evidence coordinates never shift.
+    """
+    _timeout(deadline)
+    limits, errors = [], []
     if ext == ".pdf":
         import pdfplumber
         pages = []
         with pdfplumber.open(io.BytesIO(body)) as pdf:
-            for p in pdf.pages[:400]:
-                try:
-                    pages.append(p.extract_text(x_tolerance=1.5, y_tolerance=3) or "")
-                except Exception:
-                    pages.append("")
-        return {"kind": "pages", "pages": pages}
-    if ext in (".xlsx", ".xlsm"):
-        import openpyxl
-        wb = openpyxl.load_workbook(io.BytesIO(body), data_only=True, read_only=True)
-        sheets = {}
-        for ws in wb.worksheets[:60]:
-            rows = []
-            for r_i, row in enumerate(ws.iter_rows(values_only=True)):
-                if r_i > 600:
+            if len(pdf.pages) > 400:
+                limits.append("pages:400")
+            for i, page in enumerate(pdf.pages[:400]):
+                if _expired(deadline):
+                    limits.append("deadline")
                     break
-                vals = ["" if v is None else (round(v, 6) if isinstance(v, float) else v) for v in row[:60]]
-                while vals and vals[-1] == "":
-                    vals.pop()
-                rows.append(vals)
-            while rows and not rows[-1]:
-                rows.pop()
-            sheets[ws.title] = rows
-        return {"kind": "sheets", "sheets": sheets}
+                try:
+                    pages.append(page.extract_text(x_tolerance=1.5, y_tolerance=3) or "")
+                    if not pages[-1].strip():
+                        errors.append(f"page:{i + 1}:empty; OCR may be required")
+                except Exception as e:
+                    pages.append("")
+                    errors.append(f"page:{i + 1}:{str(e)[:120]}")
+        return _text_result("pages", pages, limits, errors)
+    if ext in (".xlsx", ".xlsm", ".xls"):
+        sheets, cell_budget, budget_exhausted = {}, WORKBOOK_MAX_CELLS, False
+        def bounded_rows(source):
+            nonlocal cell_budget, budget_exhausted
+            rows = []
+            for row in source:
+                if _expired(deadline):
+                    limits.append("deadline")
+                    budget_exhausted = True
+                    break
+                if len(row) > cell_budget:
+                    limits.append(f"cells:{WORKBOOK_MAX_CELLS}")
+                    budget_exhausted = True
+                    break
+                rows.append(row)
+                cell_budget -= len(row)
+            return rows
+        if ext == ".xls":
+            import xlrd
+            book = xlrd.open_workbook(file_contents=body, on_demand=True, logfile=io.StringIO())
+            try:
+                if book.nsheets > WORKBOOK_MAX_SHEETS:
+                    limits.append(f"sheets:{WORKBOOK_MAX_SHEETS}")
+                for sheet_index in range(min(book.nsheets, WORKBOOK_MAX_SHEETS)):
+                    if budget_exhausted:
+                        break
+                    ws = book.sheet_by_index(sheet_index)
+                    if _expired(deadline):
+                        limits.append("deadline")
+                        break
+                    if ws.nrows > 601 or ws.ncols > 60:
+                        limits.append(f"sheet:{ws.name}:rows:601,columns:60")
+                    def value(cell):
+                        if cell.ctype == xlrd.XL_CELL_ERROR:
+                            return xlrd.error_text_from_code.get(cell.value, "#ERROR!")
+                        if cell.ctype == xlrd.XL_CELL_DATE:
+                            return xlrd.xldate_as_datetime(cell.value, book.datemode)
+                        if cell.ctype == xlrd.XL_CELL_BOOLEAN:
+                            return bool(cell.value)
+                        return cell.value
+                    sheets[ws.name] = bounded_rows([value(ws.cell(i, j)) for j in range(min(ws.ncols, 60))] for i in range(min(ws.nrows, 601)))
+            finally:
+                book.release_resources()
+        else:
+            import openpyxl
+            book = openpyxl.load_workbook(io.BytesIO(_workbook_zip(body, deadline)), data_only=True, read_only=True)
+            try:
+                if len(book.worksheets) > WORKBOOK_MAX_SHEETS:
+                    limits.append(f"sheets:{WORKBOOK_MAX_SHEETS}")
+                for ws in book.worksheets[:WORKBOOK_MAX_SHEETS]:
+                    if budget_exhausted:
+                        break
+                    if _expired(deadline):
+                        limits.append("deadline")
+                        break
+                    if (ws.max_row or 0) > 601 or (ws.max_column or 0) > 60:
+                        limits.append(f"sheet:{ws.title}:rows:601,columns:60")
+                    rows = ws.iter_rows(max_row=min(ws.max_row or 601, 601), max_col=min(ws.max_column or 60, 60), values_only=True)
+                    sheets[ws.title] = bounded_rows(["" if v is None else v for v in row] for row in rows)
+            finally:
+                book.close()
+        # Workbooks expose cached formula results only; no formula evaluation is attempted.
+        result = _text_result("sheets", sheets, limits, errors)
+        result["extraction"]["formula_values"] = "cached_only"
+        return result
     if ext == ".pptx":
         from pptx import Presentation
         prs = Presentation(io.BytesIO(body))
         pages = []
-        for slide in prs.slides:
+        if len(prs.slides) > 400:
+            limits.append("slides:400")
+        for slide in list(prs.slides)[:400]:
+            if _expired(deadline):
+                limits.append("deadline")
+                break
             parts = []
             for sh in slide.shapes:
                 if sh.has_text_frame:
                     parts.append(sh.text_frame.text)
-                if getattr(sh, "has_table", False) and sh.has_table:
+                if getattr(sh, "has_table", False):
                     for row in sh.table.rows:
                         parts.append(" | ".join(c.text for c in row.cells))
             pages.append("\n".join(parts))
-        return {"kind": "pages", "pages": pages}
+        return _text_result("pages", pages, limits)
     if ext == ".docx":
         import docx
-        d = docx.Document(io.BytesIO(body))
-        text = "\n".join(p.text for p in d.paragraphs)
-        for t in d.tables:
-            for row in t.rows:
+        doc = docx.Document(io.BytesIO(body))
+        text = "\n".join(p.text for p in doc.paragraphs)
+        for table in doc.tables:
+            for row in table.rows:
                 text += "\n" + " | ".join(c.text for c in row.cells)
-        return {"kind": "pages", "pages": [text]}
-    if ext in (".htm", ".html"):
+        result = _text_result("pages", [text])
+        result["extraction"]["coordinates"] = "document; no physical page mapping"
+        return result
+    if ext in (".htm", ".html", ".md"):
         from bs4 import BeautifulSoup
-        soup = BeautifulSoup(body, "lxml")
-        for t in soup(["script", "style"]):
-            t.decompose()
-        txt = soup.get_text("\n", strip=True)
-        return {"kind": "pages", "pages": [txt]}
+        if ext == ".md":
+            text = body.decode("utf-8", "replace")
+        else:
+            soup = BeautifulSoup(body, "lxml")
+            article_loader = soup.select_one(".press-release-details")
+            if article_loader is not None:
+                article = soup.select_one(".press-release-details-body")
+                article_text = article.get_text(" ", strip=True) if article is not None else ""
+                if not article_text or re.search(r"unable to load press releases|generic error", article_text, re.I):
+                    return _text_result("pages", [], errors=["article body unavailable; dynamic loader is not document text"])
+            for tag in soup(["script", "style"]):
+                tag.decompose()
+            text = soup.get_text("\n", strip=True)
+        return _text_result("pages", [text])
     if ext == ".csv":
-        return {"kind": "sheets", "sheets": {"csv": [l.split(",") for l in body.decode("utf-8", "replace").splitlines()[:2000]]}}
-    return None
+        rows = []
+        decoded = body.decode("utf-8-sig", "strict")
+        for i, row in enumerate(csv.reader(io.StringIO(decoded, newline=""), strict=True)):
+            if i >= 2000 or _expired(deadline):
+                limits.append("rows:2000" if i >= 2000 else "deadline")
+                break
+            if len(row) > 200:
+                limits.append(f"row:{i + 1}:columns:200")
+            rows.append(row[:200])
+        return _text_result("sheets", {"csv": rows}, limits)
+    return {"kind": "pages", "pages": [], "extraction": {"status": "unsupported", "nonempty": False, "limits": [], "errors": [f"unsupported format:{ext}"]}}
 
 
 def doc_id(url):
@@ -404,96 +528,645 @@ def first_page_period(text):
     return label, year
 
 
-def process_company(sb, ticker, name, cik, since_year=None, max_docs=90, refresh_site=False, sec_years=3, log=print, fye="1231", web=True):
-    """Collects a company's results documents from two places and stores every file in the `ir` bucket:
-    8-K exhibits on EDGAR (earnings releases, supplements, slides; full history for sec_years) and the company's IR
-    website (presentations, supplementary workbooks, prepared remarks and transcripts that are not filed)."""
-    from .jobs import periodic_filings
-    since_year = since_year or dt.date.today().year - 2
-    existing = sb.select("ir_documents", f"select=id,sha256&ticker=eq.{ticker}")
-    have_ids = {r["id"] for r in existing}
-    have_hashes = {r["sha256"] for r in existing if r.get("sha256")}
-    stats = {"sec": 0, "web": 0, "web_text_only": 0, "failed": 0}
-    # 1. EDGAR 8-K exhibits
-    cut = (dt.date.today() - dt.timedelta(days=int(365 * sec_years))).isoformat()
-    try:
-        eights = [f for f in periodic_filings(cik, cut, forms=("8-K", "8-K/A"), ticker=ticker) if "2.02" in (f.get("i") or "") or "7.01" in (f.get("i") or "")]
-        stats["sec"] = sec_exhibits(sb, ticker, cik, eights, have_ids, have_hashes, log=log, fye=fye)
-    except Exception as e:
-        log(f"  {ticker} 8-K exhibits failed: {str(e)[:160]}")
-    # 2. IR website
-    site = (sb.select("ir_sites", f"select=*&ticker=eq.{ticker}") or [None])[0]
-    if not site or refresh_site or not site.get("ir_url"):
-        cands = ir_candidates(name, ticker)
-        site = {"ticker": ticker, "ir_url": cands[0] if cands else None, "discovered_at": now_iso(), "notes": json.dumps({"candidates": cands[:5]})}
-        sb.upsert("ir_sites", [site], "ticker")
-    pages = []
-    # the IR website is mapped at most once a week per company (Firecrawl credits); EDGAR exhibits are checked every run
-    recent_web = any(d for d in existing) and site.get("results_url") and site.get("discovered_at", "") >= (dt.datetime.utcnow() - dt.timedelta(days=7)).isoformat()
-    if recent_web and not refresh_site:
-        web = False
-    if site.get("ir_url") and web:
-        docs, pages = discover_documents(site["ir_url"], log=log)
-        sb.upsert("ir_sites", [{"ticker": ticker, "ir_url": site["ir_url"], "results_url": pages[0] if pages else site["ir_url"], "discovered_at": now_iso()}], "ticker")
-        cand = [(u, t) for u, t in docs.items() if keep_doc(u, t, since_year) and classify(u, t) != "other"]
-        prio = {"supplement": 0, "presentation": 1, "remarks": 2, "release": 3, "transcript": 4, "annual_report": 5, "other": 6}
-        cand.sort(key=lambda ut: (-(period_hint(*ut)[1] or 0), prio[classify(*ut)]))
-        for url, title in cand[:max_docs]:
-            if doc_id(url) in have_ids:
-                continue
+# Checkpoints live in the private raw bucket, never in public-data.
+CHECKPOINT_VERSION = 1
+CHECKPOINT_BYTES = 16 * 1024 * 1024
+QUEUE_LIMIT = 20000
+MAX_ATTEMPTS = 3
+QUEUE_NAMES = ("submissions", "filings", "maps", "pages", "documents", "extractions")
+ACTIVE = ("pending", "retry")
+
+
+class DeadlineReached(RuntimeError):
+    pass
+
+
+def _expired(deadline):
+    return deadline is not None and time.monotonic() >= deadline
+
+
+def _timeout(deadline, maximum=60):
+    if deadline is None:
+        return maximum
+    remaining = deadline - time.monotonic()
+    if remaining <= 0:
+        raise DeadlineReached("time budget exhausted")
+    return min(maximum, remaining)
+
+
+def _sec_request(url, deadline=None, raw=False):
+    _timeout(deadline)
+    sec_throttle()
+    return request(url, headers={"User-Agent": SEC_UA}, timeout=_timeout(deadline, 40), retries=1, raw=raw)
+
+
+def _sec_json(url, deadline=None):
+    return json.loads(_sec_request(url, deadline))
+
+
+def _scrape(url, deadline=None):
+    timeout = _timeout(deadline, 60)
+    data = json.loads(request("https://api.firecrawl.dev/v2/scrape", method="POST",
+        data={"url": url, "formats": ["html"], "onlyMainContent": False, "timeout": max(1, int(timeout * 900))},
+        headers={"Authorization": f"Bearer {os.environ['FIRECRAWL_API_KEY']}"}, timeout=timeout, retries=1))
+    if not data.get("success") or not isinstance(data.get("data"), dict) or not data["data"].get("html"):
+        raise ValueError("Firecrawl returned no archive HTML")
+    return data["data"]
+
+
+class IRClient(Supabase):
+    """IR-scoped Supabase adapter: one attempt, remaining-time timeout per I/O.
+
+    No global request monkeypatching and no change to unrelated ETL clients. The
+    absolute I/O deadline includes persistence and lease acquisition/renewal.
+    """
+    def __init__(self, sb, deadline):
+        self.__dict__.update(sb.__dict__)
+        previous = getattr(sb, "io_deadline", None)
+        self.io_deadline = min(previous, deadline) if previous is not None and deadline is not None else previous if deadline is None else deadline
+
+    def _call(self, url, **kwargs):
+        kwargs["timeout"] = _timeout(self.io_deadline, kwargs.get("timeout", 30))
+        kwargs["retries"] = 1
+        return request(url, **kwargs)
+
+    def rpc(self, fn, args):
+        return json.loads(self._call(f"{self.url}/rest/v1/rpc/{fn}", method="POST", data=args, headers=self._h()) or "null")
+
+    def select(self, table, query="select=*"):
+        rows, offset = [], 0
+        while True:
+            page = json.loads(self._call(f"{self.url}/rest/v1/{table}?{query}", headers=self._h({"Range-Unit": "items", "Range": f"{offset}-{offset + 999}"})))
+            if not isinstance(page, list):
+                raise ValueError("Invalid relational IR response")
+            rows.extend(page)
+            if len(page) < 1000:
+                return rows
+            offset += 1000
+
+    def upsert(self, table, rows, on_conflict, batch=500):
+        self._check_lease()
+        rows = list(rows)
+        for start in range(0, len(rows), batch):
+            self._check_lease()
+            self._call(f"{self.url}/rest/v1/{table}?on_conflict={on_conflict}", method="POST", data=rows[start:start + batch],
+                       headers=self._h({"Prefer": "resolution=merge-duplicates,return=minimal", "Content-Type": "application/json"}))
+        return len(rows)
+
+    def insert(self, table, row, returning=True):
+        result = self._call(f"{self.url}/rest/v1/{table}", method="POST", data=row,
+                            headers=self._h({"Prefer": "return=representation" if returning else "return=minimal"}))
+        return json.loads(result) if returning and result else None
+
+    def update(self, table, match, values):
+        self._check_lease()
+        query = "&".join(f"{key}=eq.{urllib.parse.quote(str(value))}" for key, value in match.items())
+        self._call(f"{self.url}/rest/v1/{table}?{query}", method="PATCH", data=values, headers=self._h({"Prefer": "return=minimal"}))
+
+    def put_object(self, bucket, path, content, content_type="application/json", cache="max-age=300"):
+        self._check_lease()
+        if isinstance(content, str):
+            content = content.encode()
+        self._call(f"{self.url}/storage/v1/object/{bucket}/{urllib.parse.quote(path)}", method="POST", data=content,
+                   headers=self._h({"Content-Type": content_type, "x-upsert": "true", "cache-control": cache}))
+        return len(content)
+
+    def get_object(self, bucket, path, public=False):
+        try:
+            return self._call(f"{self.url}/storage/v1/object/{'public/' if public else ''}{bucket}/{urllib.parse.quote(path)}", headers=self._h(), raw=True)
+        except HTTPError as error:
+            if _object_missing(error):
+                return None
+            raise
+
+
+def bounded_client(sb, deadline):
+    """Copy the client's state; never attach worker deadlines or leases to shared sb."""
+    return IRClient(sb, deadline) if isinstance(sb, Supabase) else copy.copy(sb)
+
+
+def _object_missing(error):
+    if error.code == 404:
+        return True
+    if error.code == 400:
+        try:
+            data = json.loads(error.body)
+        except (ValueError, TypeError):
+            data = {}
+        return str(data.get("statusCode")) == "404" and data.get("error") == "not_found" and data.get("message") == "Object not found"
+    return False
+
+
+def _stored_object(sb, bucket, path):
+    # Generic Supabase.get_object conflates HTTP 400 with absence. IRClient is strict.
+    if isinstance(sb, IRClient):
+        return sb.get_object(bucket, path)
+    if isinstance(sb, Supabase):
+        try:
+            return request(f"{sb.url}/storage/v1/object/{bucket}/{urllib.parse.quote(path)}",
+                           headers=sb._h(), raw=True, retries=1, timeout=30)
+        except HTTPError as error:
+            if _object_missing(error):
+                return None
+            raise
+    return sb.get_object(bucket, path)
+
+def _read_checkpoint(sb, ticker):
+    raw = _stored_object(sb, "raw", f"ir/checkpoints/{ticker}.json")
+    if raw is None:
+        return {"version": CHECKPOINT_VERSION, "ticker": ticker, "scope": {}, "queues": {q: {} for q in QUEUE_NAMES},
+                "outcomes": {}, "limits": [], "sec_checked_at": None, "web_checked_at": None, "sec_polled_at": None, "web_polled_at": None}
+    if not raw or len(raw) > CHECKPOINT_BYTES:
+        raise ValueError("Empty or oversized IR checkpoint; refusing replacement")
+    state = json.loads(raw)
+    if (not isinstance(state, dict) or state.get("version") != CHECKPOINT_VERSION or state.get("ticker") != ticker
+            or not isinstance(state.get("scope"), dict) or not isinstance(state.get("outcomes"), dict)
+            or not isinstance(state.get("limits"), list) or not isinstance(state.get("queues"), dict)):
+        raise ValueError("Invalid IR checkpoint; refusing replacement")
+    scope = state["scope"]
+    if scope and (not isinstance(scope.get("since_year"), int) or not isinstance(scope.get("web"), bool)
+                  or not isinstance(scope.get("sec"), bool) or scope.get("history") not in ("recent", "available_archive")):
+        raise ValueError("Invalid IR checkpoint scope")
+    if scope:
+        dt.date.fromisoformat(scope.get("sec_since", ""))
+    for quality in state["outcomes"].values():
+        if not isinstance(quality, dict) or quality.get("status") not in ("verified", "limited", "empty", "unsupported", "failed", "unverified"):
+            raise ValueError("Invalid IR extraction outcome")
+    for name in QUEUE_NAMES:
+        queue = state["queues"].get(name)
+        if not isinstance(queue, dict) or len(queue) > QUEUE_LIMIT:
+            raise ValueError("Invalid IR checkpoint queue")
+        for item in queue.values():
+            if (not isinstance(item, dict) or item.get("status") not in (*ACTIVE, "done", "blocked")
+                    or not isinstance(item.get("attempts"), int) or item["attempts"] < 0):
+                raise ValueError("Invalid IR checkpoint task")
+            required = {"submissions": ("url", "cik", "root"), "filings": ("filing", "cik"), "maps": ("url", "search"),
+                        "pages": ("url",), "documents": ("url", "source"), "extractions": ("id",)}[name]
+            if any(key not in item for key in required):
+                raise ValueError("Incomplete IR checkpoint task")
+            if name in ("submissions", "pages", "documents") and not _url(item["url"]):
+                raise ValueError("Invalid IR checkpoint task URL")
+            if name == "documents" and item["source"] not in ("sec", "web"):
+                raise ValueError("Invalid IR checkpoint document source")
+            if name == "filings" and (not isinstance(item["filing"], dict) or any(k not in item["filing"] for k in ("a", "d", "f"))):
+                raise ValueError("Invalid IR checkpoint filing")
+    return state
+
+
+def _save_checkpoint(sb, state):
+    state["updated_at"] = now_iso()
+    body = json.dumps(state, separators=(",", ":"), default=str)
+    if len(body.encode()) > CHECKPOINT_BYTES:
+        raise ValueError("IR checkpoint size limit; refusing to replace previous progress")
+    sb.put_object("raw", f"ir/checkpoints/{state['ticker']}.json", body, "application/json", "no-store")
+
+
+def _enqueue(state, queue, key, **values):
+    tasks = state["queues"][queue]
+    if key in tasks:
+        return tasks[key]
+    if len(tasks) >= QUEUE_LIMIT:
+        marker = f"queue:{queue}:capacity:{QUEUE_LIMIT}; enumeration incomplete"
+        if marker not in state["limits"]:
+            state["limits"].append(marker)
+        return None
+    tasks[key] = {"status": "pending", "attempts": 0, **values}
+    return tasks[key]
+
+
+def _failure(item, exc, stats, category):
+    item["attempts"] += 1
+    item["status"] = "blocked" if item["attempts"] >= MAX_ATTEMPTS else "retry"
+    item["error"] = str(exc)[:300]
+    item["attempted_at"] = now_iso()
+    stats["failed"] += 1
+    stats[category + "_failed"] += 1
+
+
+def _complete(item):
+    item["status"] = "done"
+    item.pop("error", None)
+    item["completed_at"] = now_iso()
+
+
+def _url(url):
+    # Query IDs and trailing slashes can be semantically significant.
+    parsed = urllib.parse.urlsplit(url)
+    if parsed.scheme not in ("http", "https") or not parsed.netloc:
+        return None
+    return urllib.parse.urlunsplit((parsed.scheme, parsed.netloc, parsed.path, parsed.query, ""))
+
+
+def _web_doc(url):
+    return _ext(url) or (".html" if re.search(r"press-release-details|news-release-details|news-details/.+", url, re.I) else None)
+
+
+def _add_links(state, links, root, source_page, since_year):
+    root_host = urllib.parse.urlparse(root).netloc.lower()
+    for link in links:
+        url, title = _url(link.get("url") or ""), link.get("title") or ""
+        if not url:
+            continue
+        if _web_doc(url):
+            if keep_doc(url, title, since_year) and classify(url, title) != "other":
+                _enqueue(state, "documents", url, url=url, title=title[:400], source="web", source_page=source_page,
+                         ext_hint=_web_doc(url))
+        elif urllib.parse.urlparse(url).netloc.lower() == root_host and (RESULT_HINT.search(url) or RESULT_HINT.search(title)):
+            _enqueue(state, "pages", url, url=url)
+
+
+def _enumerate_sec(state, ticker, cik, deadline, stats, sb, page_budget):
+    from . import sec
+    from .universe import PREDECESSORS
+    scope = state["scope"]
+    if not state.get("sec_checked_at"):
+        for registrant, until in [(cik, None)] + list(PREDECESSORS.get(ticker, [])):
+            url = f"https://data.sec.gov/submissions/CIK{int(registrant):010d}.json"
+            _enqueue(state, "submissions", url, url=url, cik=registrant, until=until, root=True)
+    # Poll current submissions first, then fresh filing indices. Historical
+    # submission pages retain a separate share of the discovery work cap.
+    visited = set()
+    def visit_submissions(root_only):
+        while page_budget[0] > 0 and not _expired(deadline):
+            pending = [(k, v) for k, v in state["queues"]["submissions"].items() if v["status"] in ACTIVE and k not in visited and bool(v.get("root")) == root_only]
+            if not pending:
+                break
+            key, item = pending[0]; visited.add(key); page_budget[0] -= 1
             try:
-                body = download(url)
-                ext = sniff_ext(body, url)
-                if not ext or ext in (".zip", ".ole") or len(body) < 1500:
-                    stats["failed"] += 1
-                    continue
-                if store_document(sb, ticker, url, body, ext, title, site.get("results_url") or site["ir_url"], have_hashes, log=log, fye=fye):
-                    stats["web"] += 1
-                    have_ids.add(doc_id(url))
-            except HTTPError as e:
-                if e.code in (401, 403, 429) and stats["web_text_only"] < 25 and classify(url, title) in ("presentation", "supplement", "remarks", "transcript", "release"):
-                    # the host refuses automated downloads: keep the text through Firecrawl, flagged as text-only
-                    try:
-                        md, _ = firecrawl_text(url)
-                        if len(md) > 500:
-                            body = md.encode("utf-8")
-                            did = doc_id(url)
-                            path = f"{ticker}/{did}-{safe_name(url, '.md')}"
-                            sb.put_object("ir", path, body, "text/markdown; charset=utf-8", "public, max-age=31536000, immutable")
-                            text_path = f"{ticker}/text/{did}.json"
-                            sb.put_object("ir", text_path, json.dumps({"kind": "pages", "pages": [md]}), "application/json", "public, max-age=31536000, immutable")
-                            label, _ = period_hint(url, title)
-                            if not label:
-                                label, _ = first_page_period(md[:3000])
-                            dtype = classify(url, title)
-                            if dtype == "other":
-                                dtype = classify("", md[:500])
-                            sb.upsert("ir_documents", [{"id": did, "ticker": ticker, "url": url, "title": ((title or "") + " [text only: host blocks direct download]")[:400],
-                                                        "doc_type": dtype, "fiscal_label": label, "ext": ".md", "content_type": "text/markdown", "bytes": len(body),
-                                                        "sha256": hashlib.sha256(body).hexdigest(), "storage_path": path, "source_page": site.get("results_url") or site["ir_url"],
-                                                        "pages": 1, "text_path": text_path, "fetched_at": now_iso()}], "id")
-                            stats["web_text_only"] += 1
-                            have_ids.add(did)
-                    except Exception as e2:
-                        stats["failed"] += 1
-                        log(f"  {ticker} firecrawl text {url[-60:]} failed: {str(e2)[:100]}")
-                else:
-                    stats["failed"] += 1
+                data = _sec_json(item["url"], deadline=deadline)
+                recent = (data.get("filings") or {}).get("recent") if item.get("root") else data
+                required = ("accessionNumber", "filingDate", "form", "primaryDocument", "items")
+                if not isinstance(recent, dict) or any(not isinstance(recent.get(k), list) for k in required):
+                    raise ValueError("Incomplete SEC submissions response")
+                if len({len(recent[k]) for k in required}) != 1:
+                    raise ValueError("Mismatched SEC submissions columns")
+                for filing in sec.filing_list({"filings": {"recent": recent}}):
+                    if filing["f"] not in ("8-K", "8-K/A") or filing["d"] < scope["sec_since"] or (item.get("until") and filing["d"] > item["until"]):
+                        continue
+                    if "2.02" not in (filing.get("i") or "") and "7.01" not in (filing.get("i") or ""):
+                        continue
+                    _enqueue(state, "filings", f"{item['cik']}:{filing['a']}", filing=filing, cik=item["cik"])
+                if item.get("root"):
+                    files = (data.get("filings") or {}).get("files")
+                    if not isinstance(files, list):
+                        raise ValueError("Missing SEC archive file listing")
+                    for archive in files:
+                        if not archive.get("name"):
+                            raise ValueError("Invalid SEC archive page")
+                        if archive.get("filingTo", "9999") >= scope["sec_since"]:
+                            url = f"https://data.sec.gov/submissions/{archive['name']}"
+                            _enqueue(state, "submissions", url, url=url, cik=item["cik"], until=item.get("until"), root=False)
+                _complete(item)
+                if item.get("root"):
+                    state["sec_polled_at"] = item["completed_at"]
+            except DeadlineReached:
+                break
             except Exception as e:
-                stats["failed"] += 1
-                log(f"  {ticker} download {url[-80:]} failed: {str(e)[:120]}")
-    rows = sb.select("ir_documents", f"select=id,url,title,doc_type,fiscal_label,ext,bytes,storage_path,pages,text_path,fetched_at,source_page&ticker=eq.{ticker}")
-    rows.sort(key=lambda r: (r["fetched_at"]), reverse=True)
+                _failure(item, e, stats, "discovery")
+            _save_checkpoint(sb, state)
+    visit_submissions(True)
+    archives_pending = any(not item.get("root") and item["status"] in ACTIVE for item in state["queues"]["submissions"].values())
+    index_budget = max(1, page_budget[0] // 2) if archives_pending else page_budget[0]
+    for key, item in sorted(state["queues"]["filings"].items(), key=lambda pair: pair[1]["filing"]["d"], reverse=True):
+        if item["status"] not in ACTIVE or page_budget[0] <= 0 or index_budget <= 0 or _expired(deadline):
+            continue
+        page_budget[0] -= 1
+        index_budget -= 1
+        f = item["filing"]
+        folder = f"https://www.sec.gov/Archives/edgar/data/{int(item['cik'])}/{f['a'].replace('-', '')}/"
+        try:
+            page = _sec_request(folder + f"{f['a']}-index.htm", deadline=deadline)
+            names = _exhibit_names(page, f)
+            for name in names:
+                url = urllib.parse.urljoin(folder, name)
+                low = urllib.parse.urlparse(url).path.lower()
+                if not low.endswith(DOC_EXT + (".htm", ".html")):
+                    # Retain unsupported exhibits as unresolved rather than silently treating an index as complete.
+                    _enqueue(state, "documents", url, url=url, title=f"8-K {f['d']} {name}", source="sec", source_page=folder,
+                             published=f["d"], ext_hint=None)
+                    continue
+                items = f.get("i") or ""
+                hint = "release" if "2.02" in items and (re.search(r"99[-_.]?1\b|99\.?1[^0-9]|ex991", low) or name == f.get("p")) else None
+                _enqueue(state, "documents", url, url=url, title=f"8-K {f['d']} {name} (Items {items})", source="sec", source_page=folder,
+                         published=f["d"], ref_date=f["d"] if "2.02" in items else None, kind_hint=hint, ext_hint=".html" if low.endswith((".htm", ".html")) else _ext(url))
+            _complete(item)
+        except DeadlineReached:
+            break
+        except Exception as e:
+            _failure(item, e, stats, "discovery")
+        _save_checkpoint(sb, state)
+    visit_submissions(False)
+    if state["queues"]["submissions"] and all(i["status"] == "done" for q in ("submissions", "filings") for i in state["queues"][q].values()):
+        state["sec_checked_at"] = max((i.get("completed_at", "") for q in ("submissions", "filings") for i in state["queues"][q].values()), default=None)
+
+
+def _exhibit_names(page, filing):
+    if not isinstance(page, str) or not re.search(r"<table", page, re.I):
+        raise ValueError("SEC index is not a document listing")
+    names, document_rows = [], 0
+    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S | re.I):
+        cells = [re.sub(r"<[^>]+>", "", c).replace("&nbsp;", " ").strip() for c in re.findall(r"<td[^>]*>(.*?)</td>", row, re.S | re.I)]
+        href = re.findall(r'''href=["']([^"']+)["']''', row)
+        if len(cells) >= 4 and href:
+            document_rows += 1
+        if len(cells) >= 4 and cells[3].upper().startswith("EX-99") and href:
+            names.append(href[0].rsplit("/", 1)[-1])
+    if not document_rows:
+        raise ValueError("SEC index has no document rows")
+    if not names and "2.02" in (filing.get("i") or "") and filing.get("p"):
+        names.append(filing["p"])
+    return names
+
+
+def _enumerate_web(state, site, deadline, stats, sb, page_budget):
+    root = site["ir_url"]
+    _enqueue(state, "pages", root, url=root)
+    for search in ("quarterly results earnings", "financial information presentation supplement"):
+        _enqueue(state, "maps", root + " " + search, url=root, search=search)
+    for item in state["queues"]["maps"].values():
+        if item.get("search") == "site-search":
+            if item["status"] != "done":
+                _complete(item)
+            continue
+        if item["status"] not in ACTIVE or _expired(deadline) or page_budget[0] <= 0:
+            continue
+        page_budget[0] -= 1
+        try:
+            links = firecrawl_map(item["url"], search=item["search"], limit=300, deadline=deadline)
+            _add_links(state, links, root, root, state["scope"]["since_year"])
+            if len(links) >= 300 and "map_result_limit:300" not in state["limits"]:
+                state["limits"].append("map_result_limit:300")
+            _complete(item)
+        except DeadlineReached:
+            break
+        except Exception as e:
+            _failure(item, e, stats, "discovery")
+        _save_checkpoint(sb, state)
+    visited = set()
+    while page_budget[0] > 0 and not _expired(deadline):
+        pending = [(k, v) for k, v in state["queues"]["pages"].items() if v["status"] in ACTIVE and k not in visited]
+        if not pending:
+            break
+        key, item = pending[0]; visited.add(key); page_budget[0] -= 1
+        try:
+            data = _scrape(item["url"], deadline=deadline)
+            html = data.get("html")
+            if not isinstance(html, str) or not html.strip():
+                raise ValueError("Empty archive HTML")
+            _add_links(state, [{"url": u, "title": t} for u, t in anchors(html, item["url"])], root, item["url"], state["scope"]["since_year"])
+            if re.search(r"load[ -]?more|infinite[ -]?scroll", html, re.I):
+                marker = "dynamic_archive_requires_verification"
+                if marker not in state["limits"]:
+                    state["limits"].append(marker)
+            _complete(item)
+            if item["url"] == root:
+                state["web_polled_at"] = item["completed_at"]
+        except DeadlineReached:
+            break
+        except Exception as e:
+            _failure(item, e, stats, "discovery")
+        _save_checkpoint(sb, state)
+    if all(i["status"] == "done" for q in ("maps", "pages") for i in state["queues"][q].values()):
+        state["web_checked_at"] = max((i.get("completed_at", "") for q in ("maps", "pages") for i in state["queues"][q].values()), default=None)
+
+
+def _coverage(state, rows):
+    scope = state["scope"]
+    def count(queues, statuses):
+        return sum(i["status"] in statuses for q in queues for i in state["queues"][q].values())
+    discovery = ("submissions", "filings", "maps", "pages")
+    pending = {"discovery": count(discovery, ACTIVE), "documents": count(("documents",), ACTIVE), "extractions": count(("extractions",), ACTIVE)}
+    failed = {"discovery": count(discovery, ("retry", "blocked")), "documents": count(("documents",), ("retry", "blocked")), "extractions": count(("extractions",), ("retry", "blocked"))}
+    extraction = dict.fromkeys(("verified", "limited", "empty", "unsupported", "failed", "unverified"), 0)
+    for row in rows:
+        status = row["extraction"]["status"]
+        extraction[status if status in extraction else "unverified"] += 1
+    def enumeration(queues, checked):
+        if count(queues, ("retry", "blocked")):
+            return "failed"
+        if count(queues, ACTIVE):
+            return "pending"
+        return "complete" if checked else "unverified"
+    sec = enumeration(("submissions", "filings"), state.get("sec_checked_at"))
+    web = enumeration(("maps", "pages"), state.get("web_checked_at")) if scope.get("web") else "not_requested"
+    if web == "complete":
+        web = "link_traversal_unverified"
+    unresolved = any(pending.values()) or any(failed.values()) or any(extraction[s] for s in ("limited", "empty", "unsupported", "failed")) or bool(state["limits"])
+    status = "partial" if unresolved else "unverified" if scope.get("web") or sec != "complete" or extraction["unverified"] else "complete"
+    return {"version": 1, "status": status, "scope": dict(scope), "enumeration": {"sec": sec, "web": web},
+            "pending": pending, "failed": failed, "extraction": extraction, "total_documents": len(rows),
+            "updated_at": now_iso(), "limits": list(state["limits"])}
+
+
+def _repair_dates(sb, ticker, rows):
+    """Use the exact existing accession+ticker relationship only; never retrieval time."""
+    filings = sb.select("filings", f"select=accession,filed&ticker=eq.{ticker}")
+    dates = {str(r.get("accession", "")).replace("-", ""): r.get("filed") for r in filings if r.get("filed")}
+    changed = []
+    for row in rows:
+        if row.get("published"):
+            continue
+        match = re.search(r"sec\.gov/Archives/edgar/data/\d+/(\d{18})/", row.get("url") or "", re.I)
+        published = dates.get(match.group(1)) if match else None
+        if published:
+            dt.date.fromisoformat(published)
+            row["published"] = published
+            changed.append(dict(row))
+    if changed:
+        sb.upsert("ir_documents", changed, "id", batch=500)
+    return len(changed)
+
+
+def process_company(sb, ticker, name, cik, since_year=None, max_docs=90, refresh_site=False, sec_years=3, log=print,
+                    fye="1231", web=True, deadline=None, repair_existing=False, max_pages=40, backfill=False, publish_only=False, io_deadline=None):
+    """Resume private discovery/download/extraction queues; cap work, never coverage.
+
+    Deadline is an absolute monotonic time. Existing successes never consume max_docs.
+    repair_existing uses stored originals and relational dates only, without discovery providers.
+    Backfill expands scope to every available archive and maintenance never narrows it.
+    """
+    if not re.fullmatch(r"[A-Za-z0-9.^_-]{1,20}", ticker):
+        raise ValueError("Invalid ticker")
+    # A per-company lease must never be installed on the job's shared client.
+    worker = bounded_client(sb, io_deadline if io_deadline is not None else deadline)
+    if isinstance(worker, IRClient):
+        _timeout(worker.io_deadline)
+    with AggregateLease(worker, name=f"ir-company:{ticker}") as lease:
+        worker._aggregate_lease = lease
+        return _process_company(worker, ticker, name, cik, since_year, max_docs, refresh_site, sec_years, log,
+                                fye, web, deadline, repair_existing, max_pages, backfill, publish_only)
+
+
+def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, sec_years, log, fye, web, deadline,
+                     repair_existing, max_pages, backfill, publish_only):
+    state = _read_checkpoint(sb, ticker)  # Fail closed before any storage or row mutation.
+    requested_since = 1900 if backfill else since_year if since_year is not None else dt.date.today().year - 2
+    requested_sec = "1900-01-01" if backfill else (dt.date.today() - dt.timedelta(days=int(365 * max(0, sec_years)))).isoformat()
+    old_scope = state["scope"]
+    expanded = bool(old_scope) and (requested_since < old_scope["since_year"] or requested_sec < old_scope["sec_since"])
+    state["scope"] = {"web": bool(web or old_scope.get("web")), "sec": True,
+                      "since_year": min(requested_since, old_scope.get("since_year", requested_since)),
+                      "sec_since": min(requested_sec, old_scope.get("sec_since", requested_sec)),
+                      "history": "available_archive" if backfill or old_scope.get("history") == "available_archive" else "recent"}
+    if (repair_existing or publish_only) and old_scope and not backfill:
+        state["scope"] = dict(old_scope)
+        expanded = False
+    stats = {"sec": 0, "web": 0, "web_text_only": 0, "failed": 0, "discovery_failed": 0, "download_failed": 0,
+             "extraction_failed": 0, "repaired": 0, "dates_repaired": 0, "deferred": 0}
+    existing = sb.select("ir_documents", f"select=*&ticker=eq.{ticker}")
+    by_id = {r["id"]: r for r in existing}
+    have_hashes = {r["sha256"] for r in existing if r.get("sha256")}
+    site = (sb.select("ir_sites", f"select=*&ticker=eq.{ticker}") or [None])[0]
+    # Poll source roots independently from old archive failures. Successful pages
+    # keep their actual completed_at; no-op invocations cannot renew freshness.
+    day = dt.date.today().isoformat()
+    week = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    if not repair_existing and not publish_only:
+        for queue in ("submissions", "filings", "maps", "pages"):
+            for item in state["queues"][queue].values():
+                activity = max(item.get("completed_at", ""), item.get("attempted_at", ""))
+                sec_poll_due = queue == "submissions" and item.get("root") and activity[:10] < day
+                web_poll_due = web and queue in ("maps", "pages") and item["status"] == "done" and activity < week
+                if refresh_site or expanded or sec_poll_due or web_poll_due:
+                    item.update(status="pending", attempts=0)
+                    if queue in ("submissions", "filings"):
+                        state["sec_checked_at"] = None
+                    else:
+                        state["web_checked_at"] = None
+    if refresh_site:
+        for queue in ("documents", "extractions"):
+            for item in state["queues"][queue].values():
+                if item["status"] == "blocked":
+                    item.update(status="pending", attempts=0)
+    # Missing text and previously failed extraction repairs are independent of discovery cooldown.
+    for row in sorted(existing, key=lambda r: bool(r.get("text_path"))):
+        outcome = state["outcomes"].get(row["id"], {})
+        if not row.get("text_path") or (repair_existing and outcome.get("status") != "verified"):
+            _enqueue(state, "extractions", row["id"], id=row["id"])
+    if repair_existing:
+        stats["dates_repaired"] = _repair_dates(sb, ticker, existing)
+    elif not publish_only:
+        # Separate page budget from document budget so large sites do not starve downloads.
+        page_budget = [max(0, int(max_pages))]
+        discovery_deadline = time.monotonic() + max(0, deadline - time.monotonic()) / 2 if deadline is not None else None
+        _enumerate_sec(state, ticker, cik, discovery_deadline, stats, sb, page_budget)
+        if web and not _expired(discovery_deadline):
+            if not site or not site.get("ir_url") or refresh_site:
+                task = _enqueue(state, "maps", "site-search", url="", search="site-search")
+                if task and task["status"] in ACTIVE:
+                    try:
+                        candidates = ir_candidates(name, ticker, deadline=discovery_deadline)
+                        if not candidates:
+                            raise ValueError("No investor relations site found")
+                        site = {"ticker": ticker, "ir_url": candidates[0], "discovered_at": now_iso()}
+                        sb.upsert("ir_sites", [site], "ticker")
+                        _complete(task)
+                    except DeadlineReached:
+                        pass
+                    except Exception as e:
+                        _failure(task, e, stats, "discovery")
+            if site and site.get("ir_url"):
+                _enumerate_web(state, site, discovery_deadline, stats, sb, [max(0, int(max_pages))])
+    _save_checkpoint(sb, state)
+    remaining = max(0, int(max_docs))
+    pending_downloads = any(item["status"] in ACTIVE and doc_id(url) not in by_id and (web or item.get("source") == "sec")
+                            for url, item in state["queues"]["documents"].items())
+    download_reserve = max(1, remaining // 2) if remaining and pending_downloads and not repair_existing else 0
+    repair_budget = remaining - download_reserve
+    repair_deadline = time.monotonic() + max(0, deadline - time.monotonic()) / 2 if download_reserve and deadline is not None else deadline
+    # Repairs are attempted once per invocation, preserving originals and source IDs.
+    for did, item in list(state["queues"]["extractions"].items()):
+        if item["status"] not in ACTIVE or did not in by_id or repair_budget <= 0 or _expired(repair_deadline) or publish_only:
+            continue
+        remaining -= 1
+        repair_budget -= 1
+        row = by_id[did]
+        quality = None
+        try:
+            body = _stored_object(sb, "ir", row["storage_path"])
+            if body is None:
+                raise ValueError("Stored original missing")
+            if row.get("sha256") and hashlib.sha256(body).hexdigest() != row["sha256"]:
+                raise ValueError("Stored original hash mismatch")
+            text = extract_text(body, row["ext"], deadline=repair_deadline)
+            quality = {**text["extraction"], "attempted_at": now_iso()}
+            state["outcomes"][did] = quality
+            if quality.get("nonempty") and (quality["status"] == "verified" or not row.get("text_path")):
+                payload = json.dumps(text, default=str)
+                # Preserve every previous text object, including a complete legacy extraction.
+                digest = hashlib.sha256(payload.encode()).hexdigest()[:16]
+                path = f"{ticker}/text/{did}-v2-{digest}.json"
+                sb.put_object("ir", path, payload, "application/json", "public, max-age=31536000, immutable")
+                stamp = now_iso()
+                sb.upsert("ir_documents", [{**row, "text_path": path, "extracted_at": stamp,
+                           "pages": len(text.get("pages", text.get("sheets", {})))}], "id")
+                stats["repaired"] += 1
+            if quality["status"] != "verified":
+                raise ValueError("Extraction " + quality["status"])
+            _complete(item)
+        except DeadlineReached:
+            break
+        except Exception as e:
+            if quality is None:
+                state["outcomes"][did] = {"status": "failed", "nonempty": False, "limits": [], "errors": [str(e)[:200]], "attempted_at": now_iso()}
+            _failure(item, e, stats, "extraction")
+        _save_checkpoint(sb, state)
+    # Completed/known document candidates do not spend the work cap.
+    def document_date(pair):
+        url, item = pair
+        return item.get("published") or f"{period_hint(url, item.get('title', ''))[1] or 0:04d}-00-00"
+    for url, item in sorted(state["queues"]["documents"].items(), key=document_date, reverse=True):
+        did = doc_id(url)
+        if did in by_id:
+            _complete(item)
+            continue
+        if item["status"] not in ACTIVE or remaining <= 0 or _expired(deadline) or repair_existing or publish_only or (not web and item.get("source") == "web"):
+            continue
+        remaining -= 1
+        try:
+            body = _sec_request(url, deadline=deadline, raw=True) if item["source"] == "sec" else download(url, deadline=deadline)
+            ext = sniff_ext(body, url) or item.get("ext_hint")
+            if ext in (".html", ".htm") and item.get("ext_hint") not in (".html", ".htm"):
+                raise ValueError("Downloaded HTML instead of the linked document")
+            if not body or not ext or ext in (".zip", ".ole", ".pdf?"):
+                raise ValueError("Unsupported or empty downloaded original")
+            stored = store_document(sb, ticker, url, body, ext, item.get("title"), item.get("source_page"), have_hashes,
+                                    kind_hint=item.get("kind_hint"), log=log, fye=fye,
+                                    ref_date=dt.date.fromisoformat(item["ref_date"]) if item.get("ref_date") else None,
+                                    published=item.get("published"), outcomes=state["outcomes"], deadline=deadline)
+            if stored:
+                stats[item["source"]] += 1
+                by_id[did] = {"id": did}
+                quality = state["outcomes"][did]
+                if quality["status"] != "verified":
+                    task = _enqueue(state, "extractions", did, id=did)
+                    if task:
+                        _failure(task, ValueError("Extraction " + quality["status"]), stats, "extraction")
+            _complete(item)
+        except DeadlineReached:
+            break
+        except Exception as e:
+            _failure(item, e, stats, "download")
+        _save_checkpoint(sb, state)
+    rows = sb.select("ir_documents", f"select=*&ticker=eq.{ticker}")
+    for row in rows:
+        for key in ("period_end", "published", "extracted_at"):
+            row.setdefault(key, None)
+        row["extraction"] = state["outcomes"].get(row["id"], {"status": "unverified", "limits": [], "errors": []})
+    rows.sort(key=lambda r: (r.get("period_end") or r.get("published") or "", r.get("published") or "", r["id"]), reverse=True)
+    coverage = _coverage(state, rows)
+    if _expired(deadline) and not repair_existing and not state.get("sec_checked_at") and not coverage["pending"]["discovery"]:
+        coverage["pending"]["discovery"] = 1
+        coverage["status"] = "partial"
+    state["coverage"] = coverage
+    _save_checkpoint(sb, state)
     sb.put_json(f"ir/{ticker}.json", {"ticker": ticker, "generated": now_iso(), "site": site.get("ir_url") if site else None,
-                                      "results_page": pages[0] if pages else None, "documents": rows}, cache="max-age=600")
-    stats["total"] = len(rows)
+                "results_page": site.get("results_url") if site else None, "documents": rows, "coverage": coverage}, cache="max-age=600")
+    stats.update(total=len(rows), coverage=coverage, status=coverage["status"], deferred=sum(coverage["pending"].values()))
     return stats
 
 
-EX99 = re.compile(r"(ex[-_]?99|exhibit[-_]?99|dex99|ex99|exh99)", re.I)
-
-
-def store_document(sb, ticker, url, body, ext, title, source_page, have_hashes, kind_hint=None, log=print, fye=None, ref_date=None):
+def store_document(sb, ticker, url, body, ext, title, source_page, have_hashes, kind_hint=None, log=print, fye=None, ref_date=None, published=None, outcomes=None, deadline=None):
     """Stores the original file and its extracted text, classifies it and writes the ir_documents row."""
     did = doc_id(url)
     sha = hashlib.sha256(body).hexdigest()
@@ -503,11 +1176,15 @@ def store_document(sb, ticker, url, body, ext, title, source_page, have_hashes, 
     sb.put_object("ir", path, body, CT.get(ext, "application/octet-stream"), "public, max-age=31536000, immutable")
     text = None
     try:
-        text = extract_text(body, ext)
+        text = extract_text(body, ext, deadline=deadline)
     except Exception as e:
+        text = {"kind": "pages", "pages": [], "extraction": {"status": "failed", "nonempty": False, "limits": [], "errors": [str(e)[:200]]}}
         log(f"  {ticker} text {url[-60:]} failed: {str(e)[:100]}")
+    quality = {**text["extraction"], "attempted_at": now_iso()}
+    if outcomes is not None:
+        outcomes[did] = quality
     text_path, npages, first = None, None, ""
-    if text:
+    if quality.get("nonempty"):
         text_path = f"{ticker}/text/{did}.json"
         sb.put_object("ir", text_path, json.dumps(text, default=str), "application/json", "public, max-age=31536000, immutable")
         if text["kind"] == "pages":
@@ -543,58 +1220,7 @@ def store_document(sb, ticker, url, body, ext, title, source_page, have_hashes, 
             dtype = c2
     sb.upsert("ir_documents", [{"id": did, "ticker": ticker, "url": url, "title": (title or safe_name(url, ext))[:400], "doc_type": dtype,
                                 "fiscal_label": label, "period_end": period_end, "ext": ext, "content_type": CT.get(ext), "bytes": len(body), "sha256": sha,
-                                "storage_path": path, "source_page": source_page, "pages": npages, "text_path": text_path, "fetched_at": now_iso()}], "id")
+                                "storage_path": path, "source_page": source_page, "pages": npages, "text_path": text_path, "published": published,
+                                "extracted_at": now_iso() if text_path else None, "fetched_at": now_iso()}], "id")
     have_hashes.add(sha)
     return True
-
-
-def sec_exhibits(sb, ticker, cik, filings, have_ids, have_hashes, log=print, fye=None):
-    """Earnings releases, supplements and presentations filed as 8-K exhibits (Items 2.02 and 7.01)."""
-    stored = 0
-    for f in filings:
-        folder = f"https://www.sec.gov/Archives/edgar/data/{int(f.get('cik', cik))}/{f['a'].replace('-', '')}/"
-        try:
-            page = sec_get(folder + f"{f['a']}-index.htm", timeout=40)
-        except Exception as e:
-            log(f"  {ticker} 8-K index {f['a']} failed: {str(e)[:100]}")
-            continue
-        # the filing index lists each document with its exhibit type; take every EX-99 exhibit
-        names = []
-        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S | re.I):
-            cells = [re.sub(r"<[^>]+>", "", c).replace("&nbsp;", " ").strip() for c in re.findall(r"<td[^>]*>(.*?)</td>", row, re.S | re.I)]
-            href = re.findall(r'href="([^"]+)"', row)
-            if len(cells) >= 4 and cells[3].upper().startswith("EX-99") and href:
-                names.append(href[0].rsplit("/", 1)[-1])
-        # some filers (e.g. IBM before 2016) put the earnings release in the body of the 8-K itself
-        if not names and "2.02" in (f.get("i") or "") and f.get("p"):
-            names.append(f["p"])
-        for name in names:
-            low = name.lower()
-            if not low.endswith((".htm", ".html", ".pdf", ".xlsx", ".xls", ".pptx")):
-                continue
-            url = folder + name
-            if doc_id(url) in have_ids:
-                continue
-            try:
-                body = sec_get_raw(url)
-                ext = sniff_ext(body, url) or (".htm" if low.endswith((".htm", ".html")) else None)
-                if not ext or len(body) < 1500:
-                    continue
-                items = f.get("i") or ""
-                title = f"8-K {f['d']} {name} (Items {items})"
-                hint = "release" if "2.02" in items and (re.search(r"99[-_.]?1\b|99\.?1[^0-9]|ex991", low) or name == f.get("p")) else None
-                ref = dt.date.fromisoformat(f["d"]) if "2.02" in items else None
-                if store_document(sb, ticker, url, body, ext, title, folder, have_hashes, kind_hint=hint, log=log, fye=fye, ref_date=ref):
-                    stored += 1
-                    have_ids.add(doc_id(url))
-            except Exception as e:
-                log(f"  {ticker} exhibit {name} failed: {str(e)[:100]}")
-    return stored
-
-
-def firecrawl_text(url):
-    """Text of a document through Firecrawl, used when the host refuses direct downloads."""
-    d = firecrawl(url, "markdown")
-    md = d.get("markdown") or ""
-    pages = [p for p in re.split(r"\n(?=#+ |\f)", md)] if md else []
-    return md, pages
