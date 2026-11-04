@@ -120,6 +120,18 @@
     {
       "path": "/api/cron/compare",
       "schedule": "25 22 * * 1-5"
+    },
+    {
+      "path": "/api/cron/sectors?step=prices",
+      "schedule": "5 21 * * 1-5"
+    },
+    {
+      "path": "/api/cron/sectors",
+      "schedule": "35 22 * * 1-5"
+    },
+    {
+      "path": "/api/cron/sectors?step=notes",
+      "schedule": "15 12 * * 1"
     }
   ],
   "headers": [

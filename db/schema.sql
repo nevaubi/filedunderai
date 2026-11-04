@@ -328,4 +328,39 @@ begin
     end if;
   end loop;
 end $$;
+
+-- ---------------------------------------------------------------- workstream: sectors
+-- Quarterly sector and industry aggregates (etl/sectors.py). group_id is the slug used in sectors/{slug}.json.
+create table if not exists sector_metrics (
+  group_id          text not null,
+  metric            text not null,
+  quarter           text not null,
+  agg               numeric,
+  cw                numeric,
+  med               numeric,
+  n                 integer,
+  updated_at        timestamptz not null default now(),
+  primary key (group_id, metric, quarter)
+);
+create index if not exists sector_metrics_metric on sector_metrics (metric, quarter);
+
+-- Weekly written sector notes; content holds the text with {{fact}} tokens and the facts they resolve to.
+create table if not exists sector_notes (
+  group_id          text not null,
+  week              date not null,
+  content           jsonb not null,
+  generated_at      timestamptz not null default now(),
+  primary key (group_id, week)
+);
+
+do $$
+declare t text;
+begin
+  foreach t in array array['sector_metrics','sector_notes'] loop
+    execute format('alter table %I enable row level security', t);
+    if not exists (select 1 from pg_policies where tablename = t and policyname = 'public read') then
+      execute format('create policy "public read" on %I for select to anon, authenticated using (true)', t);
+    end if;
+  end loop;
+end $$;
 notify pgrst, 'reload schema';

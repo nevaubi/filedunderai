@@ -44,6 +44,10 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | | `filings/{accession}.html.gz` | Full filed documents for the source panel (scripts removed, EDGAR base URL added), gzipped and inflated in the browser |
 | | `logos/{T}.png` | Company logos (497 of 500) |
 | | `insiders/{T}.json` | Form 4 transactions, open-market summaries, largest traders |
+| | `sectors.json` | Sector and industry overview: headline aggregates, returns, rotation, macro correlations, the SIC mapping, KPI and segment rules |
+| | `sectors/{slug}.json` | One sector or industry: quarterly aggregates since 2008, valuation vs 10-year range, performance, breadth, macro sensitivity, KPIs, constituents, segment exposure, insiders, filings |
+| | `sectors/{slug}.comp.json` | Per-company inputs (with accessions) behind every aggregate, for the derivation panel |
+| | `sectors/notes.json` | Weekly sector notes (numbers inserted from computed facts) |
 | | `meta/*.json` | Job caches and status (fundamentals, price stats per part, rotation and check cursors, insiders index, pipeline status) |
 | `raw` (private) | `sec/companyfacts/*.json.gz`, `sec/filings/{accn}/*.htm.gz`, `sec/releases/*.md.gz` | Archived source documents, indexed in `documents` |
 
@@ -57,6 +61,9 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | `/api/cron/news` | 13:00, 19:00 | Rolling news + summary refresh, 14 companies per run |
 | `/api/cron/segments` | 12:50, 00:50 | Recomputes XBRL segment tables for companies with a new 10-K or 10-Q |
 | `/api/cron/ir` | 14:40, 22:40, 04:40 | Collects IR documents: companies that just reported earnings first, then a rolling cursor (8 per run) |
+| `/api/cron/sectors?step=prices` | 21:05 Mon-Fri | Refreshes monthly price histories (20 years, with splits) older than six days |
+| `/api/cron/sectors` | 22:35 Mon-Fri | Rebuilds every sector and industry file from facts, prices, macro_observations, FRED, KPIs, segments, insiders, filings; writes `sector_metrics` |
+| `/api/cron/sectors?step=notes` | 12:15 Mon | Weekly sector notes, validated so every figure comes from the data (`sector_notes`) |
 | `/api/cron/insiders` | 15:30, 23:30 | Parses new Form 4 filings into `insider_transactions`, rewrites `insiders/{T}.json` and `meta/insiders.json` |
 
 Every run is logged in `etl_runs`; the latest runs are published to `meta/status.json` for the Data status page.
@@ -83,6 +90,9 @@ python -m etl.run companies --changed            # only those with new reports
 python -m etl.run insiders                       # Form 4 backfill / refresh
 python -m etl.run companies --tickers AAPL MSFT  # a subset
 python -m etl.run news                           # next slice of the news rotation
+python -m etl.run sectors --step prices          # monthly price cache for sector valuation history
+python -m etl.run sectors                        # sector and industry files (etl/sectors.py, mapping in etl/sector_map.py)
+python -m etl.run sectors --step notes           # weekly sector notes
 ```
 
 Adding a company: append it to `etl/universe.py` and run `python -m etl.run companies --tickers NEW` then `python -m etl.run prices`.

@@ -8,7 +8,7 @@ from .common import Supabase
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "compare", "all"])
+    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "compare", "sectors", "all"])
     ap.add_argument("--tickers", nargs="*")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--news", action="store_true", help="refresh news for each company")
@@ -21,6 +21,8 @@ def main():
     ap.add_argument("--sec-only", action="store_true", help="IR job: EDGAR exhibits only, skip the IR website")
     ap.add_argument("--budget", type=float, help="compare job: time budget in seconds")
     ap.add_argument("--sec-years", type=float, default=3, help="IR job: years of EDGAR 8-K earnings exhibits to collect")
+    ap.add_argument("--step", default="publish", choices=["prices", "publish", "notes"], help="sectors job step")
+    ap.add_argument("--budget", type=float, help="time budget in seconds")
     a = ap.parse_args()
     sb = Supabase()
     if a.job in ("prices", "all"):
@@ -40,6 +42,8 @@ def main():
     if a.job == "segments":
         done, failed = jobs.segments_job(sb, a.tickers, workers=a.workers)
         print("segments", len(done), "failed", failed)
+    if a.job == "sectors":
+        print("sectors", json.dumps(jobs.sectors_job(sb, a.step, time_budget=a.budget), default=str)[:3000])
     if a.job == "viewer":
         print("viewer copies", jobs.publish_filings_job(sb, a.tickers, workers=a.workers))
     if a.job == "logos":
