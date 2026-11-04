@@ -21,6 +21,7 @@ window.FU_PAGES = window.FU_PAGES || {};
 .ks-ctl label{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center}
 .ks-ctl select,.ks-ctl input{font:inherit;font-size:12.5px;padding:4px 8px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink)}
 .ks-ctl input{width:110px}
+.ks-ctl input[type=checkbox]{width:auto;padding:0;margin:0}
 .ks-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .ks-tbl th{font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right}
 .ks-tbl th.l,.ks-tbl td.l{text-align:left}
@@ -170,10 +171,10 @@ details.ks-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
     const unit = S.unit;
     // controls
     const focusSel = el("select", { onchange: e => { ST.focus = e.target.value || null; history.replaceState(null, "", `#kpis-${id}${ST.focus ? "/" + ST.focus.toLowerCase() : ""}`); save(); redraw(); } },
-      el("option", { value: "" }, "No focus company"), tks.map(t => el("option", { value: t, selected: t === ST.focus ? "" : null }, `${t} · ${S.companies[t].name || ""}`)));
+      el("option", { value: "" }, "No focus company"), tks.map(t => el("option", { value: t, selected: t === ST.focus ? "" : null }, `${t} · ${S.companies[t].company || ""}`)));
     const grpSel = el("select", { onchange: e => { ST.group = e.target.value; save(); redraw(); } },
       [["industry", "Same industry"], ["sector", "Same sector"], ["all", "All companies"], ["custom", "Picked companies"]].map(([v, n]) => el("option", { value: v, selected: v === ST.group ? "" : null }, n)));
-    const dl = el("datalist", { id: "ks-dl" }, tks.map(t => el("option", { value: t }, S.companies[t].name || t)));
+    const dl = el("datalist", { id: "ks-dl" }, tks.map(t => el("option", { value: t }, S.companies[t].company || t)));
     const addIn = el("input", { list: "ks-dl", placeholder: "Add ticker", onkeydown: e => { if (e.key !== "Enter") return; const t = e.target.value.trim().toUpperCase(); if (!S.companies[t]) { toast(`${t || "That ticker"} does not report ${meta.name}`); return; } if (!ST.custom.includes(t)) ST.custom.push(t); ST.group = "custom"; save(); redraw(); } });
     const redraw = () => { host.innerHTML = ""; drawKpi(host, id, S, meta, tks); };
     const ctl = el("div", { class: "ks-ctl" },
@@ -244,7 +245,7 @@ details.ks-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
       const c = r.s;
       const tr = el("tr", { class: (r.focus ? "focus " : "") + (r.alt ? "alt" : "") },
         el("td", { class: "l co" }, el("a", { href: `#company-${r.tk.toLowerCase()}`, title: "Open the company" }, r.alt ? null : miniLogo(r.tk, 16), r.label),
-          el("span", { class: "sub", title: c.name }, r.alt ? c.name : `${c.name}${c.unit && c.unit !== unit ? ` (${c.unit})` : ""}`)));
+          el("span", { class: "sub", title: `${r.alt ? "" : (c.company || "") + ": "}${c.name}` }, r.alt ? c.name : `${c.company ? c.company + " · " : ""}${c.name}${c.unit && c.unit !== unit ? ` (${c.unit})` : ""}`)));
       cols.forEach((col, i) => {
         const cell = r.cells[col.k];
         const cls = i < cols.length - 6 ? "ks-hide-sm" : "";
@@ -294,13 +295,15 @@ details.ks-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
         el("span", { class: "faint" }, tax.method)))));
     const q = el("input", { placeholder: "Filter measures or tickers", style: "font:inherit;font-size:13px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);width:min(320px,100%)" });
     const body = el("div");
-    page.append(el("div", { class: "ks-ctl" }, q), body);
+    let showAll = false;
+    const allBox = el("label", {}, el("input", { type: "checkbox", onchange: e => { showAll = e.target.checked; draw(); } }), `Show the ${kp.length - covered.length} measures no company maps to yet`);
+    page.append(el("div", { class: "ks-ctl" }, q, allBox), body);
     const draw = () => {
       body.innerHTML = "";
       const v = q.value.trim().toLowerCase();
       const fams = [...new Set(kp.map(k => k.family))];
       fams.forEach(f => {
-        const items = kp.filter(k => k.family === f && (!v || k.name.toLowerCase().includes(v) || k.id.includes(v) || Object.keys(lat.kpis?.[k.id] || {}).some(t => t.toLowerCase() === v)));
+        const items = kp.filter(k => k.family === f && (showAll || (k.coverage?.companies || 0) > 0) && (!v || k.name.toLowerCase().includes(v) || k.id.includes(v) || Object.keys(lat.kpis?.[k.id] || {}).some(t => t.toLowerCase() === v)));
         if (!items.length) return;
         body.append(el("div", { class: "eyebrow ks-fam" }, f));
         body.append(el("div", { class: "ks-grid" }, items.map(k => {
@@ -328,9 +331,10 @@ details.ks-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
     const slot = el("div");
     host.append(slot);
     const [tf, lat, tax] = await Promise.all([loadT(tk), loadLatest(), loadTax().catch(() => ({ kpis: [] }))]);
-    if (!tf || !Object.keys(tf.series || {}).length || !slot.isConnected) return;
+    if (!tf || !Object.values(tf.series || {}).some(s => s.current !== false) || !slot.isConnected) return;
     const meta = Object.fromEntries((tax.kpis || []).map(k => [k.id, k]));
-    const rows = Object.entries(tf.series).map(([cid, s]) => {
+    const old = Object.values(tf.series).filter(s => s.current === false).length;
+    const rows = Object.entries(tf.series).filter(([, s]) => s.current !== false).map(([cid, s]) => {
       const L = (lat.kpis || {})[cid] || {};
       const me = L[tk];
       const peersInd = Object.entries(L).filter(([t, x]) => x.ind === tf.industry);
@@ -360,7 +364,7 @@ details.ks-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
     });
     t.append(tb);
     slot.append(panel("Standardized KPIs", el("a", { class: "chip acc", href: "#kpis" }, "All measures"), el("div", { class: "scroll" }, t),
-      el("div", { class: "src" }, `${rows.length} of this company's KPIs map to a standard measure. Each one is a single series as the company reports it; click a value for the source page, a measure for the peer comparison.`)));
+      el("div", { class: "src" }, `${rows.length} of this company's current KPIs map to a standard measure${old ? ` (${old} more the company no longer reports are on the peer pages)` : ""}. Each one is a single series as the company reports it; click a value for the source page, a measure for the peer comparison.`)));
   }
   window.FU_KPISTD = { companyPanel };
 })();

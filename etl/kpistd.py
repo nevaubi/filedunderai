@@ -243,7 +243,27 @@ def classify_company(tk, defs, uni, cache, pending):
         opts = K.candidates(d)
         if opts:
             pending.append((_llm_key(d, p), d, p, opts, cw))
+    promote_parents(defs, out)
     return out
+
+
+def promote_parents(defs, out):
+    """A top-level id whose children are the segment or region lines of the same measure is the company total, even when
+    its own name carries a qualifier ("Global streaming paid memberships" over the regional lines)."""
+    kids = {}
+    for d in defs:
+        r = out.get(d["kpi_id"])
+        if d.get("parent_id") and r and r["scope"] == "segment":
+            kids.setdefault((d["parent_id"], r["canonical"]), []).append(d["kpi_id"])
+    by = {d["kpi_id"]: d for d in defs}
+    for (pid, cid), ks in kids.items():
+        r, d = out.get(pid), by.get(pid)
+        if len(ks) < 2 or not r or not d or d.get("parent_id") or r["canonical"] != cid or r["scope"] == "total":
+            continue
+        if re.search(r"\b(" + K.GEO + r")\b", K.nn(r.get("member") or "")) and not re.search(r"\b(global|worldwide|total)\b", K.nn(r.get("member") or "")):
+            continue
+        r["scope"], r["member"], r["confidence"] = "total", None, min(r["confidence"], 0.8)
+        r["reason"] += f"; promoted to total: {len(ks)} segment lines of the same measure sit under it"
 
 
 def fetch_values(sb, tk, ids):
@@ -348,7 +368,8 @@ def choose(tk, maps, defs_by, values, fye, latest_all):
         _, pk, ps, pfirst, plast = cands[0]
         maps[pk]["role"] = "primary"
         d = defs_by[pk]
-        ent = {"kpi_id": pk, "name": d["name"], "unit": d.get("unit"), "factor": maps[pk]["factor"], "Q": ps["Q"], "A": ps["A"], "alts": []}
+        ent = {"kpi_id": pk, "name": d["name"], "unit": d.get("unit"), "factor": maps[pk]["factor"], "Q": ps["Q"], "A": ps["A"], "alts": [],
+               "current": plast >= cut}
         for _, kid, s, first, last in cands[1:]:
             m = maps[kid]
             m["role"] = "alt"
@@ -363,7 +384,8 @@ def map_job(sb, tickers=None, full=False, use_llm=True, time_budget=None, log=lo
     t0 = time.time()
     deadline = t0 + time_budget if time_budget else None
     run_ts = now_iso()
-    state = (None if full else _raw_get(sb, STATE_PATH)) or {}
+    # full remaps every company but keeps the model-proposal cache (its keys carry the definition text and taxonomy version)
+    state = _raw_get(sb, STATE_PATH) or {}
     if state.get("version") != K.VERSION:
         # proposal cache keys carry the taxonomy version, so older entries are simply never looked up again
         state = {"version": K.VERSION, "sig": {}, "llm": {k: v for k, v in (state.get("llm") or {}).items()}}
@@ -530,7 +552,7 @@ def publish(sb, uni, old_map, tfiles, touched, gone, run_ts, log=log_):
             s = (tf or {}).get("series", {}).get(cid)
             if not s:
                 continue
-            comps[tk] = {**s, "sector": tf.get("sector"), "industry": tf.get("industry"), "fye": tf.get("fye"), "name": tf.get("name")}
+            comps[tk] = {**s, "sector": tf.get("sector"), "industry": tf.get("industry"), "fye": tf.get("fye"), "company": tf.get("name")}
             for pts in [s["Q"], s["A"]] + [a["Q"] + a["A"] for a in s["alts"]]:
                 for p in pts:
                     if p[3] in (tf.get("docs") or {}):

@@ -1127,12 +1127,14 @@ def _std_fields(tf, out, prov):
     for cid in STD_FIELDS:
         t = _STD.get(cid)
         s = ((tf or {}).get("series") or {}).get(cid)
-        if not t or not s:
+        if not t or not s or s.get("current") is False:
             continue
         pts = s["Q"] if s["Q"] and (not s["A"] or s["Q"][-1][0] >= s["A"][-1][0]) else s["A"]
         if not pts:
             continue
         p = pts[-1]
+        if days_between(p[0], dt.date.today().isoformat()) > 550:
+            continue   # the company stopped reporting it
         scale = 0.01 if t["unit"] in ("%", "pp") else 1
         out[f"std_{cid}"] = p[1] * scale
         prov[f"std_{cid}"] = {"x": f"{s['name']} ({s.get('unit') or ''}), {p[2] or p[0]}; standardized as {t['name']}", "kpi": s["kpi_id"], "unit": s.get("unit"), "docs": [doc(p, s)]}
