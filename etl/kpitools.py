@@ -202,7 +202,7 @@ def check_value(sb, docs_by_id, v):
                 errs.append(f"printed {printed} x {scale} = {pv} does not match value {value}")
             elif pv and _close(-pv, value) and not _close(pv, value) and not _negative_ok(str(printed), v.get("quote") or ""):
                 errs.append(f"value {value} is negative but nothing in the printed figure or quote says so")
-            if q and str(printed).replace("$", "").strip("() ") not in v.get("quote", ""):
+            if q and str(printed).replace("$", "").strip("() ") not in v.get("quote", "") and str(printed).replace("$", "").strip("() ") not in v.get("quote", "").replace("$", ""):
                 errs.append(f"printed {printed!r} not inside quote")
             elif q and str(printed).strip().startswith("(") and not re.search(r"\(\s*\$?\s*" + re.escape(str(printed).replace("$", "").strip("() ")), v.get("quote", "")):
                 errs.append(f"printed {printed!r} has parentheses the quote does not show")
@@ -226,7 +226,7 @@ def _negative_ok(printed, quote):
     for m in re.finditer(r"(?<![\d.])" + core + r"(?![\d])", quote):
         i, j = m.start(), m.end()
         pre = quote[max(0, i - 3):i]
-        if "(" in pre or pre.rstrip().endswith(("-", "−", "–")):
+        if "(" in pre or pre.replace("$", "").rstrip().endswith(("-", "−", "–")):
             return True
         if _NEG_BEFORE.search(quote[:i]) or _NEG_AFTER.search(quote[j:]):
             return True
