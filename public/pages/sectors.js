@@ -25,7 +25,7 @@ window.FU_PAGES = window.FU_PAGES || {};
 .sx-range .bar{position:absolute;top:7px;left:0;right:0;height:2px;background:var(--line2);border-radius:2px}
 .sx-range .med{position:absolute;top:3px;width:1px;height:10px;background:var(--faint)}
 .sx-range .dot{position:absolute;top:3px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
-.sx-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.sx-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
 .sx-tile{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);display:flex;flex-direction:column;gap:2px;min-width:0}
 .sx-tile .l{font-size:11.5px;color:var(--muted)}
 .sx-tile .v{font-size:18px;font-weight:600}
@@ -54,6 +54,8 @@ window.FU_PAGES = window.FU_PAGES || {};
 .drawer .grid line{stroke:var(--line);stroke-dasharray:2 3}
 .drawer .grid .domain{display:none}
 .drawer .domain{stroke:var(--line2)}
+details.sx-ndet>summary{cursor:pointer;font-size:13px;padding:4px 0}
+details.sx-ndet[open]>summary{margin-bottom:8px}
 details.sx-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:13px}
 @media (max-width:860px){.sx-hide-sm{display:none}.sx-tbl td.nm{min-width:140px}}
 `));
@@ -365,7 +367,8 @@ details.sx-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
       el("div", { class: "sub" }, `The S&P 500 grouped into eleven sectors and ${ov.groups.filter(g => g.kind === "industry").length} industries, aggregated from each company's own filings and prices. Click any figure for the companies and filings behind it.`)),
       el("div", { class: "right" }, el("span", { class: "faint", style: "font-size:12px" }, `Built ${fdate(ov.generated.slice(0, 10))} · prices to ${fdate(ov.as_of)}`))));
     const wk = (notes.notes || []).filter(n => n.week === notes.notes[0]?.week);
-    if (wk.length) page.append(panel("This week's sector notes", el("span", { class: "faint", style: "font-size:12px" }, `${wk.length} sectors`), el("div", { class: "bd grid g2" }, ...wk.map(n => noteCard(n, n.slug, false)))));
+    if (wk.length) page.append(panel("This week's sector notes", el("span", { class: "faint", style: "font-size:12px" }, `Week of ${fdate(wk[0].week)}`), el("div", { class: "bd", style: "display:flex;flex-direction:column;gap:8px" },
+      ...wk.map(n => el("details", { class: "sx-ndet" }, el("summary", {}, el("b", {}, n.sector), el("span", { class: "muted" }, " · " + n.title)), noteCard(n, n.slug, false))))));
     page.append(overviewTable(ov));
     page.append(rotationSection(ov));
     page.append(macroHeat(ov));

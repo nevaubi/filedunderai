@@ -1231,8 +1231,13 @@ def note_facts(doc):
     q = doc["quarters"]
     facts = {}
 
+    ref = _last_idx([a or b for a, b in zip(doc["agg"]["rev_growth"]["n"], doc["agg"]["ni_growth"]["n"])])
+
     def latest(k):
+        """Value at the group's reference quarter (most of the group reported), else the latest available."""
         a = doc["agg"][k]["agg"]
+        if ref is not None and a[ref] is not None:
+            return ref, a[ref]
         for i in range(len(a) - 1, -1, -1):
             if a[i] is not None:
                 return i, a[i]
