@@ -157,7 +157,7 @@ def check_value(sb, docs_by_id, v):
         ps = str(printed)
         # PDF text sometimes splits one figure with spaces ("3 ,110", "1 05,262"); `printed` is a single figure,
         # so spaces inside a run of digits, commas and points are joined before it is read
-        if re.fullmatch(r"[\s$(–−-]*\d[\d,. ]*\d[\s)%]*", ps) and re.search(r"\d\s+[\d,.]", ps):
+        if re.fullmatch(r"[\s$(–−-]*\d[\d,. ]*\d[\s)%]*", ps) and re.search(r"[\d.,]\s+[\d,.]", ps):
             ps = re.sub(r"(?<=[\d,.])\s+(?=[\d,.])", "", ps)
         nums = numbers_in(ps)
         if not nums:
