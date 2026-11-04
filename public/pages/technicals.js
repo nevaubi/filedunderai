@@ -11,7 +11,8 @@ window.FU_PAGES = window.FU_PAGES || {};
 .tx-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--line)}
 .tx-bar .sp{flex:1}
 .tx-bar .seg{max-width:100%;overflow-x:auto;scrollbar-width:none}
-.tx-sc td.k{min-width:220px;max-width:300px}
+.tx-sc td.k{min-width:200px;max-width:240px}
+.tx-sc th,.tx-sc td{padding-left:7px;padding-right:7px}
 .tx-sc td.k .sub{white-space:normal}
 .tx-read{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);padding:6px 16px 0;min-height:22px;display:flex;gap:12px;flex-wrap:wrap}
 .tx-read b{color:var(--ink);font-weight:500}
@@ -719,8 +720,8 @@ window.FU_PAGES = window.FU_PAGES || {};
       out.innerHTML = "";
       const hz = TX.hz, bt = A.backtest, base = bt.base[hz], sb = SG?.base?.[hz]?.all;
       const t = el("table", { class: "t tx-sc" });
-      t.append(el("thead", {}, el("tr", {}, el("th", {}, "Signal"), el("th", { class: "r" }, "Events"), el("th", { class: "r" }, `Avg ${hz}d`), el("th", { class: "r" }, "Median"), el("th", { class: "r" }, "Up share"), el("th", { class: "r" }, "Avg vs all days (95% CI)"),
-        el("th", { class: "r", style: "border-left:1px solid var(--line)" }, "S&P 500 events"), el("th", { class: "r" }, `Avg ${hz}d`), el("th", { class: "r" }, "Up share"), el("th", { class: "r" }, "Avg vs all days (95% CI)"))));
+      t.append(el("thead", {}, el("tr", {}, el("th", {}, "Signal"), el("th", { class: "r" }, "Events"), el("th", { class: "r" }, `Avg ${hz}d`), el("th", { class: "r" }, "Median"), el("th", { class: "r" }, "Up share"), el("th", { class: "r" }, "Vs all days, 95% CI"),
+        el("th", { class: "r", style: "border-left:1px solid var(--line)" }, "S&P 500"), el("th", { class: "r" }, `Avg ${hz}d`), el("th", { class: "r" }, "Up share"), el("th", { class: "r" }, "Vs all days, 95% CI"))));
       const tb = el("tbody");
       const ciTxt = (ci, bm) => ci ? `${pp(ci[0] - bm)} to ${pp(ci[1] - bm)}` : "–";
       const verdict = (ci, bm) => !ci ? null : ci[0] - bm > 0 ? el("span", { class: "chip up", title: "The interval lies above the all-days average" }, "above") : ci[1] - bm < 0 ? el("span", { class: "chip down", title: "The interval lies below the all-days average" }, "below") : el("span", { class: "chip", title: "The interval includes the all-days average" }, "no clear difference");
@@ -734,7 +735,7 @@ window.FU_PAGES = window.FU_PAGES || {};
           el("td", { class: "r num " + cls(s.mean) }, num(pp(s.mean, 2), () => eventsCalc(H, A, tp, hz))), el("td", { class: "r num" }, pp(s.median, 2)), el("td", { class: "r num" }, fpct(s.hit, 0)),
           el("td", { class: "r num" }, s.ci && s.n_eff >= 10 ? [num(ciTxt(s.ci, base.mean), () => eventsCalc(H, A, tp, hz)), el("div", {}, verdict(s.ci, base.mean))] : el("span", { class: "faint" }, s.n_eff < 10 ? "too few to estimate" : "–"))]
           : [el("td", { class: "r faint" }, bt.signals[tp]?.[hz]?.pending ? `${bt.signals[tp][hz].pending} pending` : "0"), el("td"), el("td"), el("td"), el("td")];
-        const pooled = P && P.n ? [el("td", { class: "r num", style: "border-left:1px solid var(--line)" }, num(P.n.toLocaleString(), () => pooledCalc(SG, tp, hz)), el("div", { class: "sub" }, `${SG.signals[tp].symbols} names · ${P.months} months`)),
+        const pooled = P && P.n ? [el("td", { class: "r num", style: "border-left:1px solid var(--line)" }, num(P.n.toLocaleString(), () => pooledCalc(SG, tp, hz)), el("div", { class: "sub" }, `${SG.signals[tp].symbols} names · ${P.months} mo.`)),
           el("td", { class: "r num " + cls(P.mean) }, num(pp(P.mean, 2), () => pooledCalc(SG, tp, hz))), el("td", { class: "r num" }, fpct(P.hit, 0)),
           el("td", { class: "r num" }, P.excess_ci ? [num(`${pp(P.excess_ci[0])} to ${pp(P.excess_ci[1])}`, () => pooledCalc(SG, tp, hz)), el("div", {}, P.excess_ci[0] > 0 ? el("span", { class: "chip up" }, "above") : P.excess_ci[1] < 0 ? el("span", { class: "chip down" }, "below") : el("span", { class: "chip" }, "no clear difference"))] : "–")]
           : [el("td", { class: "r faint", style: "border-left:1px solid var(--line)" }, SG ? "0" : "not published yet"), el("td"), el("td"), el("td")];
