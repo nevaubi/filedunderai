@@ -1355,7 +1355,7 @@ def build_index(sb, log=print):
                    "gd_defchg": len(c.get("definition_changes") or []), "gd_last": c.get("last_issued"), "gd_series": len(b["series"])}
     ev.sort(key=lambda e: (e["d"], e["t"]), reverse=True)
     rel.sort(key=lambda r: (-(r["hit"] or 0), -r["n"]))
-    stats = {"companies": len(bundles), "scored_companies": len(rel), "points": sum((b.get("credibility") or {}).get("n_points") or 0 for b in bundles.values()),
+    stats = {"companies": sum(1 for b in bundles.values() if b.get("series")), "companies_read": len(bundles), "scored_companies": len(rel), "points": sum((b.get("credibility") or {}).get("n_points") or 0 for b in bundles.values()),
              "scored": sum((b.get("credibility") or {}).get("n_scored") or 0 for b in bundles.values()), "events": len(ev)}
     out = {"generated": now_iso(), "since": since, "events": ev, "withdrawn": sorted(wd, key=lambda w: w["d"], reverse=True), "reliability": rel, "screener": scr,
            "stats": stats, "docs": docs}
