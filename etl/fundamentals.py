@@ -24,6 +24,8 @@ FYE_HISTORY = {
     "GS": [("0000-00-00", "1130"), ("2008-12-27", "1231")],
     # Amcor moved from a June 30 to a December 31 year end, with a transition period from July 1 to December 31, 2026
     "AMCR": [("0000-00-00", "0630"), ("2026-07-01", "1231")],
+    # Archer-Daniels-Midland moved from a June 30 to a December 31 year end, with a transition period July 1 to December 31, 2012
+    "ADM": [("0000-00-00", "0630"), ("2012-07-01", "1231")],
 }
 # companies that name a fiscal year after the calendar year in which it mostly falls, although it ends in January or
 # early February of the next year (Home Depot's "fiscal 2024" ended February 2, 2025). Their labels are one year lower.
@@ -32,6 +34,7 @@ FY_NAME_PRIOR = {"HD", "LOW", "TGT", "DG", "DLTR", "ROST", "KR", "ULTA", "LULU",
 TRANSITIONS = {
     "FDX": [("2026-06-01", "2026-12-31")],
     "AMCR": [("2026-07-01", "2026-12-31")],
+    "ADM": [("2012-07-01", "2012-12-31")],
 }
 
 
