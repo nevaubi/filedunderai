@@ -116,6 +116,10 @@
     {
       "path": "/api/cron/ir?run=3",
       "schedule": "40 4 * * *"
+    },
+    {
+      "path": "/api/cron/compare",
+      "schedule": "25 22 * * 1-5"
     }
   ],
   "headers": [

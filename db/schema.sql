@@ -283,3 +283,49 @@ notify pgrst, 'reload schema';
 -- year-to-date values (6M / 9M) for KPIs that companies only print cumulatively
 alter table kpi_values drop constraint if exists kpi_values_period_kind_check;
 alter table kpi_values add constraint kpi_values_period_kind_check check (period_kind in ('Q','A','I','Y','T'));
+
+-- ---------------------------------------------------------------- compare workstream
+-- Five years of weekly closes per symbol (split-adjusted close and split-and-dividend-adjusted close), with provenance.
+create table if not exists prices_weekly (
+  symbol            text not null,
+  d                 date not null,
+  c                 numeric not null,
+  adj               numeric,
+  source_url        text,
+  retrieved_at      timestamptz,
+  primary key (symbol, d)
+);
+-- Dividends (ex-date, split-adjusted amount per share) and splits (numerator / denominator) as published by the source.
+create table if not exists corporate_actions (
+  symbol            text not null,
+  d                 date not null,
+  kind              text not null check (kind in ('dividend','split')),
+  value             numeric,
+  numerator         numeric,
+  denominator       numeric,
+  source_url        text,
+  retrieved_at      timestamptz,
+  primary key (symbol, d, kind)
+);
+-- Ten most return-correlated companies per company, recomputed daily from the published daily closes.
+create table if not exists return_peers (
+  ticker            text not null,
+  rank              int not null,
+  peer              text not null,
+  rho               numeric,
+  window_from       date,
+  window_to         date,
+  computed_at       timestamptz,
+  primary key (ticker, rank)
+);
+do $$
+declare t text;
+begin
+  foreach t in array array['prices_weekly','corporate_actions','return_peers'] loop
+    execute format('alter table %I enable row level security', t);
+    if not exists (select 1 from pg_policies where tablename = t and policyname = 'public read') then
+      execute format('create policy "public read" on %I for select to anon, authenticated using (true)', t);
+    end if;
+  end loop;
+end $$;
+notify pgrst, 'reload schema';

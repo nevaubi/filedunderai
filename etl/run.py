@@ -8,7 +8,7 @@ from .common import Supabase
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "all"])
+    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "compare", "all"])
     ap.add_argument("--tickers", nargs="*")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--news", action="store_true", help="refresh news for each company")
@@ -19,6 +19,7 @@ def main():
     ap.add_argument("--parts", type=int, default=1)
     ap.add_argument("--changed", action="store_true", help="only companies with new 10-K/10-Q/8-K filings")
     ap.add_argument("--sec-only", action="store_true", help="IR job: EDGAR exhibits only, skip the IR website")
+    ap.add_argument("--budget", type=float, help="compare job: time budget in seconds")
     ap.add_argument("--sec-years", type=float, default=3, help="IR job: years of EDGAR 8-K earnings exhibits to collect")
     a = ap.parse_args()
     sb = Supabase()
@@ -44,6 +45,10 @@ def main():
     if a.job == "logos":
         from .logos import logos_job
         print("logos", logos_job(sb, a.tickers))
+    if a.job == "compare":
+        from .compare import compare_job
+        done, errors = compare_job(sb, a.tickers, time_budget=a.budget, full=a.full_history, workers=min(a.workers, 4))
+        print("compare history", len(done), "errors", errors)
     if a.job == "index":
         print("index", jobs.build_index(sb))
     if a.job == "feed":
