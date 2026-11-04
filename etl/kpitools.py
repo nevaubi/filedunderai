@@ -31,6 +31,7 @@ Extraction file schema (JSON):
 }
 Values are in base units: dollars (not millions), members (not millions), percentages as printed (12.5 means 12.5%).
 """
+import collections
 import gzip
 import json
 import os
@@ -438,14 +439,27 @@ def publish(sb, data, fye="1231"):
         sb.upsert("kpi_values", list(uniq.values()), "ticker,kpi_id,period_kind,period_end,source_kind", batch=1000)
         # drop rows from earlier publishes that are no longer in the file (renamed ids, changed kinds, removed periods)
         existing = sb.select("kpi_values", f"select=kpi_id,period_kind,period_end&ticker=eq.{tk}&source_kind=eq.ir")
+        stale = collections.defaultdict(list)
         for r in existing:
             if (r["kpi_id"], r["period_kind"], r["period_end"]) not in uniq:
-                sb.delete("kpi_values", f"ticker=eq.{tk}&source_kind=eq.ir&kpi_id=eq.{urllib.parse.quote(r['kpi_id'])}"
-                                        f"&period_kind=eq.{r['period_kind']}&period_end=eq.{r['period_end']}")
+                stale[(r["kpi_id"], r["period_kind"])].append(r["period_end"])
+        live_ids = {r["kpi_id"] for r in uniq.values()}
+        gone = sorted({kid for (kid, _k) in stale if kid not in live_ids})
+        # ids no longer in the file go in one request per batch; the rest per id and kind with an in() list
+        for i in range(0, len(gone), 50):
+            ids = ",".join('"' + g.replace('"', '') + '"' for g in gone[i:i + 50])
+            sb.delete("kpi_values", f"ticker=eq.{tk}&source_kind=eq.ir&kpi_id=in.({urllib.parse.quote(ids)})")
+        for (kid, kind), ends in stale.items():
+            if kid in gone:
+                continue
+            for i in range(0, len(ends), 100):
+                sb.delete("kpi_values", f"ticker=eq.{tk}&source_kind=eq.ir&kpi_id=eq.{urllib.parse.quote(kid)}"
+                                        f"&period_kind=eq.{kind}&period_end=in.({','.join(ends[i:i + 100])})")
         live = {k["id"] for k in kpis}
-        for d in sb.select("kpi_definitions", f"select=kpi_id&ticker=eq.{tk}&source_kind=eq.ir"):
-            if d["kpi_id"] not in live:
-                sb.delete("kpi_definitions", f"ticker=eq.{tk}&source_kind=eq.ir&kpi_id=eq.{urllib.parse.quote(d['kpi_id'])}")
+        dead = [d["kpi_id"] for d in sb.select("kpi_definitions", f"select=kpi_id&ticker=eq.{tk}&source_kind=eq.ir") if d["kpi_id"] not in live]
+        for i in range(0, len(dead), 50):
+            ids = ",".join('"' + g.replace('"', '') + '"' for g in dead[i:i + 50])
+            sb.delete("kpi_definitions", f"ticker=eq.{tk}&source_kind=eq.ir&kpi_id=in.({urllib.parse.quote(ids)})")
     return report
 
 
