@@ -34,7 +34,7 @@
 - [x] Task 3 Workspace and presentation: public/pages/workspace.js, public/lib/workspace.js, public/workspace.css and public/professional.css; tests under tests/workspace. Office-style document/sheet editing, workbook model builder, source-backed formulas/exports and reversible AI patches. Dedicated module overrides existing Workbench route.
 - [x] Task 4 Proactive analyst: public/lib/analyst.js, public/pages/analyst.js, public/analyst.css; tests under tests/analyst. Watchlist briefing, earnings changes, standing orders, thesis guardian, historical signals, pair comparisons, earnings setup, disclosure comparison, guidance outcomes and evidence-linked report/trade cards.
 - [x] Task 5 Cloud monitoring: api/monitoring.js, api/client-config.js, api/cron/analyst.js and shared Node monitoring helpers, additive migration, browser account/preferences integration. Verified owner, rule validation, deduplicated outbox and configurable email delivery. Test without sending mail.
-- [ ] Task 6 Integration: register assets/routes/tools, remove build-time schema replay, add meaningful test/build commands and CI, run the full suite, browser-test representative workflows, resolve reviews, publish a reviewable branch and integrate validated changes.
+- [x] Task 6 Integration: register assets/routes/tools, remove build-time schema replay, add meaningful test/build commands and CI, run the full suite, browser-test representative workflows, resolve reviews, publish a reviewable branch and integrate validated changes.
 
 ## Interfaces
 

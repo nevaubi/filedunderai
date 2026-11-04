@@ -39,8 +39,14 @@
   const colHead = (ddate, qtrs) => qtrs ? [`${qtrs * 3} months ended`, fdate(ddate)] : ["As of", fdate(ddate)];
   const isPerShare = u => /\//.test(u || "");
   const isShares = u => /^shares$/i.test(u || "");
-  function scaleFor(facts) {
-    const money = facts.filter(f => f[3] === "USD" && f[6] != null).map(f => Math.abs(f[6]));
+  // Some SEC data-set EPS facts carry a currency-only unit. These exact US GAAP
+  // concepts are per-share amounts; retain the raw unit separately and never rescale the value.
+  const PER_SHARE_TAGS = new Set(["EarningsPerShareBasic", "EarningsPerShareDiluted", "EarningsPerShareBasicAndDiluted", "IncomeLossFromContinuingOperationsPerBasicShare", "IncomeLossFromContinuingOperationsPerDilutedShare", "CommonStockDividendsPerShareDeclared", "CommonStockDividendsPerShareCashPaid"]);
+  const unitOf = (uom, tag, custom) => !custom && PER_SHARE_TAGS.has(tag) && /^[A-Z]{3}$/.test(uom || "") ? `${uom}/shares` : isShares(uom) ? "shares" : uom;
+  const unitNote = (raw, unit) => raw !== unit && isPerShare(unit) ? `\nSEC data set unit: ${raw}; per-share unit follows the US GAAP concept.` : "";
+  function scaleFor(facts, lines) {
+    const custom = new Set(lines.filter(ln => ln[2]).map(ln => ln[1]));
+    const money = facts.filter(f => unitOf(f[3], f[0], custom.has(f[0])) === "USD" && f[6] != null).map(f => Math.abs(f[6]));
     const sh = facts.filter(f => isShares(f[3]) && f[6] != null).map(f => Math.abs(f[6]));
     // the filer's rounding: the largest scale that nearly every value is a whole multiple of (a few exact figures may sit on a rounded statement)
     const share = (arr, k) => arr.filter(v => v % k === 0).length / arr.length;
@@ -67,15 +73,15 @@
     if (coreg) parts.push(coreg.replace(/([a-z])([A-Z])/g, "$1 $2"));
     return parts.join(" · ");
   }
-  const unitOf = uom => isPerShare(uom) ? "USD/shares" : isShares(uom) ? "shares" : "USD";
-
   /* ---------- source cells ---------- */
   function fsCell(tk, filing, label, tag, custom, fact, sibs) {
     const [_, ddate, qtrs, uom, seg, coreg, value] = fact;
     if (!D.filings[filing.accession]) D.filings[filing.accession] = { index: filing.url, form: filing.form, filed: filing.filed };
     const start = startOf(ddate, qtrs);
-    const cell = { tk, stmt: "asreported", label, concept: tag, conceptFull: custom ? `${tag} (company extension)` : `us-gaap:${tag}`, unit: unitOf(uom), kind: qtrs === 4 || (qtrs === 0 && /10-K/.test(filing.form)) ? "A" : "Q", end: ddate, start, v: value,
-      dimText: seg || coreg ? memberText(seg, coreg) : null, rec: { v: value, accn: filing.accession, form: filing.form, filed: filing.filed, start, end: ddate } };
+    const unit = unitOf(uom, tag, custom);
+    const quality = { reportedUnit: uom, unitSelectionReason: unit === uom ? "Unit reported in the SEC data set." : isShares(uom) ? "Share-count unit spelling normalized." : `Currency-only SEC data set unit ${uom} interpreted as ${unit} for US GAAP concept ${tag}; numeric value unchanged.` };
+    const cell = { tk, stmt: "asreported", label, concept: tag, conceptFull: custom ? `${tag} (company extension)` : `us-gaap:${tag}`, unit, reportedUnit: uom, kind: qtrs === 4 || (qtrs === 0 && /10-K/.test(filing.form)) ? "A" : "Q", end: ddate, start, v: value,
+      dimText: seg || coreg ? memberText(seg, coreg) : null, rec: { v: value, unit: uom, quality, accn: filing.accession, form: filing.form, filed: filing.filed, start, end: ddate } };
     cell.sib = () => sibs || [];
     return cell;
   }
@@ -128,7 +134,7 @@
       table();
       function table() {
         const r = doc.reports.find(x => x.report === ST.report);
-        const sc = scaleFor(r.facts);
+        const sc = scaleFor(r.facts, r.lines);
         head.innerHTML = "";
         head.append(el("span", {}, el("span", { class: "form " + formCls(doc.form) }, doc.form), " ", `${doc.registrant} · accession `, el("span", { class: "mono" }, doc.accession)),
           el("span", { class: "faint" }, `USD in ${SCALE_WORD[sc.money]}${sc.shares !== 1 ? `, shares in ${SCALE_WORD[sc.shares]}` : ""}, except per-share amounts · labels, order and signs as filed · click a value for the filing`),
@@ -172,7 +178,8 @@
           const f = fs.find(x => x[1] === d && x[2] === q);
           if (!f || f[6] == null) { tr.append(el("td", { "data-i": i }, "")); return; }
           const shown = negating ? -f[6] : f[6];
-          const td = el("td", { "data-i": i, class: shown < 0 ? "neg" : "", title: `${f[6].toLocaleString("en-US")} ${f[3]} · ${tag}${f[7] ? "\nFootnote: " + f[7] : ""}` }, fmtFiled(shown, f[3], sc));
+          const unit = unitOf(f[3], tag, custom);
+          const td = el("td", { "data-i": i, class: shown < 0 ? "neg" : "", title: `${f[6].toLocaleString("en-US")} ${unit} · ${tag}${unitNote(f[3], unit)}${f[7] ? "\nFootnote: " + f[7] : ""}` }, fmtFiled(shown, unit, sc));
           const cell = fsCell(tk, doc, `${plabel}${sub ? " · " + name : ""}`, tag, custom, f, sibs);
           sibs.push(cell);
           clickCell(td, cell);
@@ -209,7 +216,8 @@
         row.forEach((f, i) => {
           if (!f || f[6] == null) { tr.append(el("td", { "data-i": i }, "")); return; }
           const shown = negating ? -f[6] : f[6];
-          const td = el("td", { "data-i": i, class: shown < 0 ? "neg" : "", title: `${f[6].toLocaleString("en-US")} ${f[3]} · ${tag}${f[4] ? " · " + f[4] : ""}` }, fmtFiled(shown, f[3], sc));
+          const unit = unitOf(f[3], tag, custom);
+          const td = el("td", { "data-i": i, class: shown < 0 ? "neg" : "", title: `${f[6].toLocaleString("en-US")} ${unit} · ${tag}${unitNote(f[3], unit)}${f[4] ? " · " + f[4] : ""}` }, fmtFiled(shown, unit, sc));
           clickCell(td, fsCell(tk, doc, `${plabel}${f[4] ? " · " + memberText(f[4]) : ""}`, tag, custom, f, null));
           tr.append(td);
         });

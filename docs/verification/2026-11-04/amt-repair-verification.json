@@ -1,0 +1,87 @@
+{
+  "scope": "AMT-only normalized facts and published financial artifacts",
+  "publisher_receipt": {
+    "ticker": "AMT",
+    "started_at": "20261104T193211Z-46fe67eead",
+    "backup_prefix": "raw/repairs/AMT/20261104T193211Z-46fe67eead",
+    "status": "verified",
+    "public_objects": [
+      "companies/AMT.json",
+      "meta/fundamentals.json",
+      "index.json",
+      "screener.json",
+      "screener/src/AMT.json"
+    ],
+    "after_hashes": {
+      "companies/AMT.json": "85fee9a2c24d900d425211e3b2647b414698eca1b35a0bde47bd7768e714784e",
+      "meta/fundamentals.json": "7724f767d08b5677252d66042993d91f0bea1379191ec5f9a5996edefc924b00",
+      "index.json": "6bdd566f2879db5f662d4753fc4bede02cc36eabf25d116c8f4a997b6889c5c8",
+      "screener.json": "eeab70be713b4d13fbb56e3fad5d69cac1afbbe65ca286f0cc2e1bff22fe3779",
+      "screener/src/AMT.json": "3b326b97421f60875628f8ec081f1188b9d72778bcbd9bb72ae6a3b15a21f701"
+    },
+    "database_rows": 2911
+  },
+  "independent_public": {
+    "verified_at": "2026-11-04T19:40:22Z",
+    "mode": "independent_public_read_only",
+    "receipt_after_hash_matches": {
+      "companies/AMT.json": true,
+      "meta/fundamentals.json": true,
+      "index.json": true,
+      "screener.json": true,
+      "screener/src/AMT.json": true
+    },
+    "amt_values": {
+      "as_of": "2026-11-03",
+      "price": 187.29,
+      "revenue_ttm": 11009500000,
+      "net_income_ttm": 3383600000,
+      "fcf_ttm": 3960700000,
+      "op_margin_lq": 0.4555898614202628,
+      "net_margin_ttm": 0.3073345746854989,
+      "rev_growth_lq": 0.025023919923456317,
+      "market_cap": 86858276215.95,
+      "ps_ttm": 7.889393361728507,
+      "eps_ttm": null,
+      "pe_ttm": null,
+      "buyback_yield": null
+    },
+    "other_index_rows_preserved": 499,
+    "other_screener_rows_preserved": 499,
+    "fundamentals_comparison_limit": "The pinned fundamentals baseline predates independent non-AMT updates. All five fetched public byte hashes match the successfully applied receipt. Non-AMT index and screener rows equal their reviewed baselines; exact preservation of the 14 changed fundamentals entries relative to apply-time fresh data requires the private pre-apply backup, which this public-only verifier did not access."
+  },
+  "independent_database": {
+    "checked_at": "2026-11-04T19:39:50Z",
+    "facts_count": 2911,
+    "q3_revenue": {
+      "value": 2785400000,
+      "unit": "USD",
+      "period_start": "2026-07-01",
+      "period_end": "2026-09-30",
+      "concept": "Revenues",
+      "accession": "0001053507-26-000157",
+      "filed": "2026-10-27"
+    },
+    "shares_outstanding": 463763555,
+    "shares_as_of": "2026-10-20",
+    "eps_ttm": null,
+    "pe_ttm": null,
+    "unsupported_derived_quarter_eps_share_rows": 0,
+    "active_financial_aggregate_leases": 0
+  },
+  "live_browser": {
+    "company_url": "https://filedunderai.vercel.app/#company-amt",
+    "observed_revenue_ttm": "$11.01B",
+    "observed_price_sales": "7.9",
+    "revenue_evidence_id": "ev_1bf37bbc10abeb34",
+    "source_details_value": "2,785,400,000 USD",
+    "source_details_concept": "us-gaap:Revenues",
+    "source_details_accession": "0001053507-26-000157"
+  },
+  "limits": [
+    "Price-dependent values retain the November 3, 2026 snapshot.",
+    "The producer preserves fresh unrelated fundamentals entries under its aggregate lease; the independent public reader did not retrieve private pre-apply backups.",
+    "Legacy company normalization backfill is incomplete. This does not certify all issuers or narrative claims.",
+    "Subsequent normal jobs may update public artifacts after this receipt."
+  ]
+}

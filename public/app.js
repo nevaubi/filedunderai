@@ -432,6 +432,8 @@ function renderDetails(body, cell) {
     el("dt", {}, "XBRL element"), el("dd", { class: "mono" }, cell.conceptFull || "us-gaap:" + cell.concept),
     cell.dimText ? el("dt", {}, "Breakdown") : null, cell.dimText ? el("dd", {}, cell.dimText) : null,
     el("dt", {}, "Reported value"), el("dd", { class: "mono" }, rec.v.toLocaleString("en-US") + " " + cell.unit),
+    rec.quality?.unitSelectionReason && rec.quality.reportedUnit !== cell.unit ? el("dt", {}, "Unit handling") : null,
+    rec.quality?.unitSelectionReason && rec.quality.reportedUnit !== cell.unit ? el("dd", {}, rec.quality.unitSelectionReason) : null,
     el("dt", {}, "Selection rule"), el("dd", {}, rec.vintage === "original" ? "First reported filing vintage. Later revisions are excluded from this record." : rec.vintage === "latest" ? "Latest compatible filing vintage in this dataset. This citation preserves the displayed value and its source." : "Legacy source snapshot. Inspect the accession and publication date; the dataset does not declare its revision policy."),
     el("dt", {}, "Links"), el("dd", {}, f?.primary ? el("a", { href: f.primary, target: "_blank", rel: "noopener" }, "Document ↗") : "–", " · ", el("a", { href: f?.index || "#", target: "_blank", rel: "noopener" }, "Filing index ↗"), " · ", el("a", { href: `https://data.sec.gov/api/xbrl/companyconcept/CIK${String(c.cik).padStart(10, "0")}/us-gaap/${cell.concept}.json`, target: "_blank", rel: "noopener" }, "Concept API ↗"))));
   if (cell.derived) {
