@@ -109,6 +109,10 @@ table.cmpx td.c.der::after{content:"";position:absolute;right:3px;top:5px;width:
 .cmp-src-t tr.hl td{background:color-mix(in srgb,var(--mark) 25%,transparent)}
 .cmp-src-t td.hit{background:var(--mark);color:var(--mark-ink);font-weight:700;outline:2px solid var(--mark)}
 .cmp-back{align-self:flex-start}
+.cmp-warn{color:var(--warn);background:var(--warn-soft);border-radius:8px;padding:3px 9px;font-size:11.5px;font-weight:600}
+.cmp-scope .cmp-tools{min-width:0;max-width:100%}
+.cmp-scope .seg{max-width:100%;overflow-x:auto;scrollbar-width:none}
+.cmp-scope .panel>.hd .r{max-width:100%;min-width:0}
 @media (max-width:860px){
   table.cmpx .lab{min-width:132px;max-width:150px}
   table.cmpx th,table.cmpx td{padding:6px 8px}
@@ -606,6 +610,8 @@ table.cmpx td.c.der::after{content:"";position:absolute;right:3px;top:5px;width:
     if (!STATE.cmp.length) STATE.cmp = ["AAPL", "MSFT", "NVDA", "GOOGL"];
     const keep = window.scrollY;
     await Promise.all([...STATE.cmp.map(t => ensureCompany(t).catch(() => null)), ensurePrices("SPY"), ensureUniverse(), ...STATE.cmp.map(ensureHistory), ensureHistory("SPY")]);
+    // the reader moved to another page while data loaded
+    if (!/^#compare(-|$)/.test(location.hash || "#compare")) return;
     STATE.cmp = STATE.cmp.filter(loaded);
     setHash();
     page.innerHTML = "";
@@ -615,7 +621,7 @@ table.cmpx td.c.der::after{content:"";position:absolute;right:3px;top:5px;width:
     const chips = el("div", { class: "cmp-row" }, STATE.cmp.map(t => el("span", { class: "cmp-chip" }, el("i", { style: `background:${colorOf(t)}` }), miniLogo(t, 16), el("a", { href: "#company-" + t.toLowerCase(), title: IDX[t].name }, t), el("button", { title: `Remove ${t}`, "aria-label": `Remove ${t}`, onclick: () => removeTicker(t) }, "×"))));
     page.append(el("section", { class: "panel" }, el("div", { class: "cmp-pick" }, chips, el("div", { class: "cmp-row" }, searchBox(), peersMenu(), setsMenu(), STATE.cmp.length > 1 ? el("button", { class: "btn", title: "Clear all but the first company", onclick: () => setTickers(STATE.cmp.slice(0, 1)) }, "Clear") : null))));
     const tabs = el("div", { class: "tabs", role: "tablist" });
-    const body = el("div", { style: "display:flex;flex-direction:column;gap:16px" });
+    const body = el("div", { class: "cmp-scope", style: "display:flex;flex-direction:column;gap:16px" });
     const show = id => {
       if (!TABS.find(t => t[0] === id)) id = "overview";
       CS.tab = id; store.set("cmpTab", id);
@@ -843,7 +849,7 @@ table.cmpx td.c.der::after{content:"";position:absolute;right:3px;top:5px;width:
       const fyes = [...new Set(tks.map(fyeText))];
       note.innerHTML = "";
       note.append(el("span", {}, el("b", {}, "Fiscal years end: "), tks.map(tk => `${tk} ${fyeText(tk)}`).join(" · ")));
-      if (fyes.length > 1) note.append(el("span", { class: "chip warn" }, align === "fiscal" ? "Fiscal years end in different months, so the same fiscal label covers different months. Switch to calendar periods to line them up by the calendar period they mostly cover." : "Calendar periods: each fiscal period is placed in the calendar year or quarter that holds most of its months."));
+      if (fyes.length > 1) note.append(el("span", { class: "cmp-warn" }, align === "fiscal" ? "Fiscal years end in different months, so the same fiscal label covers different months. Switch to calendar periods to line them up by the calendar period they mostly cover." : "Calendar periods: each fiscal period is placed in the calendar year or quarter that holds most of its months."));
       const cols = new Map();
       const byTk = {};
       const labels = new Set();
@@ -1340,7 +1346,7 @@ table.cmpx td.c.der::after{content:"";position:absolute;right:3px;top:5px;width:
       const W = host.clientWidth || 640, rh = 46, m = { t: 22, r: 24, b: 26, l: innerWidth < 860 ? 56 : 120 }, H = m.t + m.b + rows.length * rh;
       const x = d3.scaleLog().domain([lo / 1.15, hi * 1.15]).range([m.l, W - m.r]).clamp(true);
       const svg = d3.select(host).append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("height", H);
-      svg.append("g").attr("class", "grid").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(6, "~g").tickSize(-(H - m.t - m.b)).tickFormat(v => (+v.toPrecision(2)) + "×")).call(g => g.select(".domain").remove());
+      svg.append("g").attr("class", "grid").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(W < 600 ? 3 : 6, "~g").tickSize(-(H - m.t - m.b)).tickFormat(v => (+v.toPrecision(2)) + "×")).call(g => g.select(".domain").remove());
       if (setMed[k]) { svg.append("line").attr("x1", x(setMed[k])).attr("x2", x(setMed[k])).attr("y1", m.t - 4).attr("y2", H - m.b).attr("stroke", css("--ink")).attr("stroke-dasharray", "4 3").attr("opacity", .55); svg.append("text").attr("x", x(setMed[k]) + 4).attr("y", 10).text(`set median ${fmtV(setMed[k], "x")}`); }
       rows.forEach(({ tk, s }, j) => {
         const cy = m.t + j * rh + rh / 2, col = colorOf(tk);
