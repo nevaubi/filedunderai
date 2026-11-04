@@ -364,3 +364,109 @@ begin
   end loop;
 end $$;
 notify pgrst, 'reload schema';
+
+-- ---------------------------------------------------------------- workstream: calls
+-- Earnings-call intelligence (etl/calls.py). One row per call (the best transcript or prepared-remarks document for an
+-- event); speakers, turns and Q&A exchanges from the deterministic parser; themes, guidance, concerns, deflections and
+-- changes from the model, each with the exact quote and its character offsets (s, e) in the source document text
+-- (ir_documents.text_path pages joined with "\n").
+create table if not exists calls (
+  call_id           text primary key,
+  ticker            text not null references companies(ticker) on delete cascade,
+  doc_id            text not null,
+  alt_doc_ids       text[],
+  kind              text not null check (kind in ('transcript','remarks')),
+  event_type        text not null,
+  title             text,
+  event_date        date,
+  fiscal_label      text,
+  period_end        date,
+  has_qa            boolean not null default false,
+  words             integer,
+  n_turns           integer,
+  n_exchanges       integer,
+  parse_method      text,
+  text_sha256       text,
+  summary           text,
+  overall_tone      numeric,
+  analysis_model    text,
+  analyzed_at       timestamptz,
+  source_url        text,
+  updated_at        timestamptz not null default now()
+);
+create index if not exists calls_ticker on calls (ticker, event_date desc);
+
+create table if not exists call_speakers (
+  call_id           text not null references calls(call_id) on delete cascade,
+  idx               integer not null,
+  name              text not null,
+  role              text,
+  firm              text,
+  kind              text not null check (kind in ('management','analyst','operator','other')),
+  turns             integer,
+  words             integer,
+  talk_share        numeric,
+  hedge_per_1k      numeric,
+  tone              numeric,
+  primary key (call_id, idx)
+);
+create index if not exists call_speakers_name on call_speakers (kind, name);
+
+create table if not exists call_turns (
+  call_id           text not null references calls(call_id) on delete cascade,
+  idx               integer not null,
+  speaker_idx       integer not null,
+  section           text not null check (section in ('prepared','qa')),
+  s                 integer not null,
+  e                 integer not null,
+  page              integer,
+  words             integer,
+  text              text,
+  primary key (call_id, idx)
+);
+
+create table if not exists call_exchanges (
+  call_id           text not null references calls(call_id) on delete cascade,
+  idx               integer not null,
+  analyst_idx       integer,
+  q_turns           integer[],
+  a_turns           integer[],
+  topics            text[],
+  concern           text,
+  concern_quote     jsonb,
+  deflected         boolean,
+  deflection_reason text,
+  deflection_quote  jsonb,
+  primary key (call_id, idx)
+);
+
+-- themes, guidance statements and changes vs the previous call; quote = {turn, s, e, text, page}
+create table if not exists call_items (
+  call_id           text not null references calls(call_id) on delete cascade,
+  kind              text not null check (kind in ('theme','guidance','change')),
+  idx               integer not null,
+  theme             text,
+  sentiment         numeric,
+  confidence        numeric,
+  metric            text,
+  period            text,
+  value_low         numeric,
+  value_high        numeric,
+  unit              text,
+  text              text,
+  quote             jsonb not null,
+  primary key (call_id, kind, idx)
+);
+create index if not exists call_items_theme on call_items (kind, theme);
+
+do $$
+declare t text;
+begin
+  foreach t in array array['calls','call_speakers','call_turns','call_exchanges','call_items'] loop
+    execute format('alter table %I enable row level security', t);
+    if not exists (select 1 from pg_policies where tablename = t and policyname = 'public read') then
+      execute format('create policy "public read" on %I for select to anon, authenticated using (true)', t);
+    end if;
+  end loop;
+end $$;
+notify pgrst, 'reload schema';

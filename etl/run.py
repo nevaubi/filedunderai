@@ -8,7 +8,7 @@ from .common import Supabase
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "compare", "sectors", "screener", "all"])
+    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "compare", "sectors", "screener", "calls", "all"])
     ap.add_argument("--tickers", nargs="*")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--news", action="store_true", help="refresh news for each company")
@@ -22,7 +22,9 @@ def main():
     ap.add_argument("--budget", type=float, help="compare job: time budget in seconds")
     ap.add_argument("--sec-years", type=float, default=3, help="IR job: years of EDGAR 8-K earnings exhibits to collect")
     ap.add_argument("--step", default="publish", choices=["prices", "publish", "notes"], help="sectors job step")
-    ap.add_argument("--budget", type=float, help="time budget in seconds")
+    ap.add_argument("--mode", default="run", choices=["run", "publish", "db"], help="calls job: run (scan + analyse + publish), publish (cross-company files) or db (copy bundles into the calls tables)")
+    ap.add_argument("--recent", action="store_true", help="calls job: analyse only calls from the last 8 quarters")
+    ap.add_argument("--limit", type=int, help="calls job: most new analyses per company in this run")
     a = ap.parse_args()
     sb = Supabase()
     if a.job in ("prices", "all"):
@@ -55,6 +57,9 @@ def main():
         print("compare history", len(done), "errors", errors)
     if a.job == "screener":
         print("screener", jobs.screener_job(sb, full=a.full_history, workers=a.workers))
+    if a.job == "calls":
+        from .calls import calls_job
+        print("calls", json.dumps(calls_job(sb, a.tickers, step=a.mode, workers=a.workers, time_budget=a.budget, analyze_limit=a.limit, recent_only=a.recent), default=str)[:3000])
     if a.job == "index":
         print("index", jobs.build_index(sb))
     if a.job == "feed":
