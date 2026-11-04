@@ -1,6 +1,8 @@
 # Financial pipeline implementation report
 
-Implemented in the existing feature worktree. No commit, push, production ETL, database mutation, credential access, model call, or live bundle repair was performed.
+Implemented in the existing feature worktree. At the initial implementation checkpoint, this worker had made no commit, push, production ETL run, database mutation, credential access, model call, or live bundle repair. Subsequent production publication by root is recorded below.
+
+**Completed production repair:** root executed the reviewed AMT publisher on 2026-11-04; its receipt reports `verified`, 2,911 normalized fact rows, and private backup prefix `raw/repairs/AMT/20261104T193211Z-46fe67eead`. Independent public-only verification at 19:40:22 UTC passed all 13 reviewed AMT/object checks and matched all five receipt byte hashes, with one explicitly limited non-AMT fundamentals comparison. This was an AMT-only repair: 500 other fundamentals entries still lacked the version 2 marker at verification time. See the final evidence section for the distinction between public verification, helper preservation assertions, and root’s separate database checks.
 
 ## Changes and evidence
 
@@ -93,13 +95,13 @@ Tests cover live-source AMT fixture, industrial/bank/insurer scopes, original/la
 
 ## Operational limits and release notes
 
-1. Deploy the additive lease RPC migration before running aggregate jobs. Missing RPCs block publication explicitly. No live SQL verification was performed in this task. The lease serializes cooperating publishers; it does not provide a multi-object Storage transaction or fencing against already in-flight requests from a worker paused beyond its expiry. Lost/expired leases block subsequent guarded writes. Old deployed workers must be drained during rollout.
+1. Deploy the additive lease RPC migration before running aggregate jobs. Missing RPCs block publication explicitly. At the initial implementation checkpoint, this worker had performed no live SQL verification; root subsequently verified the applied AMT database state separately. The lease serializes cooperating publishers; it does not provide a multi-object Storage transaction or fencing against already in-flight requests from a worker paused beyond its expiry. Lost/expired leases block subsequent guarded writes. Old deployed workers must be drained during rollout.
 2. Full fetched-window price upserts increase database work. Existing job partitions/time budgets should be sized accordingly. History older than the fetched two-year window is unchanged; the change only guarantees synchronization of the fetched window.
 3. Existing production bundles remain unmodified. Repair/rebuild is needed to populate histories, corrected starts/revenue/FCF, and `shares_metadata`. Old unlabelled share totals now yield unknown exact market cap rather than being trusted as validated counts. There is no silent weighted-share fallback.
 4. Companyfacts does not reliably expose share-class dimensions. Ambiguous multi-class counts remain unknown, and no guessed Class A/Class B conversion is applied. Explicit dimension-aware total/class support is future work. Post-filing corporate actions need a consistent split/date policy before claiming exact current capitalization from old cover counts.
 5. Date availability is daily filing-date resolution. An actual backtest should use subsequent trading-session execution and historical universe controls. Historical weighted-share valuation remains a proxy, identified in definitions; it is not exact class market capitalization.
 6. Cross-filing same-concept derivation can establish observed consistency, not prove that all accounting-policy changes were disclosed in the retained facts. Such derivations are labeled distinctly and revoked if an incompatible smaller cumulative revision appears. Same-filing inputs provide stronger evidence. Unsupported or incompatible observations remain unknown.
-7. Public-only repair cannot invent consolidated concepts missing from the old reduced data. The report makes that limitation explicit. The actual AMT concept relationship is verified; no authorized live repair has been performed here.
+7. Public-only repair cannot invent consolidated concepts missing from the old reduced data. The report makes that limitation explicit. At this initial offline checkpoint, the actual AMT concept relationship was verified but the live repair had not yet been performed; root’s later completed publication is recorded below.
 
 ## Independent analyst engine review (read-only)
 
@@ -116,7 +118,7 @@ Reviewed root-owned `public/lib/analyst.js`, `tests/analyst/analyst.test.mjs`, a
 
 Root acknowledged the first four and is implementing regressions; the remaining findings were also sent immediately. Recheck root's final analyst tests before delivery. The existing explicit `superseded_at <= asOf` exclusion is correct. Revenue anchoring gives one coherent report period, but mismatched/missing metrics should remain unknown and older coverage must remain visibly dated.
 
-Migration review: lease RPC argument names and boolean responses match the Python client. Acquiring/renewing an owned lock and rejecting a competing owner are covered by root's local PostgreSQL/PGlite test. Table RLS and explicit function EXECUTE revocations prevent anon/authenticated lease access. No blocker found in the lease SQL. Adjusted Python TTL cap from 900 to 600 seconds to match the SQL validation. No live migration was run.
+Migration review: lease RPC argument names and boolean responses match the Python client. Acquiring/renewing an owned lock and rejecting a competing owner are covered by root's local PostgreSQL/PGlite test. Table RLS and explicit function EXECUTE revocations prevent anon/authenticated lease access. No blocker found in the lease SQL. Adjusted Python TTL cap from 900 to 600 seconds to match the SQL validation. At that review checkpoint, this worker ran no live migration; root owned the subsequent migration rollout.
 
 Independent local migration verification completed:
 
@@ -132,7 +134,7 @@ The TTL-cap alignment was followed by `python -m unittest discover -s tests/fina
 
 Re-reviewed root's fixes for all eight analyst findings and ran `node --test tests/analyst/analyst.test.mjs`: **13 tests passed, 0 failed**. The matched-interval/sign fixes, price coverage gating, session convention, insider coverage unknown, derived EPS exclusion, superseded-record handling, withdrawal handling, explicit empty watchlist, default date cutoff, and transition-period rejection are present. No blocker remains among those eight findings. Price-session completeness still uses a conservative seven-calendar-day gap check rather than a full exchange calendar; methodology should not claim exchange-calendar validation.
 
-A real AMT candidate was built from the current public company/index/fundamentals/screener/source/price bundles, SEC companyfacts, the official AMT Q3 filing, ten years of public price history (no split events), and read-only AMT relational facts/metrics/summary snapshots. No production apply was performed. Source bytes and manifests are preserved under:
+A real AMT candidate was built from the current public company/index/fundamentals/screener/source/price bundles, SEC companyfacts, the official AMT Q3 filing, ten years of public price history (no split events), and read-only AMT relational facts/metrics/summary snapshots. At this candidate-preparation checkpoint, no production apply had yet been performed. Source bytes and manifests are preserved under:
 
 `/workspace/scratch/6f66af7c3d91/audit-work/amt-repair/`
 
@@ -167,7 +169,7 @@ The helper acquires the shared lease, rereads official source bytes/current data
 
 ## Final publication guards and bounded legacy migration
 
-Root's final review requested company-row pre/post verification and a rollout path for unchanged legacy bundles. Both are complete; no production apply occurred.
+Root's final review requested company-row pre/post verification and a rollout path for unchanged legacy bundles. Both were complete at this pre-publication checkpoint; production apply had not yet occurred.
 
 - The helper now compares selected `companies(ticker, shares_outstanding, shares_as_of)` against `input/db-company-shares.json`, a reviewed read-only database snapshot. It verifies that same row against the candidate patch after writes. SQL numeric strings and REST numeric values are normalized; existing timestamp normalization remains in metrics/summary comparisons.
 - Two new offline fault tests prove preflight share drift refuses before backup/mutation, and a wrong post-write share count triggers restoration. **Five publisher tests pass**, including the original non-AMT preservation, drift refusal and mid-write rollback cases. Candidate/helper manifests have been resealed.
@@ -182,6 +184,43 @@ Root identified that upserting the new normalized facts alone would leave omitte
 
 Before any deletion, the exact obsolete rows and primary keys are written to a content-addressed private JSON backup under `raw/repairs/nonadditive-facts/<ticker>/<sha256>.json` and read back to verify the hash. Each deletion uses the complete fact primary key plus original `derived=true`, accession, concept and value guards. Each key is read again: absence succeeds, a direct reported replacement is protected, and an unsupported remaining derived row fails the company job. The successful fundamentals entry records the cleanup counts and backup path. A failed cleanup does not advance the fundamentals pipeline version, so normal bounded rotation retries it.
 
-Three added regressions verify (1) omitted invalid EPS and share rows disappear after a valid directly reported replacement is safely upserted, while other reported facts, valid derived revenue, and another ticker remain; (2) a corrupt/unverified private backup blocks all deletion; and (3) silent deletion failure is caught by exact-key readback. **28 financial tests now pass.** The AMT publisher's five offline tests still pass, its source/helper manifests are resealed against the updated jobs.py, default local validation passes, and compilation/diff checks pass. No production writes were performed.
+Three added regressions verify (1) omitted invalid EPS and share rows disappear after a valid directly reported replacement is safely upserted, while other reported facts, valid derived revenue, and another ticker remain; (2) a corrupt/unverified private backup blocks all deletion; and (3) silent deletion failure is caught by exact-key readback. **28 financial tests now pass.** The AMT publisher's five offline tests still pass, its source/helper manifests are resealed against the updated jobs.py, default local validation passes, and compilation/diff checks pass. At this reconciliation implementation checkpoint, no production writes were performed by this worker; root later executed the reviewed publisher.
 
 This is intentionally not a general delete-every-row-absent-from-new-source operation. Companyfacts coverage gaps could otherwise remove valid history. Broader reconciliation of omitted/superseded flow records should use the existing reviewed repair path: fetch complete archived sources, compare exact old/new keys, explicitly classify each proposed deletion with its invalidation evidence, preserve a private snapshot, and apply only the reviewed keys under the lease. AMT's reviewed full candidate already follows that bounded explicit-diff approach. The normal producer cleanup added here addresses the known categorically invalid additive-EPS/share records without silently deleting unrelated historical financial facts.
+
+## Bounded re-review after first production preflight refusal
+
+Root's first sealed publisher attempt stopped before backups or mutations at the AMT index-row guard. The cache-busted public index generated at 19:02:19 UTC differs from the reviewed 17:21:46 version only in AMT's capitalization-dependent projections: market_cap, ps_ttm, fcf_yield, dividend_yield and buyback_yield are null, and shares_metadata:null is newly present. Price/as_of and underlying revenue, earnings and cash-flow values are unchanged. This exactly matches the new producer's refusal to infer valid share metadata from legacy numeric share totals.
+
+With root's bounded authorization, a read-only AMT company_metrics query confirmed the same five null-field changes plus updated_at 17:21:45→19:02:19 UTC, with no other field change. The old baseline/candidate/manifests are preserved at `audit-work/amt-repair/attempts/preflight-1-before-refresh-20261104T193042Z/`. Refreshed only the public index input, the company_metrics member of the database snapshot, and associated input manifest metadata. All 2,941 fact rows are unchanged; source/filing/company/price/screener/summary/share snapshots remain pinned. Rebuilding preserved the fresh index's 499 non-AMT rows exactly.
+
+Exact diffs and pinned hashes are saved in `fresh-index-review-diff.json`, `fresh-metrics-review-diff.json`, and `baseline-refresh-review.json`. The AMT candidate and execution manifest are resealed. Five offline publisher tests and local sealed-file validation passed. No guard was disabled, no credential was sought or used, and no production write was performed by this worker. The secure apply command is unchanged.
+
+
+## Completed production publication and independent public verification
+
+Root executed the sealed AMT publisher after deployment/drain and bounded preflight re-review. The actual receipt at `audit-work/amt-repair/apply-receipt.json` reports **verified**, backup prefix `raw/repairs/AMT/20261104T193211Z-46fe67eead`, and **2,911 normalized facts**. This supersedes the earlier stage-specific statements that publication had not yet occurred. This worker performed only read-only public verification after publication and did not obtain credentials or trigger another production write.
+
+The independent evidence is saved at `audit-work/amt-repair/independent-verification.json`. Five cache-busted public reads used `etl.common.request` with `retries=1`: `companies/AMT.json`, `meta/fundamentals.json`, `index.json`, `screener.json`, and `screener/src/AMT.json`. **Every fetched byte SHA-256 matched the corresponding successful receipt hash.** The company and screener-source objects exactly matched their reviewed candidates; AMT’s index row, fundamentals entry, and screener row also exactly matched their reviewed candidates. All 268 screener source references were within the 132-field source schema.
+
+Verified AMT evidence:
+
+| Field | Published value / provenance |
+|---|---|
+| Q3 consolidated revenue | 2,785,400,000 USD; 2026-07-01 through 2026-09-30; `us-gaap:Revenues`; accession `0001053507-26-000157` |
+| Outstanding shares | 463,763,555; observation 2026-10-20; filed/available 2026-10-27; reported outstanding basis; same 10-Q accession |
+| Producer version | `pipeline_version: 2` in company and AMT fundamentals metadata |
+| Price / date | 187.29 USD / 2026-11-03 |
+| Revenue / net income / FCF TTM | 11,009,500,000 / 3,383,600,000 / 3,960,700,000 USD |
+| Latest-quarter operating margin | 0.4555898614202628 |
+| Latest-quarter revenue growth | 0.025023919923456317 |
+| Market capitalization / price-to-sales | 86,858,276,215.95 USD / 7.889393361728507 |
+| Unsupported EPS TTM / P-E / buyback yield | All null |
+
+The deterministic correction of the obsolete generated-summary warning was also verified. **Non-AMT index and screener rows matched their respective reviewed baselines exactly (499 rows each).**
+
+The non-AMT fundamentals comparison has a narrower evidence limit: its pinned baseline was older than the fresh aggregate used during publication. Fourteen entries differ from that older baseline: GOOGL, GS, HD, HON, IBM, INTC, INTU, ISRG, JNJ, JPM, KO, LIN, LLY, and LMT. The verification records ticker names and changed field names only. This comparison is classified **not independently established**, not a demonstrated publication failure. Reviewing `apply_reviewed.py` confirmed that it deep-copies current aggregates, replaces AMT alone, asserts all non-AMT entries unchanged before backup/publication, and verifies published objects against those rebased outputs. The public fundamentals byte hash matches the successful receipt, including on a second cache-busted read. These are supporting code/receipt observations; an independent exact comparison with the apply-time fundamentals baseline would require the private pre-apply backup, which this public-only verifier did not access.
+
+Root separately reported SQL verification of 2,911 AMT facts, matching metrics/shares, zero derived quarterly EPS/share observations, and no active lease. That relational verification is root’s evidence, not a database read by this post-publication verifier. Root also reported the live source-details display showing the exact Q3 revenue, concept, and accession above. A separately identified as-reported EPS unit-display issue is owned by the UI review worker and is not claimed resolved by these financial artifact checks.
+
+**Remaining scope limit:** the fundamentals object contains 501 entries: AMT has version 2; 500 entries lack that marker. This release provides bounded normal rotation and safe legacy-fact reconciliation, but this AMT repair does not establish that the full universe has been backfilled. No further backfill or rollback exercise was performed for this verification. Storage/REST publication remains a verified sequence with recoverable backups, not an atomic cross-service transaction. Scheduled jobs can change artifacts after the recorded read time.
