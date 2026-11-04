@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Filed Under</title>
 <meta name="description" content="Source-attributed research on US equities. Financials from SEC filings with every number linked to the document it came from, plus prices, macro, filings and news.">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#fbf9f4">
 <meta property="og:title" content="Filed Under">
 <meta property="og:description" content="Every number filed under its source. S&P 500 financials from SEC filings, prices, macro and filings in one place.">
 <meta property="og:type" content="website">
@@ -13,9 +13,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://apxfeteebnspwyajlxfh.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="/app.css">
 <link rel="stylesheet" href="/professional.css">
+<link rel="stylesheet" href="/company.css">
 <link rel="stylesheet" href="/workspace.css">
 <link rel="stylesheet" href="/analyst.css">
 <script>window.FU_CONFIG = { dataBase: "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/" };</script>
@@ -50,22 +51,26 @@
 <div class="app">
   <aside class="rail" aria-label="Primary">
     <a class="brand" href="#markets" aria-label="Filed Under home"><svg aria-hidden="true"><use href="#logo"/></svg><b>Filed Under</b></a>
-    <nav class="nav" id="nav" aria-label="Research and market data"></nav>
-    <div class="sect eyebrow">Watchlist</div>
-    <div class="wl" id="wl"></div>
+    <div class="rail-body">
+      <nav class="nav" id="nav" aria-label="Research, markets and workspace"></nav>
+      <div class="sect eyebrow"><span>Watchlist</span><a href="#watchlists" aria-label="Manage watchlist">+ Add</a></div>
+      <div class="wl" id="wl"></div>
+    </div>
     <div class="foot">
       <span>Data updated <span id="built"></span></span>
-      <span>Sources: SEC EDGAR, U.S. Treasury, BLS, Federal Reserve, exchange prices</span>
+      <span class="rail-source-summary" title="Sources: SEC EDGAR, U.S. Treasury, BLS, Federal Reserve, exchange prices">SEC filings &amp; public market data</span>
     </div>
   </aside>
   <div class="main">
     <header class="top">
       <div class="search">
         <svg class="ico"><use href="#i-search"/></svg>
-        <input id="q" placeholder="Search companies, metrics, or ask a question" autocomplete="off" aria-label="Open command palette" readonly>
+        <input id="q" placeholder="Search companies, pages, filings…" autocomplete="off" aria-label="Open command palette" readonly>
         <kbd>⌘K</kbd>
       </div>
       <span class="asof" id="asof"></span>
+      <nav class="market-tape" id="market-tape" aria-label="Market closing prices"></nav>
+      <a class="btn top-assistant" href="#research" aria-label="Open research assistant"><svg aria-hidden="true"><use href="#i-spark"/></svg>Assistant</a>
       <button class="iconbtn" id="kbhelp" title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts"><span class="mono" style="font-size:13px;font-weight:600">?</span></button>
     </header>
     <nav class="mnav" id="mnav" aria-label="Pages"></nav>
