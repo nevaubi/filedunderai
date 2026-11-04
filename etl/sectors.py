@@ -541,26 +541,48 @@ def load_daily(sb, syms, log=print):
     return out
 
 
-def performance(members, uni, D, dates):
+def ticker_signals(D, dates):
+    """Per stock, aligned to dates: close, above-50-day flag, above-200-day flag (None until enough history) and the
+    21-day return. Computed once and shared by every group."""
+    out = {}
+    for t, rows in D.items():
+        m = dict(rows)
+        c = [m.get(d) for d in dates]
+        f50, f200, r21 = [None] * len(c), [None] * len(c), [None] * len(c)
+        pc, ps = [0], [0.0]           # prefix counts and sums of the closes present
+        for v in c:
+            pc.append(pc[-1] + (v is not None))
+            ps.append(ps[-1] + (v or 0.0))
+        for i, v in enumerate(c):
+            if v is None:
+                continue
+            # windows count trading days on the SPY calendar; most of them must have a close
+            for w, f, need in ((50, f50, 45), (200, f200, 180)):
+                if i >= w - 1:
+                    n = pc[i + 1] - pc[i + 1 - w]
+                    if n >= need:
+                        f[i] = v > (ps[i + 1] - ps[i + 1 - w]) / n
+            if i >= 21 and c[i - 21]:
+                r21[i] = v / c[i - 21] - 1
+        out[t] = (c, f50, f200, r21)
+    return out
+
+
+def performance(members, uni, SIG, dates):
     """Cap- and equal-weight index, breadth, dispersion and concentration for a group over the daily dates."""
-    px = {t: dict(D[t]) for t in members if t in D}
+    tks = [t for t in members if t in SIG]
     shares = {}
-    for t in px:
+    for t in tks:
         mc, p = uni[t].get("mcap"), uni[t].get("price")
         if mc and p:
             shares[t] = mc / p
-    cw, ew, b50, b200, disp, top5, nmem = [100.0], [100.0], [], [], [], [], []
-    hist = {t: [] for t in px}
-    for i, d in enumerate(dates):
-        for t in px:
-            c = px[t].get(d)
-            hist[t].append(c)
+    cw, ew, b50, b200, disp, top5 = [100.0], [100.0], [], [], [], []
+    for i in range(len(dates)):
         if i:
-            p0 = dates[i - 1]
             num = den = 0.0
             rs = []
-            for t in px:
-                a, b = px[t].get(p0), px[t].get(d)
+            for t in tks:
+                a, b = SIG[t][0][i - 1], SIG[t][0][i]
                 if a and b:
                     rs.append(b / a - 1)
                     if t in shares:
@@ -568,36 +590,20 @@ def performance(members, uni, D, dates):
                         den += shares[t] * a
             cw.append(cw[-1] * (num / den if den else 1))
             ew.append(ew[-1] * (1 + (_mean(rs) if rs else 0)))
-        a50 = a200 = n50 = n200 = 0
-        r21 = []
-        for t in px:
-            h = hist[t]
-            c = h[-1]
-            if c is None:
-                continue
-            w50 = [x for x in h[-50:] if x is not None]
-            if len(h) >= 50 and len(w50) >= 45:
-                n50 += 1
-                a50 += c > _mean(w50)
-            w200 = [x for x in h[-200:] if x is not None]
-            if len(h) >= 200 and len(w200) >= 180:
-                n200 += 1
-                a200 += c > _mean(w200)
-            if len(h) > 21 and h[-22]:
-                r21.append(c / h[-22] - 1)
-        b50.append(_r(a50 / n50, 4) if n50 else None)
-        b200.append(_r(a200 / n200, 4) if n200 else None)
+        f5 = [SIG[t][1][i] for t in tks if SIG[t][1][i] is not None]
+        f2 = [SIG[t][2][i] for t in tks if SIG[t][2][i] is not None]
+        r21 = [SIG[t][3][i] for t in tks if SIG[t][3][i] is not None]
+        b50.append(_r(sum(f5) / len(f5), 4) if f5 else None)
+        b200.append(_r(sum(f2) / len(f2), 4) if f2 else None)
         disp.append(_r(statistics.pstdev(r21), 4) if len(r21) >= 3 else None)
-        caps = sorted((shares[t] * px[t][d] for t in shares if px[t].get(d)), reverse=True)
+        caps = sorted((shares[t] * SIG[t][0][i] for t in shares if SIG[t][0][i]), reverse=True)
         top5.append(_r(sum(caps[:5]) / sum(caps), 4) if caps else None)
-        nmem.append(len(caps))
     above = {}
-    for t in px:
-        h = [x for x in hist[t] if x is not None]
-        if len(h) >= 200:
-            above[t] = [h[-1] > _mean(h[-50:]), h[-1] > _mean(h[-200:])]
-        elif len(h) >= 50:
-            above[t] = [h[-1] > _mean(h[-50:]), None]
+    for t in tks:
+        f5 = next((x for x in reversed(SIG[t][1]) if x is not None), None)
+        f2 = next((x for x in reversed(SIG[t][2]) if x is not None), None)
+        if f5 is not None or f2 is not None:
+            above[t] = [f5, f2]
     return {"cw": [_r(x, 7) for x in cw], "ew": [_r(x, 7) for x in ew], "b50": b50, "b200": b200, "disp": disp, "top5": top5}, above
 
 
@@ -1058,6 +1064,7 @@ def publish(sb, log=print, time_budget=None):
     dates = [d for d, _ in D.get("SPY", [])]
     spy_map = dict(D.get("SPY", []))
     spy = [spy_map.get(d) for d in dates]
+    SIG = ticker_signals(D, dates)
     log(f"daily prices {len(D)} symbols, {len(dates)} days ({time.time() - t0:.0f}s)")
     fred, macro = load_factors(sb, log=log)
     factors = build_factors(fred, macro, D)
@@ -1075,13 +1082,16 @@ def publish(sb, log=print, time_budget=None):
             etf_rrg[etf] = rrg(dates, [em.get(d) for d in dates], spy)
     spy_ret = window_returns(spy, dates)
     db_rows = []
+    writer = ThreadPoolExecutor(6)
+    pending = []
+    done_slugs = set()
     group_perf = {}
     for g in groups:
         members = [t for t in g["members"] if t in uni]
         agg = aggregate(members, CQ, CM, quarters)
         val_now = current_valuation(members, uni, CQ, CM, quarters)
         val_range = {k: ten_year(agg[k]["agg"], quarters, val_now.get(k)) for k in ("pe", "ps", "pfcf")}
-        perf, above = performance(members, uni, D, dates)
+        perf, above = performance(members, uni, SIG, dates)
         group_perf[g["slug"]] = perf
         rets = {"cw": window_returns(perf["cw"], dates), "ew": window_returns(perf["ew"], dates), "spy": spy_ret}
         if g["etf"] and g["etf"] in D:
@@ -1133,8 +1143,9 @@ def publish(sb, log=print, time_budget=None):
                 "data": {t: [[_r(CQ[t][k][f]) if f != "end" and f != "end_py" else CQ[t][k][f] for f in COMP_FIELDS] if k in CQ.get(t, {}) else None for k in quarters[-COMP_QUARTERS:]] for t in members},
                 "px": {t: {"url": (pxm.get(t) or {}).get("url"), "at": (pxm.get(t) or {}).get("at"), "splits": (pxm.get(t) or {}).get("splits")} for t in members},
                 "mcap_now": {t: _r(uni[t]["mcap"]) for t in members}}
-        _put(sb, f"sectors/{g['slug']}.json", doc)
-        _put(sb, f"sectors/{g['slug']}.comp.json", comp)
+        pending.append(writer.submit(_put, sb, f"sectors/{g['slug']}.json", doc))
+        pending.append(writer.submit(_put, sb, f"sectors/{g['slug']}.comp.json", comp))
+        done_slugs.add(g["slug"])
         li = _last_idx([a or b for a, b in zip(agg["rev_growth"]["n"], agg["ni_growth"]["n"])])
         head = {k: (agg[k]["agg"][li] if li is not None else None) for k in METRICS}
         lv = {}
@@ -1158,7 +1169,14 @@ def publish(sb, log=print, time_budget=None):
         if time_budget and time.time() - t0 > time_budget:
             log("time budget reached; remaining groups keep their previous files")
             break
-    # industries' rotation relative to SPY, per sector
+    for f in pending:
+        f.result()
+    writer.shutdown()
+    if len(done_slugs) < len(groups):
+        # over budget: groups not rebuilt keep their previous files and overview rows
+        prev = {x["slug"]: x for x in ((_get(sb, "sectors.json", {}) or {}).get("groups") or [])}
+        overview += [prev[g["slug"]] for g in groups if g["slug"] not in done_slugs and g["slug"] in prev]
+        stats["skipped"] = [g["slug"] for g in groups if g["slug"] not in done_slugs]
     sp = {
         "generated": now_iso(), "as_of": dates[-1] if dates else None, "quarters": quarters[-1:], "groups": overview, "metrics": METRICS,
         "mapping": mapping_table(), "overrides": [{"tk": t, "industry": v[0], "why": v[1]} for t, v in OVERRIDES.items()],

@@ -49,6 +49,11 @@ window.FU_PAGES = window.FU_PAGES || {};
 .sx-sum{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px}
 .sx-sum b{font-variant-numeric:tabular-nums}
 .sx-map td{font-size:12px}
+.drawer .db>.scroll,.drawer .db>table,.drawer .db>div{flex-shrink:0}
+.drawer svg text{fill:var(--muted);font-size:10.5px;font-family:var(--f-ui)}
+.drawer .grid line{stroke:var(--line);stroke-dasharray:2 3}
+.drawer .grid .domain{display:none}
+.drawer .domain{stroke:var(--line2)}
 details.sx-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:13px}
 @media (max-width:860px){.sx-hide-sm{display:none}.sx-tbl td.nm{min-width:140px}}
 `));
