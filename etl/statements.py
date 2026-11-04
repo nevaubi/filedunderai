@@ -23,6 +23,7 @@ import os
 import re
 import tempfile
 import time
+import urllib.parse
 import urllib.request
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
@@ -352,7 +353,12 @@ def statements_job(sb, quarters=None, since="2009q2", force=False, time_budget=N
         links = dataset_links()
         sb.put_json("statements/std_map.json", published_map(), cache="max-age=3600")
         if db and _tables_ready(sb):
-            sb.upsert("fs_std_map", map_rows(), "template,line_id,tag")
+            rows = map_rows()
+            sb.upsert("fs_std_map", rows, "template,line_id,tag")
+            keep = {(r["template"], r["line_id"], r["tag"]) for r in rows}
+            for r in sb.select("fs_std_map", "select=template,line_id,tag"):
+                if (r["template"], r["line_id"], r["tag"]) not in keep:
+                    sb.delete("fs_std_map", "&".join(f"{k}=eq.{urllib.parse.quote(r[k])}" for k in ("template", "line_id", "tag")))
         for name, url in links:
             if name < since or (quarters and name not in quarters):
                 continue
