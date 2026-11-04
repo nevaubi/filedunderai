@@ -272,6 +272,8 @@ def validate(sb, data, fix=False):
             report["derived_bad"].append({**dv, "error": f"recomputed {calc}"})
         else:
             idx[(dv["kpi"], dv["kind"], dv["period_end"])] = dv["value"]
+            # a derived figure carries the rounding of every printed input it was computed from
+            unit[(dv["kpi"], dv["kind"], dv["period_end"])] = sum(unit.get((dv["kpi"], inp["kind"], inp["period_end"]), 0) for inp in dv.get("inputs", []))
     # sums: children flagged sums_to_parent must add up to the parent
     children = {}
     # a child marked "subtracts": true enters its parent's sum with a minus sign
