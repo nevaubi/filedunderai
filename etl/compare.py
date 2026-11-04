@@ -116,27 +116,40 @@ def history_job(sb, symbols, manifest, time_budget=None, full=False, workers=3, 
         except Exception as e:
             return s, None, str(e)[:200]
 
+    def results():
+        with ThreadPoolExecutor(workers) as ex:
+            yield from ex.map(one, order)
+        # rate-limited symbols get a slower second pass
+        retry = [s for s, e in errors.items() if "429" in e]
+        if retry and not (time_budget and time.time() - t0 + 25 > time_budget):
+            time.sleep(20)
+            for s in retry:
+                time.sleep(2.5)
+                r = one(s)
+                if r[1]:
+                    errors.pop(s, None)
+                yield r
+
     weekly, actions = [], []
-    with ThreadPoolExecutor(workers) as ex:
-        for s, h, err in ex.map(one, order):
-            if err:
-                if not err.startswith("skipped"):
-                    errors[s] = err
-                continue
-            if not h["w"]:
-                errors[s] = "no bars"
-                continue
-            sb.put_json(f"history/{path_key(s)}.json", h, cache="max-age=3600")
-            pw, acts = db_rows(h, None if full else 3)
-            weekly += pw
-            actions += acts
-            manifest[s] = h["retrieved_at"]
-            done.append(s)
-            if len(weekly) >= 5000:
-                db_upsert(sb, "prices_weekly", weekly, "symbol,d", log)
-                weekly = []
-            if len(done) % 50 == 0:
-                log(f"  history {len(done)} of {len(order)}")
+    for s, h, err in results():
+        if err:
+            if not err.startswith("skipped"):
+                errors[s] = err
+            continue
+        if not h["w"]:
+            errors[s] = "no bars"
+            continue
+        sb.put_json(f"history/{path_key(s)}.json", h, cache="max-age=3600")
+        pw, acts = db_rows(h, None if full else 3)
+        weekly += pw
+        actions += acts
+        manifest[s] = h["retrieved_at"]
+        done.append(s)
+        if len(weekly) >= 5000:
+            db_upsert(sb, "prices_weekly", weekly, "symbol,d", log)
+            weekly = []
+        if len(done) % 50 == 0:
+            log(f"  history {len(done)} of {len(order)}")
     db_upsert(sb, "prices_weekly", weekly, "symbol,d", log)
     db_upsert(sb, "corporate_actions", actions, "symbol,d,kind", log)
     return done, errors
