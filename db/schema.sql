@@ -363,4 +363,97 @@ begin
     end if;
   end loop;
 end $$;
+
+-- ---------------------------------------------------------------- macro workstream: generic series store
+-- One row per series with provenance; observations keep every published vintage (point in time).
+create table if not exists macro_series (
+  id                text primary key,
+  source            text not null,
+  provider          text not null,
+  title             text not null,
+  units             text,
+  frequency         text,
+  seasonal_adj      text,
+  geography         text,
+  source_url        text,
+  notes             text,
+  data_url          text,
+  source_key        text,
+  section           text,
+  release           text,
+  meta              jsonb,
+  stats             jsonb,
+  first_date        date,
+  last_date         date,
+  last_value        numeric,
+  obs_count         integer,
+  updated_at        timestamptz not null default now()
+);
+create index if not exists macro_series_section on macro_series (section);
+
+create table if not exists macro_series_obs (
+  series_id         text not null references macro_series(id) on delete cascade,
+  d                 date not null,
+  vintage           date not null,
+  value             numeric not null,
+  published         date,
+  retrieved_at      timestamptz not null default now(),
+  primary key (series_id, d, vintage)
+);
+create index if not exists macro_series_obs_vintage on macro_series_obs (vintage desc);
+
+-- Current value per observation date: the latest vintage.
+create or replace view macro_series_latest with (security_invoker = true) as
+  select distinct on (series_id, d) series_id, d, value, vintage, published, retrieved_at
+  from macro_series_obs order by series_id, d, vintage desc;
+
+-- Publisher release calendar (dates taken from the publisher's own schedule pages).
+create table if not exists macro_releases (
+  release           text not null,
+  release_date      date not null,
+  release_time      text,
+  provider          text not null,
+  title             text not null,
+  source_url        text not null,
+  retrieved_at      timestamptz not null default now(),
+  primary key (release, release_date)
+);
+
+-- Inserts observations whose value differs from the latest stored vintage (or that are new).
+-- Rows: [{"s": series_id, "d": "YYYY-MM-DD", "v": "1.23", "vt": vintage date, "p": published date or null}].
+create or replace function macro_ingest(p_rows jsonb)
+returns table(series_id text, d date) language plpgsql security definer set search_path = public as $$
+#variable_conflict use_column
+begin
+  return query
+  with r as (
+    select distinct on (x->>'s', (x->>'d')::date) x->>'s' as s, (x->>'d')::date as dd, (x->>'v')::numeric as v,
+           (x->>'vt')::date as vt, nullif(x->>'p', '')::date as p
+    from jsonb_array_elements(p_rows) x
+  ), cur as (
+    select distinct on (o.series_id, o.d) o.series_id as cs, o.d as cd, o.value as cv
+    from macro_series_obs o join r on r.s = o.series_id and r.dd = o.d
+    order by o.series_id, o.d, o.vintage desc
+  ), ins as (
+    insert into macro_series_obs as m (series_id, d, vintage, value, published, retrieved_at)
+    select r.s, r.dd, r.vt, r.v, r.p, now() from r left join cur on cur.cs = r.s and cur.cd = r.dd
+    where cur.cs is null or cur.cv is distinct from r.v
+    on conflict (series_id, d, vintage) do update set value = excluded.value,
+      published = coalesce(excluded.published, m.published), retrieved_at = excluded.retrieved_at
+    returning m.series_id, m.d
+  )
+  select ins.series_id, ins.d from ins;
+end $$;
+revoke all on function macro_ingest(jsonb) from public, anon, authenticated;
+
+do $$
+declare t text;
+begin
+  foreach t in array array['macro_series','macro_series_obs','macro_releases'] loop
+    execute format('alter table %I enable row level security', t);
+    if not exists (select 1 from pg_policies where tablename = t and policyname = 'public read') then
+      execute format('create policy "public read" on %I for select to anon, authenticated using (true)', t);
+    end if;
+  end loop;
+end $$;
 notify pgrst, 'reload schema';

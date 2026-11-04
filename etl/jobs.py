@@ -430,6 +430,11 @@ def macro_job(sb, refresh_news=True, brief=True):
         obs += [{"series": "TSY:10Y", "d": r[0], "value": r[i10]} for r in curve if r[i10] is not None]
         obs += [{"series": "TSY:2Y", "d": r[0], "value": r[i2]} for r in curve if r[i2] is not None]
         sb.upsert("macro_observations", obs, "series,d", batch=1000)
+        try:
+            from . import macrojobs
+            macrojobs.legacy_store(sb, obs)
+        except Exception as e:
+            print("macro series store mirror failed", str(e)[:200])
         if b:
             sb.upsert("summaries", [{"id": "macro:brief", "kind": "macro", "content": b, "generated_at": b.get("generated_at") or now_iso()}], "id")
         if items:

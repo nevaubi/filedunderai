@@ -24,7 +24,8 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
   - `docs.py` original 10-K/10-Q statement tables with inline XBRL anchors, earnings release text (8-K EX-99.1).
   - `prices.py` daily and 5-minute bars, return/volatility/beta stats.
   - `fundamentals.py` TTM and latest-quarter metrics for screening.
-  - `macro.py` Treasury par curve, FRED series (CPI, core CPI, unemployment, payrolls, fed funds, 2s10s), H.15.
+  - `macro.py` Treasury par curve, FRED series (CPI, core CPI, unemployment, payrolls, fed funds, 2s10s), H.15 (feeds `macro.json` and the market brief).
+  - Macro series store (`mstore.py`, jobs in `macrojobs.py`): official-source series with point-in-time vintages. Collectors: `frb.py` (Federal Reserve Board release files: H.15, H.4.1, H.8, H.6, G.17, G.19, SLOOS, SCOOS, debt service ratios, Z.1), `nyfed.py` (NY Fed Markets API: reference rates, repo and reverse repo operations, SOMA, primary dealers), `treasury.py` (par curve, bills, real yields), `bls.py` (BLS API v2: CPI components, payrolls by sector, household survey, JOLTS, ECI), `oecd.py` (OECD SDMX: CLI, confidence, CPI, GDP, unemployment, short and long rates for G20 and aggregates), `cftc.py` (Commitments of Traders), `fdic.py` (BankFind aggregates and failures), `mcal.py` (release calendar from the Fed, BLS and CFTC schedules).
   - `insiders.py` Form 4 XML parsing (owner, role, code, shares, price, holdings after, 10b5-1).
   - `news.py`, `summaries.py` recent coverage and written summaries.
   - `screener.py` the screener factor table: 189 fields per company (valuation and 5-year percentiles, growth, quality, balance sheet, Piotroski components, technicals, correlations to market, rates, commodities, the dollar, bitcoin and macro series, insider and filing activity, KPI families, segments), each with a definition, unit, source and per-company provenance.
@@ -40,6 +41,9 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | | `market.json` | Index, ETF, rates and commodity closes |
 | | `macro.json` | Curve, FRED series, fed funds, macro news and brief |
 | | `feed.json` | Latest filings across the universe |
+| | `macro/catalog.json` | Macro page: every series with metadata and statistics, upcoming releases, this week's largest moves |
+| | `macro/s/{id}.json`, `macro/snap/{id}.json` | Series history (current values, first-seen dates, revisions) and the publisher's rows for the source panel |
+| | `macro/registry.json`, `macro/releases.json`, `macro/state.json` | Series registry, release calendar, Fed file Last-Modified cursor |
 | | `companies/{T}.json` | Statements, filing tables, original tables, release, news, summary |
 | | `prices/{SYMBOL}.json` | 2y daily + 5d 5-minute bars (`^VIX` → `IDX_VIX`, `CL=F` → `CL_F`) |
 | | `filings/{accession}.html.gz` | Full filed documents for the source panel (scripts removed, EDGAR base URL added), gzipped and inflated in the browser |
@@ -77,6 +81,10 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | `/api/cron/technicals?merge=1` | 23:10 Mon-Fri | Combines the parts into `tech/signals.json`, `tech/breadth.json`, `tech/states.json` |
 | `/api/cron/insiders` | 15:30, 23:30 | Parses new Form 4 filings into `insider_transactions`, rewrites `insiders/{T}.json` and `meta/insiders.json` |
 
+| `/api/cron/mdata?source=…` | daily per source (calendar 06:15, oecd 09:20, bls 13:50, nyfed 18:25, cftc 20:55, frb_monthly 21:15, frb_weekly 22:45, frb_daily and treasury 23:15/23:35 weekdays, fdic Mondays 09:40) | Macro series store. Fed files are only re-read when their Last-Modified changes |
+
+Macro store: `macro_series` holds one row per series (publisher, release, series code, units, frequency, adjustment, geography, URLs). `macro_series_obs` keeps every vintage: `macro_ingest()` inserts a row only when a value is new or differs from the latest stored one, with `vintage` = the publisher's release date when the source states it (Fed file Last-Modified) and the retrieval date otherwise; `macro_series_latest` is the current view. Until the tables exist the jobs run storage-only and backfill the tables on their first run after.
+
 Every run is logged in `etl_runs`; the latest runs are published to `meta/status.json` for the Data status page.
 
 Vercel Hobby runs each cron entry once a day within the scheduled hour, which is why the jobs are split into several entries.
@@ -87,7 +95,7 @@ Set in Vercel (the Supabase ones come from the integration):
 
 `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `POSTGRES_URL_NON_POOLING`, `FIREWORKS_API_KEY`, `TAVILY_API_KEY`, `FIRECRAWL_API_KEY`, `CRON_SECRET`, `SEC_USER_AGENT` (SEC asks for `Name email@domain`).
 
-Optional: `FU_ASSISTANT_MODEL`, `FU_ASSISTANT_FALLBACK`, `FU_SUMMARY_MODEL`, `FU_SUMMARY_FALLBACK`.
+Optional: `BLS_API_KEY` (raises the BLS API quota), `FU_ASSISTANT_MODEL`, `FU_ASSISTANT_FALLBACK`, `FU_SUMMARY_MODEL`, `FU_SUMMARY_FALLBACK`.
 
 ## Running the ETL locally
 
@@ -111,6 +119,7 @@ python -m etl.run technicals --events            # tech/events from EDGAR submis
 python -m etl.run technicals                     # all four parts, then the merge
 node --test tests/technicals/*.test.cjs          # indicator tests (TA-Lib reference values and worked examples)
 python3 tests/technicals/test_parity.py          # JS and Python signal definitions find identical events
+python -m etl.run mdata --source nyfed --full-history   # macro store: one source, full backfill (sources in etl/macrojobs.py)
 ```
 
 Adding a company: append it to `etl/universe.py` and run `python -m etl.run companies --tickers NEW` then `python -m etl.run prices`.

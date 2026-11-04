@@ -159,6 +159,46 @@
     {
       "path": "/api/cron/technicals?merge=1&parts=4",
       "schedule": "10 23 * * 1-5"
+    },
+    {
+      "path": "/api/cron/mdata?source=calendar",
+      "schedule": "15 6 * * *"
+    },
+    {
+      "path": "/api/cron/mdata?source=oecd",
+      "schedule": "20 9 * * *"
+    },
+    {
+      "path": "/api/cron/mdata?source=fdic",
+      "schedule": "40 9 * * 1"
+    },
+    {
+      "path": "/api/cron/mdata?source=bls",
+      "schedule": "50 13 * * *"
+    },
+    {
+      "path": "/api/cron/mdata?source=nyfed",
+      "schedule": "25 18 * * *"
+    },
+    {
+      "path": "/api/cron/mdata?source=cftc",
+      "schedule": "55 20 * * *"
+    },
+    {
+      "path": "/api/cron/mdata?source=frb_monthly",
+      "schedule": "15 21 * * *"
+    },
+    {
+      "path": "/api/cron/mdata?source=frb_weekly",
+      "schedule": "45 22 * * *"
+    },
+    {
+      "path": "/api/cron/mdata?source=frb_daily",
+      "schedule": "15 23 * * 1-5"
+    },
+    {
+      "path": "/api/cron/mdata?source=treasury",
+      "schedule": "35 23 * * 1-5"
     }
   ],
   "headers": [
