@@ -147,6 +147,7 @@ table.fin td:not(.lab) { font-family: var(--f-mono); font-size: 12px; }
 /* The workspace keeps its own paper and cell styles; only the surrounding shell changes. */
 .page:has(.ws-workspace) { max-width: none; padding: 0; gap: 0; }
 .main:has(.ws-workspace) > .foot-legal { padding: 12px 20px; border-top: 1px solid var(--line); }
+@media screen and (min-width: 861px) { .main:has(.ws-workspace) > .foot-legal { display: none; } }
 
 @media (max-width: 1400px) {
   .market-tape { gap: 9px; }
