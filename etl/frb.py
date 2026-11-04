@@ -301,6 +301,8 @@ def collect(keys, state, force=False, log=print):
             log(f"frb {key}: unchanged since {lm}")
             continue
         blob, pub, lm2 = fetch(url)
+        if "datadownload/Output.aspx" in url:
+            pub = None  # DDP output is generated on request, so its Last-Modified is not a publication date
         series = z1_series(blob, pub) if key == "Z1" else release_series(key, blob, pub)
         log(f"frb {key}: {len(series)} series, file of {pub}")
         out.append((key, url, lm2 or lm, series))

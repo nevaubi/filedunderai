@@ -52,14 +52,14 @@ def display_series(meta, pts):
     """Turns stored values into what the page shows: level x scale, year-over-year % or period change."""
     kind, scale = meta.get("display", "level"), meta.get("scale", 1)
     if kind == "yoy":
-        lag = {"M": 12, "Q": 4, "W": 52, "A": 1}.get(meta.get("frequency"), 12)
-        by = {d: v for d, v in pts}
+        freq = meta.get("frequency")
+        if freq not in ("M", "Q", "A"):
+            return []
+        key = (lambda d: d[:4]) if freq == "A" else (lambda d: d[:7])
+        by = {key(d): v for d, v in pts}
         out = []
         for d, v in pts:
-            y = int(d[:4]) - 1
-            p = by.get(f"{y}{d[4:]}")
-            if p is None and meta.get("frequency") == "W":
-                continue
+            p = by.get(str(int(d[:4]) - 1) + key(d)[4:])
             if p:
                 out.append((d, (v / p - 1) * 100))
         return out
