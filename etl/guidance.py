@@ -594,7 +594,26 @@ def llm_extract(chunk, ctx):
     prompt = PROMPT.format(name=ctx["name"], tk=ctx["tk"], fye_text=fye_text(ctx["fye"]), naming=naming, doc_kind=ctx["doc_kind"],
                            issued=ctx["issued"], period=ctx.get("period") or "an unstated period", period_end=ctx.get("period_end") or "unknown",
                            metrics=" | ".join(f'"{m}"' for m in METRICS), text=chunk)
+    # model answers are cached by prompt in the private bucket, so a re-run after an extractor change (or after the
+    # provider was unavailable for part of a run) only pays for excerpts it has not seen
+    sb = ctx.get("sb")
+    key = f"guidance/llm/{hashlib.sha1((PRIMARY + '|' + REASONING + '|' + prompt).encode()).hexdigest()}.json.gz"
+    if sb is not None:
+        try:
+            b = sb.get_object("raw", key)
+            if b:
+                c = json.loads(gzip.decompress(b))
+                with _llm_lock:
+                    LLM_STATS["cached"] += 1
+                return c["answer"], c["model"]
+        except Exception:
+            pass
     j, model = complete_json(prompt)
+    if sb is not None:
+        try:
+            sb.put_object("raw", key, gzip.compress(json.dumps({"model": model, "at": now_iso(), "answer": j}).encode()), "application/gzip", cache="no-store")
+        except Exception:
+            pass
     return j, model
 
 
@@ -766,7 +785,7 @@ def process_doc(sb, tk, name, fye, doc, use_llm=True):
         return status, []
     pages = text["pages"]
     per, pend = doc_period(tk, fye, doc, issued)
-    ctx = {"tk": tk, "name": name, "fye": norm_fye(fye_at(tk, fye, issued)), "issued": issued, "period": per, "period_end": pend,
+    ctx = {"sb": sb, "tk": tk, "name": name, "fye": norm_fye(fye_at(tk, fye, issued)), "issued": issued, "period": per, "period_end": pend,
            "doc_kind": {"release": "earnings release", "presentation": "investor presentation", "remarks": "prepared remarks",
                         "transcript": "earnings call transcript", "supplement": "financial supplement"}.get(doc.get("doc_type"), "8-K exhibit")}
     rows, rejected, methods, models = [], collections.Counter(), set(), set()
