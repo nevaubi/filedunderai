@@ -895,7 +895,8 @@ async function route() {
   if (pid === "companies") pid = "screener";
   document.querySelectorAll("[data-p]").forEach(a => a.classList.toggle("on", a.dataset.p === pid || (pid === "company" && a.dataset.p === "screener")));
   document.querySelectorAll("#wl a").forEach(a => a.classList.toggle("on", a.dataset.t === arg));
-  const fn = { markets: pMarkets, screener: pScreener, company: () => pCompany(arg), compare: pCompare, feed: pFeed, technicals: pTechnicals, sectors: pSectors, macro: pMacro, theses: pTheses, workbench: pWorkbench, research: pResearch, coverage: pCoverage }[pid] || pMarkets;
+  const reg = window.FU_PAGES && window.FU_PAGES[pid];
+  const fn = reg ? () => reg(arg) : { markets: pMarkets, screener: pScreener, company: () => pCompany(arg), compare: pCompare, feed: pFeed, technicals: pTechnicals, sectors: pSectors, macro: pMacro, theses: pTheses, workbench: pWorkbench, research: pResearch, coverage: pCoverage }[pid] || pMarkets;
   document.title = (pid === "company" && arg ? `${arg} · ${SHORT[arg] || ""} · ` : (PAGES.find(p => p.id === pid)?.name ? PAGES.find(p => p.id === pid).name + " · " : "")) + "Filed Under";
   window.scrollTo(0, 0);
   loadingView(pid === "company" ? `Loading ${arg} filings` : "Loading");
