@@ -13,7 +13,7 @@ let CAT = null, CAT_AT = 0;
 async function catalogue() {
   if (CAT && Date.now() - CAT_AT < 10 * 60e3) return CAT;
   const base = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
-  const r = await fetch(`${base}/storage/v1/object/public/public-data/screener.json`);
+  const r = await fetch(`${base}/storage/v1/object/public/public-data/screener.json`, { signal: AbortSignal.timeout(12000) });
   if (!r.ok) throw new Error(`screener.json ${r.status}`);
   const d = await r.json();
   const col = Object.fromEntries(d.cols.map((c, i) => [c, i]));
@@ -89,9 +89,9 @@ Fields (id | name | unit | definition | distribution across the S&P 500):
 ${fieldText}`;
 }
 
-async function complete(model, messages) {
+async function complete(model, messages, signal) {
   const r = await fetch("https://api.fireworks.ai/inference/v1/chat/completions", {
-    method: "POST",
+    method: "POST", signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(25000)]) : AbortSignal.timeout(25000),
     headers: { Authorization: `Bearer ${process.env.FIREWORKS_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({ model: `accounts/fireworks/models/${model}`, messages, max_tokens: 6000, temperature: 0.1, response_format: { type: "json_object" } }),
   });
@@ -99,33 +99,35 @@ async function complete(model, messages) {
   const d = await r.json();
   const text = String(d.choices?.[0]?.message?.content || "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
   const m = text.match(/\{[\s\S]*\}/);
-  return JSON.parse(m ? m[0] : text);
+  const parsed = JSON.parse(m ? m[0] : text);
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed) || !Array.isArray(parsed.filters)) throw new Error("Malformed screen specification");
+  return parsed;
 }
 
-async function ask(messages) {
-  try { return { raw: await complete(PRIMARY, messages), model: PRIMARY }; }
-  catch (e) { if (e.status && e.status < 500 && e.status !== 404) throw e; return { raw: await complete(FALLBACK, messages), model: FALLBACK }; }
+async function ask(messages, signal) {
+  try { return { raw: await complete(PRIMARY, messages, signal), model: PRIMARY }; }
+  catch (e) { if (signal?.aborted || (e.status && e.status < 500 && e.status !== 404 && e.status !== 429)) throw e; return { raw: await complete(FALLBACK, messages, signal), model: FALLBACK }; }
 }
 
-export async function buildSpec({ prompt, history = [], current = null }) {
+export async function buildSpec({ prompt, history = [], current = null, signal }) {
   const cat = await catalogue();
   const messages = [{ role: "system", content: systemPrompt(cat) }];
   for (const h of history.slice(-6)) {
     if (h && typeof h.prompt === "string" && h.spec) {
       messages.push({ role: "user", content: h.prompt.slice(0, 1500) });
-      messages.push({ role: "assistant", content: JSON.stringify(h.spec).slice(0, 6000) });
+      messages.push({ role: "assistant", content: JSON.stringify(SPEC.validate(h.spec, cat).spec) });
     }
   }
   const cur = current ? SPEC.validate(current, cat).spec : null;
-  messages.push({ role: "user", content: (cur && (cur.filters.length || cur.similar_to || cur.sectors.length || cur.industries.length) ? `Current screen:\n${JSON.stringify(cur)}\n\nRequest: ` : "Request: ") + String(prompt).slice(0, 1500) });
-  let { raw, model } = await ask(messages);
+  messages.push({ role: "user", content: (cur ? `Current screen:\n${JSON.stringify(cur)}\n\nRequest: ` : "Request: ") + String(prompt).slice(0, 1500) });
+  let { raw, model } = await ask(messages, signal);
   let res = SPEC.validate(raw, cat);
   let retried = false;
   if (res.errors.length) {
     retried = true;
-    messages.push({ role: "assistant", content: JSON.stringify(raw).slice(0, 6000) });
+    messages.push({ role: "assistant", content: JSON.stringify(raw) });
     messages.push({ role: "user", content: `That spec has errors: ${res.errors.join("; ")}. Use only field ids, sectors, industries and tickers from the catalogue. Return the corrected full JSON spec.` });
-    ({ raw, model } = await ask(messages));
+    ({ raw, model } = await ask(messages, signal));
     res = SPEC.validate(raw, cat);
   }
   return { spec: res.spec, errors: res.errors, warnings: res.warnings, retried, model, asof: cat.asof };
@@ -139,11 +141,15 @@ export default async function handler(req, res) {
   if (JSON.stringify(body).length > 60_000) return res.status(413).json({ error: "Request too large" });
   const prompt = String(body.prompt || "").trim();
   if (!prompt) return res.status(400).json({ error: "prompt is required" });
+  const ctl = new AbortController(), cancel = () => ctl.abort();
+  req.on?.("aborted", cancel);
+  const close = () => { if (!res.writableEnded) cancel(); }; res.on?.("close", close);
   try {
-    const out = await buildSpec({ prompt, history: Array.isArray(body.history) ? body.history : [], current: body.current || null });
+    const out = await buildSpec({ prompt, history: Array.isArray(body.history) ? body.history : [], current: body.current || null, signal: ctl.signal });
     res.setHeader("Cache-Control", "no-store");
     return res.status(200).json(out);
   } catch (e) {
+    if (ctl.signal.aborted) return;
     return res.status(502).json({ error: "The screen agent did not return a usable screen. Try rephrasing.", detail: String(e.message || e).slice(0, 200) });
-  }
+  } finally { req.off?.("aborted", cancel); res.off?.("close", close); }
 }

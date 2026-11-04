@@ -5,3 +5,4 @@ __pycache__/
 *.pyc
 .vercel/
 cache/
+public/vendor/office.js

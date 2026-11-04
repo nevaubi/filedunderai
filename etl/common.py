@@ -1,6 +1,8 @@
 """Shared plumbing: environment, HTTP with retries, Supabase REST and Storage."""
 import datetime as dt
 import gzip
+import functools
+import uuid
 import hashlib
 import json
 import os
@@ -146,14 +148,21 @@ class Supabase:
         self.url = os.environ["SUPABASE_URL"].rstrip("/")
         self.key = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
 
+    def _check_lease(self):
+        lease = getattr(self, "_aggregate_lease", None)
+        if lease:
+            lease.check()
+
     def _h(self, extra=None):
         h = {"apikey": self.key, "Authorization": f"Bearer {self.key}"}
         h.update(extra or {})
         return h
 
     def upsert(self, table, rows, on_conflict, batch=500):
+        self._check_lease()
         rows = list(rows)
         for i in range(0, len(rows), batch):
+            self._check_lease()
             chunk = rows[i:i + batch]
             request(f"{self.url}/rest/v1/{table}?on_conflict={on_conflict}", method="POST", data=chunk,
                     headers=self._h({"Prefer": "resolution=merge-duplicates,return=minimal", "Content-Type": "application/json"}), timeout=120)
@@ -184,6 +193,7 @@ class Supabase:
             offset += 1000
 
     def put_object(self, bucket, path, content, content_type="application/json", cache="max-age=300"):
+        self._check_lease()
         if isinstance(content, str):
             content = content.encode()
         request(f"{self.url}/storage/v1/object/{bucket}/{urllib.parse.quote(path)}", method="POST", data=content,
@@ -220,6 +230,130 @@ class Supabase:
         return json.loads(request(f"{self.url}/rest/v1/rpc/{fn}", method="POST", data=args, headers=self._h()) or "null")
 
 
+class LeaseBusy(RuntimeError):
+    pass
+
+
+class AggregateLease:
+    """Serialize aggregate publishers across machines using a renewable DB lease.
+
+    Requires the additive etl_leases RPC migration. Never fall back to unsafe writes.
+    A lost heartbeat stops subsequent guarded writes; publication is not transactional.
+    """
+    def __init__(self, sb, name="financial-aggregates", seconds=300):
+        self.sb, self.name = sb, name
+        self.seconds = max(30, min(seconds, 600))
+        self.owner = str(uuid.uuid4())
+        self.stop = threading.Event()
+        self.lost = None
+
+    def acquire(self):
+        return self.sb.rpc("acquire_etl_lease", {"lock_name":self.name, "owner":self.owner, "lease_seconds":self.seconds}) is True
+
+    def check(self):
+        if getattr(self, "valid_until", float("inf")) <= time.monotonic():
+            self.lost = "lease expired before publication"
+        if self.lost:
+            raise RuntimeError("Aggregate lease lost; refusing publication: " + self.lost)
+
+    def __enter__(self):
+        try:
+            acquired = self.acquire()
+        except Exception as e:
+            raise RuntimeError("ETL lease unavailable; apply the etl_leases migration before aggregate publishing") from e
+        if not acquired:
+            raise LeaseBusy("Aggregate publisher already running; retry this job later")
+        self.valid_until = time.monotonic() + self.seconds
+        def renew():
+            while not self.stop.wait(self.seconds / 3):
+                try:
+                    self.check()
+                    if not self.acquire():
+                        self.lost = "lease owned by another run"
+                        return
+                    self.check()
+                    self.valid_until = time.monotonic() + self.seconds
+                except Exception as e:
+                    self.lost = str(e)
+                    return
+        self.thread = threading.Thread(target=renew, daemon=True)
+        self.thread.start()
+        return self
+
+    def __exit__(self, et, ev, tb):
+        self.stop.set()
+        self.thread.join(timeout=1)
+        try:
+            self.sb.rpc("release_etl_lease", {"lock_name":self.name, "owner":self.owner})
+        except Exception as e:
+            print("ETL lease release failed (will expire):", str(e)[:200])
+        if not ev:
+            self.check()
+        return False
+
+
+_aggregate_local = threading.local()
+
+
+def serialized_aggregates(fn):
+    @functools.wraps(fn)
+    def wrapped(sb, *args, **kwargs):
+        # Nested build_index shares its caller's lease on this thread only.
+        held = getattr(_aggregate_local, "held", None)
+        if held and held.sb is sb:
+            held.check()
+            return fn(sb, *args, **kwargs)
+        with AggregateLease(sb) as lease:
+            _aggregate_local.held = lease
+            # Guard writes made by worker threads sharing this client as well.
+            previous = getattr(sb, "_aggregate_lease", None)
+            sb._aggregate_lease = lease
+            try:
+                return fn(sb, *args, **kwargs)
+            finally:
+                sb._aggregate_lease = previous
+                _aggregate_local.held = held
+    return wrapped
+
+
+def run_outcome(stats, error=None):
+    """A completed function can still represent a partial or skipped job."""
+    if error:
+        return "error"
+    failures, skipped = 0, 0
+    def count(value):
+        nonlocal failures, skipped
+        if isinstance(value, dict):
+            for v in value.values():
+                count(v)
+        elif isinstance(value, (list, tuple)):
+            for v in value:
+                count(v)
+        elif isinstance(value, (int, float)):
+            failures += int(value)
+        elif value:
+            if "skipped" in str(value).lower() or str(value).lower() in ("deadline", "time budget"):
+                skipped += 1
+            else:
+                failures += 1
+    def inspect(obj):
+        nonlocal skipped
+        for key, value in obj.items():
+            if key in ("failed", "errors"):
+                count(value)
+            elif key == "skipped":
+                skipped += len(value) if isinstance(value, (dict,list)) else int(value or 0)
+            elif isinstance(value, dict):
+                inspect(value)
+    inspect(stats)
+    completed = next((stats[k] for k in ("done", "symbols", "rows", "stocks") if isinstance(stats.get(k), int)), None)
+    if failures:
+        return "error" if completed == 0 else "partial"
+    if skipped:
+        return "skipped" if completed == 0 else "partial"
+    return "ok"
+
+
 class Run:
     """Records an etl_runs row for a job."""
 
@@ -239,7 +373,7 @@ class Run:
         self.stats["seconds"] = round(time.time() - self.t0, 1)
         if self.id:
             try:
-                self.sb.update("etl_runs", {"id": self.id}, {"finished_at": now_iso(), "status": "error" if ev else "ok", "stats": self.stats, "error": str(ev)[:2000] if ev else None})
+                self.sb.update("etl_runs", {"id": self.id}, {"finished_at": now_iso(), "status": run_outcome(self.stats, ev), "stats": self.stats, "error": str(ev)[:2000] if ev else None})
             except Exception as e:
                 print("etl_runs update failed:", e)
         publish_status(self.sb)
@@ -251,7 +385,18 @@ def publish_status(sb):
     try:
         rows = sb.select("etl_runs", "select=job,started_at,finished_at,status,stats,error&order=started_at.desc&limit=200")
         latest, recent = {}, []
+        now = dt.datetime.now(dt.timezone.utc)
         for r in rows:
+            if r.get("status") == "running" and r.get("started_at"):
+                try:
+                    started = dt.datetime.fromisoformat(r["started_at"].replace("Z", "+00:00"))
+                    age = (now-started).total_seconds()
+                    r["stale"] = age > float(os.environ.get("ETL_STALE_SECONDS", "7200"))
+                    if r["stale"]:
+                        r["status"] = "stale"
+                        r["running_age_seconds"] = round(age)
+                except (ValueError, TypeError):
+                    r["stale"] = None
             if r.get("error"):
                 r["error"] = r["error"][:300]
             if r["job"] not in latest:

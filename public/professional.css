@@ -1,0 +1,105 @@
+/* Quiet shared-shell refinements. Uses existing app tokens and retains dark-theme support. */
+:root {
+  --radius: 8px;
+}
+.rail {
+  border-right-color: var(--line);
+  box-shadow: 2px 0 16px rgba(19, 39, 63, 0.015);
+}
+.brand {
+  letter-spacing: -0.4px;
+}
+.brand b {
+  font-weight: 600;
+}
+.top {
+  box-shadow: 0 1px 0 rgba(19, 39, 63, 0.025);
+}
+.search {
+  border-radius: 7px;
+}
+.nav a {
+  transition:
+    background 0.12s,
+    color 0.12s;
+}
+.nav a.on {
+  box-shadow: inset 2px 0 currentColor;
+}
+.panel {
+  box-shadow: 0 2px 8px rgba(25, 45, 68, 0.025);
+  border-radius: 9px;
+}
+.panel > .hd {
+  min-height: 50px;
+}
+.btn {
+  border-radius: 5px;
+  font-weight: 500;
+}
+.btn:focus-visible,
+.iconbtn:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+input,
+select,
+textarea {
+  accent-color: var(--accent);
+}
+.ph h1 {
+  letter-spacing: -0.65px;
+  font-weight: 600;
+}
+.ph .sub {
+  line-height: 1.65;
+  max-width: 880px;
+}
+.chip,
+.badge {
+  font-weight: 500;
+}
+.tw table thead th {
+  font-weight: 600;
+}
+.tw table td {
+  font-variant-numeric: tabular-nums;
+}
+.drawer {
+  box-shadow: -15px 0 70px rgba(19, 39, 63, 0.1);
+}
+.drawer .dh {
+  border-bottom: 1px solid var(--line);
+}
+.drawer .db {
+  line-height: 1.65;
+}
+.drawer .db h3 {
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+.drawer .db .note {
+  border-radius: 6px;
+}
+.foot-legal {
+  line-height: 1.7;
+  opacity: 0.8;
+}
+.toasts {
+  font-size: 12px;
+}
+@media (min-width: 1200px) {
+  .page:has(.ws-workspace) {
+    padding: 24px 26px 10px;
+    max-width: none;
+  }
+  .main:has(.ws-workspace) .foot-legal {
+    padding-top: 4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav a {
+    transition: none;
+  }
+}

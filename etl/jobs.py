@@ -1,11 +1,12 @@
 """ETL jobs. Each job is resumable and writes both Postgres rows and the JSON bundles the site reads."""
 import datetime as dt
 import json
+import hashlib
 import time
 from concurrent.futures import ThreadPoolExecutor
 
 from . import docs, fundamentals, insiders, macro, news, prices, sec, summaries
-from .common import Run, Supabase, now_iso
+from .common import Run, Supabase, now_iso, serialized_aggregates
 from .universe import BY_TICKER, MARKET_SYMBOLS, SECTOR_ETF, SP100, UNIVERSE
 
 IR_URLS = {
@@ -28,10 +29,12 @@ def describe(f):
             "SC 13G": "Beneficial owner >5%", "SC 13G/A": "Beneficial owner >5%", "3": "Initial insider holdings"}.get(f["f"], f["x"] or f["f"])
 
 
-def _cache(sb, path, default):
+def _cache(sb, path, default, strict=False):
     try:
         return sb.get_json(path) or default
     except Exception:
+        if strict:
+            raise
         return default
 
 
@@ -39,18 +42,29 @@ def _cache(sb, path, default):
 def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_docs=True, store_raw=True, log=print):
     u = BY_TICKER[tk]
     cik = u["cik"]
-    prev = _cache(sb, f"companies/{tk}.json", {})
+    warnings = []
+    def warn(message):
+        warnings.append(message.strip())
+        log(message)
+    prev = _cache(sb, f"companies/{tk}.json", {}, strict=True)
     sub = sec.submissions(cik)
     cf = sec.companyfacts(cik)
     facts = cf["facts"]
+    source_archive = None
     if store_raw:
+        original = json.dumps(cf)
+        digest = hashlib.sha256(original.encode()).hexdigest()
+        source_archive = f"sec/companyfacts/archives/CIK{cik:010d}/{digest}.json"
+        sb.put_raw(source_archive, original, ticker=tk, kind="companyfacts_snapshot", source_url=f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json")
         sb.put_raw(f"sec/companyfacts/CIK{cik:010d}.json", json.dumps(cf), ticker=tk, kind="companyfacts", source_url=f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json")
     filings = sec.filing_list(sub)
     try:
         sec.fill_gaps(cik, facts, sub, log=log)
     except Exception as e:
-        log(f"  {tk} gap filler failed: {str(e)[:200]}")
+        warn(f"  {tk} gap filler failed: {str(e)[:200]}")
     statements = {k: sec.build_series(facts, k) for k in sec.CONCEPTS}
+    if not any(statements.values()):
+        raise ValueError("No usable statement facts; preserving prior company bundle")
     prof = sec.profile(sub, facts)
     ftables = sec.filing_tables(facts, statements, filings, cik)
     earn = [{"filed": f["d"], "accn": f["a"], "url": sec.filing_url(cik, f["a"], f["p"])} for f in filings if f["f"] == "8-K" and "2.02" in (f["i"] or "")][:12]
@@ -73,12 +87,12 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
                     try:
                         docs.publish_filing(sb, html, cik, f["a"])
                     except Exception as e:
-                        log(f"  {tk} publish {f['a']} failed: {str(e)[:160]}")
+                        warn(f"  {tk} publish {f['a']} failed: {str(e)[:160]}")
                 tabs = docs.ix_tables(html)
                 if tabs:
                     ix[f["a"]] = {"form": f["f"], "url": url, "tables": tabs}
             except Exception as e:
-                log(f"  {tk} ix {f['a']} failed: {str(e)[:160]}")
+                warn(f"  {tk} ix {f['a']} failed: {str(e)[:160]}")
 
     # latest earnings release text
     release = prev.get("release")
@@ -92,14 +106,14 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
                 if store_raw:
                     sb.put_raw(f"sec/releases/{e0['accn']}.md", md, ticker=tk, accession=e0["accn"], kind="earnings_release", source_url=url)
         except Exception as e:
-            log(f"  {tk} release failed: {str(e)[:160]}")
+            warn(f"  {tk} release failed: {str(e)[:160]}")
 
     coverage = prev.get("news") or {}
     if refresh_news or not coverage.get("items"):
         try:
             coverage = {"items": news.company_news(u["name"], tk), "fetched_at": now_iso()}
         except Exception as e:
-            log(f"  {tk} news failed: {str(e)[:160]}")
+            warn(f"  {tk} news failed: {str(e)[:160]}")
 
     summary = prev.get("summary")
     release_changed = (release or {}).get("accn") != ((prev.get("release") or {}).get("accn"))
@@ -107,7 +121,7 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
         try:
             summary = summaries.company(u["name"], tk, statements, prof["fiscalYearEnd"], (release or {}).get("markdown"), coverage.get("items", []))
         except Exception as e:
-            log(f"  {tk} summary failed: {str(e)[:160]}")
+            warn(f"  {tk} summary failed: {str(e)[:160]}")
 
     if fundamentals.FYE_HISTORY.get(tk):
         prof["fyeHistory"] = fundamentals.FYE_HISTORY[tk]
@@ -117,7 +131,7 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
         prof["fyTransitions"] = fundamentals.TRANSITIONS[tk]
     bundle = {
         "ticker": tk, "cik": cik, "displayName": u["name"], "sector": u["sector"], "irUrl": IR_URLS.get(tk), "generated": now_iso(),
-        "profile": prof, "statements": statements, "filings": [f for f in filings][:250], "filingTables": ftables,
+        "profile": prof, "statements": statements, "source_archive": source_archive, "normalization": {"version": 2, "vintage": "latest", "availability_resolution": "filing_date"}, "warnings": warnings, "filings": [f for f in filings][:250], "filingTables": ftables,
         "earnings8k": earn, "ix": ix, "release": release, "news": coverage, "summary": summary,
     }
     sb.put_json(f"companies/{tk}.json", bundle)
@@ -148,8 +162,8 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
         sb.upsert("summaries", [{"id": f"company:{tk}", "kind": "company", "ticker": tk, "content": summary, "generated_at": summary.get("generated_at") or now_iso()}], "id")
 
     fund = fundamentals.compute(statements, prof, None)
-    return {"ticker": tk, "name": u["name"], "legal_name": prof["name"], "sector": u["sector"], "sic": prof["sicDescription"], "exchange": (prof["exchanges"] or [None])[0],
-            "fye": prof["fiscalYearEnd"], "shares": (prof["sharesOutstanding"] or {}).get("val"), "latest_filing": filings[0]["d"] if filings else None,
+    return {"ticker": tk, "warnings": warnings, "name": u["name"], "legal_name": prof["name"], "sector": u["sector"], "sic": prof["sicDescription"], "exchange": (prof["exchanges"] or [None])[0],
+            "fye": prof["fiscalYearEnd"], "shares": (prof["sharesOutstanding"] or {}).get("val"), "shares_metadata": prof["sharesOutstanding"], "latest_filing": filings[0]["d"] if filings else None,
             "latest_accession": filings[0]["a"] if filings else None, "material_accession": material_accession(filings), "fund": fund, "has_source_tables": bool(ix), "has_release": bool(release),
             "div_ttm": fundamentals.ttm(statements, "Dividends paid", ("cashflow",)), "bb_ttm": fundamentals.ttm(statements, "Buybacks", ("cashflow",))}
 
@@ -218,16 +232,17 @@ def detect_changes(sb, tickers, fund, deadline):
     return changed
 
 
+@serialized_aggregates
 def companies_job(sb, tickers=None, workers=4, refresh_news=False, refresh_summary=False, fetch_docs=True, time_budget=None, only_changed=False, max_companies=None):
     with Run(sb, "companies") as run:
         t0 = time.time()
-        fund = _cache(sb, "meta/fundamentals.json", {})
+        fund = _cache(sb, "meta/fundamentals.json", {}, strict=True)
         tickers = tickers or [t for t, *_ in UNIVERSE]
         if only_changed:
             tickers = detect_changes(sb, tickers, fund, deadline=t0 + (time_budget or 600) * 0.4)
         if max_companies:
             tickers = tickers[:max_companies]
-        done, failed = [], {}
+        done, failed, skipped, enrichment_errors = [], {}, {}, {}
 
         def one(tk):
             if time_budget and time.time() - t0 > time_budget:
@@ -241,21 +256,27 @@ def companies_job(sb, tickers=None, workers=4, refresh_news=False, refresh_summa
             for tk, res, err in ex.map(one, tickers):
                 if res:
                     fund[tk] = res
+                    if res.get("warnings"):
+                        enrichment_errors[tk] = res["warnings"]
                     done.append(tk)
                     print("ok", tk, flush=True)
                     if len(done) % 20 == 0:
                         sb.put_json("meta/fundamentals.json", fund, cache="no-store")
                 else:
-                    failed[tk] = err
+                    if (err or "").startswith("skipped:"):
+                        skipped[tk] = err
+                    else:
+                        failed[tk] = err
                     print("fail", tk, err, flush=True)
         sb.put_json("meta/fundamentals.json", fund, cache="no-store")
-        run.stats.update({"done": len(done), "failed": failed, "tickers": done})
+        run.stats.update({"done": len(done), "failed": failed, "skipped": skipped, "errors": enrichment_errors, "tickers": done})
         build_index(sb)
         build_feed(sb)
         return done, failed
 
 
 # ---------------------------------------------------------------- prices
+@serialized_aggregates
 def prices_job(sb, intraday=True, full_history=False, part=None, parts=1, time_budget=None):
     """Daily and 5-minute bars. With parts > 1 the stock list is split so each run fits a function time limit;
     part 0 also carries the market symbols. Each part writes its own stats file, merged by build_index."""
@@ -278,7 +299,8 @@ def prices_job(sb, intraday=True, full_history=False, part=None, parts=1, time_b
         for s_, d in daily.items():
             pstats[s_] = prices.stats(d["bars"], spy if s_ != "SPY" else None)
             pstats[s_]["spark"] = [round(b[4], 2) for b in d["bars"][-63:]]
-            rows = d["bars"] if full_history else d["bars"][-7:]
+            # Providers revise all adjusted prices after splits; replace the full fetched window.
+            rows = d["bars"]
             db_rows += [{"symbol": s_, "d": dt.datetime.fromtimestamp(b[0], dt.timezone.utc).date().isoformat(), "o": b[1], "h": b[2], "l": b[3], "c": b[4], "v": b[5]} for b in rows]
 
         def put(item):
@@ -294,14 +316,16 @@ def prices_job(sb, intraday=True, full_history=False, part=None, parts=1, time_b
         if db_rows:
             sb.upsert("prices_daily", db_rows, "symbol,d", batch=2000)
         if with_market:
-            market = {"generated": now_iso(), "symbols": {}}
+            market = _cache(sb, "market.json", {}, strict=True)
+            market = {**market, "generated": now_iso(), "symbols": dict(market.get("symbols") or {})}
             for s_ in MARKET_SYMBOLS:
                 if s_ in daily:
                     b = daily[s_]["bars"]
                     market["symbols"][s_] = {"bars": [[x[0], x[4]] for x in b[-270:]], "o": b[-1][1], "h": b[-1][2], "l": b[-1][3]}
             sb.put_json("market.json", market, cache="max-age=300")
         key = "all" if part is None or parts <= 1 else f"p{part}"
-        sb.put_json(f"meta/pricestats/{key}.json", {"generated": now_iso(), "parts": parts, "stats": pstats}, cache="no-store")
+        previous = _cache(sb, f"meta/pricestats/{key}.json", {}, strict=True).get("stats") or {}
+        sb.put_json(f"meta/pricestats/{key}.json", {"generated": now_iso(), "parts": parts, "stats": {**previous, **pstats}}, cache="no-store")
         run.stats.update({"part": key, "symbols": len(daily), "errors": {**err1, **{k + "@5m": v for k, v in err2.items()}}})
         build_index(sb)
         return len(daily), {**err1, **err2}
@@ -310,9 +334,9 @@ def prices_job(sb, intraday=True, full_history=False, part=None, parts=1, time_b
 def load_pricestats(sb):
     """Merges per-part stats files, keeping the newest bar date per symbol."""
     merged = {}
-    sources = [_cache(sb, "meta/pricestats.json", {})]
+    sources = [_cache(sb, "meta/pricestats.json", {}, strict=True)]
     for key in ["all"] + [f"p{i}" for i in range(8)]:
-        doc = _cache(sb, f"meta/pricestats/{key}.json", None)
+        doc = _cache(sb, f"meta/pricestats/{key}.json", None, strict=True)
         if doc:
             sources.append(doc.get("stats") or {})
     for src in sources:
@@ -355,8 +379,11 @@ def _ins_net(entry):
     return (w.get("buy_value") or 0) - (w.get("sell_value") or 0)
 
 
+@serialized_aggregates
 def build_index(sb, pstats=None):
-    fund = _cache(sb, "meta/fundamentals.json", {})
+    fund = _cache(sb, "meta/fundamentals.json", {}, strict=True)
+    if not fund:
+        raise ValueError("Fundamentals missing; refusing to replace index with an empty bundle")
     pstats = pstats or load_pricestats(sb)
     ins = (_cache(sb, "meta/insiders.json", {}) or {}).get("companies", {})
     logos = (_cache(sb, "meta/logos.json", {}) or {}).get("tickers", {})
@@ -368,7 +395,7 @@ def build_index(sb, pstats=None):
         ps = pstats.get(tk) or {}
         fd = dict(f.get("fund") or {})
         price, shares = ps.get("price"), f.get("shares")
-        mcap = price * shares if price and shares else None
+        mcap = fundamentals.market_cap(price, f.get("shares_metadata"), ps.get("as_of"))
         rev, eps, fcf = fd.get("revenue_ttm"), fd.get("eps_ttm"), fd.get("fcf_ttm")
         m = {
             "ticker": tk, "as_of": ps.get("as_of"), "price": price, "chg_1d": ps.get("chg_1d"), "ret_1m": ps.get("ret_1m"), "ret_ytd": ps.get("ret_ytd"), "ret_1y": ps.get("ret_1y"),
@@ -384,7 +411,7 @@ def build_index(sb, pstats=None):
             m["buyback_yield"] = f["bb_ttm"] / mcap
         metrics.append({k: (None if isinstance(v, float) and v != v else v) for k, v in m.items()})
         rows.append({**{k: v for k, v in m.items() if k not in ("updated_at",)}, "name": f["name"], "legal_name": f.get("legal_name"), "sector": f["sector"], "sic": f.get("sic"),
-                     "exchange": f.get("exchange"), "fye": f.get("fye"), "latest_filing": f.get("latest_filing"), "has_source_tables": f.get("has_source_tables"), "sp100": tk in SP100, "logo": tk in logos, "insider_net_90d": _ins_net(ins.get(tk)), "spark": ps.get("spark", [])})
+                     "exchange": f.get("exchange"), "fye": f.get("fye"), "latest_filing": f.get("latest_filing"), "has_source_tables": f.get("has_source_tables"), "sp100": tk in SP100, "logo": tk in logos, "insider_net_90d": _ins_net(ins.get(tk)), "spark": ps.get("spark", []), "shares_metadata": f.get("shares_metadata")})
     if metrics:
         sb.upsert("company_metrics", metrics, "ticker")
     sb.put_json("index.json", {"generated": now_iso(), "sectors": SECTOR_ETF, "companies": rows}, cache="max-age=120")
@@ -525,7 +552,7 @@ def publish_filings_job(sb, tickers=None, workers=6):
     tickers = tickers or [t for t, *_ in UNIVERSE]
 
     def one(tk):
-        b = _cache(sb, f"companies/{tk}.json", {})
+        b = _cache(sb, f"companies/{tk}.json", {}, strict=True)
         cik = BY_TICKER[tk]["cik"]
         n = 0
         for accn, meta in (b.get("ix") or {}).items():
@@ -611,7 +638,7 @@ def segments_for(sb, tk, years=None, log=print):
     years = years or S.TABLE_YEARS
     u = BY_TICKER[tk]
     cik = u["cik"]
-    b = _cache(sb, f"companies/{tk}.json", {})
+    b = _cache(sb, f"companies/{tk}.json", {}, strict=True)
     fye = (b.get("profile") or {}).get("fiscalYearEnd") or "1231"
     cut = (dt.date.today() - dt.timedelta(days=int(365 * years))).isoformat()
     fl = periodic_filings(cik, cut, ticker=tk)
@@ -732,7 +759,7 @@ def ir_job(sb, tickers=None, workers=4, time_budget=None, refresh_site=False, we
             if time_budget and time.time() - t0 > time_budget:
                 return tk, None, "skipped: time budget"
             try:
-                b = _cache(sb, f"companies/{tk}.json", {}) or {}
+                b = _cache(sb, f"companies/{tk}.json", {}, strict=True) or {}
                 fye = (b.get("profile") or {}).get("fiscalYearEnd") or "1231"
                 ir.PERIOD_ENDS[tk] = sorted({dt.date.fromisoformat(x["end"]) for rows in (b.get("statements") or {}).values() for r in rows
                                              for x in r.get("quarterly", []) + r.get("annual", [])})
@@ -754,7 +781,7 @@ def ir_job(sb, tickers=None, workers=4, time_budget=None, refresh_site=False, we
 
 def segments_changed_job(sb, time_budget=240, workers=4):
     """Recomputes segment tables for companies whose latest 10-K/10-Q differs from the one last processed."""
-    fund = _cache(sb, "meta/fundamentals.json", {})
+    fund = _cache(sb, "meta/fundamentals.json", {}, strict=True)
     idx = _cache(sb, "meta/segments.json", {"companies": {}})
     todo = [tk for tk, *_ in UNIVERSE if (fund.get(tk) or {}).get("material_accession") and
             (idx["companies"].get(tk) or {}).get("material_accession") != fund[tk]["material_accession"]]

@@ -2,11 +2,24 @@
   "name": "filedunderai",
   "private": true,
   "type": "module",
-  "engines": { "node": "22.x" },
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
-    "build": "node scripts/migrate.mjs"
+    "build": "node scripts/build.mjs",
+    "migrate": "node scripts/migrate.mjs",
+    "test": "node scripts/test.mjs",
+    "test:financials": "python -m unittest discover -s tests/financials -p \"test_*.py\"",
+    "test:parity": "python tests/technicals/test_parity.py"
   },
   "dependencies": {
+    "docx": "9.5.1",
+    "exceljs": "4.4.0",
     "pg": "8.13.1"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.15",
+    "esbuild": "0.28.2",
+    "jsdom": "26.1.0"
   }
 }
