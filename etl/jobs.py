@@ -779,3 +779,11 @@ def sectors_job(sb, step="publish", time_budget=None):
             st = sectors.publish(sb, time_budget=time_budget)
         run.stats.update(st if isinstance(st, dict) else {"result": st})
         return st
+
+
+# ---------------------------------------------------------------- screener factor table
+def screener_job(sb, full=False, time_budget=None, workers=6):
+    """Builds screener.json (150+ sourced fields per company), screener/src/{T}.json provenance and screener/corr.json.
+    Runs after prices, companies and segments; full=True refetches the 10-year close history and every company."""
+    from .screener import screener_job as build
+    return build(sb, full=full, time_budget=time_budget, workers=workers)
