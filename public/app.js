@@ -924,11 +924,25 @@ function toggleWatch(t) { const w = store.get("watch", WATCH_DEFAULT); const i =
 const STATE = { coTab: store.get("coTab", "overview"), finStmt: "income", finKind: "A", finView: "values", finRange: "all", finDense: store.get("dense", false), taSym: "NVDA", taRange: "1Y", taInd: { sma: true, bb: false, vol: true }, cmp: ["AAPL", "MSFT", "NVDA", "GOOGL"], cmpMetric: "Revenue", cmpKind: "Q", scr: store.get("scr", { sector: "", sort: "market_cap", desc: true, q: "" }) };
 function renderRail() {
   const wl = $("#wl"); wl.innerHTML = "";
-  watchlist().forEach(t => { const c = IDX[t]; wl.append(el("a", { href: "#company-" + t.toLowerCase(), "data-t": t, title: `${c.name} · ${fnum(c.price)}` }, el("span", { class: "t" }, miniLogo(t, 16), t), sparkSVG((c.spark || []).slice(-30), c.chg_1d >= 0 ? css("--up") : css("--down"), 80, 20), el("span", { class: "p num " + cls(c.chg_1d) }, fsgn(c.chg_1d)))); });
+  watchlist().forEach(t => { const c = IDX[t]; wl.append(el("a", { href: "#company-" + t.toLowerCase(), "data-t": t, title: `${c.name} · ${fnum(c.price)}` }, el("span", { class: "t" }, t), sparkSVG((c.spark || []).slice(-30), c.chg_1d >= 0 ? css("--up") : css("--down"), 80, 20), el("span", { class: "p num " + cls(c.chg_1d) }, fsgn(c.chg_1d)))); });
   if (!watchlist().length) wl.append(el("div", { class: "faint", style: "padding:6px 10px;font-size:12px" }, "Star a company to add it."));
 }
 function buildShell() {
-  $("#nav").append(...PAGES.filter(p => !p.hidden).map(p => el("a", { href: "#" + p.id, "data-p": p.id, title: `${p.name} (g then ${p.key})` }, svgUse(p.icon), p.name)));
+  const nav = $("#nav"), visible = PAGES.filter(p => !p.hidden), used = new Set();
+  const sections = [
+    ["Research", ["analyst", "research", "watchlists", "ideas", "theses", "workbench"]],
+    ["Market data", ["markets", "screener", "compare", "technicals", "sectors", "kpis", "macro"]],
+  ];
+  for (const [label, ids] of sections) {
+    const entries = ids.map(id => visible.find(p => p.id === id)).filter(Boolean);
+    if (!entries.length) continue;
+    nav.append(el("div", { class: "nav-heading" }, label));
+    for (const p of entries) {
+      used.add(p.id);
+      nav.append(el("a", { href: "#" + p.id, "data-p": p.id, title: `${p.name} (g then ${p.key})` }, svgUse(p.icon), p.name));
+    }
+  }
+  for (const p of visible.filter(p => !used.has(p.id))) nav.append(el("a", { href: "#" + p.id, "data-p": p.id, title: `${p.name} (g then ${p.key})` }, svgUse(p.icon), p.name));
   $("#mnav").append(...PAGES.filter(p => !p.hidden).map(p => el("a", { href: "#" + p.id, "data-p": p.id }, p.name)));
   renderRail();
   const lt = last("SPY")?.t;
@@ -951,7 +965,11 @@ async function route() {
   if (h.startsWith("company-")) { pid = "company"; arg = h.slice(8).toUpperCase(); }
   else { const i = h.indexOf("-"); if (i > 0 && window.FU_PAGES && window.FU_PAGES[h.slice(0, i)]) { pid = h.slice(0, i); arg = decodeURIComponent(h.slice(i + 1)); } }
   if (pid === "companies") pid = "screener";
-  document.querySelectorAll("[data-p]").forEach(a => a.classList.toggle("on", a.dataset.p === pid || (pid === "company" && a.dataset.p === "screener")));
+  document.querySelectorAll("[data-p]").forEach(a => {
+    const current = a.dataset.p === pid || (pid === "company" && a.dataset.p === "screener");
+    a.classList.toggle("on", current);
+    if (current) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+  });
   document.querySelectorAll("#wl a").forEach(a => a.classList.toggle("on", a.dataset.t === arg));
   const reg = window.FU_PAGES && window.FU_PAGES[pid];
   const fn = reg ? () => reg(arg) : { markets: pMarkets, screener: pScreener, company: () => pCompany(arg), compare: pCompare, feed: pFeed, technicals: pTechnicals, sectors: pSectors, macro: pMacro, theses: pTheses, workbench: pWorkbench, research: pResearch, coverage: pCoverage }[pid] || pMarkets;

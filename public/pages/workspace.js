@@ -77,6 +77,10 @@ window.FU_PAGES = window.FU_PAGES || {};
   }
   function init() {
     if (book) return;
+    const assistantPreference = storageRead("fu:workspace:assistant", null);
+    aiVisible = assistantPreference === null
+      ? window.innerWidth > 1100
+      : assistantPreference === "visible";
     try {
       book = W.load(localStorage);
     } catch (e) {
@@ -597,6 +601,24 @@ window.FU_PAGES = window.FU_PAGES || {};
       h("small", {}, label),
     );
   }
+  function toggleAssistant() {
+    setAssistantVisible(!aiVisible);
+  }
+  function setAssistantVisible(visible) {
+    aiVisible = visible;
+    try {
+      localStorage.setItem(
+        "fu:workspace:assistant",
+        JSON.stringify(aiVisible ? "visible" : "hidden"),
+      );
+    } catch {
+      // The visibility control remains usable when browser storage is unavailable.
+    }
+    host.classList.toggle("ws-ai-hidden", !aiVisible);
+    host.querySelectorAll("[data-assistant-toggle]").forEach((control) => {
+      control.setAttribute("aria-pressed", String(aiVisible));
+    });
+  }
   function drawRibbon() {
     const ribbon = host.querySelector(".ws-ribbon");
     ribbon.setAttribute("aria-label", tab + " commands");
@@ -837,20 +859,24 @@ window.FU_PAGES = window.FU_PAGES || {};
         ),
       );
     } else if (tab === "Review") {
+      const assistantToggle = act("AI assistant", toggleAssistant);
+      assistantToggle.setAttribute("data-assistant-toggle", "");
+      assistantToggle.setAttribute("aria-pressed", String(aiVisible));
       ribbon.append(
         group(
           "Research",
-          act("AI assistant", () => {
-            aiVisible = !aiVisible;
-            host.classList.toggle("ws-ai-hidden", !aiVisible);
+          assistantToggle,
+          act("Review proposal", () => {
+            if (proposal) {
+              setAssistantVisible(true);
+              showProposal();
+              proposalHost.focus();
+            } else {
+              notice(
+                "No pending AI proposal. Ask the assistant to propose cell or document changes.",
+              );
+            }
           }),
-          act("Review proposal", () =>
-            proposal
-              ? showProposal()
-              : notice(
-                  "No pending AI proposal. Ask the assistant to propose cell or document changes.",
-                ),
-          ),
           act("Cell evidence", () => {
             const p = W.address(selection.split(":")[0]);
             const m = ev.meta[sheet().id + "!" + p.ref];
@@ -2771,18 +2797,20 @@ window.FU_PAGES = window.FU_PAGES || {};
       h(
         "div",
         { class: "ws-titlebar" },
-        h("div", { class: "ws-app-mark", "aria-hidden": "true" }, "FU"),
-        h(
-          "div",
-          { class: "ws-title-info" },
-          h(
-            "div",
-            { class: "ws-breadcrumb" },
-            "FILED UNDER / RESEARCH WORKSPACE",
-          ),
-          title,
-        ),
+        h("div", { class: "ws-title-info" }, title),
         h("span", { class: "ws-save", role: "status" }, saveState),
+        h(
+          "button",
+          {
+            class: "ws-button ws-assistant-toggle",
+            type: "button",
+            "data-assistant-toggle": "",
+            "aria-pressed": String(aiVisible),
+            "aria-label": "Research assistant",
+            onclick: toggleAssistant,
+          },
+          "Assistant",
+        ),
         button(
           "Build model",
           modelDialog,
@@ -2791,35 +2819,28 @@ window.FU_PAGES = window.FU_PAGES || {};
         ),
       ),
     );
-    host.append(
+    const viewbar = h(
+      "div",
+      { class: "ws-viewbar" },
       h(
         "div",
-        { class: "ws-viewbar" },
-        h(
-          "div",
-          { class: "ws-mode-switch", "aria-label": "Editor mode" },
-          ...[
-            ["sheet", "Spreadsheet"],
-            ["doc", "Document"],
-            ["split", "Research split"],
-          ].map(([id, label]) =>
-            h(
-              "button",
-              {
-                "data-mode": id,
-                type: "button",
-                class: id === mode ? "active" : "",
-                "aria-pressed": String(id === mode),
-                onclick: () => switchMode(id),
-              },
-              label,
-            ),
+        { class: "ws-mode-switch", "aria-label": "Editor mode" },
+        ...[
+          ["sheet", "Spreadsheet"],
+          ["doc", "Document"],
+          ["split", "Research split"],
+        ].map(([id, label]) =>
+          h(
+            "button",
+            {
+              "data-mode": id,
+              type: "button",
+              class: id === mode ? "active" : "",
+              "aria-pressed": String(id === mode),
+              onclick: () => switchMode(id),
+            },
+            label,
           ),
-        ),
-        h(
-          "span",
-          { class: "ws-view-note" },
-          "Local research · source-linked · review before applying AI edits",
         ),
       ),
     );
@@ -2850,8 +2871,9 @@ window.FU_PAGES = window.FU_PAGES || {};
           name,
         ),
       );
+    viewbar.append(tabs);
     host.append(
-      tabs,
+      viewbar,
       h("div", {
         class: "ws-ribbon",
         role: "toolbar",
@@ -2872,11 +2894,16 @@ window.FU_PAGES = window.FU_PAGES || {};
         "div",
         { class: "ws-ai-heading" },
         h("strong", {}, "Research assistant"),
-        h("span", { class: "ws-pill" }, "Review edits"),
+        button("Hide", toggleAssistant, "Hide research assistant"),
       ),
       h("div", { class: "ws-context" }),
     );
-    proposalHost = h("div", { class: "ws-proposal", hidden: true });
+    proposalHost = h("div", {
+      class: "ws-proposal",
+      hidden: true,
+      tabindex: "-1",
+      "aria-label": "Proposed workspace changes",
+    });
     aiHost = h("div", { class: "ws-chat" });
     side.append(proposalHost, aiHost);
     body.append(main, side);
