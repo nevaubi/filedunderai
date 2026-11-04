@@ -283,3 +283,78 @@ notify pgrst, 'reload schema';
 -- year-to-date values (6M / 9M) for KPIs that companies only print cumulatively
 alter table kpi_values drop constraint if exists kpi_values_period_kind_check;
 alter table kpi_values add constraint kpi_values_period_kind_check check (period_kind in ('Q','A','I','Y','T'));
+
+-- Statements workstream: financial statements as filed (SEC Financial Statement Data Sets), standardized templates.
+-- One row per 10-K/10-Q submission of a covered company; restated figures in later filings stay with those filings.
+create table if not exists fs_filings (
+  accession         text primary key,
+  ticker            text not null references companies(ticker) on delete cascade,
+  cik               integer not null,
+  registrant        text,
+  form              text not null,
+  period            date,
+  fy                smallint,
+  fp                text,
+  fye               text,
+  filed             date not null,
+  accepted          timestamptz,
+  prevrpt           boolean not null default false,
+  sic               text,
+  template          text,
+  n_lines           integer,
+  n_values          integer,
+  std               jsonb,
+  source_zip        text not null,
+  retrieved_at      timestamptz not null default now()
+);
+create index if not exists fs_filings_ticker on fs_filings (ticker, filed desc);
+create index if not exists fs_filings_period on fs_filings (ticker, period desc, form);
+
+-- One row per rendered statement (R file) of a filing. lines: [line, tag, custom, plabel, negating, iord, crdr] in filed order.
+-- facts: [tag, ddate, qtrs, uom, segments, coreg, value, footnote] for every value presented on that statement.
+create table if not exists fs_reports (
+  accession         text not null references fs_filings(accession) on delete cascade,
+  report            smallint not null,
+  stmt              text not null,
+  inpth             boolean not null default false,
+  rfile             text,
+  lines             jsonb not null,
+  facts             jsonb not null,
+  primary key (accession, report)
+);
+create index if not exists fs_reports_stmt on fs_reports (stmt);
+
+-- Standard taxonomy tags seen in covered filings: standard label and balance attributes (custom tags are kept in fs_reports.lines).
+create table if not exists fs_tags (
+  tag               text primary key,
+  version           text not null,
+  tlabel            text,
+  datatype          text,
+  iord              text,
+  crdr              text
+);
+
+-- Standardized templates: which filed tags feed each template line, in priority order (documented in etl/stdmap.py).
+create table if not exists fs_std_map (
+  template          text not null,
+  line_id           text not null,
+  line_label        text not null,
+  stmt              text not null,
+  ord               smallint not null,
+  tag               text not null,
+  priority          smallint not null,
+  sign              smallint not null default 1,
+  primary key (template, line_id, tag)
+);
+
+do $$
+declare t text;
+begin
+  foreach t in array array['fs_filings','fs_reports','fs_tags','fs_std_map'] loop
+    execute format('alter table %I enable row level security', t);
+    if not exists (select 1 from pg_policies where tablename = t and policyname = 'public read') then
+      execute format('create policy "public read" on %I for select to anon, authenticated using (true)', t);
+    end if;
+  end loop;
+end $$;
+notify pgrst, 'reload schema';
