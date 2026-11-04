@@ -1262,9 +1262,11 @@ async function pCompany(tk) {
     stat("P/E TTM", s.pe ? s.pe.toFixed(1) : "–"), stat("P/S TTM", s.ps ? s.ps.toFixed(1) : "–"), stat("FCF yield", fpct(s.fcfy), s.fcf), stat("Gross margin LQ", fpct(s.gm?.v), s.gm), stat("Rev growth LQ", fsgn(s.growth?.v), s.growth),
     el("div", {}, el("div", { class: "l" }, "52-week range"), el("div", { class: "num", style: "font-size:12.5px;display:flex;justify-content:space-between;margin-top:4px" }, el("span", {}, fnum(st.lo52)), el("span", {}, fnum(st.hi52))), rng)));
   const tabsDef = [["overview", "Overview"], ["financials", "Financials"], ["segments", "Segments & KPIs"], ["news", "News & narratives"], ["earnings", "Earnings & IR"], ["filings", "Filings"], ["insiders", "Insiders"]];
+  const extra = window.FU_COTABS || [];
+  extra.forEach(t => tabsDef.splice(Math.max(0, tabsDef.findIndex(x => x[0] === t.after) + 1) || tabsDef.length, 0, [t.id, t.name]));
   const tabs = el("div", { class: "tabs", role: "tablist" });
   const body = el("div", { style: "display:flex;flex-direction:column;gap:16px" });
-  const show = id => { if (!tabsDef.find(t => t[0] === id)) id = "overview"; STATE.coTab = id; store.set("coTab", id); $("#crumb-tab").textContent = tabsDef.find(t => t[0] === id)[1]; tabs.querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.id === id); b.setAttribute("aria-selected", b.dataset.id === id); }); body.innerHTML = ""; ({ overview: coOverview, financials: coFinancials, segments: coSegments, news: coNews, filings: coFilings, earnings: coEarnings, insiders: coInsiders })[id](body, tk); };
+  const show = id => { if (!tabsDef.find(t => t[0] === id)) id = "overview"; STATE.coTab = id; store.set("coTab", id); $("#crumb-tab").textContent = tabsDef.find(t => t[0] === id)[1]; tabs.querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.id === id); b.setAttribute("aria-selected", b.dataset.id === id); }); body.innerHTML = ""; ({ overview: coOverview, financials: coFinancials, segments: coSegments, news: coNews, filings: coFilings, earnings: coEarnings, insiders: coInsiders, ...Object.fromEntries(extra.map(t => [t.id, t.render])) })[id](body, tk); };
   tabsDef.forEach(([id, n], i) => tabs.append(el("button", { "data-id": id, role: "tab", title: `${n} (${i + 1})`, onclick: () => show(id) }, n)));
   page.append(tabs, body);
   show(STATE.coTab);

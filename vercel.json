@@ -215,6 +215,10 @@
     {
       "path": "/api/cron/mdata?source=treasury",
       "schedule": "35 23 * * 1-5"
+    },
+    {
+      "path": "/api/cron/statements",
+      "schedule": "17 9 * * *"
     }
   ],
   "headers": [

@@ -23,6 +23,7 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
   - `sec.py` submissions, XBRL company facts, statement series with filing attribution, per-filing statement tables, derived quarters.
   - `docs.py` original 10-K/10-Q statement tables with inline XBRL anchors, earnings release text (8-K EX-99.1).
   - `prices.py` daily and 5-minute bars, return/volatility/beta stats.
+  - `statements.py` financial statements as filed from the SEC Financial Statement Data Sets (quarterly ZIPs: sub, pre, num, tag): every 10-K/10-Q of covered companies since 2009, keyed by accession, with filed line order, labels, tags, values, periods, axis/member segments and co-registrants. `stdmap.py` holds the standardized templates (industrial, bank, insurer, REIT, utility) and the documented tag mapping.
   - `fundamentals.py` TTM and latest-quarter metrics for screening.
   - `macro.py` Treasury par curve, FRED series (CPI, core CPI, unemployment, payrolls, fed funds, 2s10s), H.15 (feeds `macro.json` and the market brief).
   - Macro series store (`mstore.py`, jobs in `macrojobs.py`): official-source series with point-in-time vintages. Collectors: `frb.py` (Federal Reserve Board release files: H.15, H.4.1, H.8, H.6, G.17, G.19, SLOOS, SCOOS, debt service ratios, Z.1), `nyfed.py` (NY Fed Markets API: reference rates, repo and reverse repo operations, SOMA, primary dealers), `treasury.py` (par curve, bills, real yields), `bls.py` (BLS API v2: CPI components, payrolls by sector, household survey, JOLTS, ECI), `oecd.py` (OECD SDMX: CLI, confidence, CPI, GDP, unemployment, short and long rates for G20 and aggregates), `cftc.py` (Commitments of Traders), `fdic.py` (BankFind aggregates and failures), `mcal.py` (release calendar from the Fed, BLS and CFTC schedules).
@@ -65,6 +66,7 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | | `tech/bars/{SYMBOL}.json` | Daily split-adjusted OHLCV since 2008-01-01 (or listing) plus cash dividends, for every stock and market symbol; source URL and retrieval time in `meta` |
 | | `tech/events/{T}.json` | EDGAR 8-K (with items), 10-K and 10-Q filings since 2008, and parsed open-market Form 4 trades |
 | | `tech/signals.json`, `tech/breadth.json`, `tech/states.json` | S&P 500 signal statistics (forward 5/20/60-day returns vs base rate), daily breadth since 2009, current technical state per name |
+| | `statements/{T}/index.json`, `statements/{T}/{accession}.json.gz`, `statements/{T}/std.json.gz`, `statements/std_map.json` | As-filed statements per filing (gzipped, inflated in the browser), standardized values per filing, the template mapping |
 | | `meta/*.json` | Job caches and status (fundamentals, price stats per part, rotation and check cursors, insiders index, pipeline status) |
 | `raw` (private) | `screener/closes.json.gz`, `screener/fund.json.gz`, `screener/kpi.json.gz` | Screener caches: 6 years of split-adjusted daily closes and split dates, extracted quarterly facts per company (re-extracted when a new 10-K/10-Q arrives), KPI and segment extracts |
 | | `sec/companyfacts/*.json.gz`, `sec/filings/{accn}/*.htm.gz`, `sec/releases/*.md.gz` | Archived source documents, indexed in `documents` |
@@ -91,6 +93,7 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | `/api/cron/mdata?source=…` | daily per source (calendar 06:15, oecd 09:20, bls 13:50, nyfed 18:25, cftc 20:55, frb_monthly 21:15, frb_weekly 22:45, frb_daily and treasury 23:15/23:35 weekdays, fdic Mondays 09:40) | Macro series store. Fed files are only re-read when their Last-Modified changes |
 
 Macro store: `macro_series` holds one row per series (publisher, release, series code, units, frequency, adjustment, geography, URLs). `macro_series_obs` keeps every vintage: `macro_ingest()` inserts a row only when a value is new or differs from the latest stored one, with `vintage` = the publisher's release date when the source states it (Fed file Last-Modified) and the retrieval date otherwise; `macro_series_latest` is the current view. Until the tables exist the jobs run storage-only and backfill the tables on their first run after.
+| `/api/cron/statements` | 09:17 daily | Loads any new or republished quarter of the SEC Financial Statement Data Sets (resumes a partial one within a 250s budget) |
 
 Every run is logged in `etl_runs`; the latest runs are published to `meta/status.json` for the Data status page.
 
@@ -128,6 +131,8 @@ python -m etl.run technicals                     # all four parts, then the merg
 node --test tests/technicals/*.test.cjs          # indicator tests (TA-Lib reference values and worked examples)
 python3 tests/technicals/test_parity.py          # JS and Python signal definitions find identical events
 python -m etl.run mdata --source nyfed --full-history   # macro store: one source, full backfill (sources in etl/macrojobs.py)
+python -m etl.run statements --defer --workdir /tmp/fsds   # as-filed statements, every quarter not yet loaded
+python -m etl.run statements --quarters 2026q3 --force     # reload one quarter
 ```
 
 Adding a company: append it to `etl/universe.py` and run `python -m etl.run companies --tickers NEW` then `python -m etl.run prices`.

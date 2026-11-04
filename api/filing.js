@@ -42,13 +42,16 @@ async function resolve(accn) {
     const co = await rest(`companies?ticker=eq.${encodeURIComponent(ticker)}&select=cik`);
     return { cik: co[0]?.cik, url: f[0].url };
   }
+  // as-filed statements (SEC data sets) carry the filer's own CIK, which differs from the company's for predecessor registrants
+  const fs = await rest(`fs_filings?accession=eq.${accn}&select=ticker,cik`);
+  if (!ticker) ticker = fs[0]?.ticker;
   if (!ticker) {
     const fact = await rest(`facts?accession=eq.${accn}&select=ticker&limit=1`);
     ticker = fact[0]?.ticker;
   }
   if (!ticker) return null;
-  const co = await rest(`companies?ticker=eq.${encodeURIComponent(ticker)}&select=cik`);
-  const cik = co[0]?.cik;
+  const co = fs[0]?.cik ? [] : await rest(`companies?ticker=eq.${encodeURIComponent(ticker)}&select=cik`);
+  const cik = fs[0]?.cik || co[0]?.cik;
   if (!cik) return null;
   const folder = `https://www.sec.gov/Archives/edgar/data/${Number(cik)}/${accn.replace(/-/g, "")}/`;
   const idx = await (await sec(folder + "index.json")).json();
