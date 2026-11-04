@@ -1,0 +1,625 @@
+"""Offline IR failure regressions. Provider boundaries use deterministic fixtures."""
+import copy
+import datetime as dt
+import hashlib
+import io
+import json
+import struct
+import time
+import unittest
+import zipfile
+from contextlib import ExitStack
+from unittest.mock import patch
+
+from etl import common, ir, jobs, kpitools
+
+
+class Store:
+    def __init__(self):
+        self.rows = {}
+        self.objects = {}
+        self.json = {}
+        self.sites = [{"ticker": "TEST", "ir_url": "https://ir.example.test", "discovered_at": "2000-01-01"}]
+        self.writes = []
+        self.leases = {}
+        self.updates = []
+
+    def rpc(self, name, args):
+        key, owner = args['lock_name'], args['owner']
+        if name == 'acquire_etl_lease':
+            if key in self.leases and self.leases[key] != owner:
+                return False
+            self.leases[key] = owner
+            return True
+        if self.leases.get(key) == owner:
+            self.leases.pop(key)
+            return True
+        return False
+
+    def select(self, table, query=''):
+        if table == 'ir_documents':
+            rows = list(self.rows.values())
+            if 'ticker=eq.' in query:
+                tk = query.split('ticker=eq.')[1].split('&')[0]
+                rows = [r for r in rows if r['ticker'] == tk]
+            return copy.deepcopy(rows)
+        if table == 'ir_sites':
+            return copy.deepcopy(self.sites)
+        return []
+
+    def upsert(self, table, rows, *args, **kw):
+        self.writes.append(table)
+        if table == 'ir_documents':
+            for row in rows:
+                self.rows.setdefault(row['id'], {}).update(copy.deepcopy(row))
+        elif table == 'ir_sites':
+            for row in rows:
+                if self.sites:
+                    self.sites[0].update(row)
+                else:
+                    self.sites.append(copy.deepcopy(row))
+
+    def put_object(self, bucket, path, content, *args, **kw):
+        self.objects[bucket, path] = content.encode() if isinstance(content, str) else content
+        self.writes.append((bucket, path))
+
+    def get_object(self, bucket, path):
+        return self.objects.get((bucket, path))
+
+    def put_json(self, path, obj, **kw):
+        self.json[path] = copy.deepcopy(obj)
+        self.writes.append(path)
+
+    def get_json(self, path):
+        return copy.deepcopy(self.json.get(path))
+
+    def insert(self, *args, **kw):
+        return [{'id': 1}]
+
+    def update(self, *args):
+        self.updates.append(args)
+
+
+def sub(filings=None, files=None):
+    filings = filings or []
+    keys = {'accessionNumber':'a', 'filingDate':'d', 'reportDate':'r', 'form':'f', 'primaryDocument':'p', 'primaryDocDescription':'x', 'items':'i'}
+    recent = {key:[f.get(short, '') for f in filings] for key, short in keys.items()}
+    return {'filings': {'recent': recent, 'files': files or []}}
+
+
+def existing(sb, url, text=True):
+    did = ir.doc_id(url)
+    sb.rows[did] = {'id': did, 'ticker': 'TEST', 'url': url, 'title': 'Q1 2026 earnings', 'doc_type': 'release',
+                    'ext': '.csv', 'storage_path': 'TEST/' + did + '.csv', 'text_path': 'TEST/text/' + did + '.json' if text else None,
+                    'fetched_at': '2026-01-01T00:00:00Z', 'sha256': None}
+    sb.objects['ir', sb.rows[did]['storage_path']] = b'Label,Value\nRevenue,42\n'
+    if text:
+        sb.objects['ir', sb.rows[did]['text_path']] = b'{"kind":"sheets","sheets":{"csv":[["Revenue",42]]}}'
+    return did
+
+
+class ExtractionTests(unittest.TestCase):
+    def test_csv_quoted_multiline_coordinates_and_precision(self):
+        result = ir.extract_text(b'Name,Value,Note\n"Revenue, net",1.234567890123,"line one\nline two"\n,,\n', '.csv')
+        self.assertEqual(result['sheets']['csv'][1], ['Revenue, net', '1.234567890123', 'line one\nline two'])
+        self.assertEqual(result['sheets']['csv'][2], ['', '', ''])
+        self.assertEqual(result['extraction']['status'], 'verified')
+
+    def test_empty_and_unsupported_are_not_successful_text(self):
+        sb = Store()
+        ir.store_document(sb, 'TEST', 'https://example.test/q1.pdf', b'%PDF-invalid', '.pdf', 'Q1 earnings', '', set())
+        row = next(iter(sb.rows.values()))
+        self.assertIsNone(row.get('text_path'))
+        self.assertIsNone(row.get('extracted_at'))
+        self.assertEqual(ir.extract_text(b'', '.csv')['extraction']['status'], 'empty')
+        self.assertEqual(ir.extract_text(b'binary', '.doc')['extraction']['status'], 'unsupported')
+
+    def test_sheet_limit_is_explicit_and_preserves_numeric_values(self):
+        import openpyxl
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.cell(1, 1, 1.234567890123)
+        ws.cell(602, 61, 'outside budget')
+        raw = io.BytesIO(); wb.save(raw)
+        result = ir.extract_text(raw.getvalue(), '.xlsx')
+        self.assertEqual(result['sheets']['Sheet'][0][0], 1.234567890123)
+        self.assertEqual(result['extraction']['status'], 'limited')
+        self.assertTrue(result['extraction']['limits'])
+    def test_eighty_small_worksheets_retain_every_sheet_and_coordinate(self):
+        import openpyxl
+        wb = openpyxl.Workbook(); wb.remove(wb.active)
+        for i in range(80):
+            ws = wb.create_sheet(f'Sheet {i + 1}')
+            ws.cell(3, 2, i + 0.125)
+        raw = io.BytesIO(); wb.save(raw)
+        result = ir.extract_text(raw.getvalue(), '.xlsx')
+        self.assertEqual(len(result['sheets']), 80)
+        self.assertEqual(result['sheets']['Sheet 80'][2][1], 79.125)
+        self.assertEqual(result['extraction']['status'], 'verified')
+
+    def test_total_workbook_cell_budget_is_explicit_and_preserves_coordinates(self):
+        import openpyxl
+        wb = openpyxl.Workbook(); ws = wb.active
+        ws.cell(1, 3, 42); ws.cell(2, 3, 99)
+        raw = io.BytesIO(); wb.save(raw)
+        with patch.object(ir, 'WORKBOOK_MAX_CELLS', 5, create=True):
+            result = ir.extract_text(raw.getvalue(), '.xlsx')
+        self.assertEqual(result['sheets']['Sheet'], [['', '', 42]])
+        self.assertEqual(result['extraction']['status'], 'limited')
+        self.assertIn('cells:5', result['extraction']['limits'])
+
+    def test_windows_zip_member_names_extract_without_changing_original_bytes(self):
+        import openpyxl
+        wb = openpyxl.Workbook(); wb.active.title = 'Financial data'
+        wb.active.cell(3, 2, 123.4567890123)
+        wb.active.cell(4, 1, 'Revenue, net')
+        raw = io.BytesIO(); wb.save(raw)
+        altered = io.BytesIO()
+        with zipfile.ZipFile(io.BytesIO(raw.getvalue())) as source, zipfile.ZipFile(altered, 'w', zipfile.ZIP_DEFLATED) as target:
+            for entry in source.infolist():
+                target.writestr(entry.filename.replace('/', chr(92)), source.read(entry))
+        original = altered.getvalue(); digest = hashlib.sha256(original).hexdigest()
+        result = ir.extract_text(original, '.xlsx')
+        self.assertEqual(result['sheets']['Financial data'][2][1], 123.4567890123)
+        self.assertEqual(result['sheets']['Financial data'][3][0], 'Revenue, net')
+        self.assertEqual(result['extraction']['status'], 'verified')
+        self.assertEqual(hashlib.sha256(original).hexdigest(), digest)
+
+    def test_zip_normalization_rejects_collisions_traversal_and_excess_size(self):
+        import openpyxl
+        wb = openpyxl.Workbook(); wb.active.cell(1, 1, 42)
+        raw = io.BytesIO(); wb.save(raw)
+        for extra in ('xl' + chr(92) + 'workbook.xml', '../outside.xml', '/absolute.xml'):
+            with self.subTest(extra=extra):
+                altered = io.BytesIO(raw.getvalue())
+                with zipfile.ZipFile(altered, 'a') as archive:
+                    archive.writestr(extra, '<workbook/>')
+                with self.assertRaises(ValueError):
+                    ir.extract_text(altered.getvalue(), '.xlsx')
+        with patch.object(ir, 'WORKBOOK_ZIP_MAX_BYTES', 100, create=True), self.assertRaises(ValueError):
+            ir.extract_text(raw.getvalue(), '.xlsx')
+
+    def test_html_article_loader_is_empty_until_article_body_is_available(self):
+        raw = b'<html><nav>Quarterly results</nav><div class="press-release-details"></div><p>Generic Error Unable to load press releases</p></html>'
+        result = ir.extract_text(raw, '.html')
+        self.assertEqual(result['extraction']['status'], 'empty')
+        self.assertFalse(result['extraction']['nonempty'])
+        rendered = b'<html><div class="press-release-details"><div class="press-release-details-body">Revenue was $42 million.</div></div></html>'
+        good = ir.extract_text(rendered, '.html')
+        self.assertEqual(good['extraction']['status'], 'verified')
+        self.assertIn('Revenue was $42 million.', good['pages'][0])
+
+    def test_xls_preserves_numeric_values_and_cell_errors(self):
+        # Minimal BIFF2 workbook: A1=42, A2='Revenue', B3=#DIV/0!.
+        def record(code, body=b''):
+            return struct.pack('<HH', code, len(body)) + body
+        raw = (record(0x0009, struct.pack('<HH', 2, 0x10)) + record(0x0042, struct.pack('<H', 1252))
+               + record(0x0002, struct.pack('<HH', 0, 0) + b'\0\0\0' + struct.pack('<H', 42))
+               + record(0x0004, struct.pack('<HH', 1, 0) + b'\0\0\0' + bytes([7]) + b'Revenue')
+               + record(0x0005, struct.pack('<HH', 2, 1) + b'\0\0\0' + bytes([7, 1]))
+               + record(0x000a))
+        result = ir.extract_text(raw, '.xls')
+        self.assertEqual(result['sheets']['Sheet 1'][0][0], 42)
+        self.assertEqual(result['sheets']['Sheet 1'][2][1], '#DIV/0!')
+        self.assertEqual(result['extraction']['status'], 'verified')
+
+
+class PipelineTests(unittest.TestCase):
+    def providers(self, docs=None, scrape=None, secdata=None):
+        stack = ExitStack()
+        stack.enter_context(patch.object(ir, 'firecrawl_map', return_value=[{'url':u, 'title':t} for u,t in (docs or {}).items()]))
+        stack.enter_context(patch.object(ir, '_scrape', side_effect=scrape or (lambda *a, **k: {'html':'<html><a href="/results">Results</a></html>'}), create=True))
+        stack.enter_context(patch.object(ir, '_sec_json', return_value=secdata or sub(), create=True))
+        # Old code calls this helper; new code owns resumable submissions itself.
+        stack.enter_context(patch.object(jobs, 'periodic_filings', return_value=[]))
+        stack.enter_context(patch.object(ir, 'download', side_effect=lambda url, **kw: ('Label,Value\n' + url + ',42\n').encode()))
+        return stack
+
+    def test_existing_documents_do_not_consume_work_budget(self):
+        sb = Store()
+        urls = [f'https://ir.example.test/q1-2026-earnings-{i}.csv' for i in range(3)]
+        existing(sb, urls[0])
+        with self.providers(dict.fromkeys(urls, 'Q1 2026 earnings')):
+            result = ir.process_company(sb, 'TEST', 'Test', 1, max_docs=1)
+        self.assertEqual(len(sb.rows), 2)
+        self.assertEqual(result['web'], 1)
+        self.assertGreater(result['deferred'], 0)
+        self.assertNotEqual(result['coverage']['status'], 'complete')
+
+    def test_queue_resumes_without_successes_starving_later_documents(self):
+        sb = Store()
+        urls = [f'https://ir.example.test/q1-2026-earnings-{i}.csv' for i in range(3)]
+        with self.providers(dict.fromkeys(urls, 'Q1 2026 earnings')):
+            for _ in range(3):
+                result = ir.process_company(sb, 'TEST', 'Test', 1, max_docs=1)
+        self.assertEqual(len(sb.rows), 3)
+        self.assertIn(('raw', 'ir/checkpoints/TEST.json'), sb.objects)
+        self.assertEqual(result['coverage']['pending']['documents'], 0)
+        self.assertEqual(result['coverage']['status'], 'unverified')
+
+    def test_checkpoint_read_failure_has_no_writes(self):
+        sb = Store()
+        sb.get_object = lambda *a: (_ for _ in ()).throw(RuntimeError('checkpoint read failed'))
+        with self.providers(), self.assertRaisesRegex(RuntimeError, 'checkpoint read failed'):
+            ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+        self.assertEqual(sb.writes, [])
+
+    def test_malformed_checkpoint_has_no_writes(self):
+        sb = Store(); sb.objects['raw', 'ir/checkpoints/TEST.json'] = b'{"version":1,"ticker":"WRONG"}'
+        with self.providers(), self.assertRaises(ValueError):
+            ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+        self.assertEqual(sb.writes, [])
+
+    def test_sec_only_never_discovers_site(self):
+        sb = Store(); sb.sites = []
+        with self.providers(), patch.object(ir, 'ir_candidates', side_effect=AssertionError('web provider invoked')):
+            result = ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+        self.assertEqual(result['failed'], 0)
+        self.assertFalse(result['coverage']['scope']['web'])
+
+    def test_expired_deadline_defers_without_provider_calls(self):
+        sb = Store()
+        with patch.object(ir, 'request', side_effect=AssertionError('deadline ignored')):
+            result = ir.process_company(sb, 'TEST', 'Test', 1, deadline=time.monotonic() - 1)
+        self.assertGreater(result['deferred'], 0)
+        self.assertEqual(result['status'], 'partial')
+
+    def test_sec_error_is_reported_and_retried_next_run(self):
+        sb = Store()
+        with self.providers(), patch.object(ir, '_sec_json', side_effect=RuntimeError('SEC down')):
+            first = ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+        self.assertGreater(first['failed'], 0)
+        self.assertGreater(first['coverage']['pending']['discovery'], 0)
+        with self.providers():
+            second = ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+        self.assertEqual(second['failed'], 0)
+        self.assertEqual(second['coverage']['status'], 'complete')
+
+    def test_repair_uses_original_and_does_not_rewrite_it_or_invent_dates(self):
+        sb = Store(); did = existing(sb, 'https://ir.example.test/q1-2026-earnings.csv', text=False)
+        raw = copy.deepcopy(sb.objects)
+        with patch.object(ir, 'request', side_effect=AssertionError('provider called')):
+            result = ir.process_company(sb, 'TEST', 'Test', 1, repair_existing=True)
+        self.assertEqual(result['repaired'], 1)
+        self.assertEqual(sb.objects['ir', sb.rows[did]['storage_path']], raw['ir', sb.rows[did]['storage_path']])
+        self.assertIsNone(sb.rows[did].get('published'))
+        self.assertEqual(sb.json['ir/TEST.json']['documents'][0]['extraction']['status'], 'verified')
+        self.assertEqual(sb.json['ir/TEST.json']['coverage']['enumeration']['sec'], 'unverified')
+
+    def test_legacy_text_path_is_unverified_until_read(self):
+        sb = Store(); existing(sb, 'https://ir.example.test/q1-2026-earnings.csv')
+        with self.providers():
+            ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+        row = sb.json['ir/TEST.json']['documents'][0]
+        self.assertEqual(row['extraction']['status'], 'unverified')
+        self.assertEqual(sb.json['ir/TEST.json']['coverage']['extraction']['unverified'], 1)
+
+    def test_failed_archive_page_retries_and_discovers_children(self):
+        sb = Store(); archive = 'https://ir.example.test/results/2026'
+        def first(url, **kw):
+            if url == archive:
+                raise RuntimeError('archive timeout')
+            return {'html': f'<a href="{archive}">2026 results</a>'}
+        with self.providers(scrape=first):
+            one = ir.process_company(sb, 'TEST', 'Test', 1)
+        self.assertGreater(one['failed'], 0)
+        def second(url, **kw):
+            return {'html':'<a href="/q1-2026-earnings.csv">Q1 earnings</a>'}
+        with self.providers(scrape=second):
+            two = ir.process_company(sb, 'TEST', 'Test', 1)
+        self.assertEqual(two['web'], 1)
+        self.assertEqual(two['coverage']['status'], 'unverified')
+
+    def test_publish_only_reconciles_all_rows_without_providers_or_repair(self):
+        sb = Store()
+        for i in range(205):
+            existing(sb, f'https://ir.example.test/q1-2026-earnings-{i}.csv')
+        with patch.object(ir, 'request', side_effect=AssertionError('provider called')):
+            result = ir.process_company(sb, 'TEST', 'Test', 1, publish_only=True)
+        self.assertEqual(len(sb.json['ir/TEST.json']['documents']), 205)
+        self.assertEqual(result['coverage']['extraction']['unverified'], 205)
+        self.assertEqual(result['repaired'], 0)
+        self.assertEqual(sb.objects['ir', next(iter(sb.rows.values()))['storage_path']], b'Label,Value\nRevenue,42\n')
+
+    def test_backfill_scope_never_narrows_on_maintenance(self):
+        sb = Store()
+        with self.providers():
+            ir.process_company(sb, 'TEST', 'Test', 1, backfill=True, web=False)
+            result = ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+        self.assertEqual(result['coverage']['scope']['history'], 'available_archive')
+        self.assertEqual(result['coverage']['scope']['since_year'], 1900)
+        self.assertEqual(result['coverage']['scope']['sec_since'], '1900-01-01')
+
+    def test_sec_filing_date_is_published_even_for_item_701(self):
+        sb = Store()
+        f = {'a':'0000000001-26-000001', 'f':'8-K', 'd':'2026-10-02', 'p':'report.htm', 'i':'7.01'}
+        index = '<html><table><tr><td>1</td><td>Slides</td><td><a href="ex99.htm">ex99.htm</a></td><td>EX-99.1</td></tr></table></html>'
+        def sec_request(url, deadline=None, raw=False):
+            return b'<html>Quarterly earnings presentation revenue 42</html>' if raw else index
+        with self.providers(secdata=sub([f])), patch.object(ir, '_sec_request', side_effect=sec_request):
+            ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+        row = next(iter(sb.rows.values()))
+        self.assertEqual(row['published'], '2026-10-02')
+        self.assertIsNone(row['period_end'])
+
+    def test_repair_dates_join_accession_and_keep_unknowns_missing(self):
+        sb = Store()
+        yes = existing(sb, 'https://www.sec.gov/Archives/edgar/data/1/000000000126000001/ex99.htm')
+        no = existing(sb, 'https://ir.example.test/2026-q1-earnings.csv')
+        base_select = sb.select
+        sb.select = lambda table, query='': [{'accession':'0000000001-26-000001','filed':'2026-10-02'}] if table == 'filings' else base_select(table, query)
+        ir.process_company(sb, 'TEST', 'Test', 1, repair_existing=True, max_docs=0)
+        self.assertEqual(sb.rows[yes]['published'], '2026-10-02')
+        self.assertIsNone(sb.rows[no].get('published'))
+
+    def test_shared_client_is_not_mutated_with_worker_lease(self):
+        sb = Store()
+        with self.providers():
+            ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+        self.assertFalse(hasattr(sb, '_aggregate_lease'))
+        self.assertEqual(sb.leases, {})
+
+    def test_provider_timeout_is_bounded_and_single_attempt(self):
+        calls = []
+        def request(url, **kw):
+            calls.append(kw)
+            return b'data'
+        with patch.object(ir, 'request', side_effect=request):
+            ir.download('https://example.test/file.csv', deadline=time.monotonic() + 0.5)
+        self.assertLessEqual(calls[0]['timeout'], 0.5)
+        self.assertEqual(calls[0]['retries'], 1)
+
+    def test_failed_tasks_stop_at_retry_bound_and_remain_failed(self):
+        sb = Store()
+        with self.providers(), patch.object(ir, '_sec_json', side_effect=RuntimeError('SEC down')):
+            for _ in range(4):
+                result = ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+        self.assertEqual(result['failed'], 0)  # no fourth provider attempt
+        self.assertEqual(result['coverage']['failed']['discovery'], 1)
+        self.assertEqual(result['coverage']['status'], 'partial')
+
+    def test_query_ids_and_trailing_slashes_survive_discovery(self):
+        sb = Store(); sb.sites[0]['ir_url'] += '/'
+        visited = []
+        def scrape(url, **kw):
+            visited.append(url)
+            return {'html':'<a href="/news/press-release-details?id=122500">Q1 2026 results</a>'}
+        with self.providers(scrape=scrape), patch.object(ir, 'download', return_value=b'<html>Quarterly earnings revenue 42</html>'):
+            ir.process_company(sb, 'TEST', 'Test', 1)
+        self.assertIn('https://ir.example.test/', visited)
+        self.assertEqual(next(iter(sb.rows.values()))['url'], 'https://ir.example.test/news/press-release-details?id=122500')
+
+    def test_coverage_index_includes_zero_document_universe_members(self):
+        sb = Store(); existing(sb, 'https://ir.example.test/q1.csv')
+        with patch('etl.universe.UNIVERSE', [('TEST',), ('EMPTY',)]):
+            summary = kpitools.build_index(sb)
+        self.assertIn('EMPTY', sb.json['meta/coverage_ir.json']['companies'])
+        self.assertEqual(summary['companies'], 2)
+        self.assertEqual(sb.json['meta/coverage_ir.json']['companies']['TEST']['coverage']['status'], 'unverified')
+
+    def test_repair_upserts_preserve_required_columns_and_batch_dates(self):
+        sb = Store()
+        for i in range(20):
+            existing(sb, f'https://www.sec.gov/Archives/edgar/data/1/000000000126000001/ex99-{i}.htm', text=False)
+        base_select, base_upsert = sb.select, sb.upsert
+        date_batches = []
+        def select(table, query=''):
+            return [{'accession':'0000000001-26-000001','filed':'2026-10-02'}] if table == 'filings' else base_select(table, query)
+        def upsert(table, rows, *args, **kw):
+            rows = list(rows)
+            if table == 'ir_documents':
+                for row in rows:
+                    if not row.get('ticker') or not row.get('url'):
+                        raise ValueError('NOT NULL ticker/url')
+                date_batches.append(len(rows))
+            return base_upsert(table, rows, *args, **kw)
+        sb.select, sb.upsert = select, upsert
+        result = ir.process_company(sb, 'TEST', 'Test', 1, repair_existing=True, max_docs=1)
+        self.assertEqual(result['dates_repaired'], 20)
+        self.assertEqual(result['repaired'], 1)
+        self.assertIn(20, date_batches)
+        self.assertEqual(result['failed'], 0)
+
+    def test_limited_repair_preserves_previous_text_bytes(self):
+        sb = Store(); did = existing(sb, 'https://ir.example.test/q1.csv')
+        path = sb.rows[did]['text_path']; original = sb.objects['ir', path]
+        partial = {'kind':'sheets','sheets':{'csv':[['partial']]},'extraction':{'status':'limited','nonempty':True,'limits':['deadline'],'errors':[]}}
+        with patch.object(ir, 'extract_text', return_value=partial):
+            result = ir.process_company(sb, 'TEST', 'Test', 1, repair_existing=True)
+        self.assertEqual(sb.objects['ir', path], original)
+        self.assertEqual(result['coverage']['extraction']['limited'], 1)
+
+    def test_html_error_page_cannot_be_verified_as_pdf(self):
+        sb = Store()
+        with self.providers({'https://ir.example.test/q1-2026-results.pdf':'Q1 results'}), patch.object(ir, 'download', return_value=b'<html>Access Denied</html>'):
+            result = ir.process_company(sb, 'TEST', 'Test', 1)
+        self.assertEqual(len(sb.rows), 0)
+        self.assertEqual(result['download_failed'], 1)
+
+    def test_sec_error_html_is_not_a_completed_index(self):
+        sb = Store(); f = {'a':'0000000001-26-000001', 'f':'8-K', 'd':'2026-10-02', 'p':'report.htm', 'i':'7.01'}
+        with self.providers(secdata=sub([f])), patch.object(ir, '_sec_request', return_value='<html>Rate limited</html>'):
+            result = ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+        self.assertEqual(result['coverage']['enumeration']['sec'], 'failed')
+
+    def test_strict_checkpoint_read_accepts_only_explicit_missing_object(self):
+        sb = object.__new__(common.Supabase); sb.url = 'https://storage.example'; sb.key = 'fake'
+        with patch.object(ir, 'request', side_effect=common.HTTPError(400, '{"statusCode":"404","error":"not_found","message":"Object not found"}')):
+            self.assertEqual(ir._read_checkpoint(sb, 'TEST')['ticker'], 'TEST')
+        with patch.object(ir, 'request', side_effect=common.HTTPError(400, '{"message":"bad credentials"}')):
+            with self.assertRaises(common.HTTPError):
+                ir._read_checkpoint(sb, 'TEST')
+
+    def test_invalid_task_payload_refuses_checkpoint_replacement(self):
+        sb = Store()
+        with self.providers():
+            ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+        state = json.loads(sb.objects['raw','ir/checkpoints/TEST.json'])
+        state['queues']['documents']['bad'] = {'status':'pending','attempts':0}
+        sb.objects['raw','ir/checkpoints/TEST.json'] = json.dumps(state).encode()
+        sb.writes.clear()
+        with self.providers(), self.assertRaises(ValueError):
+            ir.process_company(sb, 'TEST', 'Test', 1)
+        self.assertEqual(sb.writes, [])
+
+    def test_incremental_coverage_reuses_prior_status_without_500_manifest_reads(self):
+        sb = Store(); existing(sb, 'https://ir.example.test/q1.csv')
+        sb.json['meta/coverage_ir.json'] = {'companies':{'EMPTY':{'coverage':{'status':'complete','total_documents':0}}}}
+        def get_json(path):
+            if path.startswith('ir/'):
+                raise AssertionError('rotation must not read per-company manifests')
+            return copy.deepcopy(sb.json.get(path))
+        sb.get_json = get_json
+        with patch('etl.universe.UNIVERSE', [('TEST',), ('EMPTY',)]):
+            kpitools.build_index(sb, coverage_updates={'TEST':{'status':'partial','total_documents':1}})
+        self.assertEqual(sb.json['meta/coverage_ir.json']['companies']['TEST']['coverage']['status'], 'partial')
+        self.assertEqual(sb.json['meta/coverage_ir.json']['companies']['EMPTY']['coverage']['status'], 'complete')
+
+    def test_rotation_skips_aggregate_work_after_deadline(self):
+        sb = Store()
+        with patch.object(jobs, 'UNIVERSE', [('TEST',)]), patch.object(jobs, 'ir_job', return_value=({}, {'TEST':'skipped: time budget'})), patch.object(kpitools, 'build_index', side_effect=AssertionError('budget exhausted')):
+            done, failed = jobs.ir_rotation_job(sb, per_run=1, time_budget=0)
+        self.assertTrue(sb.json['meta/ir_rotation.json']['coverage_pending'])
+        self.assertEqual(failed['coverage_index'], 'skipped: time budget')
+
+    def test_provider_free_republication_preserves_existing_scope(self):
+        sb = Store()
+        with self.providers():
+            before = ir.process_company(sb, 'TEST', 'Test', 1, web=False, backfill=True)
+        after = ir.process_company(sb, 'TEST', 'Test', 1, publish_only=True)
+        self.assertEqual(after['coverage']['scope'], before['coverage']['scope'])
+
+    def test_new_sec_filings_are_polled_while_historical_index_is_blocked(self):
+        sb = Store()
+        today = dt.date.today()
+        old = {'a':'0000000001-26-000001','f':'8-K','d':today.isoformat(),'p':'report.htm','i':'7.01'}
+        with self.providers(secdata=sub([old])), patch.object(ir, '_sec_request', side_effect=RuntimeError('historical index down')):
+            for _ in range(3):
+                ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+        actual_date = dt.date
+        class Tomorrow(actual_date):
+            @classmethod
+            def today(cls):
+                return today + dt.timedelta(days=1)
+        new = dict(old, a='0000000001-26-000002', d=Tomorrow.today().isoformat())
+        index = '<table><tr><td>1</td><td>Slides</td><td><a href="ex99.htm">Slides</a></td><td>EX-99.1</td></tr></table>'
+        with self.providers(secdata=sub([new, old])), patch.object(ir.dt, 'date', Tomorrow), patch.object(ir, '_sec_request', side_effect=lambda url, **kw: b'<html>Revenue 42</html>' if kw.get('raw') else index):
+            result = ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+        self.assertEqual(result['sec'], 1)
+        self.assertEqual(next(iter(sb.rows.values()))['published'], new['d'])
+        self.assertEqual(result['coverage']['enumeration']['sec'], 'failed')
+
+    def test_noop_web_visits_do_not_extend_poll_freshness(self):
+        sb = Store()
+        first_stamp = ir.now_iso()
+        later_stamp = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=1)).strftime('%Y-%m-%dT%H:%M:%SZ')
+        with self.providers(), patch.object(ir, 'now_iso', return_value=first_stamp):
+            ir.process_company(sb, 'TEST', 'Test', 1)
+        first = json.loads(sb.objects['raw','ir/checkpoints/TEST.json'])
+        with self.providers(), patch.object(ir, 'now_iso', return_value=later_stamp):
+            ir.process_company(sb, 'TEST', 'Test', 1)
+        second = json.loads(sb.objects['raw','ir/checkpoints/TEST.json'])
+        self.assertEqual(second['web_checked_at'], first['web_checked_at'])
+        self.assertEqual(second['web_polled_at'], first['web_polled_at'])
+
+    def test_web_root_refreshes_despite_a_blocked_historical_page(self):
+        sb = Store(); root = sb.sites[0]['ir_url']; visited = []
+        def failing(url, **kw):
+            visited.append(url)
+            if url != root:
+                raise RuntimeError('old archive down')
+            return {'html':'<a href="/results/old">old results</a>'}
+        with self.providers(scrape=failing), patch.object(ir, 'now_iso', return_value='2000-01-01T00:00:00Z'):
+            for _ in range(3):
+                ir.process_company(sb, 'TEST', 'Test', 1)
+        visited.clear()
+        with self.providers(scrape=lambda url, **kw: (visited.append(url) or {'html':'<a href="/q1-2026-results.csv">Q1 results</a>'})):
+            result = ir.process_company(sb, 'TEST', 'Test', 1)
+        self.assertIn(root, visited)
+        self.assertEqual(result['web'], 1)
+        self.assertEqual(result['coverage']['enumeration']['web'], 'failed')
+
+    def test_new_documents_advance_alongside_a_repair_backlog(self):
+        sb = Store()
+        for i in range(3):
+            existing(sb, f'https://ir.example.test/q1-2025-old-{i}.csv', text=False)
+        new = 'https://ir.example.test/q3-2026-results-new.csv'
+        with self.providers({new:'Q3 2026 earnings'}):
+            result = ir.process_company(sb, 'TEST', 'Test', 1, max_docs=2)
+        self.assertEqual(result['web'], 1)
+        self.assertEqual(result['repaired'], 1)
+        self.assertIn(ir.doc_id(new), sb.rows)
+        self.assertEqual(result['coverage']['pending']['extractions'], 2)
+
+    def test_fresh_filing_index_precedes_old_archives_and_old_indices(self):
+        sb = Store(); state = ir._read_checkpoint(sb, 'TEST')
+        state['scope'] = {'web':False,'sec':True,'since_year':1900,'sec_since':'1900-01-01','history':'available_archive'}
+        older = {'a':'0000000001-20-000001','f':'8-K','d':'2020-01-01','p':'report.htm','i':'7.01'}
+        newer = dict(older, a='0000000001-26-000002', d='2026-11-01')
+        ir._enqueue(state, 'filings', 'old', filing=older, cik=1)
+        ir._enqueue(state, 'filings', 'new', filing=newer, cik=1)
+        ir._enqueue(state, 'submissions', 'https://data.sec.gov/submissions/archive.json', url='https://data.sec.gov/submissions/archive.json', cik=1, root=False)
+        ir._save_checkpoint(sb, state)
+        index = '<table><tr><td>1</td><td>Slides</td><td><a href="ex99.htm">Slides</a></td><td>EX-99.1</td></tr></table>'
+        with self.providers(), patch.object(ir, '_sec_request', side_effect=lambda url, **kw:b'<html>Revenue 42</html>' if kw.get('raw') else index):
+            result = ir.process_company(sb, 'TEST', 'Test', 1, web=False, max_pages=2, max_docs=1)
+        self.assertEqual(result['sec'], 1)
+        self.assertIn('/000000000126000002/', next(iter(sb.rows.values()))['url'])
+
+    def test_job_propagates_partial_and_rotation_retries_skipped(self):
+        sb = Store()
+        partial = {'failed': 1, 'deferred': 2, 'status':'partial', 'coverage':{'status':'partial'}}
+        with patch.object(jobs, 'UNIVERSE', [('TEST', 1, 'Test', '')]), patch.object(jobs, 'BY_TICKER', {'TEST':{'name':'Test','cik':1}}), patch.object(ir, 'process_company', return_value=partial), patch.object(common, 'publish_status'):
+            done, failed = jobs.ir_job(sb, ['TEST'], workers=1, time_budget=10)
+        self.assertIn('TEST', failed)
+        self.assertIn('TEST', done)
+        self.assertEqual(sb.updates[-1][2]['status'], 'partial')
+        with patch.object(jobs, 'UNIVERSE', [('TEST',), ('NEXT',)]), patch.object(jobs, 'ir_job', return_value=({}, {'TEST':'skipped: time budget'})), patch.object(kpitools, 'build_index'):
+            jobs.ir_rotation_job(sb, per_run=1)
+        self.assertIn('TEST', sb.json['meta/ir_rotation.json']['retry'])
+
+
+class DeadlineIOTests(unittest.TestCase):
+    def client(self):
+        sb = object.__new__(common.Supabase)
+        sb.url, sb.key = 'https://storage.example', 'fake'
+        return sb
+
+    def test_actual_ir_storage_and_lease_requests_use_remaining_time_once(self):
+        calls = []
+        def request(url, **kwargs):
+            calls.append((url, kwargs))
+            return 'true' if '/rpc/' in url else '[]' if '/rest/' in url else b'{}'
+        with patch.object(ir, 'request', side_effect=request):
+            sb = ir.bounded_client(self.client(), time.monotonic() + 0.5)
+            sb.rpc('acquire_etl_lease', {'lock_name':'test'})
+            sb.put_object('raw', 'ir/checkpoints/TEST.json', '{}')
+            sb.get_object('raw', 'ir/checkpoints/TEST.json')
+            sb.put_json('ir/TEST.json', {'documents':[]})
+            sb.select('ir_documents')
+            sb.upsert('ir_documents', [{'id':'x','ticker':'TEST','url':'https://example.test'}], 'id')
+        self.assertEqual(len(calls), 6)
+        for url, kwargs in calls:
+            self.assertLessEqual(kwargs['timeout'], 0.5, url)
+            self.assertEqual(kwargs['retries'], 1, url)
+
+    def test_expired_rotation_budget_starts_no_lease_or_storage_request(self):
+        calls = []
+        with patch.object(ir, 'request', side_effect=lambda *a, **k: calls.append(a)), patch.object(common, 'request', return_value='true'), self.assertRaises(ir.DeadlineReached):
+            jobs.ir_rotation_job(self.client(), time_budget=0)
+        self.assertEqual(calls, [])
+
+    def test_long_paginated_select_stops_at_absolute_io_deadline(self):
+        clock, calls = [0.0], []
+        def request(url, **kwargs):
+            calls.append(url); clock[0] = 2.0
+            return json.dumps([{'id':i} for i in range(1000)])
+        with patch.object(ir.time, 'monotonic', side_effect=lambda:clock[0]), patch.object(ir, 'request', side_effect=request):
+            sb = ir.bounded_client(self.client(), 1.0)
+            with self.assertRaises(ir.DeadlineReached):
+                sb.select('ir_documents')
+        self.assertEqual(len(calls), 1)
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -708,6 +708,7 @@ function baseTools(trace) {
     { name: "get_macro", description: "Macro series. Names: CPI, CORE_CPI, UNRATE (%), PAYEMS (thousands), EFFR (%), CURVE (latest Treasury curve), SPREAD_2S10S (daily, %). Returns the last n observations (default 24).", inputSchema: { type: "object", properties: { name: { type: "string" }, n: { type: "number" } }, required: ["name"] }, execute: wrap("get_macro", i => macroSeries(String(i.name).toUpperCase(), Math.min(120, Number(i.n) || 24))) },
     { name: "list_filings", description: "Recent SEC filings for a company, newest first, optionally filtered by form type (10-K, 10-Q, 8-K, 4, DEF 14A).", inputSchema: { type: "object", properties: { ticker: { type: "string" }, form: { type: "string" }, limit: { type: "number" } }, required: ["ticker"] }, execute: wrap("list_filings", async (i, ctx) => { const tk = String(i.ticker).toUpperCase(); await ensureCompany(tk, ctx); const c = D.companies[tk]; return c.filings.filter(f => !i.form || f.f === i.form).slice(0, Math.min(30, Number(i.limit) || 10)).map(f => ({ form: f.f, filed: f.d, period: f.r, accession: f.a, items: f.i })); }) },
     { name: "calculate", description: "Deterministic arithmetic only. Formula supports + - * / ^, parentheses, SUM AVG MIN MAX ABS SQRT, and numeric variables. Common operations: growth ([base,current]), cagr ([base,current], periods), sum, mean. No JavaScript execution. Outputs are calculations, not independently verified claims.", inputSchema: { type: "object", properties: { operation: { type: "string", enum: ["formula", "growth", "cagr", "sum", "mean"] }, expression: { type: "string" }, values: { type: "array", items: { type: "number" } }, periods: { type: "number" }, variables: { type: "object", additionalProperties: { type: "number" } } } }, execute: wrap("calculate", i => ({ value: FU_FINANCIAL.calculate(i), status: "calculated", assumptions: i })) },
+    { name: "run_analysis", description: "Run a bounded JSON data program over immutable evidence. inputs:[{name,evidenceIds}], assumptions:[{name,value,unit,note}], steps:[{op,input,as,...}], output:name. Max 200 input records, 16 steps. Operations: filter(field,operator,value); derive(expression,unit,optional bindings:{variable:evidenceId}); group(by:[field],stat); statistics(stat); sort(field,direction). Stats: sum/mean/min/max/median/count. Formula uses value, declared assumptions and evidence bindings aligned by company and period. Units are checked; group different periods separately. No arbitrary code. Results retain source lineage and explicitly declared assumptions; calculations are not verified financial claims.", inputSchema: { type: "object", properties: { inputs: { type: "array", items: { type: "object" } }, assumptions: { type: "array", items: { type: "object" } }, steps: { type: "array", items: { type: "object" } }, output: { type: "string" } }, required: ["inputs", "steps", "output"] }, execute: wrap("run_analysis", (i, ctx) => FU_RESEARCH_RUNTIME.runAnalysis(i, ctx)) },
     { name: "lookup_evidence", description: "Search captured immutable evidence by ticker or metric with pagination; retrieve records for follow-up research.", inputSchema: { type: "object", properties: { ticker: { type: "string" }, metric: { type: "string" }, offset: { type: "integer" }, limit: { type: "integer" } } }, execute: wrap("lookup_evidence", i => FU_EVIDENCE.list(i)) },
     { name: "inspect_evidence", description: "Inspect an exact immutable evidence record, original filing URL and derivation inputs.", inputSchema: { type: "object", properties: { evidenceId: { type: "string" } }, required: ["evidenceId"] }, execute: wrap("inspect_evidence", i => { const e = FU_EVIDENCE.get(i.evidenceId); if (!e) return { status: "unresolved", evidenceId: i.evidenceId }; return { evidence: e, inputs: e.inputEvidenceIds.map(id => FU_EVIDENCE.get(id)) }; }) },
     { name: "compare_evidence", description: "Compare two records with identical metric, unit and period type. Returns exact inputs, difference, fractional growth and alignment notes.", inputSchema: { type: "object", properties: { evidenceIds: { type: "array", items: { type: "string" }, minItems: 2, maxItems: 2 } }, required: ["evidenceIds"] }, execute: wrap("compare_evidence", i => { const ids = i.evidenceIds || [], [a,b] = ids.map(id => FU_EVIDENCE.get(id)); if (ids.length !== 2 || !a || !b) throw new Error("Two known evidence IDs required"); if (a.unit !== b.unit || a.metric !== b.metric || a.periodType !== b.periodType || a.value == null || b.value == null) throw new Error("Evidence metrics, units and period types must align"); return { inputs: [a,b], difference: b.value-a.value, growth: a.value > 0 ? b.value/a.value-1 : null, samePeriod: a.periodEnd === b.periodEnd, status: "calculated", note: "Inspect dates and duration before interpreting this comparison" }; }) },
@@ -715,7 +716,7 @@ function baseTools(trace) {
     ...(window.FU_TOOL_PROVIDERS || []).flatMap(provider => provider(trace) || []),
   ];
 }
-const CITE_RULE = "Cite exact evidence IDs from tools as [[E:ev_...]]. Every financial report must be a JSON object {markdown:string, claims:[{evidenceId,value,unit,ticker,metric,period}]} with exact raw numeric values and units from evidence; omit optional identifying fields unless exact. Claims are checked before display. Do not fabricate IDs. Narrative interpretation and values not covered by checked claims are unverified. A citation validates only its numeric claim, never nearby sentences. Mark forecasts/assumptions explicitly. Use calculate for deterministic math; do not write or request executable JavaScript.";
+const CITE_RULE = "Cite exact evidence IDs from tools as [[E:ev_...]]. Every financial report must be a JSON object {markdown:string, claims:[{evidenceId,value,unit,ticker,metric,period}]} with exact raw numeric values and units from evidence; omit optional identifying fields unless exact. Claims are checked before display. Do not fabricate IDs. Narrative interpretation and values not covered by checked claims are unverified. A citation validates only its numeric claim, never nearby sentences. Mark forecasts/assumptions explicitly. Use run_analysis for reproducible source-based programs and calculate for standalone arithmetic. Analysis outputs are calculated with lineage, not automatically checked claims; do not cite an input ID as if it were a derived output. You may show inert fenced code for reproducibility; never request arbitrary executable JavaScript.";
 function resolveCitation(token) {
   if (token.startsWith("E:")) return FU_EVIDENCE.get(token.slice(2));
   const [t,m,p] = token.split("|");
@@ -727,18 +728,33 @@ function citationHTML(token) {
   if (!e && !token.startsWith("E:")) { const [t,m,p] = token.split("|"); if (t && m && p) return `<button class="cite unresolved" data-t="${esc(t)}" data-m="${esc(m)}" data-p="${esc(p)}" title="Unresolved legacy citation; click to load its company and attempt resolution">Unresolved: ${esc(token)}</button>`; }
   return e ? `<button class="cite" data-evidence-id="${esc(e.id)}" title="${esc(e.validation.status + ': ' + e.value + ' ' + e.unit + '. This source does not verify surrounding prose.')}">${esc(e.ticker + ' ' + e.metric + ' ' + e.period)} · ${esc(e.validation.status)}</button>` : `<span class="cite unresolved" aria-label="Unresolved citation" title="No matching evidence record">Unresolved: ${esc(token)}</span>`;
 }
+function markdownSegments(text) {
+  const segments = []; let fence = null, code = [];
+  for (const line of String(text).replace(/\r/g, "").split("\n")) {
+    const marker = line.match(/^\s{0,3}(`{3,}|~{3,})(.*)$/);
+    if (fence) {
+      if (marker && marker[1][0] === fence[0] && marker[1].length >= fence.length && !marker[2].trim()) { segments.push({ type: "code", text: code.join("\n") }); fence = null; code = []; }
+      else code.push(line);
+    } else if (marker) fence = marker[1];
+    else segments.push({ type: "line", text: line });
+  }
+  if (fence) segments.push({ type: "code", text: code.join("\n") });
+  return segments;
+}
 function md(text) {
-  const lines = String(text).replace(/\r/g, "").split("\n");
   let html = "", list = null, tbl = null;
-  const inline = s => String(s).split(/(\[\[(?:E:[^\]]+|[A-Z.-]+\|[^\]]+)\]\])/g).map(part => /^\[\[/.test(part) ? citationHTML(part.slice(2,-2)) : esc(part).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "<code>$1</code>")).join("");
+  const prose = s => String(s).split(/(\[\[(?:E:[^\]]+|[A-Z.-]+\|[^\]]+)\]\])/g).map(part => /^\[\[/.test(part) ? citationHTML(part.slice(2,-2)) : esc(part).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")).join("");
+  const inline = s => String(s).split(/(`[^`]*`)/g).map(part => part.startsWith("`") ? "<code>" + esc(part.slice(1,-1)) + "</code>" : prose(part)).join("");
   const flush = () => { if (list) { html += `</${list}>`; list = null; } if (tbl) { html += "</table>"; tbl = null; } };
-  for (const ln of lines) {
+  for (const segment of markdownSegments(text)) {
+    if (segment.type === "code") { flush(); html += "<pre><code>" + esc(segment.text) + "</code></pre>"; continue; }
+    const ln = segment.text;
     if (/^\s*\|.*\|\s*$/.test(ln)) { if (/^\s*\|[\s:|-]+\|\s*$/.test(ln)) continue; const tokens = []; const protectedLine = ln.replace(/\[\[[^\]]+\]\]/g, t => { tokens.push(t); return `\uE000${tokens.length - 1}\uE001`; }); const cells = protectedLine.trim().slice(1, -1).split("|").map(c => c.replace(/\uE000(\d+)\uE001/g, (_, n) => tokens[+n])); if (!tbl) { flush(); html += "<table>"; tbl = 1; html += "<tr>" + cells.map(c => `<th>${inline(c.trim())}</th>`).join("") + "</tr>"; } else html += "<tr>" + cells.map(c => `<td>${inline(c.trim())}</td>`).join("") + "</tr>"; continue; }
     let m;
     if ((m = ln.match(/^\s*[-*]\s+(.*)/))) { if (list !== "ul") { flush(); html += "<ul>"; list = "ul"; } html += `<li>${inline(m[1])}</li>`; continue; }
     if ((m = ln.match(/^\s*\d+[.)]\s+(.*)/))) { if (list !== "ol") { flush(); html += "<ol>"; list = "ol"; } html += `<li>${inline(m[1])}</li>`; continue; }
     flush();
-    if ((m = ln.match(/^#{1,4}\s+(.*)/))) html += `<h4>${inline(m[1])}</h4>`;
+    if ((m = ln.match(/^(#{1,6})\s+(.*)/))) html += `<h${m[1].length}>${inline(m[2])}</h${m[1].length}>`;
     else if (ln.trim()) html += `<p>${inline(ln)}</p>`;
   }
   flush();
@@ -751,7 +767,8 @@ document.addEventListener("click", async e => { const b = e.target.closest(".cit
 function validateMarkdownNumbers(markdown) {
   const checks = [];
   const re = /([$€£]?[-−+]?\d[\d,]*(?:\.\d+)?\s*(?:percentage points|basis points|billion|million|thousand|bps|pp|[TBMK%×x])?)\s*\[\[([^\]]+)\]\]/gi;
-  for (const match of String(markdown).matchAll(re)) {
+  const prose = markdownSegments(markdown).filter(segment => segment.type === "line").map(segment => segment.text.replace(/`[^`]*`/g, "")).join("\n");
+  for (const match of prose.matchAll(re)) {
     const e = resolveCitation(match[2]), raw = match[1].replace(/,/g, "").replace("−", "-").trim();
     if (!e || e.value == null) { checks.push({ status: "unverified", reason: "Unresolved numeric citation" }); continue; }
     const number = raw.match(/[-+]?\d+(?:\.\d+)?/)[0], suffix = raw.slice(raw.indexOf(number) + number.length).trim().toLowerCase();
@@ -762,66 +779,139 @@ function validateMarkdownNumbers(markdown) {
   }
   return checks;
 }
-function checkedReport(content) {
+function checkedReport(content, maxClaims = 160) {
   let report;
-  const numericChecks = validateMarkdownNumbers(content);
-  if (numericChecks.some(c => c.status === "contradicted")) return { text: "**Report withheld: a displayed number contradicts its cited evidence.**", claims: numericChecks, status: "contradicted" };
-  try { report = JSON.parse(content.replace(/^```(?:json)?\s*|\s*```$/g, "")); } catch { return { text: "**Unverified narrative — numeric claims have not been checked.**\n\n" + content, claims: [], status: "unverified" }; }
-  if (!report || typeof report.markdown !== "string" || !Array.isArray(report.claims)) throw new Error("Malformed structured report");
+  try { report = JSON.parse(content.replace(/^```(?:json)?\s*|\s*```$/g, "")); }
+  catch {
+    const checks = validateMarkdownNumbers(content);
+    if (checks.some(c => c.status === "contradicted")) return { text: "**Report withheld: a displayed number contradicts its cited evidence.**", claims: checks, status: "contradicted" };
+    return { text: "**Unverified narrative — numeric claims have not been checked.**\n\n" + content, claims: [], status: "unverified" };
+  }
+  if (!report || typeof report.markdown !== "string" || !Array.isArray(report.claims)) return { text: "**Partial research — malformed structured report. Claims have not been checked.**", claims: [], status: "partial" };
   const inlineChecks = validateMarkdownNumbers(report.markdown);
   if (inlineChecks.some(c => c.status === "contradicted")) return { text: "**Report withheld: a displayed number contradicts its cited evidence.**", claims: inlineChecks, status: "contradicted" };
-  const claims = report.claims.slice(0, 80).map(c => ({ ...c, validation: FU_EVIDENCE.validateClaim(c) }));
-  if (report.claims.length > 80 || claims.some(c => c.validation.status === "contradicted")) return { text: "**Report withheld: numeric claims conflict with their evidence.**\n\n" + claims.filter(c => c.validation.status === "contradicted").map(c => `- ${c.evidenceId}: ${c.validation.reason}`).join("\n"), claims, status: "contradicted" };
-  const checked = claims.filter(c => c.validation.status === "verified");
-  const detail = claims.map(c => `- ${c.validation.status}: ${c.value} ${c.unit} ${c.evidenceId ? FU_EVIDENCE.citation(c.evidenceId) : "(no evidence)"}`).join("\n");
-  return { text: `**Claim checks: ${checked.length}/${claims.length}. Narrative interpretation remains unverified.**\n\n${report.markdown}` + (detail ? "\n\nChecked numeric claims\n" + detail : ""), claims, status: checked.length && checked.length === claims.length ? "checked_claims" : "unverified" };
+  // A bounded overflow scan still withholds contradictions beyond the displayed claim budget.
+  if (report.claims.length > 2000) return { text: "**Partial research — claim validation limit exceeded. Report remains withheld pending a smaller claim set.**", claims: [], status: "partial" };
+  const all = report.claims.map(c => ({ ...(c && typeof c === "object" ? c : {}), validation: FU_EVIDENCE.validateClaim(c && typeof c === "object" ? c : {}) }));
+  if (all.some(c => c.validation.status === "contradicted")) return { text: "**Report withheld: numeric claims conflict with their evidence.**", claims: all.slice(0,maxClaims), status: "contradicted" };
+  const claims = all.slice(0, maxClaims), checked = claims.filter(c => c.validation.status === "verified"), incomplete = all.length > maxClaims;
+  return { text: `**${incomplete ? "Partial claim checks" : "Claim checks"}: ${checked.length}/${all.length}. Narrative interpretation remains unverified.**\n\n${report.markdown}`, claims, totalClaims: all.length, status: incomplete ? "partial" : checked.length && checked.length === claims.length ? "checked_claims" : "unverified" };
 }
-function conversationWindow(turns, maxChars = 240000) {
+function conversationWindow(turns, maxChars = 560000) {
   const groups = [];
   for (const t of turns) { if (t.role === "user" || !groups.length) groups.push([]); groups.at(-1).push(t); }
   const kept = []; let size = 0;
-  for (const group of groups.slice(-4).reverse()) { const n = JSON.stringify(group).length; if (size + n > maxChars && kept.length) break; if (n > maxChars) throw new Error("Conversation step too large; start a new chat"); kept.unshift(...group); size += n; }
+  for (const original of groups.slice(-4).reverse()) {
+    let group = original, n = JSON.stringify(group).length;
+    if (n > maxChars) {
+      // Retain complete assistant/tool exchanges; replace oversized payloads with intact, explicit summaries.
+      group = group.map(t => t.role !== "tool" ? t : { ...t, content: JSON.stringify({ compacted: true, originalCharacters: String(t.content).length, evidenceIds: [...new Set(String(t.content).match(/ev_[a-f0-9]{16}/g) || [])].slice(0,200), instruction: "Earlier tool payload omitted to fit conversation history. Retrieve immutable IDs with inspect_evidence or rerun the original tool before using omitted facts." }) });
+      n = JSON.stringify(group).length;
+    }
+    if (size + n > maxChars && kept.length) break;
+    if (n > maxChars) throw new Error("Conversation step too large; start a new chat");
+    kept.unshift(...group); size += n;
+  }
   return kept;
 }
-async function agentLoop({ system, turns, tools, signal, onText }) {
-  const t0 = performance.now();
-  const msgs = [{ role: "system", content: system }, ...conversationWindow(turns)];
-  const spec = tools.map(t => ({ type: "function", function: { name: t.name, description: t.description, parameters: t.inputSchema || { type: "object", properties: {} } } }));
-  let calls = 0;
-  for (let round = 0; round < 10; round++) {
-    abortCheck(signal);
-    const r = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: msgs, tools: spec }), signal });
-    if (!r.ok) { const body = await r.json().catch(() => ({})); throw { code: r.status === 429 ? "rate_limited" : r.status === 413 ? "too_large" : r.status === 403 ? "forbidden" : "upstream_error", message: body.error || r.statusText }; }
-    const d = await r.json(), m = d.choices?.[0]?.message;
-    if (!m || (typeof m.content !== "string" && !m.tool_calls?.length)) throw new Error("Malformed assistant response");
-    if (m.tool_calls?.length) {
-      if (m.tool_calls.length > 12 || m.tool_calls.some(tc => !tc.id || !tc.function?.name || typeof tc.function.arguments !== "string")) throw new Error("Malformed tool calls");
-      msgs.push({ role: "assistant", content: m.content || "", tool_calls: m.tool_calls });
-      calls += m.tool_calls.length;
-      // Ordered execution preserves proposal dependencies and gives cancellation an explicit boundary.
-      for (const tc of m.tool_calls) {
-        abortCheck(signal); const tool = tools.find(t => t.name === tc.function.name); let out;
-        try { const args = JSON.parse(tc.function.arguments || "{}"); if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Tool arguments must be an object"); out = tool ? await tool.execute(args, { signal }) : { error: "Unknown tool" }; }
-        catch (e) { if (e.name === "AbortError" || signal?.aborted) throw e; out = { error: String(e.message || e) }; }
-        abortCheck(signal); msgs.push({ role: "tool", tool_call_id: tc.id, content: boundedToolResult(out) });
-      }
-      if (JSON.stringify(msgs).length > 580000) throw new Error("Evidence context limit reached; narrow the question");
-      continue;
-    }
-    const raw = m.content.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
-    if (!raw) throw new Error("Empty assistant response");
-    const report = checkedReport(raw); onText?.({ text: report.text });
-    msgs.push({ role: "assistant", content: report.status === "contradicted" ? report.text : raw });
-    return { ...report, turns: msgs.slice(1), meta: `${((performance.now() - t0) / 1000).toFixed(1)}s · ${calls} data lookup${calls === 1 ? "" : "s"} · ${report.status}` };
+function researchPartial(raw, reason, progress) {
+  let draft = raw, structured = /^\s*(?:\{|```json)/.test(raw);
+  if (structured) {
+    // Only a closed JSON string can expose partial markdown; never parse a fragment as a checked report.
+    const field = raw.match(/"markdown"\s*:\s*("(?:[^"\\]|\\.)*")/);
+    try { draft = field ? JSON.parse(field[1]) : ""; } catch { draft = ""; }
   }
-  throw { code: "upstream_error", message: "Too many steps" };
+  const checks = validateMarkdownNumbers(draft);
+  if (checks.some(c => c.status === "contradicted")) return { text: "**Report withheld: a displayed number contradicts its cited evidence.**", claims: checks, status: "contradicted", reason };
+  const reasons = { cancelled: "Research stopped", time_limit: "Research time limit reached", output_limit: "Research output limit reached", call_limit: "Research step limit reached", invalid_tool: "Incomplete or invalid tool request was not executed", incomplete_json: "Structured report is incomplete", upstream_error: "The assistant service stopped responding", context_limit: "Evidence context limit reached" };
+  return { text: `**Partial research — ${reasons[reason] || reason}. Numeric claims and interpretation remain unverified.**\n\n` + (draft || "A complete report was not produced.") + (progress.length ? "\n\nResearch progress:\n" + progress.slice(-12).map(p => "- " + p).join("\n") : "") + "\n\nUnresolved scope remains. Continue with a narrower follow-up or start another report.", claims: [], status: "partial", reason };
+}
+async function agentLoop({ system, turns, tools = [], signal, onText, profile = "detailed" }) {
+  const p = FU_RESEARCH_RUNTIME.profile(profile), t0 = performance.now();
+  const msgs = [{ role: "system", content: system + "\n\nResearch depth: " + p.instruction + ` Maximum ${p.maxClaims} checked claims; prioritize material claims.` }, ...conversationWindow(turns)];
+  const spec = tools.map(t => ({ type: "function", function: { name: t.name, description: t.description, parameters: t.inputSchema || { type: "object", properties: {} } } }));
+  let calls = 0, tokens = 0, raw = "", forceFinal = false, answerStart = null;
+  const progress = [];
+  const finish = (report, assembled = null) => {
+    if (answerStart != null) msgs.splice(answerStart);
+    msgs.push({ role: "assistant", content: assembled != null && !["partial", "contradicted"].includes(report.status) ? assembled : report.text });
+    onText?.({ text: report.text, status: report.status });
+    return { ...report, turns: msgs.slice(1).filter(m => m.role !== "system"), meta: `${p.label} · ${((performance.now() - t0) / 1000).toFixed(1)}s · ${calls} data lookup${calls === 1 ? "" : "s"} · ${report.status}` };
+  };
+  const partial = reason => finish(researchPartial(raw, reason, progress));
+  try {
+    for (let round = 0; round < p.maxCalls; round++) {
+      abortCheck(signal);
+      const remainingMs = Math.floor(p.maxMs - (performance.now() - t0)), remainingTokens = p.totalTokens - tokens;
+      if (remainingMs < 1000) return partial("time_limit");
+      if (remainingTokens < 1 || raw.length >= p.maxChars) return partial("output_limit");
+      const final = forceFinal || !!raw || !spec.length || round >= p.maxCalls - 2 || remainingTokens <= p.finalTokens * 2 || remainingMs <= p.requestMs + 3000;
+      const maxTokens = Math.min(p.maxTokens, final ? remainingTokens : remainingTokens - p.finalTokens);
+      if (final && !raw) msgs.push({ role: "system", content: "Synthesize your final answer now using the evidence collected. No more tool calls. State missing evidence and unresolved scope. Return one complete report JSON object; do not claim exhaustive research." });
+      const requestSignal = typeof AbortSignal !== "undefined" && AbortSignal.timeout ? AbortSignal.any([...(signal ? [signal] : []), AbortSignal.timeout(remainingMs)]) : signal;
+      const r = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: msgs, tools: final ? undefined : spec, profile: p.id, round, maxTokens, remainingTokens: final ? remainingTokens : remainingTokens - p.finalTokens, timeoutMs: Math.min(p.requestMs, remainingMs) }), signal: requestSignal });
+      abortCheck(signal);
+      if (!r.ok) { const body = await r.json().catch(() => ({})); if (!raw && !progress.length) throw { code: r.status === 429 ? "rate_limited" : r.status === 413 ? "too_large" : r.status === 403 ? "forbidden" : "upstream_error", message: body.error || r.statusText }; return partial("upstream_error"); }
+      const d = await r.json(), choice = d.choices?.[0], m = choice?.message;
+      abortCheck(signal);
+      const charged = d.research?.chargedTokens ?? d.usage?.completion_tokens;
+      tokens += Number.isInteger(charged) && charged > 0 ? charged : maxTokens;
+      if (!m || (typeof m.content !== "string" && !m.tool_calls?.length)) return partial("upstream_error");
+      if (m.tool_calls != null && !Array.isArray(m.tool_calls)) return partial("invalid_tool");
+      if (m.tool_calls?.length) {
+        // Validate every argument before any action. Even syntactically valid length-limited tool calls are inert.
+        if (choice.finish_reason === "length" || final || m.tool_calls.length > 12 || new Set(m.tool_calls.map(t => t.id)).size !== m.tool_calls.length) return partial("invalid_tool");
+        const parsed = [];
+        try { for (const tc of m.tool_calls) { if (typeof tc.id !== "string" || !tc.id || (tc.type && tc.type !== "function") || typeof tc.function?.name !== "string" || typeof tc.function.arguments !== "string") throw new Error("Invalid tool call"); const args = JSON.parse(tc.function.arguments); if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Invalid arguments"); parsed.push(args); } } catch { return partial("invalid_tool"); }
+        msgs.push({ role: "assistant", content: m.content || "", tool_calls: m.tool_calls });
+        for (let i = 0; i < m.tool_calls.length; i++) {
+          const tc = m.tool_calls[i], tool = tools.find(t => t.name === tc.function.name); let out;
+          const exhausted = calls >= p.maxTools || performance.now() - t0 >= p.maxMs - 3000;
+          if (signal?.aborted || exhausted) { out = { error: signal?.aborted ? "Cancelled before execution" : "Tool budget reached; synthesize existing evidence" }; forceFinal = true; }
+          else {
+            calls++;
+            try { out = tool ? await tool.execute(parsed[i], { signal: requestSignal }) : { error: "Unknown tool" }; }
+            catch (e) { out = { error: e.name === "AbortError" ? "Cancelled during execution" : String(e.message || e) }; }
+            progress.push(`${tc.function.name}: ${out?.error ? "unresolved — " + String(out.error).slice(0,160) : "result collected"}`);
+          }
+          msgs.push({ role: "tool", tool_call_id: tc.id, content: boundedToolResult(out) });
+        }
+        abortCheck(signal);
+        if (JSON.stringify(msgs).length > 560000) return partial("context_limit");
+        continue;
+      }
+      if (typeof m.content !== "string" || !m.content.trim()) return partial("upstream_error");
+      if (answerStart == null) answerStart = msgs.length;
+      // Keep byte-for-byte text continuity, including whitespace at a split JSON/string boundary.
+      const chunk = m.content, availableCharacters = Math.max(0, p.maxChars - raw.length);
+      raw += chunk.slice(0, availableCharacters);
+      msgs.push({ role: "assistant", content: chunk });
+      if (chunk.length > availableCharacters) return partial("output_limit");
+      if (choice.finish_reason === "length") {
+        onText?.(researchPartial(raw, "output_limit", progress));
+        abortCheck(signal);
+        if (raw.length >= p.maxChars) return partial("output_limit");
+        msgs.push({ role: "user", content: "Continue exactly from the final character of your preceding answer. Return only the missing suffix, preserving JSON escaping, without repeating content, adding a preface or opening a new code fence. Complete the original report and claims object." });
+        forceFinal = true; continue;
+      }
+      const cleaned = raw.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+      if (/^(?:\{|```json)/.test(cleaned)) { try { const parsed = JSON.parse(cleaned.replace(/^```(?:json)?\s*|\s*```$/g, "")); if (typeof parsed?.markdown !== "string" || !Array.isArray(parsed.claims)) return partial("incomplete_json"); } catch { return partial("incomplete_json"); } }
+      return finish(checkedReport(cleaned, p.maxClaims), cleaned);
+    }
+    return partial(raw ? "output_limit" : "call_limit");
+  } catch (e) {
+    if (signal?.aborted) return partial("cancelled");
+    if (e.name === "TimeoutError" || performance.now() - t0 >= p.maxMs) return partial("time_limit");
+    if (raw || progress.length) return partial("upstream_error");
+    throw e;
+  }
 }
 function webTools(trace) {
   const wrap = (name, fn) => async (i, ctx) => { const st = trace(name, i); try { abortCheck(ctx?.signal); const r = await fn(i || {}, ctx); abortCheck(ctx?.signal); st.done(r); return r; } catch (e) { st.fail(e); throw e; } };
   const post = async (path, body, ctx) => { const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: ctx?.signal }); const d = await r.json(); if (!r.ok) throw new Error(d.error || r.statusText); return d; };
   return [
     { name: "web_search", description: "Search recent web and news. Returns titles, URLs, dates and short snippets. Use for events after the latest filings.", inputSchema: { type: "object", properties: { query: { type: "string" }, news: { type: "boolean" } }, required: ["query"] }, execute: wrap("web_search", (i, ctx) => post("/api/search", i, ctx)) },
-    { name: "read_url", description: "Fetch a web page as markdown, trimmed to 12,000 characters. Use for IR pages, press releases and filings.", inputSchema: { type: "object", properties: { url: { type: "string" } }, required: ["url"] }, execute: wrap("read_url", (i, ctx) => post("/api/scrape", i, ctx)) },
+    { name: "read_url", description: "Read a web page as markdown in 12,000-character pages. Follow nextOffset with the returned contentId to preserve source identity. A content change requires restarting. Maximum source window 240,000 characters; sourceLimitReached means incomplete coverage.", inputSchema: { type: "object", properties: { url: { type: "string" }, offset: { type: "integer", minimum: 0 }, contentId: { type: "string" } }, required: ["url"] }, execute: wrap("read_url", (i, ctx) => post("/api/scrape", i, ctx)) },
   ];
 }
 
@@ -834,18 +924,21 @@ function chatPanel(host, cfg) {
   const stop = el("button", { class: "btn", hidden: true }, svgUse("i-stop"), "Stop");
   const status = el("span", { class: "muted", style: "font-size:12px;flex:1;min-width:160px" }, cfg.footnote || "");
   const clear = el("button", { class: "btn", title: "Start a new conversation" }, "New chat");
+  const depth = el("select", { class: "research-depth", "aria-label": "Research depth" }, ...Object.values(FU_RESEARCH_RUNTIME.profiles).map(p => el("option", { value: p.id }, p.label)));
+  depth.value = cfg.profile || "detailed";
   const sugg = el("div", { class: "sugg" }, cfg.suggestions.map(s => el("button", { onclick: () => { ta.value = s; go(); } }, s)));
-  host.append(log, el("div", { class: "comp" }, sugg, ta, el("div", { class: "row" }, send, stop, status, clear)));
+  host.append(log, el("div", { class: "comp" }, sugg, ta, el("div", { class: "row" }, send, stop, el("label", { class: "research-depth-label" }, "Depth ", depth), status, clear)));
   const intro = () => { if (cfg.intro) log.append(el("div", { class: "msg a", html: md(cfg.intro) })); };
   intro();
   const turns = [];
-  let ctl = null;
-  clear.onclick = () => { ctl?.abort(); turns.length = 0; log.innerHTML = ""; intro(); };
+  let ctl = null, generation = 0;
+  clear.onclick = () => { generation++; ctl?.abort(); turns.length = 0; log.innerHTML = ""; intro(); };
   ta.addEventListener("keydown", e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) go(); });
   stop.onclick = () => ctl?.abort();
   send.onclick = () => go();
   async function go() {
     const q = ta.value.trim(); if (!q || send.disabled) return;
+    const run = ++generation;
     ta.value = ""; log.append(el("div", { class: "msg u" }, q));
     const steps = el("div", { class: "steps" }); const out = el("div", { class: "msg a" }, el("span", { class: "thinking" }, el("i"), "Working"));
     const meta = el("div", { class: "resp-meta" });
@@ -858,18 +951,29 @@ function chatPanel(host, cfg) {
       return { done: r => { st.className = "st chip up"; st.textContent = `${Math.round(performance.now() - t0)} ms`; det.append(el("pre", {}, (typeof r === "string" ? r : JSON.stringify(r, null, 1)).slice(0, 3000))); }, fail: e => { st.className = "st chip down"; st.textContent = "error"; det.append(el("pre", {}, String(e.message || e))); } };
     };
     turns.push({ role: "user", content: q });
-    ctl = new AbortController(); send.disabled = true; stop.hidden = false;
+    ctl = new AbortController(); send.disabled = true; depth.disabled = true; stop.hidden = false;
     try {
       const tools = [...baseTools(trace), ...webTools(trace), ...(cfg.tools ? cfg.tools(trace) : [])];
       const ctx = cfg.context ? cfg.context() : "";
       const rules = cfg.rules + "\n\n" + CITE_RULE + (ctx ? "\n\nCurrent workspace:\n" + ctx : "");
-      const r = await agentLoop({ system: rules, turns, tools, signal: ctl.signal, onText: ({ text }) => { out.innerHTML = md(text); log.scrollTop = log.scrollHeight; } });
-      out.innerHTML = md(r.text); meta.textContent = r.meta; turns.splice(0, turns.length, ...conversationWindow(r.turns));
+      const r = await agentLoop({ system: rules, turns, tools, signal: ctl.signal, profile: depth.value, onText: ({ text }) => { if (run !== generation) return; out.innerHTML = md(text); log.scrollTop = log.scrollHeight; } });
+      if (run !== generation) return;
+      out.innerHTML = md(r.text);
+      if (r.claims?.length) {
+        const details = el("details", { class: "claim-checks" }, el("summary", {}, `Numeric claim details (${r.claims.length}${r.totalClaims > r.claims.length ? " of " + r.totalClaims : ""})`));
+        const list = el("ul");
+        r.claims.forEach(c => list.append(el("li", {}, `${c.validation?.status || c.status || "unverified"}: ${c.value ?? "—"} ${c.unit || ""} `, el("span", { html: c.evidenceId ? citationHTML("E:" + c.evidenceId) : "No evidence ID" }))));
+        details.append(list); out.append(details);
+      }
+      meta.textContent = r.meta;
+      try { turns.splice(0, turns.length, ...conversationWindow(r.turns)); }
+      catch { turns.length = 0; meta.textContent += " · Conversation history could not be retained; the answer remains available. Start a new question."; }
     } catch (e) {
+      if (run !== generation) return;
       out.innerHTML = "";
       if (e.name !== "AbortError" && e.code !== "cancelled") out.append(el("div", { class: "note" }, AI_ERR[e.code] || AI_ERR.upstream_error));
       turns.pop();
-    } finally { send.disabled = false; stop.hidden = true; ctl = null; cfg.onDone && cfg.onDone(); }
+    } finally { send.disabled = false; depth.disabled = false; stop.hidden = true; ctl = null; cfg.onDone && cfg.onDone(); }
   }
   return { ask: q => { ta.value = q; go(); } };
 }
@@ -1880,29 +1984,9 @@ function openKpiSource(tk, it, K, e, v) {
 }
 
 /* ---------- IR document library ---------- */
-const DOC_TYPES = { release: "Earnings release", presentation: "Presentation", supplement: "Supplement / data", remarks: "Prepared remarks / letter", transcript: "Transcript", annual_report: "Annual report", other: "Other" };
+const DOC_TYPES = { release: "Company release", presentation: "Presentation", supplement: "Supplement / data", remarks: "Prepared remarks / letter", transcript: "Transcript", annual_report: "Annual report", other: "Other" };
 function renderIrDocs(host, tk, ir) {
-  const docs = ir?.documents || [];
-  const wrap = el("div", { class: "bd", style: "padding-top:4px" });
-  if (!docs.length) wrap.append(el("div", { class: "muted" }, "Investor relations documents for this company are being collected."));
-  let type = "";
-  const draw = () => {
-    wrap.innerHTML = "";
-    const list = docs.filter(d => !type || d.doc_type === type).sort((a, b) => String(b.fiscal_label || "").localeCompare(String(a.fiscal_label || "")) || String(b.fetched_at).localeCompare(String(a.fetched_at)));
-    const t = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Period"), el("th", {}, "Type"), el("th", {}, "Document"), el("th", { class: "r" }, "Size"), el("th", {}, ""))));
-    const tb = el("tbody");
-    list.slice(0, 200).forEach(d => tb.append(el("tr", { class: "click", onclick: () => openDoc(tk, d, {}) },
-      el("td", { class: "mono", style: "white-space:nowrap" }, d.fiscal_label || "–"),
-      el("td", {}, el("span", { class: "chip" }, DOC_TYPES[d.doc_type] || d.doc_type || "–")),
-      el("td", { style: "max-width:520px" }, el("div", { style: "overflow:hidden;text-overflow:ellipsis;white-space:nowrap" }, docTitle(d)), el("div", { class: "faint", style: "font-size:11px" }, (d.ext || "").replace(".", "").toUpperCase() + (/sec\.gov/.test(d.url) ? " · SEC exhibit" : " · IR website"))),
-      el("td", { class: "r num faint" }, d.bytes ? (d.bytes > 1e6 ? (d.bytes / 1e6).toFixed(1) + " MB" : Math.round(d.bytes / 1e3) + " KB") : ""),
-      el("td", {}, el("a", { href: IRPUB + d.storage_path, target: "_blank", rel: "noopener", onclick: e => e.stopPropagation(), title: "Download the stored file" }, "File ↓")))));
-    t.append(tb); wrap.append(el("div", { class: "scroll", style: "max-height:520px;overflow:auto" }, t));
-  };
-  const types = [...new Set(docs.map(d => d.doc_type))];
-  const filt = el("select", { class: "btn", onchange: e => { type = e.target.value; draw(); } }, el("option", { value: "" }, `All types (${docs.length})`), ...types.map(x => el("option", { value: x }, `${DOC_TYPES[x] || x} (${docs.filter(d => d.doc_type === x).length})`)));
-  draw();
-  host.append(panel("Investor relations documents", filt, wrap, el("div", { class: "src" }, `Collected from ${ir?.site ? new URL(ir.site).host : "the company's IR site"} and from 8-K exhibits on EDGAR. Every file is stored by Filed Under; open one to read it here.`)));
+  FU_IR_LIBRARY.render(host, tk, ir, { fileBase: IRPUB, openDocument: doc => openDoc(tk, doc, {}) });
 }
 function docTitle(d) { return String(d.title || "").split("||")[0].replace(/\(opens in (a )?new (window|tab)\)/gi, "").replace(/\s+/g, " ").trim() || d.storage_path?.split("/").pop() || "Document"; }
 
@@ -2531,14 +2615,14 @@ async function pResearch() {
   const g = el("div", { class: "grid", style: "grid-template-columns:minmax(0,1fr) 300px" });
   const chat = el("section", { class: "panel", style: "display:flex;flex-direction:column;min-height:68vh" });
   const side = el("div", { style: "display:flex;flex-direction:column;gap:16px" },
-    panel("What it can look up", null, el("div", { class: "bd", style: "display:flex;flex-direction:column;gap:8px;font-size:12.5px" }, ...[["Screen", "Rank the S&P 500 on valuation, margins, growth, returns"], ["Financials", "Filed and calculated series with sources"], ["Prices", "Returns, volatility, beta, RSI"], ["Earnings reactions", "Moves after each 8-K Item 2.02"], ["Macro", "CPI, jobs, rates, the curve"], ["Filings", "SEC filings by form"], ["Calculations", "Deterministic financial formulas"], ["Web", "Recent news and any public page"]].map(([n, d]) => el("div", {}, el("b", {}, n), el("div", { class: "muted" }, d))))),
+    panel("What it can look up", null, el("div", { class: "bd", style: "display:flex;flex-direction:column;gap:8px;font-size:12.5px" }, ...[["Screen", "Rank the S&P 500 on valuation, margins, growth, returns"], ["Financials", "Filed and calculated series with sources"], ["Prices", "Returns, volatility, beta, RSI"], ["Earnings reactions", "Moves after each 8-K Item 2.02"], ["Macro", "CPI, jobs, rates, the curve"], ["Filings", "SEC filings by form"], ["Analysis", "Bounded source-based programs, formulas and assumptions"], ["Web", "Recent news and any public page"]].map(([n, d]) => el("div", {}, el("b", {}, n), el("div", { class: "muted" }, d))))),
     el("div", { class: "note" }, "Citations like ", el("span", { class: "cite" }, "NVDA Revenue Q2 FY27"), " open the filing behind the number. Answers can be wrong; check the sources."));
   g.append(chat, side); page.append(g);
   if (innerWidth < 860) g.style.gridTemplateColumns = "minmax(0,1fr)";
   RESEARCH = chatPanel(chat, {
-    id: "rs", tier: "default", placeholder: "e.g. Compare free cash flow conversion across all four companies over the last eight quarters. Ctrl/⌘+Enter to send.",
+    id: "rs", tier: "default", profile: "detailed", placeholder: "e.g. Compare free cash flow conversion across all four companies over the last eight quarters. Ctrl/⌘+Enter to send.",
     suggestions: ["Top 10 by FCF yield, and what explains the leaders?", "Which megacaps grew revenue fastest last quarter?", "Compare JPM, BAC and WFC net income over eight quarters", "How did NVDA react to its last four earnings?", "Is the yield curve still inverted, and since when?"],
-    rules: "Today is " + new Date().toISOString().slice(0, 10) + ". You are Filed Under's research assistant for US equities (coverage: S&P 500). Work like a careful analyst: call tools to get facts (never guess financial figures), use screen_companies for cross-sectional questions, calculate for multi-series math, web_search only for events the data does not cover. Answer in concise markdown with a short table when comparing. Note when a quarter is derived from cumulative figures. Do not give investment advice.",
+    rules: "Today is " + new Date().toISOString().slice(0, 10) + ". You are Filed Under's research assistant for US equities (coverage: S&P 500). Work like a careful analyst: call tools to get facts (never guess financial figures), use screen_companies for cross-sectional questions, calculate for multi-series math, web_search only for events the data does not cover. Follow the selected research depth. Synthesize comparisons, calculations, drivers, risks, conflicting sources and missing evidence with useful headings and tables. Note when a quarter is derived from cumulative figures. Do not give investment advice.",
   });
 }
 

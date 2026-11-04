@@ -1,4 +1,18 @@
 /* Research workspace: flat controls, readable commands, local editing state. */
+.ws-workspace,
+.ws-dialog {
+  --surface: #fff;
+  --rail: #fff;
+  --sunk: #f3f4f6;
+  --ink: #20252b;
+  --ink2: #343b44;
+  --muted: #626b75;
+  --line: #e0e3e7;
+  --line2: #d3d8df;
+  --ws-ink: var(--ink);
+  --ws-line: var(--line);
+  --ws-muted: var(--muted);
+}
 .ws-workspace {
   --ws-navy: var(--accent);
   --ws-ink: var(--ink);
@@ -32,11 +46,11 @@
   outline-offset: 2px;
 }
 .ws-titlebar {
-  min-height: 50px;
+  min-height: 36px;
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
-  padding: 8px 16px;
+  padding: 2px 12px;
   border-bottom: 1px solid var(--ws-line);
   background: var(--surface);
 }
@@ -51,12 +65,12 @@
   width: min(100%, 560px);
   padding: 3px 5px;
   margin-left: -5px;
-  font-family: var(--f-display) !important;
-  font-size: 23px !important;
-  font-weight: 400 !important;
-  letter-spacing: -0.2px;
+  font-family: var(--f-ui, Inter, Arial, sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0;
   color: var(--ws-ink);
-  height: 32px;
+  height: 28px;
 }
 .ws-title:hover,
 .ws-title:focus {
@@ -74,7 +88,7 @@
   align-items: center;
   gap: 18px;
   padding: 0 16px;
-  min-height: 43px;
+  min-height: 28px;
   border-bottom: 1px solid var(--ws-line);
   background: var(--surface);
 }
@@ -82,7 +96,7 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  padding-right: 16px;
+  padding-right: 8px;
   border-right: 1px solid var(--ws-line);
   flex-shrink: 0;
 }
@@ -90,7 +104,8 @@
   border: 1px solid transparent;
   background: transparent;
   border-radius: var(--r);
-  padding: 6px 9px;
+  padding: 4px 7px;
+  min-height: 28px;
   font-size: 12px;
   font-weight: 500;
   color: var(--ws-muted);
@@ -113,7 +128,7 @@
 .ws-ribbon-tabs button {
   border: 0;
   background: none;
-  padding: 12px 0 10px;
+  padding: 4px 0 3px;
   font-size: 12px;
   font-weight: 500;
   color: var(--ws-muted);
@@ -129,9 +144,9 @@
   color: var(--ink2);
 }
 .ws-ribbon {
-  height: 66px;
-  min-height: 66px;
-  padding: 6px 4px;
+  height: 36px;
+  min-height: 36px;
+  padding: 3px 4px;
   display: flex;
   background: var(--rail);
   border-bottom: 1px solid var(--ws-line);
@@ -142,9 +157,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 3px;
-  padding: 0 12px;
+  justify-content: center;
+  padding: 0 8px;
   border-right: 1px solid var(--ws-line);
   min-width: max-content;
 }
@@ -152,9 +166,7 @@
   border: 0;
 }
 .ws-ribbon-group > small {
-  font-size: 11px;
-  color: var(--ws-muted);
-  line-height: 14px;
+  display: none;
 }
 .ws-ribbon-actions {
   display: flex;
@@ -258,14 +270,14 @@
   border-bottom: 3px solid var(--line2);
 }
 .ws-formula-bar {
-  height: 40px;
-  min-height: 40px;
+  height: 32px;
+  min-height: 32px;
   display: flex;
   align-items: center;
   gap: 5px;
   background: var(--surface);
   border-bottom: 1px solid var(--line2);
-  padding: 5px 8px;
+  padding: 2px 8px;
   font-size: 12px;
 }
 .ws-address {
@@ -443,8 +455,8 @@
   background: var(--rail);
 }
 .ws-ruler {
-  height: 25px;
-  min-height: 25px;
+  height: 20px;
+  min-height: 20px;
   display: flex;
   justify-content: space-around;
   border-bottom: 1px solid var(--line2);
@@ -455,7 +467,7 @@
         var(--line2) 15px,
         var(--line2) 16px
       )
-      center 17px/100% 5px no-repeat,
+      center 14px/100% 5px no-repeat,
     var(--rail);
   color: var(--ws-muted);
   font-size: 11px;
@@ -877,22 +889,22 @@
 @media (max-width: 1200px) {
   .ws-viewbar { gap: 12px; padding: 0 12px; }
   .ws-mode-switch { padding-right: 10px; }
-  .ws-mode-switch button { padding: 6px; }
+  .ws-mode-switch button { padding: 4px 6px; }
   .ws-ribbon-tabs { gap: 15px; }
   .ws-body { grid-template-columns: minmax(0, 1fr) 290px; }
   .ws-sheet-hint { display: none; }
 }
 @media (max-width: 1050px) {
-  .ws-viewbar { flex-wrap: wrap; gap: 0; padding-top: 5px; }
-  .ws-mode-switch { border-right: 0; width: 100%; }
+  .ws-mode-switch { border-right: 0; padding-right: 0; }
   .ws-ribbon-tabs { width: 100%; gap: 24px; }
-  .ws-ribbon-tabs button { padding-top: 9px; padding-bottom: 8px; }
-  .ws-save { max-width: 125px; }
+  .ws-save { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
 @media (max-width: 860px) {
   .ws-workspace { display: flex; flex-direction: column; width: 100%; }
   .ws-titlebar { flex-wrap: wrap; gap: 6px 10px; padding: 8px 12px; }
   .ws-title-info { flex-basis: 100%; }
+  .ws-mode-switch { flex-wrap: wrap; }
+  .ws-viewbar { min-height: 40px; }
   .ws-save { flex: 1; max-width: none; }
   .ws-body { display: flex; flex-direction: column; }
   .ws-main-editor { height: 560px; flex: none; }
@@ -912,6 +924,7 @@
   .ws-mode-switch button,
   .ws-ribbon-tabs button { min-height: 40px; }
   .ws-title { height: 40px; }
+  .ws-ribbon-tabs button { padding-block: 9px; }
   .ws-formula-bar .ws-button { min-height: 28px; }
   .ws-ribbon { height: 72px; min-height: 72px; padding-block: 4px; }
   .ws-ribbon-actions { min-height: 40px; }
@@ -1064,7 +1077,7 @@
 .ws-chat.ai .intro { color: var(--ws-muted); font-size: 13px; }
 .ws-chat.ai .steps, .ws-chat.ai .aimeta { font-size: 11px; }
 
-/* Paper chrome uses shared application tokens; the document and cells retain their own styles. */
+/* Editor tokens are scoped above; document and cell formatting stay local. */
 .ws-workspace { background: var(--surface); }
 .ws-titlebar, .ws-viewbar, .ws-ribbon-tabs, .ws-ai-sidebar, .ws-proposal, .ws-chat.ai .comp, .ws-chat.ai textarea, .ws-chat.ai .sugg button { background: var(--surface); }
 .ws-document-canvas { background: var(--sunk); }

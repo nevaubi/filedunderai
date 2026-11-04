@@ -19,7 +19,12 @@ def main():
     ap.add_argument("--parts", type=int, default=1)
     ap.add_argument("--changed", action="store_true", help="only companies with new 10-K/10-Q/8-K filings")
     ap.add_argument("--sec-only", action="store_true", help="IR job: EDGAR exhibits only, skip the IR website")
-    ap.add_argument("--budget", type=float, help="time budget in seconds (compare, sectors)")
+    ap.add_argument("--budget", type=float, help="time budget in seconds (IR, compare, sectors)")
+    ap.add_argument("--repair-existing", action="store_true", help="IR: repair extraction/dates using stored originals only")
+    ap.add_argument("--publish-only", action="store_true", help="IR: reconcile manifests from existing rows without providers")
+    ap.add_argument("--max-docs", type=int, default=90, help="IR: per-company new/repair document work cap")
+    ap.add_argument("--max-pages", type=int, default=40, help="IR: per-source per-company discovery work cap")
+    ap.add_argument("--refresh-site", action="store_true", help="IR: refresh discovery and reset blocked retries")
     ap.add_argument("--sec-years", type=float, default=3, help="IR job: years of EDGAR 8-K earnings exhibits to collect")
     ap.add_argument("--step", default="publish", choices=["prices", "publish", "notes"], help="sectors job step")
     ap.add_argument("--backfill", action="store_true", help="technicals job: fetch full daily history for symbols without a history file")
@@ -47,7 +52,9 @@ def main():
     if a.job in ("insiders", "all"):
         print("insiders", jobs.insiders_job(sb, a.tickers, workers=a.workers))
     if a.job == "ir":
-        done, failed = jobs.ir_job(sb, a.tickers, workers=a.workers, web=not a.sec_only, sec_years=a.sec_years)
+        done, failed = jobs.ir_job(sb, a.tickers, workers=a.workers, web=not a.sec_only, sec_years=a.sec_years, time_budget=a.budget,
+                                   max_docs=a.max_docs, max_pages=a.max_pages, repair_existing=a.repair_existing, publish_only=a.publish_only,
+                                   refresh_site=a.refresh_site, backfill=a.full_history)
         print("ir", len(done), "failed", failed)
     if a.job == "segments":
         done, failed = jobs.segments_job(sb, a.tickers, workers=a.workers)

@@ -1,0 +1,54 @@
+.ir-library { overflow: hidden; }
+.ir-library-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.ir-library-head > div:first-child { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 12px; }
+.ir-library h3 { margin: 0; font: 600 14px/1.4 var(--f-ui); letter-spacing: 0; }
+.ir-library-count { color: var(--muted); font: 11px/1.5 var(--f-mono); }
+.ir-controls { display: flex; align-items: center; gap: 8px; max-width: 100%; }
+.ir-search, .ir-type { min-width: 0; height: 32px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); color: var(--ink); font: 12px/1.5 var(--f-ui); padding: 5px 9px; }
+.ir-search { width: 240px; }
+.ir-type { max-width: 205px; }
+.ir-coverage { border-bottom: 1px solid var(--line); background: var(--rail); font-size: 11px; color: var(--muted); }
+.ir-coverage > summary { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; padding: 9px 18px; cursor: pointer; list-style: none; }
+.ir-coverage > summary::-webkit-details-marker { display: none; }
+.ir-coverage-label { color: var(--ink2); }
+.ir-coverage-label::before { content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--faint); margin-right: 7px; vertical-align: 1px; }
+.ir-coverage[data-status="complete"] .ir-coverage-label::before { background: var(--up); }
+.ir-coverage-more { margin-left: auto; text-decoration: underline; text-underline-offset: 3px; }
+.ir-coverage-more::after { content: ' +'; text-decoration: none; }
+.ir-coverage[open] .ir-coverage-more::after { content: ' −'; }
+.ir-coverage-body { max-width: 900px; padding: 0 18px 10px; line-height: 1.65; }
+.ir-coverage-body p { margin: 5px 0; }
+.ir-coverage-body ul { margin: 6px 0; padding-left: 18px; }
+.ir-coverage-updated { color: var(--faint); }
+.ir-table-scroll { overflow: auto; max-height: 600px; }
+.ir-library [hidden] { display: none; }
+.ir-table { width: 100%; min-width: 620px; }
+.ir-table th { position: sticky; top: 0; z-index: 1; background: var(--surface); font-size: 10px; }
+.ir-table td { padding-top: 11px; padding-bottom: 11px; vertical-align: top; }
+.ir-document-date { min-width: 125px; white-space: nowrap; font: 11px/1.5 var(--f-mono); }
+.ir-document-date small, .ir-document-file small { display: block; margin-top: 3px; color: var(--muted); font: 10px/1.5 var(--f-ui); white-space: normal; }
+.ir-document-name { min-width: 240px; max-width: 570px; }
+.ir-document-title { display: block; padding: 0; border: 0; border-radius: 2px; background: transparent; color: var(--ink); font: 500 12px/1.5 var(--f-ui); text-align: left; overflow-wrap: anywhere; cursor: pointer; }
+.ir-document-title:hover { text-decoration: underline; text-underline-offset: 3px; }
+.ir-document-title:disabled { cursor: default; color: var(--muted); }
+.ir-document-meta { margin-top: 4px; color: var(--faint); font: 10px/1.5 var(--f-ui); }
+.ir-document-type { width: 140px; color: var(--muted); font: 11px/1.5 var(--f-ui); }
+.ir-document-file { width: 85px; white-space: nowrap; font: 11px/1.5 var(--f-ui); }
+.ir-document-file a { color: var(--muted); text-underline-offset: 3px; }
+.ir-empty { padding: 32px 18px; margin: 0; color: var(--muted); font-size: 12px; }
+.ir-pagination { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 18px; border-top: 1px solid var(--line); }
+.ir-pagination > div { display: flex; gap: 6px; }
+.ir-pagination .btn { height: 28px; padding: 4px 9px; font-size: 11px; }
+.ir-pagination .btn:disabled { opacity: .4; cursor: default; }
+.ir-range { color: var(--muted); font: 10px/1.5 var(--f-mono); }
+.ir-library-source { font-size: 10px; line-height: 1.6; }
+.ir-library :is(button, input, select, summary, a):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 600px) {
+  .ir-library-head, .ir-coverage > summary, .ir-pagination { padding-left: 12px; padding-right: 12px; }
+  .ir-controls { width: 100%; }
+  .ir-search { width: 50%; flex: 1; }
+  .ir-type { width: 50%; }
+  .ir-search, .ir-type, .ir-pagination .btn { height: 40px; }
+  .ir-coverage-more { margin-left: 0; }
+  .ir-document-title, .ir-document-file a { min-height: 40px; display: inline-flex; align-items: center; }
+}
