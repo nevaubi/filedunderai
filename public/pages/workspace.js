@@ -1025,11 +1025,16 @@ window.FU_PAGES = window.FU_PAGES || {};
     });
     table.style.fontSize = (12 * zoom) / 100 + "px";
     const cg = h("colgroup", {}, h("col", { style: "width:42px" }));
-    for (let c = 0; c < s.cols; c++)
-      if (!s.hiddenCols.includes(c))
-        cg.append(
-          h("col", { style: `width:${((s.widths[c] || 118) * zoom) / 100}px` }),
-        );
+    let tableWidth = 42;
+    for (let c = 0; c < s.cols; c++) {
+      if (s.hiddenCols.includes(c)) continue;
+      const width = ((s.widths[c] || 118) * zoom) / 100;
+      tableWidth += width;
+      cg.append(h("col", { style: `width:${width}px` }));
+    }
+    // Fixed table layout needs a definite width; cell text must not size columns.
+    table.style.width = tableWidth + "px";
+    table.style.minWidth = "0";
     table.append(cg);
     const head = h(
       "tr",
@@ -1109,7 +1114,9 @@ window.FU_PAGES = window.FU_PAGES || {};
             ].join(" "),
             title:
               meta?.error ||
-              (String(cell?.value || "").startsWith("=") ? cell.value : ""),
+              (String(cell?.value || "").startsWith("=")
+                ? cell.value
+                : typeof v === "string" ? v : ""),
           },
           display(v, cell, meta),
         );
