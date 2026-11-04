@@ -86,3 +86,16 @@ test('business metrics preserve definitions, units, document locators and public
  assert.equal(A.series(c,'Capital ratio',{asOf:'2025-06-01'}).length,0);
  assert.equal(A.series(c,'Capital ratio',{requireHistory:true}).length,0);
 });
+test('reports retain complete derivation sources and use percentage points for margin changes',()=>{
+ const c=company([rec('2024-03-31',100,'2024-05-01'),rec('2025-03-31',120,'2025-05-01')]);
+ c.statements.income.push({label:'Operating income',unit:'USD',quarterly:[rec('2024-03-31',20,'2024-05-01'),rec('2025-03-31',30,'2025-05-01')]});
+ const r=A.report(c),ids=new Set(r.evidence.map(e=>e.id));
+ assert.match(r.markdown,/margin change was 5.00 percentage points/);
+ for(const e of r.evidence)for(const id of e.inputEvidenceIds)assert.ok(ids.has(id),'missing exported derivation input '+id);
+ assert.ok(r.evidence.some(e=>e.metric==='Revenue' && e.periodEnd==='2024-03-31'));
+ const q=rec('2025-09-30',30,'2025-11-01',{accn:'new',derived:{from:rec('2025-09-30',100,'2025-11-01',{accn:'new',start:'2025-01-01'}),minus:rec('2025-06-30',70,'2025-08-01',{accn:'old',start:'2025-01-01'})}});
+ const d=company([q]);d.filings=[{a:'new',p:'new.htm',d:'2025-11-01'},{a:'old',p:'old.htm',d:'2025-08-01'}];
+ const ev=A.series(d,'Revenue')[0].evidence,inputs=ev.inputEvidenceIds.map(id=>globalThis.FU_EVIDENCE.get(id));
+ assert.equal(ev.validation.status,'valid');assert.ok(inputs[0].sourceUrl.endsWith('/new/new.htm'));assert.ok(inputs[1].sourceUrl.endsWith('/old/old.htm'));
+ assert.equal(inputs[1].filedDate,'2025-08-01');
+});

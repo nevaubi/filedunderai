@@ -1,4 +1,5 @@
--- Filed Under schema. Idempotent: safe to run on every deploy.
+-- Legacy Filed Under schema reference. Do not replay over an existing deployment.
+-- New schema changes belong in versioned supabase/migrations files.
 -- Public market data is readable by the anon role; only the service role writes.
 
 create table if not exists companies (

@@ -7,7 +7,7 @@ test('monitoring migration enforces owner isolation, column permissions and serv
  const db=new PGlite();
  try{
   await db.exec(`create role anon; create role authenticated; create role service_role bypassrls; create schema auth; create table auth.users(id uuid primary key); create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$; grant usage on schema auth,public to anon,authenticated,service_role; grant execute on function auth.uid() to authenticated; insert into auth.users values('${a}'),('${b}');`);
-  await db.exec(await readFile(new URL('../../supabase/migrations/20261104200000_research_monitoring_and_leases.sql',import.meta.url),'utf8'));
+  await db.exec(await readFile(new URL('../../supabase/migrations/20261104184603_research_monitoring_and_leases.sql',import.meta.url),'utf8'));
   const privileges=await db.query(`select has_table_privilege('anon','public.research_settings','SELECT') anon_read, has_table_privilege('authenticated','public.research_outbox','SELECT') outbox_read, has_function_privilege('authenticated','public.acquire_etl_lease(text,text,integer)','EXECUTE') acquire, has_function_privilege('anon','public.due_research_settings(integer)','EXECUTE') due`);
   assert.deepEqual(privileges.rows[0],{anon_read:false,outbox_read:false,acquire:false,due:false});
   await db.exec(`insert into public.research_settings(user_id,watchlist) values('${b}','["MSFT"]');set role authenticated;select set_config('request.jwt.claim.sub','${a}',false);insert into public.research_settings(user_id,watchlist) values('${a}','["AAPL"]');`);

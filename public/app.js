@@ -365,7 +365,7 @@ function colHeader(key) {
   return ["As of", fdate(key)];
 }
 const fmtCell = c => c.unit === "pct" ? fpct(c.v) : c.unit === "x" ? fx(c.v) : fmtMoney(c.v, c.unit);
-const periodText = c => c.kind === "TTM" ? "TTM to " + fdate(c.end) : plabel(c.tk, c.end, c.kind);
+const periodText = c => (c.evidenceId && FU_EVIDENCE.get(c.evidenceId)?.period) || (c.kind === "TTM" ? "TTM to " + fdate(c.end) : plabel(c.tk, c.end, c.kind));
 function siblings(cell) {
   if (cell?.sib) return cell.sib();
   if (!cell || cell.kind === "TTM" || !cell.end) return [];
@@ -432,7 +432,7 @@ function renderDetails(body, cell) {
     el("dt", {}, "XBRL element"), el("dd", { class: "mono" }, cell.conceptFull || "us-gaap:" + cell.concept),
     cell.dimText ? el("dt", {}, "Breakdown") : null, cell.dimText ? el("dd", {}, cell.dimText) : null,
     el("dt", {}, "Reported value"), el("dd", { class: "mono" }, rec.v.toLocaleString("en-US") + " " + cell.unit),
-    el("dt", {}, "Selection rule"), el("dd", {}, "First filing that reported this period. Later restatements are kept in the facts store."),
+    el("dt", {}, "Selection rule"), el("dd", {}, rec.vintage === "original" ? "First reported filing vintage. Later revisions are excluded from this record." : rec.vintage === "latest" ? "Latest compatible filing vintage in this dataset. This citation preserves the displayed value and its source." : "Legacy source snapshot. Inspect the accession and publication date; the dataset does not declare its revision policy."),
     el("dt", {}, "Links"), el("dd", {}, f?.primary ? el("a", { href: f.primary, target: "_blank", rel: "noopener" }, "Document ↗") : "–", " · ", el("a", { href: f?.index || "#", target: "_blank", rel: "noopener" }, "Filing index ↗"), " · ", el("a", { href: `https://data.sec.gov/api/xbrl/companyconcept/CIK${String(c.cik).padStart(10, "0")}/us-gaap/${cell.concept}.json`, target: "_blank", rel: "noopener" }, "Concept API ↗"))));
   if (cell.derived) {
     const dv = cell.derived;
@@ -748,14 +748,14 @@ document.addEventListener("click", async e => { const b = e.target.closest(".cit
 /* Assistant client. The server route picks the model and holds the keys. */
 function validateMarkdownNumbers(markdown) {
   const checks = [];
-  const re = /([$€£]?[-−+]?\d[\d,]*(?:\.\d+)?\s*(?:billion|million|thousand|[TBMK%×x])?)\s*\[\[([^\]]+)\]\]/gi;
+  const re = /([$€£]?[-−+]?\d[\d,]*(?:\.\d+)?\s*(?:percentage points|basis points|billion|million|thousand|bps|pp|[TBMK%×x])?)\s*\[\[([^\]]+)\]\]/gi;
   for (const match of String(markdown).matchAll(re)) {
     const e = resolveCitation(match[2]), raw = match[1].replace(/,/g, "").replace("−", "-").trim();
     if (!e || e.value == null) { checks.push({ status: "unverified", reason: "Unresolved numeric citation" }); continue; }
     const number = raw.match(/[-+]?\d+(?:\.\d+)?/)[0], suffix = raw.slice(raw.indexOf(number) + number.length).trim().toLowerCase();
-    const scale = ({ t: 1e12, b: 1e9, billion: 1e9, m: 1e6, million: 1e6, k: 1e3, thousand: 1e3, '%': .01 })[suffix] || 1;
+    const scale = ({ t: 1e12, b: 1e9, billion: 1e9, m: 1e6, million: 1e6, k: 1e3, thousand: 1e3, '%': .01, pp: .01, 'percentage points': .01, bps: .0001, 'basis points': .0001 })[suffix] || 1;
     const value = Number(number) * scale, decimals = (number.split('.')[1] || '').length, tolerance = .5 * 10 ** -decimals * scale + Number.EPSILON * Math.abs(e.value);
-    const wrongUnit = (suffix === '%' && e.unit !== 'pct') || (/[$]/.test(raw) && !['USD', 'USD/shares'].includes(e.unit)) || (['x', '×'].includes(suffix) && e.unit !== 'x');
+    const wrongUnit = (['%','pp','percentage points','bps','basis points'].includes(suffix) && e.unit !== 'pct') || (/[$]/.test(raw) && !['USD', 'USD/shares'].includes(e.unit)) || (['x', '×'].includes(suffix) && e.unit !== 'x');
     checks.push({ evidenceId: e.id, value, status: wrongUnit || Math.abs(value - e.value) > tolerance ? "contradicted" : "verified", reason: "Displayed number checked against record, allowing displayed rounding only" });
   }
   return checks;

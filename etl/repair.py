@@ -68,6 +68,7 @@ def value_index(bundle):
 
 def rebuild(bundle, facts, vintage='latest', as_of=None, price=None, archived=True):
     candidate = copy.deepcopy(bundle)
+    candidate['pipeline_version'] = 2
     candidate['statements'] = {k:sec.build_series(facts,k,vintage=vintage,as_of=as_of) for k in ('income','balance','cashflow')}
     if not any(candidate['statements'].values()):
         raise ValueError('No usable source facts; refusing to produce an empty replacement')

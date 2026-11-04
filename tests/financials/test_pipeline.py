@@ -125,10 +125,108 @@ class PipelineRegressions(unittest.TestCase):
         self.assertEqual(r['v'],400)
         self.assertIn('insurance',r['selection_reason'])
 
+    def test_distribution_yields_require_reported_components(self):
+        # Exercise the real screener valuation branch with a profitable company whose
+        # statement omits dividends, rather than treating absence as a reported zero.
+        import inspect, textwrap
+        src=inspect.getsource(screener.screener_job.__wrapped__)
+        code=textwrap.dedent(src[src.index('            price = out.get("price")'):src.index('            # correlations')])
+        for div,bb,expected in [(None,10,None),(10,None,None),(0,0,0),(10,20,.03)]:
+            out={'price':10};prov=screener.Prov()
+            inp={key:None for key in ('eps','oi','rev','fcf','eq','ta','tl','tca','tcl','re','debt','cash')}
+            inp.update(fin=True,ni=5,div=div,bb=bb,recs={key:[] for key in ('eps','oi','rev','fcf','eq','div','bb','debt','cash')})
+            data={'T':{'q':{},'shares':{'v':100,'end':'2026-10-20','basis':'reported_outstanding'}}}
+            scope=dict(screener.__dict__,out=out,prov=prov,inp=inp,fundc=data,tk='T',dates=['2026-11-03'],c=[10],fx=None,valuation_history=lambda *a:{})
+            exec(compile(code,'production_valuation_branch','exec'),scope)
+            self.assertEqual(out.get('sh_yield'),expected)
+            self.assertEqual(out.get('div_yield'),None if div is None else div/1000)
+
+    def test_unchanged_legacy_companies_migrate_in_bounded_rotation(self):
+        sb=MemoryStore()
+        sb.data['meta/fundamentals.json']={
+            'OLD':{'ticker':'OLD','material_accession':'same','latest_accession':'same'},
+            'CURRENT':{'ticker':'CURRENT','material_accession':'same','latest_accession':'same','pipeline_version':2},
+            'OLD2':{'ticker':'OLD2','material_accession':'same','latest_accession':'same','pipeline_version':1}}
+        filing={'f':'10-Q','a':'same','d':'2026-10-27','r':'2026-09-30','p':'report.htm','i':'','x':''}
+        visited=[]
+        def process(store,tk,**kwargs):
+            visited.append(tk)
+            return dict(store.data['meta/fundamentals.json'][tk],pipeline_version=2)
+        universe={tk:{'cik':i+1} for i,tk in enumerate(sb.data['meta/fundamentals.json'])}
+        with patch.object(jobs,'BY_TICKER',universe),patch.object(jobs.sec,'submissions',return_value={}),patch.object(jobs.sec,'filing_list',return_value=[filing]),patch.object(jobs,'process_company',side_effect=process),patch.object(jobs,'build_index'),patch.object(jobs,'build_feed'):
+            for expected in (['OLD'],['OLD2'],[]):
+                done,failed=jobs.companies_job(sb,list(universe),only_changed=True,max_companies=1,time_budget=240,workers=1)
+                self.assertEqual(done,expected);self.assertEqual(failed,{})
+        self.assertEqual(visited,['OLD','OLD2'])
+        self.assertEqual(sb.data['meta/fundamentals.json']['OLD2']['pipeline_version'],2)
+
     def test_market_cap_uses_same_unknown_and_reported_rules(self):
         from etl.fundamentals import market_cap
         self.assertIsNone(market_cap(10,{'val':100,'basis':'weighted_diluted_proxy'}))
         self.assertEqual(market_cap(10,{'val':100,'basis':'reported_outstanding','end':'2026-09-30'},'2026-11-01'),1000)
         self.assertIsNone(market_cap(10,{'val':100,'basis':'reported_outstanding','end':'2020-09-30'},'2026-11-01'))
+
+
+class FactStore(MemoryStore):
+    def __init__(self, rows, backup_ok=True, delete_ok=True):
+        super().__init__(); self.rows=copy.deepcopy(rows); self.raw={}; self.ops=[]; self.backup_ok=backup_ok; self.delete_ok=delete_ok
+    def upsert(self, table, rows, keys, **kw):
+        self.ops.append('upsert')
+        keys=keys.split(','); key=lambda r:tuple(r[k] for k in keys)
+        current={key(r):r for r in self.rows}
+        current.update({key(r):copy.deepcopy(r) for r in rows});self.rows=list(current.values())
+    def select(self, table, query):
+        from urllib.parse import parse_qs
+        def matches(r):
+            for key,items in parse_qs(query).items():
+                if key in ('select','order'):continue
+                value=items[0]
+                if value=='is.true':
+                    if r.get(key) is not True:return False
+                elif value.startswith('eq.') and str(r.get(key))!=value[3:]:return False
+            return True
+        return copy.deepcopy([r for r in self.rows if matches(r)])
+    def put_object(self, bucket, path, raw, **kw):
+        self.ops.append('backup'); self.raw[(bucket,path)]=raw
+    def get_object(self, bucket, path):
+        self.ops.append('verify_backup');return self.raw[(bucket,path)] if self.backup_ok else b'corrupt backup'
+    def delete(self, table, query):
+        self.ops.append('delete')
+        if self.delete_ok:
+            doomed=self.select(table,query);self.rows=[r for r in self.rows if r not in doomed]
+
+
+class RelationalCleanupRegressions(unittest.TestCase):
+    def fixture(self):
+        def row(label,end,value,derived,tk='T',concept=None):
+            return dict(ticker=tk,statement='income',label=label,kind='Q',period_end=end,period_start='2025-01-01',concept=concept or label,unit='USD/shares',value=value,accession='old',form='10-Q',filed='2025-11-01',derived=derived)
+        omitted=row('EPS diluted','2025-12-31',1/3,True,concept='EarningsPerShareDiluted')
+        replaced=row('EPS diluted','2025-09-30',.7,True,concept='EarningsPerShareDiluted')
+        shares=row('Diluted shares','2025-12-31',100,True,concept='WeightedAverageNumberOfDilutedSharesOutstanding')
+        good=row('EPS basic','2025-06-30',.5,False,concept='EarningsPerShareBasic')
+        revenue=row('Revenue','2025-12-31',100,True,concept='Revenues')
+        other=row('EPS diluted','2025-12-31',.3,True,tk='OTHER',concept='EarningsPerShareDiluted')
+        replacement=dict(replaced,value=1.64,derived=False,accession='new')
+        return [omitted,replaced,shares,good,revenue,other],replacement,[good,revenue,other]
+    def test_obsolete_derived_facts_removed_after_safe_reported_replacement(self):
+        rows,replacement,untouched=self.fixture();sb=FactStore(rows)
+        result=jobs.persist_normalized_facts(sb,'T',[replacement])
+        self.assertEqual(result['deleted'],2)
+        self.assertIn(replacement,sb.rows)
+        for row in untouched:self.assertIn(row,sb.rows)
+        self.assertEqual(len(sb.rows),4)
+        self.assertEqual(sb.ops[:3],['upsert','backup','verify_backup'])
+        saved=json.loads(next(iter(sb.raw.values())))
+        self.assertEqual({r['label'] for r in saved['rows']},{'EPS diluted','Diluted shares'})
+        self.assertTrue(all(r['ticker']=='T' and r['derived'] for r in saved['rows']))
+    def test_unverified_backup_blocks_every_deletion(self):
+        rows,replacement,_=self.fixture();sb=FactStore(rows,backup_ok=False)
+        with self.assertRaisesRegex(RuntimeError,'backup verification'):jobs.persist_normalized_facts(sb,'T',[replacement])
+        self.assertNotIn('delete',sb.ops);self.assertIn(replacement,sb.rows);self.assertEqual(len(sb.rows),6)
+    def test_silent_delete_failure_is_detected_by_exact_key_readback(self):
+        rows,replacement,_=self.fixture();sb=FactStore(rows,delete_ok=False)
+        with self.assertRaisesRegex(RuntimeError,'still present'):jobs.persist_normalized_facts(sb,'T',[replacement])
+        self.assertIn(replacement,sb.rows)
+
 
 if __name__=='__main__': unittest.main()

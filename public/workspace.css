@@ -1012,6 +1012,38 @@
     min-height: 0;
   }
 }
+/* Keep the composer, sheet tabs and status visible on desktop-height viewports. */
+@media screen and (min-width: 801px) {
+  .ws-workspace {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 116px);
+    min-height: 590px;
+  }
+  .ws-workspace > :not(.ws-body) {
+    flex-shrink: 0;
+  }
+  .ws-body {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    overflow: hidden;
+  }
+  .ws-surface {
+    min-height: 0;
+  }
+  .ws-proposal {
+    max-height: min(220px, 25dvh);
+  }
+  .ws-chat .comp {
+    flex-shrink: 0;
+  }
+}
+@media screen and (min-width: 801px) and (max-width: 860px) {
+  .ws-workspace {
+    height: calc(100dvh - 155px);
+  }
+}
 @media print {
   .ws-workspace .ws-titlebar,
   .ws-viewbar,

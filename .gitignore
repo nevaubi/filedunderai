@@ -6,3 +6,4 @@ __pycache__/
 .vercel/
 cache/
 public/vendor/office.js
+dist/

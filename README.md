@@ -1,22 +1,22 @@
 # Filed Under
 
-Source-attributed research on US equities. Financials come from SEC filings and every number links to the filing, table and XBRL fact it came from. Prices, macro series, filings, news and a research assistant sit around that core.
+Source-attributed research on US equities. Financial observations retain their SEC filing, period and accounting concept; calculated claims retain their formulas and original input records. Prices, macro series, filings, news and a research assistant sit around that core. Missing provenance and incomplete data remain visible.
 
 Coverage today: the S&P 500 (S&P 100 flagged in the index).
 
 ## How it fits together
 
-```
-                ┌───────────────────────────── Vercel ─────────────────────────────┐
- browser ──────▶│ public/ (index.html, app.js, app.css)                             │
-   │            │ api/ai.js · api/search.js · api/scrape.js   (Node, guarded)       │
-   │            │ api/cron/*.py  ── scheduled ETL, imports etl/                     │
-   │            └──────────────────────────────┬───────────────────────────────────┘
-   │                                           │ service role
-   │   public JSON (CDN)                       ▼
-   └────────────────────────────▶  Supabase: Storage `public-data` (site bundles)
-                                             Storage `raw` (archived source docs)
-                                             Postgres (companies, filings, facts, prices, insiders, macro, news, runs)
+```mermaid
+flowchart TD
+  Browser["Browser research workspace"] --> Static["Vercel static assets"]
+  Browser --> API["AI and research APIs"]
+  Browser --> Public["Public financial bundles"]
+  Cron["Scheduled ETL and monitoring"] --> Private["Private source archives"]
+  Cron --> DB["Postgres facts and owner-scoped research"]
+  Cron --> Public
+  API --> DB
+  Public --> Evidence["Evidence records and source inspection"]
+  Evidence --> Browser
 ```
 
 - **`etl/`** pulls and normalizes data and writes both Postgres rows and the JSON bundles the site reads.
@@ -32,8 +32,21 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
   - `screener.py` the screener factor table: 189 fields per company (valuation and 5-year percentiles, growth, quality, balance sheet, Piotroski components, technicals, correlations to market, rates, commodities, the dollar, bitcoin and macro series, insider and filing activity, KPI families, segments), each with a definition, unit, source and per-company provenance.
   - `kpi_taxonomy.py`, `kpistd.py` standardized KPIs: a canonical taxonomy (about 75 measures: comparable sales, organic growth, ARR, net revenue retention, RPO, backlog, book-to-bill, subscribers, ARPU, NIM, CET1, ROTCE, combined ratio, FFO per share, occupancy, RevPAR, load factor, ASMs, production, adjusted EBITDA and EPS, free cash flow, capex, segment revenue and operating income, ...) and the mapping of every company KPI id onto it. Rules on name, unit, category and parent decide most ids; the ones they leave open with a plausible match go to a Fireworks model, and a proposal is kept only if it passes the rule review (candidate list, unit, exclusions, segment qualifiers, value range). Each mapping stores scope (total, segment, variant), confidence, method and the reason. Each reporting-basis id is mapped on its own; per company and measure one total-company id is the compared series and other bases stay separate series, never joined.
   - `jobs.py` the jobs: `companies_job`, `prices_job`, `macro_job`, `news_rotation_job`, `build_index`, `build_feed`.
-- **`public/`** is a dependency-free single-page app (D3 for charts). It reads `index.json`, `market.json`, `macro.json`, `feed.json`, `companies/{TICKER}.json` and `prices/{SYMBOL}.json` from the public bucket.
-- **`db/schema.sql`** is applied on every deploy by `scripts/migrate.mjs` (idempotent). Public tables are read-only for `anon` via RLS.
+- **`public/`** is a vanilla JavaScript single-page app (D3 for charts). It reads public market-data bundles from Storage. The build bundles ExcelJS and docx for real worksheet and document exports; there is no frontend framework migration.
+- **`public/lib/evidence.js`** captures immutable records containing exact values, units, periods, source accessions, availability dates and derivation inputs. The assistant validates structured numerical claims against these records; narrative interpretation still needs review.
+- **`public/lib/analyst.js`** is shared by the browser and scheduled monitoring. It computes reported changes, exact-metric rules, thesis criteria, source-based ideas and conservative historical tests.
+- **`public/lib/workspace.js`** and **`public/pages/workspace.js`** implement document, worksheet and split views, local saved work, staged AI edits, cited model/report generation and XLSX/DOCX export.
+- **`supabase/migrations/`** contains explicit versioned migrations. Application builds do not execute SQL. `db/schema.sql` is a legacy reference, not a production migration runner. Monitoring settings/alerts have owner-scoped RLS; leases, monitoring state and the email outbox are service-only.
+
+## Research workspace
+
+The Morning brief, Watchlists, Research ideas and Thesis guardian pages use the same structured evidence as company statements and the assistant. The company **What changed** tab compares aligned quarters. Missing or incompatible periods remain unavailable; quarterly EPS is not manufactured by subtracting annual EPS.
+
+Watchlists and drafts work locally. Cloud monitoring requires Supabase sign-in, an explicit save of preferences, and a verified account for email opt-in. Scheduled checks produce deduplicated in-app alerts. Email delivery additionally requires a configured provider and sender. A provider-accepted message is not marked as inbox-delivered.
+
+The workspace offers familiar ribbon controls, a formula bar, multiple sheets, editable document blocks, formatting, history and source inspection. AI proposals are previewed before Apply/Reject. XLSX, CSV, TSV, JSON, TXT and Markdown imports preserve original copies; DOCX import is not supported. The editors are custom Office-style editors, not a complete replacement for Microsoft Word or Excel.
+
+Signals and historical tests require the relevant filed vintages and price coverage. Legacy/current-only data is excluded where it cannot establish what was known at the time. Price tests omit dividends and use the current covered universe, so they do not constitute a survivorship-free total-return backtest. Forecasts are editable scenarios, not analyst consensus. Management promise scoring requires explicit comparable period, unit and accounting-basis metadata.
 
 ## Storage layout
 
@@ -89,6 +102,7 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | `/api/cron/technicals?part=N&parts=4` | 22:05-22:26 Mon-Fri | Appends the day's bars from `prices/` to `tech/bars/` (no extra Yahoo calls; a split is detected from the overlap and rescales history), refreshes `tech/events/`, computes signals, breadth and state for a quarter of the names |
 | `/api/cron/technicals?merge=1` | 23:10 Mon-Fri | Combines the parts into `tech/signals.json`, `tech/breadth.json`, `tech/states.json` |
 | `/api/cron/insiders` | 15:30, 23:30 | Parses new Form 4 filings into `insider_transactions`, rewrites `insiders/{T}.json` and `meta/insiders.json` |
+| `/api/cron/analyst` | Hourly at :05 | Checks saved watchlists, rules and thesis criteria; queues source-linked alerts and optional daily briefs, then processes the verified-opt-in email outbox |
 
 | `/api/cron/mdata?source=…` | daily per source (calendar 06:15, oecd 09:20, bls 13:50, nyfed 18:25, cftc 20:55, frb_monthly 21:15, frb_weekly 22:45, frb_daily and treasury 23:15/23:35 weekdays, fdic Mondays 09:40) | Macro series store. Fed files are only re-read when their Last-Modified changes |
 
@@ -97,7 +111,7 @@ Macro store: `macro_series` holds one row per series (publisher, release, series
 
 Every run is logged in `etl_runs`; the latest runs are published to `meta/status.json` for the Data status page.
 
-Vercel Hobby runs each cron entry once a day within the scheduled hour, which is why the jobs are split into several entries.
+The deployment plan must support the configured cron frequencies. The hourly analyst schedule requires sub-daily cron support.
 
 ## Environment
 
@@ -106,6 +120,34 @@ Set in Vercel (the Supabase ones come from the integration):
 `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `POSTGRES_URL_NON_POOLING`, `FIREWORKS_API_KEY`, `TAVILY_API_KEY`, `FIRECRAWL_API_KEY`, `CRON_SECRET`, `SEC_USER_AGENT` (SEC asks for `Name email@domain`).
 
 Optional: `BLS_API_KEY` (raises the BLS API quota), `FU_ASSISTANT_MODEL`, `FU_ASSISTANT_FALLBACK`, `FU_SUMMARY_MODEL`, `FU_SUMMARY_FALLBACK`.
+
+Cloud sign-in needs `SUPABASE_PUBLISHABLE_KEY` (or `SUPABASE_ANON_KEY`); `/api/client-config` exposes only the public project URL and client key. Configure the production/preview URLs in Supabase Auth redirect settings. Never use a service-role key as a client key.
+
+Optional monitoring email: `RESEND_API_KEY` and `MONITORING_FROM_EMAIL`, using a sender verified with the provider. Delivery remains disabled without them. Local research and in-app cloud alerts do not require this provider.
+
+## Build, verify and migrate
+
+```bash
+npm ci
+pip install -r requirements.txt
+npm test
+npm run test:financials
+npm run test:parity
+npm run build
+```
+
+The build produces browser assets in `dist/` and fingerprints each local script/style URL by content. Source files remain in `public/`; a new deployment cannot reuse a differently versioned cached script. CI runs JavaScript behavior/export/ownership tests, Python financial regressions and JS/Python technical-signal parity on Node 22 and Python 3.12.
+
+Use the official Supabase CLI against the intended linked project, or the connected Supabase migration tool, for reviewed schema changes. The CLI workflow is separate from deployment:
+
+```bash
+supabase init                 # only when local CLI configuration does not exist
+supabase link --project-ref YOUR_PROJECT_REF
+npm run migrate               # dry-run of pending versioned migrations
+npm run migrate -- --apply     # explicit application after reviewing the dry-run
+```
+
+The monitoring/lease migration is recorded as `20261104184603_research_monitoring_and_leases.sql`. Before deploying lease-aware ETL, apply that migration and verify the service-only RPC grants. For a manual financial-data repair, let old deployment workers drain first, acquire the publication lease, preserve private backups, reject source/data drift, and verify published objects and normalized database rows. `python -m etl.repair` prepares offline candidates; it does not publish them.
 
 ## Running the ETL locally
 
