@@ -34,7 +34,7 @@ window.FU_PAGES = window.FU_PAGES || {};
 .tx-tag.u{background:var(--up-soft);color:var(--up)} .tx-tag.d{background:var(--down-soft);color:var(--down)} .tx-tag.n{background:var(--sunk);color:var(--muted)}
 .tx-sc .sub{font-size:11px;color:var(--faint)}
 .tx-calc table.t td{font-size:12px;padding:4px 8px;font-family:var(--f-mono)}
-.tx-calc tr.hit td{background:var(--mark);color:var(--mark-ink)}
+.tx-calc tr.hit td,.tx-calc tr.hit:hover td{background:var(--mark);color:var(--mark-ink)}
 .tx-calc tr.win td{background:var(--accent-soft)}
 .tx-chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .tx-tbl th.s{cursor:pointer}
@@ -253,14 +253,31 @@ window.FU_PAGES = window.FU_PAGES || {};
       wrap.append(el("div", { class: "note", style: "margin:12px" }, `The filing could not be opened in the viewer (${err.message}). `, el("a", { href: url, target: "_blank", rel: "noopener" }, "Open it on EDGAR ↗")));
     });
   }
+  const money = v => v == null ? "–" : Math.abs(v) >= 1e6 ? fmtMoney(v) : "$" + Math.round(v).toLocaleString("en-US");
+  // Form 4 primary documents are XML, so the trades are shown as parsed from the XML, with the filing index on EDGAR.
   function openInsiderDay(tk, day, rows, cik) {
-    const t = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Insider"), el("th", {}, "Type"), el("th", { class: "r" }, "Shares"), el("th", { class: "r" }, "Price"), el("th", { class: "r" }, "Value"), el("th", {}, ""))));
-    const tb = el("tbody");
-    rows.forEach(r => tb.append(el("tr", { class: "click", onclick: () => openOne(r) }, el("td", {}, el("div", {}, r[4]), el("div", { class: "faint", style: "font-size:11px" }, r[5] || "")), el("td", {}, el("span", { class: "chip " + (r[1] === "P" ? "up" : "down") }, r[1] === "P" ? "Buy" : "Sale"), r[7] ? el("span", { class: "chip", style: "margin-left:4px" }, "10b5-1") : null),
-      el("td", { class: "r num" }, r[2] != null ? Math.round(r[2]).toLocaleString("en-US") : "–"), el("td", { class: "r num" }, r[3] ? "$" + f2(r[3]) : "–"), el("td", { class: "r num" }, r[2] && r[3] ? fmtMoney(r[2] * r[3]) : "–"), el("td", {}, "Form 4 ›"))));
-    t.append(tb);
-    const openOne = r => openFiling(tk, { form: "4", filed: r[8] || day, accn: r[6], cik, doc: "", title: `Form 4 · ${r[4]}`, detail: `${r[1] === "P" ? "Bought" : "Sold"} ${r[2] != null ? Math.round(r[2]).toLocaleString("en-US") : "?"} shares at $${f2(r[3])} on ${fdate(r[0])}`, rows: rows.length > 1 ? el("div", { class: "scroll" }, t) : null }, r[3] ? { value: r[3], label: "Transaction price highlighted" } : null);
-    openOne(rows[0]);
+    hideTip();
+    const dh = $("#dh"), db = $("#db"); dh.innerHTML = ""; db.innerHTML = "";
+    DR.cell = { txIns: day };
+    const show = sel => {
+      const r = rows[sel], idxUrl = `https://www.sec.gov/Archives/edgar/data/${Number(cik)}/${r[6].replace(/-/g, "")}/${r[6]}-index.htm`;
+      dh.innerHTML = "";
+      dh.append(el("div", { class: "row" }, el("span", { class: "eyebrow" }, `Form 4 · filed ${fdate(r[8] || day)}`), el("div", { class: "x", style: "display:flex;gap:6px" },
+        el("a", { class: "btn", href: idxUrl, target: "_blank", rel: "noopener" }, "EDGAR", svgUse("i-ext")), el("button", { class: "iconbtn", onclick: closeSource, "aria-label": "Close source (Esc)" }, svgUse("i-x")))),
+        el("div", { class: "row" }, el("h2", {}, `${SHORT[tk] || tk} · ${r[4]}`)),
+        el("div", { class: "row" }, el("span", { class: "chip acc mono", style: "font-size:13.5px;height:26px" }, `${r[1] === "P" ? "Bought" : "Sold"} ${r[2] != null ? Math.round(r[2]).toLocaleString("en-US") : "?"} @ $${f2(r[3])}`), el("span", { class: "muted", style: "font-size:12.5px" }, `${fdate(r[0])} · ${r[5] || ""} · accession ${r[6]}`)));
+      const t = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Insider"), el("th", {}, "Type"), el("th", { class: "r" }, "Shares"), el("th", { class: "r" }, "Price"), el("th", { class: "r" }, "Value"), el("th", {}, "Accession"))));
+      const tb = el("tbody");
+      rows.forEach((x, k) => tb.append(el("tr", { class: "click" + (k === sel ? " hit" : ""), onclick: () => show(k) }, el("td", {}, el("div", {}, x[4]), el("div", { class: "faint", style: "font-size:11px" }, x[5] || "")), el("td", {}, el("span", { class: "chip " + (x[1] === "P" ? "up" : "down") }, x[1] === "P" ? "Buy" : "Sale"), x[7] ? el("span", { class: "chip", style: "margin-left:4px", title: "Executed under a Rule 10b5-1 trading plan" }, "10b5-1") : null),
+        el("td", { class: "r num" }, x[2] != null ? Math.round(x[2]).toLocaleString("en-US") : "–"), el("td", { class: "r num" }, x[3] ? "$" + f2(x[3]) : "–"), el("td", { class: "r num" }, x[2] && x[3] ? money(x[2] * x[3]) : "–"), el("td", { class: "mono faint", style: "font-size:11px" }, el("a", { href: `https://www.sec.gov/Archives/edgar/data/${Number(cik)}/${x[6].replace(/-/g, "")}/${x[6]}-index.htm`, target: "_blank", rel: "noopener", onclick: e => e.stopPropagation() }, x[6] + " ↗")))));
+      t.append(tb);
+      db.innerHTML = "";
+      db.append(el("div", { class: "tx-calc", style: "display:flex;flex-direction:column;gap:12px;padding-top:14px" }, el("div", { class: "scroll", style: "border:1px solid var(--line);border-radius:8px" }, t),
+        el("div", { class: "faint", style: "font-size:11.5px;line-height:1.5" }, `Open-market ${r[1] === "P" ? "purchases (code P)" : "sales (code S)"} of non-derivative shares reported on ${fdate(r[0])}, parsed from each Form 4's XML (table I: transaction date, code, shares, price). The highlighted row is the selected trade; the EDGAR link opens the filing index with the rendered form.`)));
+      drawer.classList.add("open"); drawer.setAttribute("aria-hidden", "false");
+      if (innerWidth < 860) scrim.hidden = false;
+    };
+    show(0);
   }
 
   /* ---------- page ---------- */
@@ -573,7 +590,7 @@ window.FU_PAGES = window.FU_PAGES || {};
       hlab.append("rect").attr("x", W - m.r + 2).attr("width", m.r - 4).attr("height", 16).attr("rx", 3).attr("fill", C("--accent"));
       const hlt = hlab.append("text").attr("x", W - m.r + 6).style("fill", "#fff");
       const ov2 = svg.append("rect").attr("x", m.l).attr("y", pr.y).attr("width", W - m.l - m.r).attr("height", Ht - axisH - pr.y).attr("fill", "transparent").style("cursor", anchorMode ? "crosshair" : "default");
-      svg.selectAll(".mk").raise();
+      const topG = svg.append("g"); svg.selectAll(".mk").each(function () { topG.node().appendChild(this); });
       const idxAt = mx => Math.max(i0, Math.min(i1, i0 + Math.floor((mx - m.l) / step)));
       const hover = (mx, my) => {
         const i = idxAt(mx); cross.style("display", null).attr("x1", X(i)).attr("x2", X(i)); setReadout(i);
