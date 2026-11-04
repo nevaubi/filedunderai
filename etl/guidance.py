@@ -63,6 +63,7 @@ METRICS = {
     "buybacks": ("Share repurchases", "USD", 0),
     "other": ("Other", None, 0),
 }
+GAAP_DEFAULT = {"revenue", "capex", "operating_cash_flow", "net_interest_income", "d_and_a", "share_count", "buybacks"}
 BASES = ("gaap", "adjusted", "organic", "constant_currency", "unspecified")
 BASIS_NAME = {"gaap": "GAAP", "adjusted": "Adjusted (non-GAAP)", "organic": "Organic", "constant_currency": "Constant currency", "unspecified": "As stated"}
 MEASURES = ("level", "growth", "change")
@@ -622,6 +623,9 @@ def validate_item(raw, pages, kind="guide"):
     it["page"] = page
     it["metric"] = _norm_enum(it.get("metric"), METRICS, "other")
     it["basis"] = _norm_enum(it.get("basis"), BASES, "unspecified")
+    if it["basis"] == "unspecified" and it["metric"] in GAAP_DEFAULT:
+        # accounting totals with no stated basis are the GAAP figures; keeps one series when a release says "GAAP revenue" once
+        it["basis"] = "gaap"
     it["measure"] = _norm_enum(it.get("measure"), MEASURES, "level")
     it["unit"] = _norm_enum(it.get("unit"), UNITS, METRICS[it["metric"]][1] or "USD")
     it["scale"] = _norm_enum(it.get("scale"), ("trillion", "billion", "million", "thousand", "none"), "none")
@@ -1028,6 +1032,12 @@ DOC_COLS = ("doc_id", "ticker", "issued", "version", "status", "windows", "items
 def build_company(sb, store, state, tk, name, sector, fye, log=print):
     """Revision chains, actuals, outcomes and the credibility record for one company; writes guidance/{T}.json."""
     rows = sorted(state["items"].values(), key=lambda r: (r["issued"], r["id"]))
+    for r in rows:
+        if r["basis"] == "unspecified" and r["metric"] in GAAP_DEFAULT:
+            r["basis"] = "gaap"
+            parts = r["series_key"].split("|")
+            parts[1] = "gaap"
+            r["series_key"] = "|".join(parts)
     guides = [r for r in rows if r["kind"] == "guide"]
     reported = [r for r in rows if r["kind"] == "reported"]
     withdrawn = [r for r in rows if r["kind"] == "withdrawn"]
@@ -1084,7 +1094,8 @@ def build_company(sb, store, state, tk, name, sector, fye, log=print):
                 rr = rep[(skey, lab)]
                 actual = {"v": rr["mid"], "src": "release", "doc": rr["doc_id"], "page": rr["page"], "quote": rr["quote"], "printed": (rr.get("printed") or {}).get("value"),
                           "reported_on": rr["issued"], "label": rr["label"], "item": rr["id"]}
-            if actual is None and ptype in ("Q", "FY"):
+            # published KPIs carry no GAAP / adjusted basis, so only segment and company-specific items are matched to them
+            if actual is None and ptype in ("Q", "FY") and (first["metric"] == "other" or first.get("segment")):
                 kid = kpi_match(kdefs, first)
                 kv = kvals[kid].get(("Q" if ptype == "Q" else "A", lab)) if kid else None
                 if kv:
@@ -1189,7 +1200,8 @@ def credibility(tk, series, outcomes, guides):
     within = sum(1 for o in sc if o["result"] == "within")
     above = sum(1 for o in sc if o["result"] == "above")
     below = sum(1 for o in sc if o["result"] == "below")
-    rel = sorted(o["surprise_rel"] * (1 if o["direction"] >= 0 else -1) for o in sc if o["surprise_rel"] is not None and o["direction"] != 0)
+    # each surprise is capped at ±50% so one-off items (a tax benefit doubling GAAP EPS) do not swamp the average
+    rel = sorted(max(-0.5, min(0.5, o["surprise_rel"] * (1 if o["direction"] >= 0 else -1))) for o in sc if o["surprise_rel"] is not None and o["direction"] != 0)
     up = [o for o in sc if o["direction"] > 0]
     # annual guidance raised between the first and the last point of the year
     fy = [o for o in sc if o["period_type"] == "FY" and o["initial_mid"] is not None and o["direction"] > 0]

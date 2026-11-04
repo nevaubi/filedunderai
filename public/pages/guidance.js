@@ -40,7 +40,9 @@ window.FU_COTABS = window.FU_COTABS || {};
 .gd-chart .hit{cursor:pointer}
 .gd-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:6px}
 .gd-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:-1px}
-.gd-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.gd-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-width:0;max-width:100%}
+.gd-segwrap{max-width:100%;overflow-x:auto;scrollbar-width:none}
+.panel>.hd .r:has(.gd-bar){min-width:0;max-width:100%}
 .gd-quote{font-size:12.5px;line-height:1.5;border-left:3px solid var(--mark);padding:4px 10px;background:var(--sunk);border-radius:0 6px 6px 0}
 .gd-sec{display:grid;grid-template-columns:minmax(120px,190px) 1fr 52px;gap:8px;align-items:center;font-size:12.5px;padding:3px 0}
 .gd-sec .b{height:8px;border-radius:4px;background:var(--line);position:relative;overflow:hidden}
@@ -338,7 +340,7 @@ window.FU_COTABS = window.FU_COTABS || {};
     const host = el("div");
     const secSel = el("select", { class: "btn", onchange: e => { sector = e.target.value; store.set("gd:sector", sector); lim = 60; drawEv(); drawRel(); } }, el("option", { value: "" }, "All sectors"), ...sectors.map(s => { const o = el("option", { value: s }, s); if (s === sector) o.selected = true; return o; }));
     const cb = el("input", { type: "checkbox" }); cb.checked = only100; cb.onchange = () => { only100 = cb.checked; store.set("gd:sp100", only100); drawEv(); drawRel(); };
-    const filt = el("div", { class: "gd-bar" }, seg([["chg", "Raised or lowered"], ["raised", "Raised"], ["lowered", "Lowered"], ["initial", "New"], ["reaffirmed", "Reaffirmed"], ["withdrawn", "Withdrawn"]], act, v => { act = v; store.set("gd:act", v); lim = 60; drawEv(); }),
+    const filt = el("div", { class: "gd-bar" }, el("div", { class: "gd-segwrap" }, seg([["chg", "Raised or lowered"], ["raised", "Raised"], ["lowered", "Lowered"], ["initial", "New"], ["reaffirmed", "Reaffirmed"], ["withdrawn", "Withdrawn"]], act, v => { act = v; store.set("gd:act", v); lim = 60; drawEv(); })),
       secSel, el("label", { style: "display:flex;gap:5px;align-items:center;font-size:12.5px;color:var(--muted)" }, cb, "S&P 100"));
     page.append(panel("Recent guidance changes", filt, host, el("div", { class: "src" }, "Changes are measured against the previous statement for the same metric, basis and period. Click a figure to open the sentence it came from.")));
     const okT = t => (!sector || IDX[t]?.sector === sector) && (!only100 || IDX[t]?.sp100 || (ix.reliability || []).find(r => r.t === t)?.sp100);
