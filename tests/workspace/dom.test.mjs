@@ -102,6 +102,48 @@ const click = (w, label) => {
   n.click();
   return n;
 };
+test("explicit proposal review reveals a hidden assistant and synchronizes both visibility controls", async () => {
+  const { w, close } = await setup();
+  try {
+    const hidden = () => w.document.querySelector(".ws-workspace").classList.contains("ws-ai-hidden");
+    const assertToggles = (pressed) => {
+      const controls = w.document.querySelectorAll("[data-assistant-toggle]");
+      assert.equal(controls.length, 2);
+      controls.forEach((control) => assert.equal(control.getAttribute("aria-pressed"), String(pressed)));
+    };
+    assert.equal(hidden(), true, "assistant starts collapsed at the constrained default width");
+    w.FU_WORKSPACE.stageProposal({
+      summary: "Review a proposed edit",
+      cells: [{ address: "A1", value: "Proposed value" }],
+    });
+    assert.equal(hidden(), true, "staging alone preserves the hidden assistant");
+    click(w, "Review");
+    assertToggles(false);
+    click(w, "Review proposal");
+    assert.equal(hidden(), false);
+    assertToggles(true);
+    assert.equal(w.document.querySelector(".ws-proposal").hidden, false);
+    assert.equal(
+      w.document.activeElement,
+      w.document.querySelector(".ws-proposal"),
+      "explicit review focuses the revealed proposal so the browser brings it into view",
+    );
+    click(w, "Assistant");
+    assert.equal(hidden(), true);
+    assertToggles(false);
+    await w.FU_PAGES.workbench();
+    assert.equal(hidden(), true, "rendering a pending proposal preserves deliberate hiding");
+    assertToggles(false);
+    click(w, "AI assistant");
+    assert.equal(hidden(), false);
+    assertToggles(true);
+    assert.equal(w.FU_WORKSPACE.getWorkbook().sheets[0].cells.A1, undefined);
+    click(w, "Apply changes");
+    assert.equal(w.FU_WORKSPACE.getWorkbook().sheets[0].cells.A1.value, "Proposed value");
+  } finally {
+    close();
+  }
+});
 test("real workspace UI edits selection, stages changes, preserves undo and exports editable XLSX with provenance", async () => {
   const { w, close } = await setup();
   try {

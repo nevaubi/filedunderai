@@ -12,7 +12,8 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'%3E%3Cpath d='M0 55H120' stroke='%230B0C0F' stroke-width='8' fill='none'/%3E%3Cpath d='M27 55 16.5 18.5 87 4 98 55' stroke='%230B0C0F' stroke-width='8' fill='none'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://apxfeteebnspwyajlxfh.supabase.co" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="/app.css">
 <link rel="stylesheet" href="/professional.css">
 <link rel="stylesheet" href="/workspace.css">
@@ -48,8 +49,8 @@
 
 <div class="app">
   <aside class="rail" aria-label="Primary">
-    <a class="brand" href="#markets" aria-label="Filed Under home"><svg><use href="#logo"/></svg><b>Filed Under</b><small>beta</small></a>
-    <nav class="nav" id="nav"></nav>
+    <a class="brand" href="#markets" aria-label="Filed Under home"><svg aria-hidden="true"><use href="#logo"/></svg><b>Filed Under</b></a>
+    <nav class="nav" id="nav" aria-label="Research and market data"></nav>
     <div class="sect eyebrow">Watchlist</div>
     <div class="wl" id="wl"></div>
     <div class="foot">
@@ -61,7 +62,7 @@
     <header class="top">
       <div class="search">
         <svg class="ico"><use href="#i-search"/></svg>
-        <input id="q" placeholder="Search tickers, metrics, pages, or ask a question" autocomplete="off" aria-label="Open command palette" readonly>
+        <input id="q" placeholder="Search companies, metrics, or ask a question" autocomplete="off" aria-label="Open command palette" readonly>
         <kbd>⌘K</kbd>
       </div>
       <span class="asof" id="asof"></span>

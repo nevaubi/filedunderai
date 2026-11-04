@@ -115,11 +115,15 @@ The deployment plan must support the configured cron frequencies. The hourly ana
 
 ## Environment
 
-Set in Vercel (the Supabase ones come from the integration):
+Set server configuration in Vercel (the Supabase project values come from the integration). The [API requirements guide](docs/api-requirements.md) maps every workflow to its service, endpoint, model settings and fallback behavior.
 
-`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `POSTGRES_URL_NON_POOLING`, `FIREWORKS_API_KEY`, `TAVILY_API_KEY`, `FIRECRAWL_API_KEY`, `CRON_SECRET`, `SEC_USER_AGENT` (SEC asks for `Name email@domain`).
+- Data publishing, usage counters and scheduled monitoring: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`.
+- Live assistant, AI edits, natural-language screening and generated narratives: `FIREWORKS_API_KEY`.
+- Web/news search and the corresponding ingestion jobs: `TAVILY_API_KEY`.
+- External page/document extraction and the corresponding ingestion jobs: `FIRECRAWL_API_KEY`.
+- Scheduled jobs and SEC source requests: `CRON_SECRET`, `SEC_USER_AGENT` (a deployment-specific name and contact email).
 
-Optional: `BLS_API_KEY` (raises the BLS API quota), `FU_ASSISTANT_MODEL`, `FU_ASSISTANT_FALLBACK`, `FU_SUMMARY_MODEL`, `FU_SUMMARY_FALLBACK`.
+Optional model overrides: `FU_ASSISTANT_MODEL`, `FU_ASSISTANT_FALLBACK`, `FU_SCREEN_MODEL`, `FU_SCREEN_FALLBACK`, `FU_SUMMARY_MODEL`, `FU_SUMMARY_FALLBACK`, `FU_KPISTD_MODEL`, `FU_KPISTD_FALLBACK`. These are Fireworks model slugs; validate availability and required capabilities before enabling live requests. `BLS_API_KEY` is optional for the BLS integration. `POSTGRES_URL_NON_POOLING` is not read by the active runtime or current linked-CLI migration wrapper.
 
 Cloud sign-in needs `SUPABASE_PUBLISHABLE_KEY` (or `SUPABASE_ANON_KEY`); `/api/client-config` exposes only the public project URL and client key. Configure the production/preview URLs in Supabase Auth redirect settings. Never use a service-role key as a client key.
 

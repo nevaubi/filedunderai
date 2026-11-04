@@ -17,8 +17,8 @@
     const label=pp?(c.v*100).toFixed(2)+' pp':change?pct(c.v):c.unit==='pct'?(c.v*100).toFixed(1)+'%':fmtMoney(c.v,c.unit);
     return el('button',{class:'an-value'+(change?' '+cls(c.v):''),title:`${c.label} · ${c.end} · inspect exact value and source`,onclick:()=>openSource(FU_EVIDENCE.cell(c.evidence?.id)||c)},label,el('span',{'aria-hidden':'true'},' ↗'));
   }
-  function header(kicker,title,description,actions=[]) {
-    return el('header',{class:'an-header'},el('div',{},el('div',{class:'eyebrow'},kicker),el('h1',{},title),el('p',{},description)),el('div',{class:'an-actions'},...actions));
+  function header(title,description,actions=[]) {
+    return el('header',{class:'an-header'},el('div',{},el('h1',{},title),el('p',{},description)),actions.length?el('div',{class:'an-actions'},...actions):null);
   }
   function card(title,content,action=null) {return el('section',{class:'an-card'},el('div',{class:'an-card-head'},el('h2',{},title),action),content);}
   function selectTicker(selected) {const s=el('select',{'aria-label':'Company'},...TICKERS.map(t=>el('option',{value:t,selected:t===selected},`${t} · ${SHORT[t] || t}`)));return s;}
@@ -58,28 +58,54 @@
     if(!events.length)return note('No new filings or earnings releases in this window.');
     return el('div',{class:'an-events'},...events.slice(0,10).map(e=>el('div',{class:'an-event'},badge(e.type==='release'?'Release':e.title),link(e.type==='release'?'Earnings release':`${e.title} filing`,e.url),el('time',{datetime:e.date},e.date))));
   }
+  function briefOverview(companies,brief) {
+    const table=el('table',{class:'an-overview-table'},el('caption',{},'Latest reported quarter for each company. Select a figure to inspect its source.'),el('thead',{},el('tr',{},...['Company / quarter','Revenue','Operating margin','Filings & releases','Details'].map(text=>el('th',{scope:'col'},text)))));
+    const body=el('tbody');
+    for(const item of brief.items) {
+      const c=companies.find(company=>company.ticker===item.ticker),rev=item.changes.rows.find(r=>r.metric==='Revenue'),margin=item.changes.rows.find(r=>r.metric==='Operating margin');
+      const detailId='brief-detail-'+item.ticker.toLowerCase();
+      const detailContent=el('div',{class:'an-brief-detail',role:'region','aria-label':item.ticker+' quarterly details'});
+      const detail=el('tr',{class:'an-detail-row',id:detailId,hidden:true},el('td',{colspan:5},detailContent));
+      const label=el('span',{},'Review');
+      const review=el('button',{class:'an-review',type:'button','aria-expanded':'false','aria-controls':detailId,'aria-label':'Review '+item.ticker+' details'},label,el('span',{class:'an-chevron','aria-hidden':'true'}));
+      const metric=(row,pp=false)=>el('td',{},el('div',{class:'an-overview-value'},value(row?.current)),el('div',{class:'an-overview-change'},value(row?.yoy,{change:true,pp}),el('span',{},'YoY')));
+      const activity=item.events.length?el('div',{class:'an-activity'},el('strong',{},item.events.length+' new'),el('span',{},'Since '+brief.since)):el('span',{class:'an-meta'},'No new activity');
+      const row=el('tr',{class:'an-overview-row','data-ticker':item.ticker},
+        el('th',{scope:'row'},el('a',{class:'an-company-name',href:'#company-'+item.ticker.toLowerCase()},el('strong',{},item.ticker),el('span',{},SHORT[item.ticker] || c.name || '')),el('div',{class:'an-meta'},item.changes.periodEnd?'Quarter ended '+item.changes.periodEnd:'Reporting period unavailable'),el('div',{class:'an-meta an-available'},'Available '+(item.changes.availableAt || 'date unavailable'))),
+        metric(rev),metric(margin,true),el('td',{},activity),el('td',{},review));
+      review.addEventListener('click',()=>{
+        const expanded=review.getAttribute('aria-expanded')!=='true';
+        if(expanded && !detailContent.childElementCount) {
+          const context=el('div',{class:'an-brief-context'},el('h3',{},'Filings & releases'),renderEvents(item.events));
+          if(rev?.yoy || margin?.yoy)context.append(el('div',{class:'an-question'},el('b',{},'Worth investigating'),el('p',{},rev?.yoy?.v>0 && margin?.yoy?.v<0?'Revenue grew while operating margin fell. Check pricing, mix and operating costs in the filing.':rev?.yoy?.v<0?'Revenue declined from the comparable prior-year period. Check the reported demand and mix explanations.':'Check whether the reported changes support your investment thesis and whether the same pattern holds in segment results.')));
+          detailContent.append(el('div',{class:'an-brief-detail-head'},el('h3',{},item.ticker+' · Quarterly changes'),el('p',{class:'an-meta'},'Period ended '+(item.changes.periodEnd || 'unavailable')+' · available '+(item.changes.availableAt || 'date unavailable'))),el('div',{class:'an-brief-detail-grid'},changesTable(c),context),companyActions(c));
+        }
+        detail.hidden=!expanded;
+        row.classList.toggle('is-expanded',expanded);
+        review.setAttribute('aria-expanded',String(expanded));
+        review.setAttribute('aria-label',(expanded?'Close ':'Review ')+item.ticker+' details');
+        label.textContent=expanded?'Close':'Review';
+      });
+      body.append(row,detail);
+    }
+    table.append(body);
+    return el('section',{class:'an-brief-section','aria-label':'Watchlist quarterly overview'},el('div',{class:'an-section-heading'},el('h2',{},'Your companies'),el('span',{class:'an-meta'},'Reported figures · source linked')),el('div',{class:'an-table-wrap'},table));
+  }
   async function pAnalyst() {
     const host=el('div',{class:'analyst-page'});page.append(host);
     const since=saved('briefSince',new Date(Date.now()-7*864e5).toISOString().slice(0,10));
     const dateInput=el('input',{type:'date',value:since,max:new Date().toISOString().slice(0,10),'aria-label':'Show events since'});
-    host.append(header('Your research desk','The morning brief','What arrived, what changed, and which questions deserve your attention.',[button('Manage watchlist',()=>location.hash='watchlists'),button('Research ideas',()=>location.hash='ideas',true)]));
-    const toolbar=el('div',{class:'an-toolbar'},field('Since',dateInput),button('Refresh brief',()=>{save('briefSince',dateInput.value);route();}),badge('Filed figures · source linked'));
+    host.append(header('Morning brief','New filings and quarterly changes across the companies you follow.',[button('Manage watchlist',()=>location.hash='watchlists'),button('Research ideas',()=>location.hash='ideas')]));
+    const toolbar=el('div',{class:'an-toolbar an-brief-toolbar'},field('Activity since',dateInput),button('Refresh brief',()=>{save('briefSince',dateInput.value);route();}));
     host.append(toolbar);
     const progress=note('Loading your watchlist…');host.append(progress);
     const {companies,failed}=await loadMany(watchlist(),{onProgress:(n,total)=>progress.textContent=`Reading ${n} of ${total} companies…`});
     if(!host.isConnected)return;progress.remove();
     const brief=A.brief(companies,{since,failed});
-    host.append(el('div',{class:'an-summary-grid'},...[[String(companies.length),'Companies followed'],[String(brief.eventCount),'New filings & releases'],[String(saved('rules',[]).filter(r=>r.enabled).length),'Standing orders'],[new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}),'Brief prepared']].map(([v,l])=>el('div',{class:'an-summary'},el('strong',{},v),el('span',{},l)))));
+    host.append(el('div',{class:'an-summary-grid'},...[[String(companies.length),'Companies followed'],[String(brief.eventCount),'New filings & releases'],[String(saved('rules',[]).filter(r=>r.enabled).length),'Active standing orders']].map(([v,l])=>el('div',{class:'an-summary'},el('strong',{},v),el('span',{},l)))));
     if(failed.length)host.append(note('Could not load: '+failed.map(x=>x.ticker).join(', ')+'. The brief does not cover these companies.'));
     if(!companies.length)host.append(card('Start with a watchlist',el('div',{class:'an-card-body'},el('p',{},'Follow the companies you research. Their filings and quarterly changes will appear here.'),button('Choose companies',()=>location.hash='watchlists',true))));
-    const list=el('div',{class:'an-company-grid'});
-    for(const item of brief.items) {
-      const c=companies.find(c=>c.ticker===item.ticker),rev=item.changes.rows.find(r=>r.metric==='Revenue'),margin=item.changes.rows.find(r=>r.metric==='Operating margin');
-      const body=el('div',{class:'an-card-body'},el('div',{class:'an-meta'},`${item.changes.periodEnd || 'No reporting period'} · available ${item.changes.availableAt || 'date unavailable'}`),renderEvents(item.events),changesTable(c,true));
-      if(rev?.yoy || margin?.yoy)body.append(el('div',{class:'an-question'},el('b',{},'Question to investigate'),el('p',{},rev?.yoy?.v>0 && margin?.yoy?.v<0?'Revenue grew while operating margin fell. Check pricing, mix and operating costs in the filing.':rev?.yoy?.v<0?'Revenue declined from the comparable prior-year period. Check the reported demand and mix explanations.':'Check whether the reported changes support your investment thesis and whether the same pattern holds in segment results.')));
-      body.append(companyActions(c));list.append(card(`${item.ticker} · ${SHORT[item.ticker] || ''}`,body,item.events.length?badge('New activity','positive'):badge('Quarterly view')));
-    }
-    host.append(list);
+    if(companies.length)host.append(briefOverview(companies,brief));
     const ruleHost=el('div',{class:'an-card-body'});host.append(card('Standing order checks',ruleHost));
     await renderRuleResults(ruleHost,companies);
   }
@@ -118,7 +144,7 @@
   }
   async function pWatchlists() {
     const host=el('div',{class:'analyst-page'});page.append(host);
-    host.append(header('Research that continues','Watchlists & standing orders','Follow companies, define what matters, and control how your analyst checks in.',[button('Read morning brief',()=>location.hash='analyst',true)]));
+    host.append(header('Watchlists & standing orders','Follow companies and define what to check when new filings arrive.',[button('Read morning brief',()=>location.hash='analyst')]));
     const picker=selectTicker(watchlist()[0] || TICKERS[0]),list=el('div',{class:'an-watch-list'});
     const draw=()=>{list.innerHTML='';for(const t of watchlist())list.append(el('div',{class:'an-watch-row'},el('a',{href:'#company-'+t.toLowerCase()},el('b',{},t),el('span',{},SHORT[t])),el('span',{class:'muted'},IDX[t].sector),button('Remove',()=>{toggleWatch(t);draw();})));};draw();
     host.append(card('Companies you follow',el('div',{class:'an-card-body'},el('div',{class:'an-toolbar'},picker,button('Follow company',()=>{if(!watchlist().includes(picker.value))toggleWatch(picker.value);draw();},true)),list)));
@@ -146,7 +172,7 @@
   }
   async function pGuardian() {
     const host=el('div',{class:'analyst-page'});page.append(host);
-    host.append(header('Thesis guardian','Turn a thesis into a test','Define measurable conditions. Each score comes from reported evidence, with missing coverage kept visible.'));
+    host.append(header('Thesis guardian','Track your thesis against measurable, reported results.'));
     const title=el('textarea',{rows:2,maxlength:2000,placeholder:'AMD gains data-center share','aria-label':'Your investment thesis'}),tk=selectTicker(watchlist()[0] || 'AMD'),metric=metricsSelect('Revenue');
     const ruleType=el('select',{'aria-label':'Criterion type'},el('option',{value:'threshold'},'Threshold'),el('option',{value:'trend'},'Consecutive quarterly change'));
     const operator=el('select',{'aria-label':'Criterion operator'},el('option',{value:'gte'},'At least'),el('option',{value:'gt'},'Greater than'),el('option',{value:'lte'},'At most'),el('option',{value:'lt'},'Less than'));
@@ -253,7 +279,7 @@
   }
   async function pIdeas() {
     const host=el('div',{class:'analyst-page'});page.append(host);
-    host.append(header('Evidence before conviction','Research ideas','Scan your watchlist, compare peers, and test an idea against the information available at the time.'));
+    host.append(header('Research ideas','Compare signals, peers and scenarios using reported evidence.'));
     const selected=selectTicker(saved('ideaTicker',watchlist()[0] || 'AAPL')),peer=selectTicker(saved('peerTicker','MSFT'));
     const body=el('div',{class:'an-stack'});host.append(el('div',{class:'an-toolbar'},field('Company',selected),field('Compare with',peer),button('Analyze',()=>{save('ideaTicker',selected.value);save('peerTicker',peer.value);route();},true),button('Scan watchlist',async e=>{
       const scanButton=e.currentTarget;scanButton.disabled=true;const results=await loadMany(watchlist()),scan=el('div',{class:'an-card-body'});
