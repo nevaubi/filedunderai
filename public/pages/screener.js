@@ -32,7 +32,7 @@ window.FU_PAGES = window.FU_PAGES || {};
     if (v == null || (typeof v === "number" && !isFinite(v))) return "–";
     if (!f) return String(v);
     switch (f.u) {
-      case "usd": return fmtMoney(v);
+      case "usd": return id === "price" ? "$" + fnum(v, 2) : fmtMoney(v);
       case "pct": return SIGNED.test(id) ? fsgn(v) : fpct(v, Math.abs(v) < 0.1 ? 2 : 1);
       case "x": return v.toFixed(Math.abs(v) >= 100 ? 0 : 1) + "×";
       case "pctl": return Math.round(v * 100) + "th";
@@ -90,8 +90,8 @@ window.FU_PAGES = window.FU_PAGES || {};
       spec: { filters: [{ field: "c_tnx", op: "top", pct: 10, scope: "all" }], sort: { field: "c_tnx", dir: "desc" }, columns: ["c_tnx", "cm_10y", "c_spy", "beta", "pb", "ret_3m"] } },
     { id: "ratedown", n: "Rate-sensitive (bond proxies)", why: "Bottom 10% by correlation with 10-year yield changes: names that have traded down when yields rise, typically utilities, REITs and long-duration growth.",
       spec: { filters: [{ field: "c_tnx", op: "bottom", pct: 10, scope: "all" }], sort: { field: "c_tnx", dir: "asc" }, columns: ["c_tnx", "cm_10y", "div_yield", "nd_ebitda", "beta", "ret_3m"] } },
-    { id: "dollar", n: "Dollar-hurt multinationals", why: "Large companies whose returns have moved against the dollar index (correlation below −0.1). A stronger dollar shrinks foreign sales when translated, so these tend to lag when the dollar rallies.",
-      spec: { filters: [{ field: "c_dxy", op: "<", value: -0.1 }, { field: "mcap", op: ">", value: 50e9 }], exclude_sectors: ["Utilities", "Real Estate"], sort: { field: "c_dxy", dir: "asc" }, columns: ["c_dxy", "mcap", "c_spy", "rev_g_ttm", "om"] } },
+    { id: "dollar", n: "Dollar-hurt multinationals", why: "Large companies in the fifth of the index whose returns have moved most against the dollar index. A stronger dollar shrinks foreign sales when translated, so these tend to lag when the dollar rallies.",
+      spec: { filters: [{ field: "c_dxy", op: "bottom", pct: 20, scope: "all" }, { field: "mcap", op: ">", value: 50e9 }], exclude_sectors: ["Utilities", "Real Estate"], sort: { field: "c_dxy", dir: "asc" }, columns: ["c_dxy", "mcap", "c_spy", "rev_g_ttm", "om"] } },
     { id: "divgrow", n: "Dividend growers", why: "Pays a dividend above 1.5% with five-year EPS growth above 5% and positive free cash flow yield above the dividend's typical cover. Dividends are paid from earnings growth, not leverage.",
       spec: { filters: [{ field: "div_yield", op: ">", value: 0.015 }, { field: "eps_cagr5", op: ">", value: 0.05 }, { field: "fcf_yield", op: ">", value: 0.03 }, { field: "nd_ebitda", op: "<", value: 3 }], sort: { field: "div_yield", dir: "desc" }, columns: ["div_yield", "eps_cagr5", "fcf_yield", "sh_yield", "nd_ebitda", "pio_f"] } },
     { id: "turnaround", n: "Turnarounds", why: "Shares down over a year and operating margin below three years ago, but revenue growth accelerating and operating income up on the year. Early evidence that a decline is reversing.",
@@ -106,8 +106,8 @@ window.FU_PAGES = window.FU_PAGES || {};
       spec: { filters: [{ field: "rsi14", op: "<", value: 35 }, { field: "roic", op: ">", value: 0.12 }, { field: "pio_f", op: ">=", value: 6 }], sort: { field: "rsi14", dir: "asc" }, columns: ["rsi14", "ret_1m", "dist_sma50", "roic", "pio_f", "pe_p5"] } },
     { id: "lowvol", n: "Low-volatility defensives", why: "Lowest fifth of the index on one-year volatility, beta under 0.8 and a dividend. These have historically fallen less in drawdowns.",
       spec: { filters: [{ field: "vol_1y", op: "bottom", pct: 20, scope: "all" }, { field: "beta", op: "<", value: 0.8 }, { field: "div_yield", op: ">", value: 0 }], sort: { field: "vol_1y", dir: "asc" }, columns: ["vol_1y", "beta", "mdd_1y", "div_yield", "c_spy"] } },
-    { id: "oil", n: "Oil-linked", why: "Daily returns correlated above 0.4 with WTI crude over the last year: the names an oil move will carry.",
-      spec: { filters: [{ field: "c_oil", op: ">", value: 0.4 }], sort: { field: "c_oil", dir: "desc" }, columns: ["c_oil", "c_spy", "c_dxy", "fcf_yield", "ret_3m"] } },
+    { id: "oil", n: "Oil-linked", why: "Top 10% of the index by correlation of daily returns with WTI crude over the last year: the names an oil move will carry.",
+      spec: { filters: [{ field: "c_oil", op: "top", pct: 10, scope: "all" }], sort: { field: "c_oil", dir: "desc" }, columns: ["c_oil", "c_spy", "c_dxy", "fcf_yield", "ret_3m"] } },
     { id: "cheaphist", n: "Cheap vs own history", why: "P/E and EV/Sales both in the bottom fifth of their own five-year monthly range: multiples compressed relative to what the market has paid for this company before.",
       spec: { filters: [{ field: "pe_p5", op: "<", value: 0.2 }, { field: "ev_sales_p5", op: "<", value: 0.2 }], sort: { field: "pe_p5", dir: "asc" }, columns: ["pe", "pe_p5", "ev_sales", "ev_sales_p5", "rev_g_ttm", "om_chg3"] } },
     { id: "strong", n: "Financially strong", why: "Piotroski F-score 8 or 9 and Altman Z above 3: improving profitability, liquidity and efficiency with a low distress score.",
@@ -892,7 +892,8 @@ window.FU_PAGES = window.FU_PAGES || {};
     };
     intro();
     hist.forEach(drawTurn);
-    clear.onclick = () => { hist.length = 0; store.set(KEY + ":chat", hist); log.innerHTML = ""; intro(); };
+    sugg.hidden = hist.length > 0;
+    clear.onclick = () => { hist.length = 0; store.set(KEY + ":chat", hist); log.innerHTML = ""; intro(); sugg.hidden = false; };
     undo.onclick = () => { const prev = undoStack.pop(); if (prev) { setSpec(prev.spec, { columns: false }); ST.cols = prev.cols; save(); renderResults(); toast("Restored the previous screen"); } undo.disabled = !undoStack.length; };
     ta.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); go(); } });
     send.onclick = () => go();
@@ -922,6 +923,7 @@ window.FU_PAGES = window.FU_PAGES || {};
       drawTurn(turn);
       hist.push(turn); while (hist.length > 30) hist.shift();
       store.set(KEY + ":chat", hist);
+      sugg.hidden = true;
       send.disabled = false;
       if (innerWidth < 860 && turn.spec) SCR.ui.summary.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -973,17 +975,17 @@ window.FU_PAGES = window.FU_PAGES || {};
 .sx-range{display:flex;gap:4px;align-items:center}
 .sx-range input[type=number]{width:72px;height:28px;border:1px solid var(--line);border-radius:6px;padding:0 6px;background:var(--surface);font-size:12px}
 .sx-mini{height:28px;padding:0 8px;font-size:11.5px}
-.sx-slider{position:relative;height:30px}
+.sx-slider{position:relative;height:36px}
 .sx-slider input[type=range]{position:absolute;left:0;right:0;top:2px;width:100%;margin:0;background:none;pointer-events:none;-webkit-appearance:none;appearance:none;height:16px}
 .sx-slider input[type=range]::-webkit-slider-thumb{pointer-events:auto;-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);box-shadow:0 0 0 1px var(--accent);cursor:pointer}
 .sx-slider input[type=range]::-moz-range-thumb{pointer-events:auto;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);cursor:pointer}
 .sx-slider input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--line2);border-radius:2px}
 .sx-slider input[type=range]::-moz-range-track{height:4px;background:var(--line2);border-radius:2px}
 .sx-slider input[type=range]+input[type=range]::-webkit-slider-runnable-track{background:transparent}
-.sx-ticks{position:absolute;left:0;right:0;top:18px;display:flex;justify-content:space-between;font-size:10px}
+.sx-ticks{position:absolute;left:0;right:0;top:21px;display:flex;justify-content:space-between;font-size:10px}
 .sx-summary{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
 .sx-count{font-size:13px}.sx-count b{font-size:18px}
-.sx-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.sx-stats{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}
 .sx-stat{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:11.5px;background:var(--surface)}
 .sx-stat b{font-size:15px;color:var(--ink)}
 .sx-mix{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--sunk)}
@@ -1012,7 +1014,7 @@ table.sx thead th{position:sticky;top:0;background:var(--surface);z-index:1}
 .sx-diff{list-style:none;padding:0;margin:6px 0;display:flex;flex-direction:column;gap:3px;font-size:12.5px}
 .sx-diff li.add b{color:var(--up)} .sx-diff li.rem b{color:var(--down)} .sx-diff li.chg b{color:var(--accent)}
 .sx-turn ul{margin:4px 0 0;padding-left:18px}
-@media (max-width:1180px){.sx-grid{grid-template-columns:minmax(0,1fr) 320px}}
+@media (max-width:1180px){.sx-grid{grid-template-columns:minmax(0,1fr) 320px}.sx-stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (max-width:980px){
   .sx-grid{grid-template-columns:minmax(0,1fr)}
   .sx-chat{position:static;max-height:none;order:-1;min-height:0}
@@ -1023,7 +1025,8 @@ table.sx thead th{position:sticky;top:0;background:var(--surface);z-index:1}
   .sx-fields{grid-template-columns:minmax(0,1fr)}
   .scr-tools{gap:6px}
   .scr-tools input[type=search]{min-width:0;flex:1 1 100%}
-  .sx-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sx-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .sx-stat{padding:5px 7px;font-size:10.5px}.sx-stat b{font-size:13px}
   table.sx td.sx-name{max-width:150px}
 }`;
     document.head.append(s);
