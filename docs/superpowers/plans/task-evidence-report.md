@@ -83,3 +83,9 @@ Coverage includes immutable restatements and reloads, source snapshots, exact cl
 - Old source IDs retain exact numeric/filing metadata. Archived full-document availability still depends on the existing filing endpoint/storage; the original SEC URL remains in the record.
 - Available source data, not the ledger, determines whether a period has an independently reconciled fact. Validation does not claim broader factual verification.
 - The initial-price dependency was already correct. Only cancellation propagation was changed there; no nonexistent dependency bug was reported or fixed.
+
+## Integration follow-up: persistence coalescing
+
+At root's review request, browser ledger persistence now coalesces each synchronous capture batch into one microtask flush, flushes on `pagehide`, and exposes `FU_EVIDENCE.flush()` for deterministic persistence/testing. Server imports without localStorage do not serialize the ledger. Storage failures dispatch a status event and trigger an application toast; the source drawer also exposes the failure state. A regression verifies 50 captures produce one write and quota errors remain visible. No financial values changed.
+
+The updated evidence/assistant test total is **19 passed**. With the second task's 17 monitoring tests, the focused combined run is **36 passed, 0 failed**.

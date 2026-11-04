@@ -3,11 +3,14 @@ import datetime as dt
 import json
 import hashlib
 import time
+from urllib.parse import quote
 from concurrent.futures import ThreadPoolExecutor
 
 from . import docs, fundamentals, insiders, macro, news, prices, sec, summaries
 from .common import Run, Supabase, now_iso, serialized_aggregates
 from .universe import BY_TICKER, MARKET_SYMBOLS, SECTOR_ETF, SP100, UNIVERSE
+
+PIPELINE_VERSION = 2
 
 IR_URLS = {
     "AAPL": "https://investor.apple.com/", "MSFT": "https://www.microsoft.com/en-us/investor", "NVDA": "https://investor.nvidia.com/",
@@ -36,6 +39,52 @@ def _cache(sb, path, default, strict=False):
         if strict:
             raise
         return default
+
+
+FACT_KEY = ("ticker", "statement", "label", "kind", "period_end")
+NONADDITIVE_FACT_LABELS = sec.NON_ADDITIVE | {"Basic shares", "Weighted average shares", "Weighted average diluted shares"}
+NONADDITIVE_FACT_CONCEPTS = {"EarningsPerShareBasic", "EarningsPerShareDiluted", "EarningsPerShareBasicAndDiluted",
+                            "WeightedAverageNumberOfDilutedSharesOutstanding", "WeightedAverageNumberOfSharesOutstandingBasic"}
+
+
+def persist_normalized_facts(sb, ticker, rows):
+    """Upsert valid replacements, then remove only unsupported legacy nonadditive quarters.
+
+    Every deletion uses the exact primary key plus the backed-up derived flag,
+    accession, concept and value. A direct reported replacement at that key survives.
+    No other absent historical facts are reconciled here: those need a reviewed repair.
+    """
+    sb.upsert("facts", rows, "ticker,statement,label,kind,period_end", batch=1000)
+    existing = sb.select("facts", f"select=*&ticker=eq.{quote(ticker, safe='')}&kind=eq.Q&derived=is.true")
+    obsolete = [r for r in existing if r.get("ticker") == ticker and r.get("kind") == "Q" and r.get("derived") is True
+                and (r.get("label") in NONADDITIVE_FACT_LABELS or r.get("concept") in NONADDITIVE_FACT_CONCEPTS)]
+    if not obsolete:
+        return {"deleted": 0, "backup": None}
+    payload = {"ticker": ticker, "pipeline_version": PIPELINE_VERSION, "created_at": now_iso(),
+               "reason": "Unsupported cumulative subtraction of per-share or weighted-share observations",
+               "keys": [{k:r[k] for k in FACT_KEY} for r in obsolete], "rows": obsolete}
+    body = json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+    digest = hashlib.sha256(body).hexdigest()
+    backup = f"repairs/nonadditive-facts/{quote(ticker, safe='')}/{digest}.json"
+    sb.put_object("raw", backup, body, cache="no-store")
+    if hashlib.sha256(sb.get_object("raw", backup) or b"").hexdigest() != digest:
+        raise RuntimeError(f"Nonadditive fact backup verification failed: raw/{backup}; no facts deleted")
+    deleted, protected = 0, 0
+    for row in obsolete:
+        key_query = "&".join(f"{k}=eq.{quote(str(row[k]), safe='')}" for k in FACT_KEY)
+        guard = "&derived=is.true" + "".join(f"&{k}=eq.{quote(str(row[k]), safe='')}" for k in ("accession", "concept", "value"))
+        lease = getattr(sb, "_aggregate_lease", None)
+        if lease:
+            lease.check()
+        sb.delete("facts", key_query + guard)
+        remaining = sb.select("facts", "select=*&" + key_query)
+        if remaining and any(r.get("derived") is not False for r in remaining):
+            raise RuntimeError(f"Unsupported derived fact still present after exact-key deletion: {ticker}/{row['label']}/{row['period_end']}; backup raw/{backup}")
+        if remaining:
+            protected += 1  # a concurrent direct reported replacement must never be deleted
+        else:
+            deleted += 1
+    return {"deleted": deleted, "protected_reported": protected, "backup": "raw/" + backup}
 
 
 # ---------------------------------------------------------------- companies
@@ -130,7 +179,7 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
     if fundamentals.TRANSITIONS.get(tk):
         prof["fyTransitions"] = fundamentals.TRANSITIONS[tk]
     bundle = {
-        "ticker": tk, "cik": cik, "displayName": u["name"], "sector": u["sector"], "irUrl": IR_URLS.get(tk), "generated": now_iso(),
+        "pipeline_version": PIPELINE_VERSION, "ticker": tk, "cik": cik, "displayName": u["name"], "sector": u["sector"], "irUrl": IR_URLS.get(tk), "generated": now_iso(),
         "profile": prof, "statements": statements, "source_archive": source_archive, "normalization": {"version": 2, "vintage": "latest", "availability_resolution": "filing_date"}, "warnings": warnings, "filings": [f for f in filings][:250], "filingTables": ftables,
         "earnings8k": earn, "ix": ix, "release": release, "news": coverage, "summary": summary,
     }
@@ -153,7 +202,7 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
                     rows[(stmt, r["label"], kind, p["end"])] = {
                         "ticker": tk, "statement": stmt, "label": r["label"], "kind": kind, "period_end": p["end"], "period_start": p.get("start"),
                         "concept": p.get("c") or r["concept"], "unit": r["unit"], "value": p["v"], "accession": p["accn"], "form": p["form"], "filed": p["filed"], "derived": bool(p.get("derived"))}
-    sb.upsert("facts", rows.values(), "ticker,statement,label,kind,period_end", batch=1000)
+    fact_cleanup = persist_normalized_facts(sb, tk, rows.values())
     if coverage.get("items"):
         lines = (summary or {}).get("news_lines") or {}
         sb.upsert("news_items", [{"url": x["url"], "ticker": tk, "title": x["title"][:500], "source": x["source"], "published_at": _ts(x.get("date")),
@@ -162,7 +211,7 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
         sb.upsert("summaries", [{"id": f"company:{tk}", "kind": "company", "ticker": tk, "content": summary, "generated_at": summary.get("generated_at") or now_iso()}], "id")
 
     fund = fundamentals.compute(statements, prof, None)
-    return {"ticker": tk, "warnings": warnings, "name": u["name"], "legal_name": prof["name"], "sector": u["sector"], "sic": prof["sicDescription"], "exchange": (prof["exchanges"] or [None])[0],
+    return {"pipeline_version": PIPELINE_VERSION, "ticker": tk, "warnings": warnings, "fact_cleanup": fact_cleanup, "name": u["name"], "legal_name": prof["name"], "sector": u["sector"], "sic": prof["sicDescription"], "exchange": (prof["exchanges"] or [None])[0],
             "fye": prof["fiscalYearEnd"], "shares": (prof["sharesOutstanding"] or {}).get("val"), "shares_metadata": prof["sharesOutstanding"], "latest_filing": filings[0]["d"] if filings else None,
             "latest_accession": filings[0]["a"] if filings else None, "material_accession": material_accession(filings), "fund": fund, "has_source_tables": bool(ix), "has_release": bool(release),
             "div_ttm": fundamentals.ttm(statements, "Dividends paid", ("cashflow",)), "bb_ttm": fundamentals.ttm(statements, "Buybacks", ("cashflow",))}
@@ -187,7 +236,8 @@ def material_accession(filings):
 
 def detect_changes(sb, tickers, fund, deadline):
     """Checks SEC submissions for each ticker. New material filings (10-K, 10-Q, 8-K) mark the company for
-    reprocessing; every other new filing (Form 4, 144, proxies) is written straight to the filings table."""
+    reprocessing, as do legacy normalization versions even without a new filing. The caller
+    applies its ordinary max_companies/time budget. Other new filings sync to the filings table."""
     state = _cache(sb, "meta/check_cursor.json", {"cursor": 0})
     start = state.get("cursor", 0) % max(len(tickers), 1)
     order = tickers[start:] + tickers[:start]
@@ -212,7 +262,8 @@ def detect_changes(sb, tickers, fund, deadline):
             prev = fund.get(tk) or {}
             mat = material_accession(fl)
             known = prev.get("material_accession") or prev.get("latest_accession")
-            if not prev or (mat and mat != known):
+            needs_upgrade = (prev.get("pipeline_version") or 0) < PIPELINE_VERSION
+            if not prev or needs_upgrade or (mat and mat != known):
                 changed.append(tk)
             elif fl and fl[0]["a"] != prev.get("latest_accession"):
                 cik = BY_TICKER[tk]["cik"]
@@ -228,7 +279,7 @@ def detect_changes(sb, tickers, fund, deadline):
     state["cursor"] = (start + checked) % max(len(tickers), 1)
     state["updated_at"] = now_iso()
     sb.put_json("meta/check_cursor.json", state, cache="no-store")
-    print(f"checked {checked}/{len(tickers)}, {len(changed)} with new reports, {len(light)} other filings synced")
+    print(f"checked {checked}/{len(tickers)}, {len(changed)} with new reports or legacy pipeline versions, {len(light)} other filings synced")
     return changed
 
 
@@ -471,6 +522,7 @@ def macro_job(sb, refresh_news=True, brief=True):
 
 
 # ---------------------------------------------------------------- rotation for news + summaries
+@serialized_aggregates
 def news_rotation_job(sb, per_run=12, workers=4, time_budget=240):
     state = _cache(sb, "meta/rotation.json", {"cursor": 0})
     tickers = [t for t, *_ in UNIVERSE]

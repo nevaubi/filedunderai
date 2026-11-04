@@ -1451,11 +1451,8 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
                         if num is not None:
                             out[fid] = num / mcap
                             prov.put(fid, x, srefs + recs, p=[[dates[-1], price]])
-                    if fundc[tk]["q"].get("Dividends paid") is None and "div_yield" not in out and inp["ni"] is not None:
-                        out["div_yield"] = 0.0
-                        prov.put("div_yield", "No dividends paid in the cash flow statement", [])
-                    if inp["div"] is not None or inp["bb"] is not None:
-                        out["sh_yield"] = ((inp["div"] or 0) + (inp["bb"] or 0)) / mcap
+                    if inp["div"] is not None and inp["bb"] is not None:
+                        out["sh_yield"] = (inp["div"] + inp["bb"]) / mcap
                         prov.put("sh_yield", "(Dividends paid + share repurchases, trailing four quarters) / market cap", srefs + R["div"] + R["bb"], p=[[dates[-1], price]])
                     if not inp["fin"] and inp["ta"] and inp["tl"] and None not in (inp["tca"], inp["tcl"], inp["re"], inp["oi"], inp["rev"]):
                         ta = inp["ta"]

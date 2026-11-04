@@ -127,3 +127,61 @@ tests 1; pass 1; fail 0
 ```
 
 The TTL-cap alignment was followed by `python -m unittest discover -s tests/financials -q`: 23 tests, OK.
+
+## Follow-up: analyst fixes and real AMT repair candidate
+
+Re-reviewed root's fixes for all eight analyst findings and ran `node --test tests/analyst/analyst.test.mjs`: **13 tests passed, 0 failed**. The matched-interval/sign fixes, price coverage gating, session convention, insider coverage unknown, derived EPS exclusion, superseded-record handling, withdrawal handling, explicit empty watchlist, default date cutoff, and transition-period rejection are present. No blocker remains among those eight findings. Price-session completeness still uses a conservative seven-calendar-day gap check rather than a full exchange calendar; methodology should not claim exchange-calendar validation.
+
+A real AMT candidate was built from the current public company/index/fundamentals/screener/source/price bundles, SEC companyfacts, the official AMT Q3 filing, ten years of public price history (no split events), and read-only AMT relational facts/metrics/summary snapshots. No production apply was performed. Source bytes and manifests are preserved under:
+
+`/workspace/scratch/6f66af7c3d91/audit-work/amt-repair/`
+
+Key artifacts:
+
+- `README.md`: complete review, values, preconditions and operational limits.
+- `candidate/review.json`: detailed changes, calculator/source hashes and limitations.
+- `candidate/manifest.json` and `execution-manifest.json`: sealed candidate/source/helper bytes.
+- `candidate/companies/AMT.json`, `candidate/meta/fundamentals.json`, `candidate/index.json`, `candidate/screener.json`, `candidate/screener/src/AMT.json`.
+- `candidate/db/`: 2,911 normalized fact rows, reviewed deletion keys, metrics, shares patch and summaries mirror.
+- `build_candidate.py`: offline reproducible generator.
+- `apply_reviewed.py`: reviewed guarded publisher; default mode is local-only validation.
+- `test_apply_offline.py`: memory-only success/drift/failure restoration tests.
+
+Corrected current AMT values: revenue TTM $11,009.5M (was $849.5M), Q3 operating margin 45.558986% (was 626.666667%), net margin TTM 30.733457% (was 398.304885%), quarterly revenue growth +2.502392% (was −17.816558%), price/sales 7.889393 (was 102.246352). EPS TTM and P/E become unknown because the old Q4 EPS was subtracted; no replacement is invented. FCF TTM remains $3,960.7M with proper intervals. Reported outstanding shares and current market cap are unchanged. Thirty-five screener fields change. Of the prior 2,941 AMT relational fact rows, 30 unsupported rows are removed; 2,193 are changed/added, chiefly latest vintage, concept and start-date corrections. Other ticker values are identical in the candidate aggregates.
+
+The real rebuild exposed two additional missing-component defects in the original screener valuation block: absent dividends were forced to zero, and unknown buybacks were treated as zero for total shareholder yield. Root authorized the corrections; `etl/screener.py` now requires known components, and a focused regression exercises the real production valuation block with missing/zero/positive components. Financial tests now total **24 passed**. `etl/jobs.py` and `etl/repair.py` expose producer `pipeline_version: 2`; the candidate carries the same version.
+
+One obsolete generated-summary warning still cited the incorrect $0.20B revenue/626.7% margin. With root agreement, the candidate replaces only that exact warning with a deterministic accession-linked correction, preserves the original narrative generation time, and includes the same change in the relational summaries candidate and backup plan. No model call or wholesale narrative rewrite occurred.
+
+Publisher safety verification: **3 offline tests passed** for fresh non-AMT aggregate updates preserved, unexpected AMT drift refused before mutation, and an injected mid-publication failure restoring original public objects and database rows. Timestamp representations are normalized in preflight and post-write comparisons for SQL-versus-REST `Z`/`+00:00` differences. Local sealed-file validation passes, and compilation/diff checks are clean.
+
+After root deploys/drains/reviews, the exact secure execution command is:
+
+```bash
+python /workspace/scratch/6f66af7c3d91/audit-work/amt-repair/apply_reviewed.py --apply --prompt-key
+```
+
+A real TTY is required for no-echo getpass. Alternatively omit `--prompt-key` only with an existing `SUPABASE_SERVICE_ROLE_KEY` environment variable. No credential is embedded in command, file, manifest or report.
+
+The helper acquires the shared lease, rereads official source bytes/current data and refuses unexpected changes, rebases only AMT into fresh aggregates, verifies private backups under `raw/repairs/AMT/<run-id>/` before current-data mutation, updates normalized mirrors, publishes and verifies. REST and Storage cannot form a single transaction; rollback is best-effort under the lease, with an explicit receipt if restoration is incomplete. Old workers must be drained because a lease cannot fence requests already in flight. Root alone owns execution/publication.
+
+## Final publication guards and bounded legacy migration
+
+Root's final review requested company-row pre/post verification and a rollout path for unchanged legacy bundles. Both are complete; no production apply occurred.
+
+- The helper now compares selected `companies(ticker, shares_outstanding, shares_as_of)` against `input/db-company-shares.json`, a reviewed read-only database snapshot. It verifies that same row against the candidate patch after writes. SQL numeric strings and REST numeric values are normalized; existing timestamp normalization remains in metrics/summary comparisons.
+- Two new offline fault tests prove preflight share drift refuses before backup/mutation, and a wrong post-write share count triggers restoration. **Five publisher tests pass**, including the original non-AMT preservation, drift refusal and mid-write rollback cases. Candidate/helper manifests have been resealed.
+- `detect_changes` now treats missing/older fundamentals `pipeline_version` as requiring reprocessing even when no new material filing exists. Producers emit version 2 in both company and fundamentals metadata, including the AMT repair candidate. Existing max_companies/time_budget bounds remain in force. The focused regression first failed because no legacy ticker was selected, then passed with two old companies processed in separate max_companies=1 batches while the current company was skipped. **25 financial tests pass**.
+- Writer audit: the only repository writer of `companies/{ticker}.json` is `jobs.process_company`, called through leased `companies_job`. News rotation delegates to that entrypoint, so its prose/company writes already shared the lease. `news_rotation_job` now acquires the lease around its whole operation as well, covering rotation cursor reads/writes and reusing the nested company lease. No separate unleased scheduled company/prose writer was found. Direct ad-hoc calls to the lower-level worker or old deployed code still require drain/coordination; a lease cannot fence requests already in flight.
+
+All artifact locations and the secure root-only apply command are unchanged. Include updated `etl/jobs.py` in the deployed cutover build.
+
+## Narrow reconciliation of legacy relational facts
+
+Root identified that upserting the new normalized facts alone would leave omitted old derived EPS/share quarters in Postgres for non-AMT companies. `process_company` now calls `persist_normalized_facts`: valid new rows are upserted first, then only that ticker's existing derived quarterly EPS/basic/diluted/weighted-share observations are considered for removal.
+
+Before any deletion, the exact obsolete rows and primary keys are written to a content-addressed private JSON backup under `raw/repairs/nonadditive-facts/<ticker>/<sha256>.json` and read back to verify the hash. Each deletion uses the complete fact primary key plus original `derived=true`, accession, concept and value guards. Each key is read again: absence succeeds, a direct reported replacement is protected, and an unsupported remaining derived row fails the company job. The successful fundamentals entry records the cleanup counts and backup path. A failed cleanup does not advance the fundamentals pipeline version, so normal bounded rotation retries it.
+
+Three added regressions verify (1) omitted invalid EPS and share rows disappear after a valid directly reported replacement is safely upserted, while other reported facts, valid derived revenue, and another ticker remain; (2) a corrupt/unverified private backup blocks all deletion; and (3) silent deletion failure is caught by exact-key readback. **28 financial tests now pass.** The AMT publisher's five offline tests still pass, its source/helper manifests are resealed against the updated jobs.py, default local validation passes, and compilation/diff checks pass. No production writes were performed.
+
+This is intentionally not a general delete-every-row-absent-from-new-source operation. Companyfacts coverage gaps could otherwise remove valid history. Broader reconciliation of omitted/superseded flow records should use the existing reviewed repair path: fetch complete archived sources, compare exact old/new keys, explicitly classify each proposed deletion with its invalidation evidence, preserve a private snapshot, and apply only the reviewed keys under the lease. AMT's reviewed full candidate already follows that bounded explicit-diff approach. The normal producer cleanup added here addresses the known categorically invalid additive-EPS/share records without silently deleting unrelated historical financial facts.

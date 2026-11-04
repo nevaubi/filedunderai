@@ -280,23 +280,105 @@ window.FU_PAGES = window.FU_PAGES || {};
       if (!n.dataset.blockId) n.dataset.blockId = W.uid();
     return t.innerHTML;
   }
+  function evidenceRecord(id) {
+    return (
+      window.FU_EVIDENCE?.get(id) ||
+      (Array.isArray(book?.document?.evidence)
+        ? book.document.evidence
+        : []
+      ).find((r) => r.id === id) ||
+      null
+    );
+  }
+  function evidenceClosure(seeds) {
+    const known = new Map(
+      (Array.isArray(book?.document?.evidence)
+        ? book.document.evidence
+        : []
+      ).map((r) => [r.id, r]),
+    );
+    for (const r of seeds || []) if (r?.id) known.set(r.id, r);
+    const found = new Map();
+    const visit = (r) => {
+      if (!r?.id || found.has(r.id)) return;
+      found.set(r.id, r);
+      for (const id of r.inputEvidenceIds || [])
+        visit(known.get(id) || window.FU_EVIDENCE?.get(id));
+    };
+    for (const r of seeds || [])
+      visit(
+        typeof r === "string" ? known.get(r) || window.FU_EVIDENCE?.get(r) : r,
+      );
+    return [...found.values()];
+  }
+  function evidenceElement(record, label) {
+    const derived = !!record.inputEvidenceIds?.length,
+      records = evidenceClosure([record]),
+      urls = new Map();
+    for (const r of records)
+      if (/^https?:\/\//i.test(r.sourceUrl || "") && !urls.has(r.sourceUrl))
+        urls.set(r.sourceUrl, r);
+    const rootLabel =
+      label || `${record.ticker} · ${record.metric} · ${record.period}`;
+    if (!derived && urls.size)
+      return h(
+        "a",
+        { href: [...urls.keys()][0], "data-evidence-id": record.id },
+        rootLabel,
+      );
+    const span = h(
+      "span",
+      { "data-evidence-id": record.id },
+      rootLabel + (derived ? " · calculated" : ""),
+    );
+    let index = 0;
+    for (const [url, r] of urls) {
+      span.append(
+        " ",
+        h(
+          "a",
+          {
+            href: url,
+            "data-evidence-id": record.id,
+            title: `Original input source: ${r.metric || r.id}`,
+          },
+          `[${derived ? "input source" : "source"} ${++index}]`,
+        ),
+      );
+    }
+    if (!urls.size)
+      span.append(
+        derived
+          ? " · input source URLs unavailable"
+          : " · source URL unavailable",
+      );
+    if (
+      (record.inputEvidenceIds || []).some(
+        (id) => !records.some((r) => r.id === id),
+      )
+    )
+      span.append(" · one or more input records are unavailable");
+    return span;
+  }
+  function rememberEvidence(record) {
+    book.document.evidence = evidenceClosure([
+      ...(book.document.evidence || []),
+      record,
+    ]).map(W.clone);
+  }
   function htmlFromMarkdown(text) {
     if (typeof md === "function") {
       const t = document.createElement("template");
       t.innerHTML = md(String(text || ""));
       for (const n of t.content.querySelectorAll(".cite")) {
         const r = n.dataset.evidenceId
-          ? window.FU_EVIDENCE?.get(n.dataset.evidenceId)
+          ? evidenceRecord(n.dataset.evidenceId)
           : null;
-        const link =
-          r?.sourceUrl && /^https?:\/\//.test(r.sourceUrl)
-            ? h(
-                "a",
-                { href: r.sourceUrl, "data-evidence-id": r.id },
-                n.textContent,
-              )
-            : h("span", {}, n.textContent || "Unresolved citation");
-        n.replaceWith(link);
+        n.replaceWith(
+          r
+            ? evidenceElement(r, n.textContent)
+            : h("span", {}, n.textContent || "Unresolved citation"),
+        );
       }
       return sanitize(t.innerHTML);
     }
@@ -517,6 +599,7 @@ window.FU_PAGES = window.FU_PAGES || {};
   }
   function drawRibbon() {
     const ribbon = host.querySelector(".ws-ribbon");
+    ribbon.setAttribute("aria-label", tab + " commands");
     ribbon.replaceChildren();
     const doc = mode === "doc";
     const withSelection = (btn) => {
@@ -1328,28 +1411,20 @@ window.FU_PAGES = window.FU_PAGES || {};
   function insertCitation() {
     const id = prompt("Evidence ID (from a source record)");
     if (!id) return;
-    const record = window.FU_EVIDENCE?.get(id);
+    const record = evidenceRecord(id);
     if (!record) throw Error("Evidence ID could not be resolved");
-    if (!/^https?:\/\//.test(record.sourceUrl || ""))
-      throw Error("This evidence record has no source URL");
-    const link = h(
-      "a",
-      { href: record.sourceUrl, "data-evidence-id": record.id },
-      `${record.ticker} · ${record.metric} · ${record.period}`,
-    );
+    const link = evidenceElement(record);
     editor.focus();
     if (docRange) {
-      const s = getSelection();
-      s.removeAllRanges();
-      s.addRange(docRange);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(docRange);
     }
     document.execCommand("insertHTML", false, link.outerHTML);
-    book.document.evidence = [
-      ...(book.document.evidence || []).filter((x) => x.id !== record.id),
-      W.clone(record),
-    ];
+    rememberEvidence(record);
     captureDoc("Insert source citation");
   }
+
   function addSheet() {
     const name = prompt("Worksheet name", `Sheet${book.sheets.length + 1}`);
     if (!name) return;
@@ -1693,6 +1768,7 @@ window.FU_PAGES = window.FU_PAGES || {};
     const evidence = (options.evidence || [])
       .map((x) => (typeof x === "string" ? window.FU_EVIDENCE?.get(x) : x))
       .filter(Boolean);
+    book.document.evidence = evidenceClosure(evidence).map(W.clone);
     let html;
     if (options.markdown) html = htmlFromMarkdown(options.markdown);
     else {
@@ -1727,13 +1803,9 @@ window.FU_PAGES = window.FU_PAGES || {};
               ": " +
               display(fact.value, { format: { number: "currency" } }) +
               " · latest filed fiscal year ",
-            r?.sourceUrl
-              ? h(
-                  "a",
-                  { href: r.sourceUrl, "data-evidence-id": r.id },
-                  "Source",
-                )
-              : h("span", {}, "Source record available in evidence drawer"),
+            r
+              ? evidenceElement(r, "Source")
+              : h("span", {}, "Source record unavailable"),
           ),
         );
       }
@@ -1763,7 +1835,7 @@ window.FU_PAGES = window.FU_PAGES || {};
       html = container.innerHTML;
     }
     book.document.html = sanitize(html);
-    book.document.evidence = evidence.map(W.clone);
+    book.document.evidence = evidenceClosure(evidence).map(W.clone);
     book.document.claims = W.clone(options.claims || []);
     history = new W.History(book);
     mode = "doc";
@@ -1815,24 +1887,16 @@ window.FU_PAGES = window.FU_PAGES || {};
     let last = 0;
     for (const m of String(text).matchAll(/\[\[E:([^\]]+)\]\]/g)) {
       node.append(text.slice(last, m.index));
-      const r = window.FU_EVIDENCE?.get(m[1]);
-      if (r && /^https?:\/\//.test(r.sourceUrl || "")) {
-        node.append(
-          h(
-            "a",
-            { href: r.sourceUrl, "data-evidence-id": r.id },
-            `${r.ticker} · ${r.metric} · ${r.period}`,
-          ),
-        );
-        book.document.evidence = [
-          ...(book.document.evidence || []).filter((x) => x.id !== r.id),
-          W.clone(r),
-        ];
+      const r = evidenceRecord(m[1]);
+      if (r) {
+        node.append(evidenceElement(r));
+        rememberEvidence(r);
       } else node.append("[Unresolved evidence: " + m[1] + "]");
       last = m.index + m[0].length;
     }
     node.append(text.slice(last));
   }
+
   function showProposal() {
     if (!proposalHost || !proposal) return;
     proposalHost.replaceChildren();
@@ -2323,16 +2387,14 @@ window.FU_PAGES = window.FU_PAGES || {};
     );
   }
   function citationRecords() {
-    const records = new Map(
-      (book.document.evidence || []).map((e) => [e.id, e]),
-    );
+    const seeds = [...(book.document.evidence || [])];
     const t = document.createElement("template");
     t.innerHTML = sanitize(book.document.html);
     for (const link of t.content.querySelectorAll("[data-evidence-id]")) {
-      const r = window.FU_EVIDENCE?.get(link.dataset.evidenceId);
-      if (r) records.set(r.id, r);
+      const r = evidenceRecord(link.dataset.evidenceId);
+      if (r) seeds.push(r);
     }
-    return [...records.values()];
+    return evidenceClosure(seeds);
   }
   async function exportDocx() {
     flushDoc();
@@ -2442,30 +2504,39 @@ window.FU_PAGES = window.FU_PAGES || {};
       children.push(
         new d.Paragraph({ text: "Sources", heading: d.HeadingLevel.HEADING_1 }),
       );
-      for (const r of evidence)
+      for (const r of evidence) {
+        const runs = [
+          new d.TextRun(
+            `${r.ticker || ""} · ${r.metric || ""} · ${r.period || ""} · ${r.id}. Value: ${r.value ?? "Unavailable"} ${r.unit || ""}. `,
+          ),
+        ];
+        if (r.derivation)
+          runs.push(new d.TextRun(`Calculation: ${r.derivation}. `));
+        if (r.inputEvidenceIds?.length)
+          runs.push(
+            new d.TextRun(`Input evidence: ${r.inputEvidenceIds.join(", ")}. `),
+          );
+        if (/^https?:\/\//i.test(r.sourceUrl || ""))
+          runs.push(
+            new d.ExternalHyperlink({
+              link: r.sourceUrl,
+              children: [
+                new d.TextRun({ text: r.sourceUrl, style: "Hyperlink" }),
+              ],
+            }),
+          );
+        else
+          runs.push(
+            new d.TextRun(
+              r.inputEvidenceIds?.length
+                ? "Calculated from the original input records listed in this appendix."
+                : "Source URL unavailable.",
+            ),
+          );
         children.push(
-          new d.Paragraph({
-            children: [
-              new d.TextRun(
-                `${r.ticker || ""} · ${r.metric || ""} · ${r.period || ""} · ${r.id} `,
-              ),
-              ...(r.sourceUrl
-                ? [
-                    new d.ExternalHyperlink({
-                      link: r.sourceUrl,
-                      children: [
-                        new d.TextRun({
-                          text: r.sourceUrl,
-                          style: "Hyperlink",
-                        }),
-                      ],
-                    }),
-                  ]
-                : [new d.TextRun("Source URL unavailable")]),
-            ],
-            spacing: { after: 140 },
-          }),
+          new d.Paragraph({ children: runs, spacing: { after: 140 } }),
         );
+      }
     }
     const margin = book.document.margin * 20;
     const doc = new d.Document({

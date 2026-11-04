@@ -17,16 +17,22 @@
     if (!rec.accn || !company.cik) return null;
     return `https://www.sec.gov/Archives/edgar/data/${Number(company.cik)}/${rec.accn.replace(/-/g, '')}/${f?.p || rec.accn + '-index.html'}`;
   }
+  function evidenceContext(company,cell) {
+    const rec=cell.rec || {},filing=(company.filings || []).find(f=>(f.a || f.accn)===rec.accn);
+    return {sourceUrl:sourceURL(company,rec),filedDate:rec.filed || filing?.d || filing?.filed,
+      period:cell.kind==='YTD'?`${cell.start} to ${cell.end}`:cell.end,
+      resolveContext:child=>evidenceContext(company,child)};
+  }
   function attach(company, metric, unit, rec, stmt = 'income', kind = 'Q') {
     const cell = {tk:company.ticker, label:metric, v:rec.v, unit, concept:rec.c, kind, stmt, start:rec.start, end:rec.end,
       rec:{...rec, url:sourceURL(company, rec)}, derived:rec.derived};
-    const evidence = E()?.fromCell(cell, {sourceUrl:cell.rec.url, period:rec.end});
+    const evidence = E()?.fromCell(cell, evidenceContext(company,cell));
     return {...cell, evidence, availableAt:rec.available_at || rec.filed || null};
   }
   function derived(company, metric, unit, value, inputs, formula) {
     if (!finite(value) || !inputs.length) return null;
     const cell={tk:company.ticker,label:metric,v:value,unit,stmt:'ratios',kind:inputs[0].kind || 'Q',start:inputs[0].start,end:inputs[0].end,calc:{formula,inputs}};
-    return {...cell,evidence:E()?.fromCell(cell,{period:cell.end}),availableAt:latest(inputs.map(x=>x.availableAt).filter(Boolean))};
+    return {...cell,evidence:E()?.fromCell(cell,evidenceContext(company,cell)),availableAt:latest(inputs.map(x=>x.availableAt).filter(Boolean))};
   }
   function series(company, metric, {asOf, kind='Q', requireHistory=false} = {}) {
     const key = kind === 'A' ? 'annual' : 'quarterly';
@@ -169,8 +175,8 @@
     const hit=points.every((x,i)=>!i || (rule.direction==='up'?x.v>points[i-1].v:x.v<points[i-1].v));
     return result(hit?'triggered':'clear',hit?'All consecutive comparisons meet the rule.':'The sequence does not meet the rule.',points);
   }
-  function thesis(thesis,company) {
-    const criteria=(thesis.criteria || []).map(c=>({...c,result:evaluateRule({type:c.type || 'threshold',scope:'tickers',tickers:[company.ticker],...c},company)}));
+  function thesis(thesis,company,{asOf}={}) {
+    const criteria=(thesis.criteria || []).map(c=>({...c,result:evaluateRule({type:c.type || 'threshold',scope:'tickers',tickers:[company.ticker],...c},company,{asOf})}));
     const measured=criteria.filter(c=>['clear','triggered'].includes(c.result.status));
     const passing=measured.filter(c=>c.result.status==='triggered').length;
     const score=measured.length?passing/measured.length:null;
@@ -181,12 +187,12 @@
     if (type==='revenue_acceleration') {
       const s=series(company,'Revenue',options), a=s.at(-1), b=a&&aligned(s,a.end,91,25);
       const ag=a&&growth(company,a,aligned(s,a.end,365),'Revenue growth YoY'), bg=b&&growth(company,b,aligned(s,b.end,365),'Prior quarter revenue growth YoY');
-      if (!ag || !bg) return {status:'unknown',reason:'Two adjacent year-over-year comparisons are required.'};
+      if (!ag || !bg) return {status:'unknown',type,reason:'Two adjacent year-over-year comparisons are required.'};
       return {status:ag.v>bg.v && ag.v>0?'triggered':'clear',type,period:a.end,availableAt:latest([ag.availableAt,bg.availableAt]),observations:[ag,bg],reason:'Year-over-year revenue growth increased versus the preceding quarter.',invalidation:'Revenue growth decelerates or the underlying filings are revised.',horizon:'Next quarterly report'};
     }
     if (type==='margin_turn') {
       const s=series(company,'Operating margin',options), p=s.slice(-3);
-      if (p.length!==3 || p.some((x,i)=>i&&Math.abs(diff(x.end,p[i-1].end)-91)>25)) return {status:'unknown',reason:'Three adjacent quarterly operating margins are required.'};
+      if (p.length!==3 || p.some((x,i)=>i&&Math.abs(diff(x.end,p[i-1].end)-91)>25)) return {status:'unknown',type,reason:'Three adjacent quarterly operating margins are required.'};
       return {status:p[2].v>p[1].v && p[1].v<=p[0].v?'triggered':'clear',type,period:p[2].end,availableAt:latest(p.map(x=>x.availableAt)),observations:p,reason:'Operating margin improved after a flat or declining quarter.',invalidation:'The improvement reverses in the next reported quarter.',horizon:'Next quarterly report'};
     }
     return {status:'unknown',reason:'Unknown signal.'};
@@ -284,13 +290,14 @@
     return (unit==='USD'?'$':'')+value.toLocaleString('en-US',{maximumFractionDigits:2})+(unit && !['USD','USD/shares'].includes(unit)?' '+unit:'');
   }
   function report(company) {
-    const c=changes(company), claims=[], evidence=[];
-    const cite=x=>{if(!x)return 'Unavailable';if(x.evidence){evidence.push(x.evidence);claims.push({evidenceId:x.evidence.id,value:x.v,unit:x.unit,ticker:company.ticker,metric:x.label,period:x.evidence.period});}return `${format(x.v,x.unit)} ${x.evidence?E().citation(x.evidence.id):''}`;};
+    const c=changes(company), claims=[], evidence=new Map();
+    const retain=record=>{if(!record || evidence.has(record.id))return;evidence.set(record.id,record);for(const id of record.inputEvidenceIds || [])retain(E()?.get(id));};
+    const cite=(x,percentagePoints=false)=>{if(!x)return 'Unavailable';if(x.evidence){retain(x.evidence);claims.push({evidenceId:x.evidence.id,value:x.v,unit:x.unit,ticker:company.ticker,metric:x.label,period:x.evidence.period});}return `${percentagePoints?(x.v*100).toFixed(2)+' percentage points':format(x.v,x.unit)} ${x.evidence?E().citation(x.evidence.id):''}`;};
     const lines=[`# ${company.ticker} — evidence-backed research draft`,`Reporting period: ${c.periodEnd || 'unavailable'}. This is a factual first draft; investment conclusions require analyst review.`,`## Financial performance`];
-    for(const r of c.rows)if(r.current)lines.push(`${r.metric} was ${cite(r.current)} for the period ending ${r.current.end}.${r.yoy?` The comparable year-over-year ${r.changeType==='percentage_points'?'margin change':'change'} was ${cite(r.yoy)}.`:''}`);
+    for(const r of c.rows)if(r.current)lines.push(`${r.metric} was ${cite(r.current)} for the period ending ${r.current.end}.${r.yoy?` The comparable year-over-year ${r.changeType==='percentage_points'?'margin change':'change'} was ${cite(r.yoy,r.changeType==='percentage_points')}.`:''}`);
     lines.push('## Research questions','Which reported drivers explain the changes above? Does the next filing support the same thesis? Add interpretation only after checking the sources.','## Source register');
-    for(const e of [...new Map(evidence.map(x=>[x.id,x])).values()])lines.push(`- ${e.id}: ${e.ticker} · ${e.metric} · ${e.periodEnd} · ${e.sourceUrl || 'Derived from evidence inputs: '+e.inputEvidenceIds.join(', ')}`);
-    return {title:`${company.ticker} research — ${c.periodEnd || today()}`,markdown:lines.join('\n\n'),claims,evidence:[...new Map(evidence.map(x=>[x.id,x])).values()],sections:[]};
+    for(const e of evidence.values())lines.push(`- ${e.id}: ${e.ticker} · ${e.metric} · ${e.periodStart?e.periodStart+' to ':''}${e.periodEnd} · ${e.sourceUrl || 'Derived from evidence inputs: '+e.inputEvidenceIds.join(', ')}${e.derivation?' · '+e.derivation:''}`);
+    return {title:`${company.ticker} research — ${c.periodEnd || today()}`,markdown:lines.join('\n\n'),claims,evidence:[...evidence.values()],sections:[]};
   }
   root.FU_ANALYST=Object.freeze({metrics,series,attachBusinessMetrics,aligned,changes,sourceURL,newEvents,brief,compileRule,validateRule,describeRule,inScope,evaluateRule,thesis,signal,backtest,eventStudy,earningsSetup,pair,insiderContext,promises,disclosureChanges,exposure,report,format,esc});
 })(typeof window!=='undefined'?window:globalThis);

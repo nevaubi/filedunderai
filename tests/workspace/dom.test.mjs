@@ -10,7 +10,7 @@ const sources = [
   "public/lib/workspace.js",
   "public/pages/workspace.js",
 ].map((p) => fs.readFileSync(p, "utf8"));
-async function setup() {
+async function setup({ actualMarkdown = false } = {}) {
   const dom = new JSDOM('<main id="page"></main>', {
     url: "https://research.example/#workbench",
     runScripts: "outside-only",
@@ -68,6 +68,29 @@ async function setup() {
       sourceUrl: "https://www.sec.gov/Archives/test-filing",
       period: "FY2025",
     });
+  if (actualMarkdown) {
+    w.esc = (s) =>
+      String(s ?? "").replace(
+        /[&<>"']/g,
+        (c) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[c],
+      );
+    const app = fs.readFileSync("public/app.js", "utf8");
+    w.eval(
+      app.slice(
+        app.indexOf("function resolveCitation("),
+        app.indexOf(
+          'document.addEventListener("click", async e => { const b = e.target.closest(".cite',
+        ),
+      ),
+    );
+  }
   await w.FU_PAGES.workbench();
   return { dom, w, close: () => dom.window.close() };
 }
@@ -214,6 +237,100 @@ test("AI read tool returns valid bounded data with pagination and never applies 
     assert.equal(next.sheets[0].cells.length, 20);
     assert.equal(next.sheets[0].truncated, false);
     assert.doesNotThrow(() => JSON.parse(w.chatConfig.context()));
+  } finally {
+    close();
+  }
+});
+test("actual app markdown preserves derived citation IDs and full nested input sources in editor, staged blocks and DOCX", async () => {
+  const { w, close } = await setup({ actualMarkdown: true });
+  try {
+    const common = {
+      ticker: "TEST",
+      unit: "USD",
+      period: "FY2025",
+      periodStart: "2025-01-01",
+      periodEnd: "2025-12-31",
+      filedDate: "2026-02-10",
+      periodType: "annual",
+    };
+    const cash = w.FU_EVIDENCE.capture({
+        ...common,
+        metric: "Operating cash flow",
+        value: 30e6,
+        sourceUrl: "https://www.sec.gov/cash-input",
+      }),
+      capex = w.FU_EVIDENCE.capture({
+        ...common,
+        metric: "Capex",
+        value: 6e6,
+        sourceUrl: "https://www.sec.gov/capex-input",
+      }),
+      revenue = w.FU_EVIDENCE.capture({
+        ...common,
+        metric: "Revenue",
+        value: 120e6,
+        sourceUrl: "https://www.sec.gov/revenue-input",
+      });
+    const fcf = w.FU_EVIDENCE.capture({
+        ...common,
+        metric: "Free cash flow",
+        value: 24e6,
+        inputEvidenceIds: [cash.id, capex.id],
+        derivation: "Operating cash flow − Capex",
+      }),
+      ratio = w.FU_EVIDENCE.capture({
+        ...common,
+        metric: "FCF margin",
+        unit: "pct",
+        value: 0.2,
+        inputEvidenceIds: [fcf.id, revenue.id],
+        derivation: "Free cash flow / Revenue",
+      });
+    await w.FU_WORKSPACE.openReport("TEST", {
+      title: "Derived report",
+      markdown: "# Derived report\n\nFCF margin: 20% [[E:" + ratio.id + "]]",
+      evidence: [ratio],
+    });
+    const editor = w.document.querySelector(".ws-document");
+    assert.ok(
+      editor.querySelector('a[data-evidence-id="' + ratio.id + '"]'),
+      "derived claim retains its own evidence ID on source links",
+    );
+    for (const r of [cash, capex, revenue])
+      assert.ok(
+        [...editor.querySelectorAll("a")].some((a) => a.href === r.sourceUrl),
+      );
+    assert.ok(!editor.textContent.includes("Unresolved"));
+    w.FU_WORKSPACE.stageProposal({
+      summary: "Append derived claim",
+      blocks: [{ text: "Free cash flow was $24 million [[E:" + fcf.id + "]]" }],
+    });
+    click(w, "Apply changes");
+    assert.ok(
+      w.document.querySelector(
+        '.ws-document a[data-evidence-id="' + fcf.id + '"]',
+      ),
+    );
+    assert.ok(
+      !w.document
+        .querySelector(".ws-document")
+        .textContent.includes("Unresolved"),
+    );
+    await w.FU_WORKSPACE.exportDocx();
+    const zip = await JSZip.loadAsync(await w.captured.at(-1).arrayBuffer()),
+      xml = await zip.file("word/document.xml").async("string"),
+      rels = await zip.file("word/_rels/document.xml.rels").async("string");
+    for (const r of [ratio, fcf, cash, capex, revenue])
+      assert.ok(xml.includes(r.id), "appendix includes " + r.metric);
+    assert.ok(xml.includes("Operating cash flow − Capex"));
+    assert.ok(xml.includes("Free cash flow / Revenue"));
+    for (const r of [cash, capex, revenue])
+      assert.ok(rels.includes(r.sourceUrl));
+    click(w, "File");
+    assert.equal(
+      w.document.querySelector(".ws-ribbon").getAttribute("aria-label"),
+      "File commands",
+    );
   } finally {
     close();
   }

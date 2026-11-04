@@ -1,23 +1,35 @@
-// Applies db/schema.sql during the Vercel build. The schema is idempotent.
-import { readFile } from "node:fs/promises";
-import pg from "pg";
+// Explicit versioned migrations only. Application builds never run this script.
+// The official Supabase CLI owns migration history and connection security.
+import { spawnSync } from 'node:child_process';
 
-const url = process.env.POSTGRES_URL_NON_POOLING || process.env.POSTGRES_URL;
-if (!url) {
-  console.log("migrate: no POSTGRES_URL_NON_POOLING set, skipping");
-  process.exit(0);
-}
+const args = process.argv.slice(2);
+const usage = `Database migrations are separate from application builds.
 
-const sql = await readFile(new URL("../db/schema.sql", import.meta.url), "utf8");
-const client = new pg.Client({ connectionString: url.replace(/[?&]sslmode=[^&]*/g, ""), ssl: { rejectUnauthorized: false } });
-try {
-  await client.connect();
-  await client.query(sql);
-  const { rows } = await client.query("select count(*)::int as n from information_schema.tables where table_schema = 'public'");
-  console.log(`migrate: schema applied, ${rows[0].n} public tables`);
-} catch (e) {
-  console.error("migrate: failed", e.message);
-  process.exit(1);
-} finally {
-  await client.end().catch(() => {});
+Install the official Supabase CLI, initialize its local configuration if needed,
+and link the intended project before using this command.
+
+  npm run migrate             Preview pending linked migrations (dry run).
+  npm run migrate -- --apply  Apply the reviewed pending migrations.
+
+Only supabase/migrations/*.sql is managed here. db/schema.sql is a legacy schema
+reference and must not be replayed over an existing production database.
+https://supabase.com/docs/guides/deployment/database-migrations`;
+
+if (args.includes('--help') || args.includes('-h')) {
+  console.log(usage);
+} else if (args.some(arg => arg !== '--apply') || args.length > 1) {
+  console.error(usage);
+  process.exitCode = 2;
+} else {
+  const result = spawnSync('supabase', ['db', 'push', '--linked', ...(args.includes('--apply') ? [] : ['--dry-run'])], {
+    stdio: 'inherit', shell: false,
+  });
+  if (result.error) {
+    console.error(result.error.code === 'ENOENT'
+      ? 'The Supabase CLI is not installed. Install it using the official documentation, or apply the reviewed migration through the connected Supabase migration tool.'
+      : `Could not start the Supabase CLI (${result.error.code || 'unknown error'}).`);
+    process.exitCode = 1;
+  } else {
+    process.exitCode = result.status ?? 1;
+  }
 }

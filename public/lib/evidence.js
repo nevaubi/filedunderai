@@ -51,7 +51,7 @@
     const rec = cell.rec || {}, inputs = (cell.calc?.inputs || []).map(c => fromCell(c, context.resolveContext ? context.resolveContext(c) : {})).filter(Boolean);
     if (cell.derived?.from && cell.derived?.minus) {
       for (const r of [cell.derived.from, cell.derived.minus]) {
-        const child = { ...cell, kind: 'YTD', v: r.v, start: r.start, end: r.end, derived: null, rec: { ...rec, ...r, filed: r.filed || (r.accn === rec.accn ? rec.filed : null), available_at: r.available_at || r.filed || (r.accn === rec.accn ? rec.available_at : null) } };
+        const child = { ...cell, kind: 'YTD', v: r.v, start: r.start, end: r.end, derived: null, rec: { ...rec, ...r, url: r.url || (r.accn === rec.accn ? rec.url : null), accessions:r.accessions || (r.accn?[r.accn]:[]), filed: r.filed || (r.accn === rec.accn ? rec.filed : null), available_at: r.available_at || r.filed || (r.accn === rec.accn ? rec.available_at : null) } };
         inputs.push(fromCell(child, context.resolveContext ? context.resolveContext(child) : { sourceUrl: r.url, period: `${r.start} to ${r.end}` }));
       }
     }
@@ -60,7 +60,7 @@
       concept: cell.conceptFull || cell.concept, accession: rec.accn, filedDate: rec.filed || context.filedDate, sourceUrl: context.sourceUrl || rec.url,
       availabilityDate: inputs.length ? inputs.every(x => x.availabilityDate) ? inputs.map(x => x.availabilityDate).sort().at(-1) : null : rec.available_at || rec.filed || context.filedDate,
       inputEvidenceIds: inputs.map(x => x.id), derivation: cell.calc?.formula || (cell.derived ? 'Reported cumulative value minus prior cumulative value' : null),
-      quality: { derived: !!cell.derived, calculated: !!cell.calc, accessions: rec.accessions || (rec.accn ? [rec.accn] : []), vintage: rec.vintage || "latest", selectionReason: rec.selection_reason || null, sourceValidationStatus: rec.validation_status || null, ...(rec.quality || {}) }, validation: rec.validation || (rec.validation_status && !["valid", "reported", "derived"].includes(rec.validation_status) ? {status: rec.validation_status} : null) });
+      quality: { derived: !!cell.derived, calculated: !!cell.calc, accessions: rec.accessions || (rec.accn ? [rec.accn] : []), vintage: rec.vintage || "legacy_unknown", selectionReason: rec.selection_reason || null, sourceValidationStatus: rec.validation_status || null, ...(rec.quality || {}) }, validation: rec.validation || (rec.validation_status && !["valid", "reported", "derived"].includes(rec.validation_status) ? {status: rec.validation_status} : null) });
     if (!cells.has(result.id)) { cells.set(result.id, freeze(clone({ ...cell, evidenceId: result.id, evidenceSource: context.filing || { primary: result.sourceUrl, filed: result.filedDate } }))); save(); }
     return result;
   }
