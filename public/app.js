@@ -1589,18 +1589,33 @@ function renderSegments(host, tk, seg, ir, kpi) {
   const tables = (seg?.tables || []).filter(t => t.rows.length);
   const kindSeg = seg_wrap(st, v => { STATE.segK = v; host.innerHTML = ""; renderSegments(host, tk, seg, ir, kpi); });
   const rangeSeg = seg_range(st, v => { STATE.segRange = v; host.innerHTML = ""; renderSegments(host, tk, seg, ir, kpi); });
+  const showSeg = seg_show(v => { STATE.segShow = v; store.set("segShow", v); host.innerHTML = ""; renderSegments(host, tk, seg, ir, kpi); });
+  showSeg.title = "Current series hides lines and tables the company no longer reports (no value in the latest fifteen months of its data), such as old segment structures and discontinued metrics. Their full history stays available under All series.";
   const recAll = tables.flatMap(t => Object.values(t.recon).filter(x => !x.partial));
   const nAll = recAll.length, nOk = recAll.filter(x => x.ok || x.residual != null).length;
   host.append(el("div", { class: "seg-head" },
     el("div", {}, el("div", { class: "eyebrow" }, "Segments and breakdowns"), el("div", { class: "muted", style: "font-size:12.5px;max-width:760px" },
       "Operating KPIs come from the company's investor materials (supplements, slides, letters, releases); breakdowns come from the inline XBRL in its 10-K and 10-Q filings. Every number opens the stored source document at that value. Missing quarters are derived from year-to-date figures, and every breakdown is checked against its total.")),
-    el("div", { style: "display:flex;gap:10px;align-items:center;margin-left:auto" }, nAll ? el("span", { class: "chip " + (nOk === nAll ? "up" : ""), title: "Periods where the lines add up to the consolidated total, counting an explicit derived line for unallocated items" }, `${nOk} of ${nAll} period totals tie out`) : null, rangeSeg, kindSeg)));
+    el("div", { style: "display:flex;gap:10px;align-items:center;margin-left:auto" }, nAll ? el("span", { class: "chip " + (nOk === nAll ? "up" : ""), title: "Periods where the lines add up to the consolidated total, counting an explicit derived line for unallocated items" }, `${nOk} of ${nAll} period totals tie out`) : null, showSeg, rangeSeg, kindSeg)));
   if (kpi?.groups?.length) renderKpiGroups(host, tk, kpi, st);
   if (!tables.length) host.append(el("div", { class: "empty" }, el("h3", {}, "No segment breakdown tagged"), el("p", { class: "muted" }, "This company's filings do not tag a segment, product or geographic breakdown with dimensions, or it reports a single segment.")));
-  tables.forEach(t => host.append(segTable(tk, t, st)));
+  let shown = tables;
+  if (segShow() === "cur" && tables.length) {
+    const last = t => { let m = ""; t.rows.concat([t.total]).forEach(r => ["Q", "A", "I"].forEach(K => Object.keys(r[K] || {}).forEach(e => { if (e > m) m = e; }))); return m; };
+    const latest = tables.reduce((m, t) => { const l = last(t); return l > m ? l : m; }, "");
+    const cut = shiftDays(latest, -455);
+    shown = tables.filter(t => last(t) >= cut);
+    const hid = tables.length - shown.length;
+    if (hid) host.append(el("div", { class: "muted", style: "font-size:12px;padding:0 4px" }, `${hid} older breakdown table${hid > 1 ? "s" : ""} hidden. Switch to All series to show ${hid > 1 ? "them" : "it"}.`));
+  }
+  shown.forEach(t => host.append(segTable(tk, t, st)));
   renderIrDocs(host, tk, ir);
   anchorRight(host);
 }
+function seg_show(onChange) { return seg([["cur", "Current series"], ["all", "All series"]], segShow(), onChange); }
+function segShow() { return STATE.segShow || store.get("segShow", "cur"); }
+function shiftDays(iso, d) { if (!iso) return ""; const t = new Date(iso + "T00:00:00Z"); t.setUTCDate(t.getUTCDate() + d); return t.toISOString().slice(0, 10); }
+function kpiLastEnd(it) { let m = ""; Object.values(it.values || {}).forEach(byEnd => Object.keys(byEnd || {}).forEach(e => { if (e > m) m = e; })); return m; }
 function seg_wrap(value, onChange) { return seg([["Q", "Quarterly"], ["A", "Annual"]], value, onChange); }
 function seg_range(K, onChange) {
   return seg(K === "A" ? [["short", "5Y"], ["mid", "10Y"], ["all", "All"]] : [["short", "8Q"], ["mid", "20Q"], ["all", "All"]], STATE.segRange || "all", onChange);
@@ -1682,7 +1697,24 @@ function kpiVals(it, K, aEnds) {
 function renderKpiGroups(host, tk, kpi, K0) {
   const aEnds = new Set();
   (kpi.groups || []).forEach(g => g.items.forEach(it => Object.keys(it.values?.A || {}).forEach(e => aEnds.add(e))));
-  (kpi.groups || []).forEach(g => {
+  let groups = kpi.groups || [];
+  if (segShow() === "cur") {
+    // a series is current when it has a value within fifteen months of the company's latest KPI period
+    const latest = groups.reduce((m, g) => g.items.reduce((mm, it) => { const l = kpiLastEnd(it); return l > mm ? l : mm; }, m), "");
+    const cut = shiftDays(latest, -455);
+    let hidRows = 0, hidGroups = 0;
+    groups = groups.map(g => {
+      const keep = new Set(g.items.filter(it => kpiLastEnd(it) >= cut).map(it => it.id || it.name));
+      // keep a parent row when any of its children is current, so trees stay readable
+      for (let i = 0; i < 4; i++) g.items.forEach(it => { if (it.parent && keep.has(it.id || it.name)) keep.add(it.parent); });
+      const items = g.items.filter(it => keep.has(it.id || it.name));
+      hidRows += g.items.length - items.length;
+      if (!items.length) hidGroups++;
+      return { ...g, items };
+    }).filter(g => g.items.length);
+    if (hidRows) host.append(el("div", { class: "muted", style: "font-size:12px;padding:0 4px" }, `${hidRows.toLocaleString("en-US")} discontinued or older-basis KPI line${hidRows > 1 ? "s" : ""}${hidGroups ? ` (${hidGroups} whole table${hidGroups > 1 ? "s" : ""})` : ""} hidden. Switch to All series to show the full history of every reporting basis.`));
+  }
+  groups.forEach(g => {
     let K = K0;
     const ends = new Set();
     g.items.forEach(it => Object.keys(kpiVals(it, K, aEnds)).forEach(e => ends.add(e)));
