@@ -8,7 +8,7 @@ const fact = (tag, value, unit = "USD", qtrs = 1) =>
 const line = (tag, label = tag, custom = 0) =>
   [1, tag, custom, label, 0, "D", "C"];
 
-async function renderReport(lines, facts) {
+async function renderReport(lines, facts, { form = "10-Q", statement = "IS" } = {}) {
   const dom = new JSDOM('<main id="page"></main>', {
     url: "https://research.example/#company-amt",
     runScripts: "outside-only",
@@ -17,10 +17,10 @@ async function renderReport(lines, facts) {
   const accession = "0001053507-26-000133";
   const doc = {
     accession, ticker: "AMT", cik: 1053507, registrant: "American Tower Corporation",
-    form: "10-Q", period: "2026-06-30", fy: 2026, fp: "Q2", filed: "2026-07-28",
+    form, period: "2026-06-30", fy: 2026, fp: form === "10-K" ? "FY" : "Q2", filed: "2026-07-28",
     url: `https://www.sec.gov/Archives/edgar/data/1053507/${accession.replaceAll("-", "")}/${accession}-index.htm`,
     source: "https://www.sec.gov/files/dera/data/financial-statement-data-sets/2026q3.zip",
-    reports: [{ report: 1, stmt: "IS", inpth: false, lines, facts }],
+    reports: [{ report: 1, stmt: statement, inpth: false, lines, facts }],
   };
   w.el = (tag, attrs = {}, ...kids) => {
     const e = w.document.createElement(tag);
@@ -148,4 +148,39 @@ test("source cells preserve foreign currency, explicit per-share, arbitrary unit
     }
     assert.equal(row("Foreign EPS").querySelector("td[data-i]").textContent, "1.86");
   } finally { close(); }
+});
+
+test("as-reported evidence distinguishes cumulative, quarterly, annual, and instant periods without changing UI kinds", async () => {
+  const cases = [
+    [2, "10-Q", "CF", "duration", "2026-01-01", "Q"],
+    [3, "10-Q", "CF", "duration", "2025-10-01", "Q"],
+    [1, "10-Q", "IS", "quarter", "2026-04-01", "Q"],
+    [4, "10-K", "IS", "annual", "2025-07-01", "A"],
+    [0, "10-Q", "BS", "instant", null, "Q"],
+    [0, "10-K", "BS", "instant", null, "A"],
+    [5, "10-K", "IS", "duration", "2025-04-01", "Q"],
+  ];
+  for (const [qtrs, form, statement, type, start, kind] of cases) {
+    const tag = statement === "BS" ? "Assets" : "Revenues";
+    const { w, row, opened, doc, close } = await renderReport(
+      [line(tag)], [fact(tag, 1000000, "USD", qtrs)], { form, statement },
+    );
+    try {
+      row(tag).querySelector("td[data-i]").click();
+      const cell = opened[0], evidence = w.FU_EVIDENCE.fromCell(cell, { sourceUrl: doc.url });
+      assert.equal(evidence.periodType, type, `${form} / ${qtrs} quarters`);
+      assert.equal(cell.periodType, type);
+      assert.equal(cell.kind, kind, "UI period label remains compatible");
+      assert.equal(evidence.periodStart, start);
+      assert.equal(evidence.periodEnd, "2026-06-30");
+      const serialized = JSON.parse(JSON.stringify(evidence));
+      assert.equal(serialized.periodType, type);
+      assert.equal(serialized.periodStart, start);
+      assert.equal(serialized.periodEnd, "2026-06-30");
+      const legacy = { ...cell };
+      delete legacy.periodType;
+      assert.equal(w.FU_EVIDENCE.fromCell(legacy, { sourceUrl: doc.url }).periodType, kind === "A" ? "annual" : "quarter");
+      assert.equal(w.FU_EVIDENCE.fromCell({ ...legacy, periodType: "unsupported" }, { sourceUrl: doc.url }).periodType, kind === "A" ? "annual" : "quarter");
+    } finally { close(); }
+  }
 });

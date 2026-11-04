@@ -10,7 +10,7 @@
 
 ## Automated checks
 
-105 JavaScript tests passed with no failures. The financial suite passed 28 tests, all 1,698 technical parity events matched, and the build emitted 22 content-fingerprinted assets. Five offline AMT publisher fault tests passed, including reviewed-input drift refusal, unrelated-company preservation and restoration after injected failure.
+106 JavaScript tests passed with no failures. The financial suite passed 28 tests, all 1,698 technical parity events matched, and the build emitted 22 content-fingerprinted assets. Five offline AMT publisher fault tests passed, including reviewed-input drift refusal, unrelated-company preservation and restoration after injected failure.
 
 Three additional statement-renderer regressions cover the observed AMT EPS scaling error, monetary/share scale inference, foreign/arbitrary units, custom-concept boundaries and immutable preservation of raw source-unit provenance. Exact known per-share concepts now render 1.86 and 3.71 without a thousands divisor; source details explain the unit decision.
 
@@ -63,3 +63,7 @@ Independent SQL at 19:39 UTC confirmed the following published values. Prices re
 The [original filing](https://americantower.gcs-web.com/node/29311/html) reports consolidated revenue of $2,785.4 million; the old series had selected the $202.5 million contract-revenue component. The exact source context and candidate were reviewed before publication. See the [financial task report](../../superpowers/plans/task-financials-report.md) and [execution ledger](../../superpowers/plans/2026-11-04-progress.md) for the guarded preflight, baseline refresh and rollout limits.
 
 The sanitized [AMT verification record](amt-repair-verification.json) includes the successful publisher receipt, independent public hash matches, database observations and live source-details check. Non-AMT index/screener preservation was independently checked for 499 rows each. The older fundamentals snapshot is not an independent apply-time baseline; that comparison limit is explicit in the record.
+
+## Period-type provenance
+
+As-reported evidence now explicitly distinguishes instant balances, quarters, annual periods and cumulative/nonstandard durations. Six- and nine-month values no longer inherit the quarter label from the statement UI, and balance observations no longer inherit annual/quarter types. A fourth statement DOM regression checks exact start/end dates, preserved UI kinds, immutable serialization, fallback behavior and these period mappings. Cumulative derivation inputs remain duration evidence. All 106 JavaScript tests pass after integration.

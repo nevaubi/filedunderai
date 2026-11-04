@@ -51,12 +51,13 @@
     const rec = cell.rec || {}, inputs = (cell.calc?.inputs || []).map(c => fromCell(c, context.resolveContext ? context.resolveContext(c) : {})).filter(Boolean);
     if (cell.derived?.from && cell.derived?.minus) {
       for (const r of [cell.derived.from, cell.derived.minus]) {
-        const child = { ...cell, kind: 'YTD', v: r.v, start: r.start, end: r.end, derived: null, rec: { ...rec, ...r, url: r.url || (r.accn === rec.accn ? rec.url : null), accessions:r.accessions || (r.accn?[r.accn]:[]), filed: r.filed || (r.accn === rec.accn ? rec.filed : null), available_at: r.available_at || r.filed || (r.accn === rec.accn ? rec.available_at : null) } };
+        const child = { ...cell, kind: 'YTD', periodType: 'duration', v: r.v, start: r.start, end: r.end, derived: null, rec: { ...rec, ...r, url: r.url || (r.accn === rec.accn ? rec.url : null), accessions:r.accessions || (r.accn?[r.accn]:[]), filed: r.filed || (r.accn === rec.accn ? rec.filed : null), available_at: r.available_at || r.filed || (r.accn === rec.accn ? rec.available_at : null) } };
         inputs.push(fromCell(child, context.resolveContext ? context.resolveContext(child) : { sourceUrl: r.url, period: `${r.start} to ${r.end}` }));
       }
     }
+    const periodType = ['instant', 'quarter', 'annual', 'duration', 'ttm'].includes(cell.periodType) ? cell.periodType : cell.kind === 'TTM' ? 'ttm' : cell.stmt === 'balance' ? 'instant' : cell.kind === 'A' ? 'annual' : cell.kind === 'Q' ? 'quarter' : cell.kind === 'YTD' ? 'duration' : 'unknown';
     const result = capture({ ticker: cell.tk, metric: cell.label, value: cell.v, unit: cell.unit, period: context.period || cell.end,
-      periodStart: cell.start || inputs[0]?.periodStart, periodEnd: cell.end || inputs.at(-1)?.periodEnd, periodType: cell.kind === 'TTM' ? 'ttm' : cell.stmt === 'balance' ? 'instant' : cell.kind === 'A' ? 'annual' : cell.kind === 'Q' ? 'quarter' : cell.kind === 'YTD' ? 'duration' : 'unknown',
+      periodStart: cell.start || inputs[0]?.periodStart, periodEnd: cell.end || inputs.at(-1)?.periodEnd, periodType,
       concept: cell.conceptFull || cell.concept, accession: rec.accn, filedDate: rec.filed || context.filedDate, sourceUrl: context.sourceUrl || rec.url,
       availabilityDate: inputs.length ? inputs.every(x => x.availabilityDate) ? inputs.map(x => x.availabilityDate).sort().at(-1) : null : rec.available_at || rec.filed || context.filedDate,
       inputEvidenceIds: inputs.map(x => x.id), derivation: cell.calc?.formula || (cell.derived ? 'Reported cumulative value minus prior cumulative value' : null),

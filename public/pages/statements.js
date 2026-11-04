@@ -80,7 +80,7 @@
     const start = startOf(ddate, qtrs);
     const unit = unitOf(uom, tag, custom);
     const quality = { reportedUnit: uom, unitSelectionReason: unit === uom ? "Unit reported in the SEC data set." : isShares(uom) ? "Share-count unit spelling normalized." : `Currency-only SEC data set unit ${uom} interpreted as ${unit} for US GAAP concept ${tag}; numeric value unchanged.` };
-    const cell = { tk, stmt: "asreported", label, concept: tag, conceptFull: custom ? `${tag} (company extension)` : `us-gaap:${tag}`, unit, reportedUnit: uom, kind: qtrs === 4 || (qtrs === 0 && /10-K/.test(filing.form)) ? "A" : "Q", end: ddate, start, v: value,
+    const cell = { tk, stmt: "asreported", label, concept: tag, conceptFull: custom ? `${tag} (company extension)` : `us-gaap:${tag}`, unit, reportedUnit: uom, kind: qtrs === 4 || (qtrs === 0 && /10-K/.test(filing.form)) ? "A" : "Q", periodType: qtrs === 0 ? "instant" : qtrs === 1 ? "quarter" : qtrs === 4 ? "annual" : "duration", end: ddate, start, v: value,
       dimText: seg || coreg ? memberText(seg, coreg) : null, rec: { v: value, unit: uom, quality, accn: filing.accession, form: filing.form, filed: filing.filed, start, end: ddate } };
     cell.sib = () => sibs || [];
     return cell;
