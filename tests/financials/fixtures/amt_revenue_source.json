@@ -1,0 +1,35 @@
+{
+  "source_url": "https://americantower.gcs-web.com/node/29311/html",
+  "source_sha256": "f54a6407cbe52204d23274f001868f9424267906c49de7a7f21940d0901e87af",
+  "context_xml": "<xbrli:context id=\"c-27\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0001053507</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2026-07-01</xbrli:startdate><xbrli:enddate>2026-09-30</xbrli:enddate></xbrli:period></xbrli:context>",
+  "observations": [
+    {
+      "concept": "us-gaap:Revenues",
+      "value_text": "2,785.4",
+      "scale": "6",
+      "unit": "usd",
+      "context": "c-27"
+    },
+    {
+      "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+      "value_text": "202.5",
+      "scale": "6",
+      "unit": "usd",
+      "context": "c-27"
+    },
+    {
+      "concept": "us-gaap:OperatingLeaseLeaseIncome",
+      "value_text": "2,582.9",
+      "scale": "6",
+      "unit": "usd",
+      "context": "c-27"
+    },
+    {
+      "concept": "us-gaap:Revenues",
+      "value_text": "2,785.4",
+      "scale": "6",
+      "unit": "usd",
+      "context": "c-27"
+    }
+  ]
+}

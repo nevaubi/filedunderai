@@ -1,0 +1,2 @@
+import { runMonitor, secretMatches } from '../_lib/monitoring.js';
+export default async function handler(req,res){res.setHeader('Cache-Control','no-store');if(!['GET','POST'].includes(req.method))return res.status(405).json({error:'Use GET or POST'});if(!process.env.CRON_SECRET||!secretMatches(req.headers.authorization,'Bearer '+process.env.CRON_SECRET))return res.status(401).json({error:'Unauthorized'});try{return res.status(200).json({ok:true,result:await runMonitor()});}catch(e){return res.status(502).json({ok:false,error:String(e.message||e).slice(0,400)});}}

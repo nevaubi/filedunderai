@@ -54,7 +54,7 @@ CONCEPTS = {
 INSTANT = {"balance"}
 # Weighted-average share counts are averages over the period, not flows: a quarter cannot be
 # derived by subtracting a shorter year-to-date figure from a longer one.
-NON_ADDITIVE = {"Diluted shares"}
+NON_ADDITIVE = {"Diluted shares", "EPS basic", "EPS diluted"}
 TABLE_YEARS = 6  # statement tables kept per filing for the source panel
 
 
@@ -71,96 +71,140 @@ def companyfacts(cik):
 
 
 def pick_concept(facts, names):
+    """Keep concept identity until accounting-aware selection; aliases are not interchangeable facts."""
     merged, seen, unit, first, latest = [], set(), None, None, ""
     for n in names:
-        f = facts.get("us-gaap", {}).get(n)
-        if not f:
+        units = facts.get("us-gaap", {}).get(n, {}).get("units") or {}
+        if not units:
             continue
-        units = f["units"]
-        u = "USD" if "USD" in units else ("USD/shares" if "USD/shares" in units else ("shares" if "shares" in units else list(units)[0]))
+        u = next((u for u in ("USD", "USD/shares", "shares") if u in units), next(iter(units)))
         if unit is None:
-            unit = u
-        if u != unit or u not in units:
+            unit, first = u, n
+        if u != unit:
             continue
-        if first is None:
-            first = n
         for r in units[u]:
-            k = (r.get("start"), r["end"], r["accn"])
-            if k in seen:
-                continue
-            seen.add(k)
-            rr = dict(r)
-            rr["c"] = n
-            merged.append(rr)
-            latest = max(latest, r["end"])
-    if first is None:
-        return None
-    return first, unit, merged, latest
+            k = (n, r.get("start"), r["end"], r["accn"], r.get("filed"), r["val"])
+            if k not in seen:
+                seen.add(k)
+                merged.append(dict(r, c=n))
+                latest = max(latest, r["end"])
+    return (first, unit, merged, latest) if first else None
 
 
-def build_series(facts, stmt):
+def _revenue_rank(facts, r, names):
+    """Explicit accounting scopes, never largest-value selection.
+
+    ASC 606 contract revenue excludes leases and financial instruments. A reported
+    total is preferred when the same filing/context also reports those activities.
+    """
+    def carries(concepts):
+        for c in concepts:
+            for x in facts.get("us-gaap", {}).get(c, {}).get("units", {}).get("USD", []):
+                if (x.get("start"), x["end"], x["accn"]) == (r.get("start"), r["end"], r["accn"]):
+                    return True
+        return False
+    c = r["c"]
+    if c == "RevenuesNetOfInterestExpense":
+        return -3, "bank revenue net of interest expense; contract revenue is a component"
+    leases = ("OperatingLeaseLeaseIncome", "OperatingLeasesIncomeStatementLeaseRevenue", "OperatingLeaseIncome", "LeaseIncome", "SalesTypeAndDirectFinancingLeasesIncomeStatementLeaseRevenue")
+    insurance = ("PremiumsEarnedNet", "PremiumsEarnedNetOfReinsurance", "InsuranceServicesRevenue", "Premiums")
+    if c == "Revenues" and carries(leases):
+        return -2, "reported consolidated revenue includes lease income outside ASC 606"
+    if c == "Revenues" and carries(insurance):
+        return -2, "reported consolidated insurance revenue includes premiums outside ASC 606"
+    return names.index(c), "reported concept priority within accounting scope"
+
+
+def build_series(facts, stmt, vintage="latest", as_of=None, concepts=None, instant=None):
+    """Normalize reported observations and retain filing histories for point-in-time use.
+
+    as_of is a filing-date cutoff (daily granularity). Cross-filing subtraction is
+    allowed only on an unchanged concept with no subsequently conflicting smaller
+    cumulative observation. Such inputs are explicitly identified in derivation.basis.
+    """
+    if vintage not in ("latest", "original"):
+        raise ValueError("vintage must be latest or original")
     out = []
-    for label, names in CONCEPTS[stmt]:
+    is_instant = stmt in INSTANT if instant is None else instant
+    for label, names in (CONCEPTS[stmt] if concepts is None else concepts):
         pc = pick_concept(facts, names)
         if not pc:
             continue
-        concept, unit, rows, _ = pc
-        rows = [r for r in rows if r.get("form") in ("10-K", "10-Q", "10-K/A", "10-Q/A", "20-F", "10-KT")]
-        annual, quarterly, ytd = {}, {}, {}
-        for r in rows:
-            end = r["end"]
-            rec = {"v": r["val"], "end": end, "accn": r["accn"], "form": r["form"], "filed": r["filed"], "c": r["c"]}
-            if stmt in INSTANT:
-                if "start" in r:
-                    continue
-                if r.get("fp") == "FY" and r["form"].startswith("10-K"):
-                    if end not in annual or r["filed"] < annual[end]["filed"]:
-                        annual[end] = rec
-                if end not in quarterly or r["filed"] < quarterly[end]["filed"]:
-                    quarterly[end] = rec
+        concept, unit, raw, _ = pc
+        annual, quarterly, cumulative = [], [], []
+        for r in raw:
+            if r.get("form") not in ("10-K", "10-Q", "10-K/A", "10-Q/A", "20-F", "10-KT"):
+                continue
+            if as_of and r.get("filed", "") > as_of:
+                continue
+            rank, reason = _revenue_rank(facts, r, names) if label == "Revenue" else (names.index(r["c"]), "reported concept priority")
+            rec = {"v": r["val"], "end": r["end"], "accn": r["accn"], "form": r["form"],
+                   "filed": r["filed"], "c": r["c"], "available_at": r["filed"],
+                   "accessions": [r["accn"]], "vintage": vintage, "validation_status": "reported",
+                   "selection_reason": reason, "_rank": rank}
+            if is_instant:
+                if "start" not in r:
+                    quarterly.append(rec)
+                    if r.get("fp") == "FY" and r["form"].startswith(("10-K", "20-F")):
+                        annual.append(rec)
                 continue
             if "start" not in r:
                 continue
             rec["start"] = r["start"]
-            d = days(r["start"], end)
-            key = (r["start"], end)
+            d = days(r["start"], r["end"])
             if 350 <= d <= 380:
-                if key not in annual or r["filed"] < annual[key]["filed"]:
-                    annual[key] = rec
+                annual.append(rec); cumulative.append(rec)
             elif 80 <= d <= 120:
-                if key not in quarterly or r["filed"] < quarterly[key]["filed"]:
-                    quarterly[key] = rec
+                quarterly.append(rec); cumulative.append(rec)
             elif 160 <= d <= 300:
-                if key not in ytd or r["filed"] < ytd[key]["filed"]:
-                    ytd[key] = rec
-        A, Q = {}, {}
-        for rec in annual.values():
-            if rec["end"] not in A or rec["filed"] < A[rec["end"]]["filed"]:
-                A[rec["end"]] = rec
-        for rec in quarterly.values():
-            if rec["end"] not in Q or rec["filed"] < Q[rec["end"]]["filed"]:
-                Q[rec["end"]] = rec
-        if stmt not in INSTANT and label not in NON_ADDITIVE:
-            allper = {}
-            for rec in list(Q.values()) + list(ytd.values()) + list(A.values()):
-                allper[(rec["start"], rec["end"])] = rec
-            by_start = {}
-            for rec in allper.values():
-                by_start.setdefault(rec["start"], []).append(rec)
-            for recs in by_start.values():
-                recs.sort(key=lambda x: x["end"])
-                for i in range(1, len(recs)):
-                    big, small = recs[i], recs[i - 1]
-                    if 80 <= days(small["end"], big["end"]) <= 120 and big["end"] not in Q:
-                        Q[big["end"]] = {
-                            "v": big["v"] - small["v"], "start": small["end"], "end": big["end"],
-                            "accn": big["accn"], "form": big["form"], "filed": big["filed"], "c": big["c"],
-                            "derived": {"minus": {"v": small["v"], "accn": small["accn"], "form": small["form"], "start": small["start"], "end": small["end"]},
-                                        "from": {"v": big["v"], "start": big["start"], "end": big["end"]}},
-                        }
-        out.append({"label": label, "concept": concept, "unit": unit,
-                    "annual": sorted(A.values(), key=lambda x: x["end"]),
-                    "quarterly": sorted(Q.values(), key=lambda x: x["end"])})
+                cumulative.append(rec)
+        if not is_instant and label not in NON_ADDITIVE:
+            for big in cumulative:
+                candidates = [x for x in cumulative if x["start"] == big["start"] and x["c"] == big["c"]
+                              and 80 <= days(x["end"], big["end"]) <= 120 and x["filed"] <= big["filed"]]
+                same = [x for x in candidates if x["accn"] == big["accn"]]
+                if not candidates:
+                    continue
+                small = max(same or candidates, key=lambda x: (x["filed"], x["end"], x["accn"]))
+                # Retain the historical derivation, but invalidate its current basis when
+                # only the smaller cumulative leg was subsequently restated.
+                conflicting = [x["filed"] for x in cumulative if not same and x["c"] == small["c"]
+                               and x["start"] == small["start"] and x["end"] == small["end"]
+                               and x["filed"] > big["filed"] and x["v"] != small["v"]]
+                def source(x):
+                    return {k: v for k, v in x.items() if not k.startswith("_")}
+                quarterly.append(dict(big, v=big["v"]-small["v"],
+                    start=(dt.date.fromisoformat(small["end"])+dt.timedelta(days=1)).isoformat(),
+                    accessions=sorted({big["accn"], small["accn"]}),
+                    available_at=max(big["filed"], small["filed"]), validation_status="derived",
+                    superseded_at=min(conflicting) if conflicting else None,
+                    derived={"minus": source(small), "from": source(big),
+                             "basis": "same_filing_same_concept" if same else "sequential_filings_same_concept_no_observed_revision"}))
+        def select(records):
+            grouped = {}
+            for r in records:
+                if vintage == "latest" and r.get("superseded_at") and (not as_of or r["superseded_at"] <= as_of):
+                    continue
+                grouped.setdefault(r["end"], []).append(r)
+            chosen = []
+            for end, options in grouped.items():
+                date = (max if vintage == "latest" else min)(r["available_at"] for r in options)
+                pool = [r for r in options if r["available_at"] == date]
+                chosen.append(min(pool, key=lambda r: (r["_rank"], bool(r.get("derived")), r["accn"])))
+            return sorted(chosen, key=lambda r:r["end"])
+        def clean(records):
+            return [{k:v for k,v in r.items() if not k.startswith("_")} for r in records]
+        def history(records):
+            grouped = {}
+            for r in records:
+                key = (r["end"], r["accn"], r["available_at"])
+                prev = grouped.get(key)
+                if not prev or (r["_rank"], bool(r.get("derived"))) < (prev["_rank"], bool(prev.get("derived"))):
+                    grouped[key] = r
+            return clean(sorted(grouped.values(), key=lambda r:(r["end"], r["available_at"], r["accn"])))
+        out.append({"label": label, "concept": concept, "unit": unit, "vintage": vintage, "as_of": as_of,
+                    "annual": clean(select(annual)), "quarterly": clean(select(quarterly)),
+                    "filing_history": {"annual": history(annual), "quarterly": history(quarterly)}})
     return out
 
 
@@ -200,7 +244,7 @@ def filing_tables(facts, statements, filings, cik):
                 if not pc:
                     continue
                 concept, unit, rr, _ = pc
-                vals, rc = {}, concept
+                vals, rc, ranks = {}, concept, {}
                 for r in rr:
                     if r["accn"] != acc:
                         continue
@@ -213,6 +257,10 @@ def filing_tables(facts, statements, filings, cik):
                         if "start" not in r:
                             continue
                         col = r["start"] + "|" + r["end"]
+                    rank = _revenue_rank(facts, r, next(names for label,names in CONCEPTS[k] if label == lab))[0] if lab == "Revenue" else next(names for label,names in CONCEPTS[k] if label == lab).index(r["c"])
+                    if col in ranks and ranks[col] <= rank:
+                        continue
+                    ranks[col] = rank
                     cols[col] = 1
                     vals[col] = r["val"]
                     rc = r["c"]
@@ -231,13 +279,27 @@ def filing_tables(facts, statements, filings, cik):
     return out
 
 
+def shares_outstanding(facts, as_of=None):
+    """An unambiguous consolidated cover-page observation, never sum duplicate filings.
+
+    Companyfacts strips class dimensions; distinct values in one context are ambiguous.
+    Explicit class conversions require a separate dimension-aware source.
+    """
+    so = facts.get("dei", {}).get("EntityCommonStockSharesOutstanding", {}).get("units", {}).get("shares", [])
+    rows = [r for r in so if r.get("form") in ("10-K", "10-Q", "10-K/A", "10-Q/A", "10-KT")
+            and (not as_of or r.get("filed", "") <= as_of)]
+    if not rows:
+        return None
+    last = max(rows, key=lambda r:(r["end"], r.get("filed", ""), r.get("accn", "")))
+    same = [r for r in rows if (r["end"],r.get("accn")) == (last["end"],last.get("accn"))]
+    values = {r["val"] for r in same}
+    return {"val": next(iter(values)) if len(values)==1 else None, "end": last["end"],
+            "accn": last.get("accn"), "filed": last.get("filed"), "available_at": last.get("filed"),
+            "form": last.get("form"), "basis": "reported_outstanding" if len(values)==1 else "ambiguous_share_classes"}
+
+
 def profile(sub, facts):
-    dei = facts.get("dei", {})
-    so = dei.get("EntityCommonStockSharesOutstanding", {}).get("units", {}).get("shares", [])
-    shares = None
-    if so:
-        latest_end = max(r["end"] for r in so)
-        shares = {"val": sum(r["val"] for r in so if r["end"] == latest_end and r.get("form") in ("10-K", "10-Q")) or max(so, key=lambda r: r["end"])["val"], "end": latest_end}
+    shares = shares_outstanding(facts)
     ba = sub.get("addresses", {}).get("business", {})
     return {
         "name": sub["name"], "sic": sub.get("sic"), "sicDescription": sub.get("sicDescription"), "exchanges": sub.get("exchanges") or [],

@@ -114,11 +114,43 @@ def series(statements, label, kind="quarterly", prefer=("income", "balance", "ca
     return []
 
 
+NON_SUMMABLE = {"Diluted shares", "Basic shares", "Shares outstanding", "Total assets", "Total liabilities", "Shareholders' equity"}
+
+
+def consecutive_quarters(q):
+    if len(q) != 4 or any(not r.get("start") for r in q):
+        return False
+    q = sorted(q, key=lambda r:r["end"])
+    if any(not 80 <= (_d(r["end"])-_d(r["start"])).days <= 120 for r in q):
+        return False
+    return all((_d(b["start"])-_d(a["end"])).days == 1 for a,b in zip(q,q[1:]))
+
+
+def ttm_records(statements, label, stmt_order=("income", "cashflow")):
+    if label in NON_SUMMABLE:
+        return []
+    # A balance cannot become a flow by passing a different statement order.
+    for row in statements.get("balance", []):
+        if row["label"] == label:
+            return []
+    q = sorted(series(statements, label, "quarterly", stmt_order), key=lambda r:r["end"])[-4:]
+    if label in ("EPS diluted", "EPS basic") and any(r.get("derived") for r in q):
+        return []
+    return q if consecutive_quarters(q) else []
+
+
 def ttm(statements, label, stmt_order=("income", "cashflow")):
-    q = series(statements, label, "quarterly", stmt_order)[-4:]
-    if len(q) < 4 or (_d(q[-1]["end"]) - _d(q[0]["end"])).days > 300:
+    q = ttm_records(statements, label, stmt_order)
+    return sum(x["v"] for x in q) if q else None
+
+
+def market_cap(price, shares, price_date=None):
+    """Only reported, unambiguous outstanding shares; stale counts remain unknown."""
+    if not price or not shares or not shares.get("val") or shares.get("basis") != "reported_outstanding":
         return None
-    return sum(x["v"] for x in q)
+    if price_date and shares.get("end") and (_d(price_date)-_d(shares["end"])).days > 400:
+        return None
+    return price * shares["val"]
 
 
 def latest(statements, label, kind="quarterly"):
@@ -145,9 +177,13 @@ def compute(statements, profile, px):
     eps = ttm(statements, "EPS diluted")
     ocf, capex = ttm(statements, "Operating cash flow", ("cashflow",)), ttm(statements, "Capex", ("cashflow",))
     div, bb = ttm(statements, "Dividends paid", ("cashflow",)), ttm(statements, "Buybacks", ("cashflow",))
-    fcf = ocf - capex if ocf is not None and capex is not None else (ocf if ocf is not None and capex is None else None)
+    ocf_q, capex_q = ttm_records(statements, "Operating cash flow", ("cashflow",)), ttm_records(statements, "Capex", ("cashflow",))
+    aligned = [(r["start"], r["end"]) for r in ocf_q] == [(r["start"], r["end"]) for r in capex_q]
+    fcf = ocf - sum(abs(r["v"]) for r in capex_q) if ocf is not None and capex is not None and aligned else None
     out.update({"revenue_ttm": rev, "net_income_ttm": ni, "eps_ttm": eps, "fcf_ttm": fcf})
-    out["net_margin_ttm"] = ni / rev if rev and ni is not None else None
+    rev_periods = [(r["start"],r["end"]) for r in ttm_records(statements,"Revenue")]
+    ni_periods = [(r["start"],r["end"]) for r in ttm_records(statements,"Net income")]
+    out["net_margin_ttm"] = ni / rev if rev and ni is not None and rev_periods == ni_periods else None
     if lq:
         r = at(statements, "Revenue", lq)
         gp = at(statements, "Gross profit", lq)
@@ -164,9 +200,9 @@ def compute(statements, profile, px):
             pr = at(statements, "Revenue", prior, tol=20)
             if pr and pr["v"]:
                 out["rev_growth_lq"] = r["v"] / pr["v"] - 1
-    shares = (profile.get("sharesOutstanding") or {}).get("val")
+    shares = profile.get("sharesOutstanding")
     price = px.get("price") if px else None
-    mcap = price * shares if price and shares else None
+    mcap = market_cap(price, shares, (px or {}).get("as_of"))
     out["market_cap"] = mcap
     out["pe_ttm"] = price / eps if price and eps and eps > 0 else None
     out["ps_ttm"] = mcap / rev if mcap and rev else None

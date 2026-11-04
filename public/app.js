@@ -8,12 +8,12 @@ let TICKERS = [];
 const IDX = {};
 let INDEX = null, FEED = null, MACRO = null, MARKET = null;
 const _inflight = {};
-async function getJSON(path, { fresh = false } = {}) {
+async function getJSON(path, { fresh = false, signal } = {}) {
   const key = path;
-  if (!fresh && _inflight[key]) return _inflight[key];
-  const p = fetch(PUB + path, { cache: fresh ? "no-cache" : "default" }).then(r => { if (!r.ok) throw new Error(`${r.status} loading ${path}`); return r.json(); });
-  _inflight[key] = p;
-  p.catch(() => { delete _inflight[key]; });
+  if (!signal && !fresh && _inflight[key]) return _inflight[key];
+  const p = fetch(PUB + path, { cache: fresh ? "no-cache" : "default", signal }).then(r => { if (!r.ok) throw new Error(`${r.status} loading ${path}`); return r.json(); });
+  if (!signal) _inflight[key] = p;
+  p.catch(() => { if (_inflight[key] === p) delete _inflight[key]; });
   return p;
 }
 function applyIndex(ix) {
@@ -37,20 +37,20 @@ function applyMacro(m) {
   E.macro_brief = m.brief ? { ...m.brief, meta: { at: m.brief.generated_at } } : null;
   E.macro_news = m.news || [];
 }
-async function ensurePrices(sym) {
+async function ensurePrices(sym, { signal } = {}) {
   if (PX[sym] && !PX[sym].light) return PX[sym];
   try {
-    const p = await getJSON(`prices/${sym.replace("^", "IDX_").replace("=", "_")}.json`);
+    const p = await getJSON(`prices/${sym.replace("^", "IDX_").replace("=", "_")}.json`, { signal });
     PX[sym] = { meta: p.meta || {}, bars: (p.d || []).map(b => ({ t: new Date(b[0] * 1000), o: b[1], h: b[2], l: b[3], c: b[4], v: b[5] })) };
     if (p.i?.length) PX[sym + "@5m"] = { meta: p.meta || {}, bars: p.i.map(b => ({ t: new Date(b[0] * 1000), o: b[1], h: b[2], l: b[3], c: b[4], v: b[5] })) };
-  } catch (e) { console.warn("prices", sym, e.message); }
+  } catch (e) { if (e.name === "AbortError") throw e; console.warn("prices", sym, e.message); }
   return PX[sym];
 }
-async function ensureCompany(tk) {
+async function ensureCompany(tk, { signal } = {}) {
   tk = String(tk || "").toUpperCase();
   if (!IDX[tk]) throw new Error(`${tk} is not in coverage`);
   if (D.companies[tk]?.statements) return D.companies[tk];
-  const [b] = await Promise.all([getJSON(`companies/${tk}.json`), ensurePrices(tk), ensurePrices("SPY")]);
+  const [b] = await Promise.all([getJSON(`companies/${tk}.json`, { signal }), ensurePrices(tk, { signal }), ensurePrices("SPY", { signal })]);
   const p = b.profile || {};
   D.companies[tk] = { ticker: tk, cik: b.cik, name: p.name, sic: p.sic, sicDescription: p.sicDescription, exchanges: p.exchanges, fiscalYearEnd: p.fiscalYearEnd || "1231", fyeHistory: p.fyeHistory || null, fyTransitions: p.fyTransitions || null, fyNameOffset: p.fyNameOffset || 0, stateOfIncorporation: p.stateOfIncorporation, phone: p.phone, website: p.website, address: p.address, sharesOutstanding: p.sharesOutstanding, filings: (b.filings || []).map(f => ({ ...f })), statements: b.statements, earnings8k: b.earnings8k || [], sector: b.sector, generated: b.generated };
   Object.assign(D.filings, b.filingTables || {});
@@ -238,23 +238,17 @@ function model(tk) {
     { label: "EPS growth YoY", unit: "pct", f: (k, e) => { const pe = priorEnd(k, e); return ratio(get("EPS diluted", k, e), pe && get("EPS diluted", k, pe), "EPS diluted / EPS diluted (prior year) − 1", true); } },
     { label: "Free cash flow", unit: "USD", f: (k, e) => { const o = get("Operating cash flow", k, e), x = get("Capex", k, e); return o && x ? { v: o.v - x.v, calc: { formula: "Operating cash flow − Capex", inputs: [o, x] } } : null; } },
     { label: "FCF margin", unit: "pct", f: (k, e) => { const o = get("Operating cash flow", k, e), x = get("Capex", k, e), r = get("Revenue", k, e); return o && x && r ? { v: (o.v - x.v) / r.v, calc: { formula: "(Operating cash flow − Capex) / Revenue", inputs: [o, x, r] } } : null; } },
-    { label: "Capital returned", unit: "USD", f: (k, e) => { const b = get("Buybacks", k, e), d = get("Dividends paid", k, e); if (!b && !d) return null; return { v: (b?.v || 0) + (d?.v || 0), calc: { formula: "Buybacks + Dividends paid", inputs: [b, d].filter(Boolean) } }; } },
+    { label: "Capital returned", unit: "USD", f: (k, e) => { const b = get("Buybacks", k, e), d = get("Dividends paid", k, e); if (!b || !d) return null; return { v: b.v + d.v, calc: { formula: "Buybacks + Dividends paid", inputs: [b, d].filter(Boolean) } }; } },
     { label: "Return on equity", unit: "pct", annualOnly: true, f: (k, e) => ratio(get("Net income", k, e), get("Shareholders' equity", k, e), "Net income / Shareholders' equity (period end)") },
     { label: "Current ratio", unit: "x", f: (k, e) => ratio(get("Total current assets", k, e), get("Total current liabilities", k, e), "Total current assets / Total current liabilities") },
     { label: "Debt to equity", unit: "x", f: (k, e) => ratio(get("Long-term debt", k, e), get("Shareholders' equity", k, e), "Long-term debt / Shareholders' equity") },
-    { label: "Cash & securities", unit: "USD", f: (k, e) => { const a = get("Cash & equivalents", k, e), b = get("Marketable securities, current", k, e); if (!a) return null; return { v: a.v + (b?.v || 0), calc: { formula: "Cash & equivalents + Marketable securities, current", inputs: [a, b].filter(Boolean) } }; } },
+    { label: "Cash & securities", unit: "USD", f: (k, e) => { const a = get("Cash & equivalents", k, e), b = get("Marketable securities, current", k, e); if (!a || !b) return null; return { v: a.v + b.v, calc: { formula: "Cash & equivalents + Marketable securities, current", inputs: [a, b].filter(Boolean) } }; } },
   ];
   function ratio(a, b, formula, growth) { if (!a || !b || !b.v) return null; return { v: growth ? a.v / b.v - 1 : a.v / b.v, calc: { formula, inputs: [a, b] } }; }
-  m.ratio = (label, kind, end) => { const d = m.ratioDefs.find(x => x.label === label); if (!d || (d.annualOnly && kind === "Q")) return null; const r = d.f(kind, end); if (!r) return null; return { ...r, tk, stmt: "ratios", label, unit: d.unit, kind, end }; };
+  m.ratio = (label, kind, end) => { const d = m.ratioDefs.find(x => x.label === label); if (!d || (d.annualOnly && kind === "Q")) return null; const r = d.f(kind, end); if (!r) return null; return { ...r, tk, stmt: "ratios", label, unit: d.unit, kind, end, start: r.calc?.inputs?.[0]?.start }; };
   m.metric = (label, kind, end) => byLabel[label] ? get(label, kind, end) : m.ratio(label, kind, end);
   m.series = (label, kind) => m.periods(kind).map(e => ({ end: e, cell: m.metric(label, kind, e) })).filter(x => x.cell && x.cell.v != null);
-  m.ttm = label => {
-    const s = m.series(label, "Q").slice(-4);
-    if (s.length < 4 || dayDiff(s[0].end, s[3].end) > 300) return null;
-    const unit = s[0].cell.unit;
-    if (unit === "pct" || unit === "x") return null;
-    return { v: s.reduce((a, x) => a + x.cell.v, 0), tk, label, unit, kind: "TTM", end: s[3].end, calc: { formula: `Sum of last four quarters of ${label}`, inputs: s.map(x => x.cell) } };
-  };
+  m.ttm = label => FU_FINANCIAL.ttm(m.series(label, "Q").slice(-4).map(x => x.cell));
   m.latestQ = () => m.periods("Q").at(-1);
   m.latestA = () => m.periods("A").at(-1);
   CACHE[tk] = m;
@@ -357,6 +351,7 @@ function barChart(host, data, o = {}) {
 
 /* ---------- toasts ---------- */
 function toast(msg) { const t = el("div", { class: "toast" }, msg); $("#toasts").append(t); setTimeout(() => t.remove(), 2600); }
+window.addEventListener("fu:evidence-persistence", e => { if (!e.detail.ok) toast("Evidence could not be saved to browser storage; it remains available in this session."); });
 async function copyText(text, label) { try { await navigator.clipboard.writeText(text); toast(label || "Copied"); } catch { const ta = el("textarea", { style: "position:fixed;left:-9999px" }, text); document.body.append(ta); ta.select(); try { document.execCommand("copy"); toast(label || "Copied"); } catch { toast("Select and copy the text manually"); } ta.remove(); } }
 
 /* ---------- source drawer ---------- */
@@ -378,12 +373,13 @@ function siblings(cell) {
 }
 function citation(cell) {
   if (cell.calc) return `${cell.tk} ${cell.label}, ${periodText(cell)}: ${fmtCell(cell)}. Calculated as ${cell.calc.formula} from SEC filings (Filed Under).`;
-  const f = D.filings[cell.rec.accn];
+  const f = cell.evidenceSource || D.filings[cell.rec.accn];
   return `${cell.tk} ${cell.label}, ${periodText(cell)}: ${fmtCell(cell)}${cell.derived ? " (derived from cumulative figures)" : ""}. Source: ${cell.rec.form} filed ${fdate(cell.rec.filed)}, accession ${cell.rec.accn}, ${cell.conceptFull || "us-gaap:" + cell.concept}${cell.dimText ? " (" + cell.dimText + ")" : ""}. ${f?.primary || f?.index || ""}`;
 }
 function openSource(cell, tab) {
   if (!cell) return;
   hideTip();
+  const evidence = evidenceForCell(cell);
   DR.cell = cell; if (tab) DR.tab = tab;
   if (cell.calc && DR.tab === "filing") DR.tab = "filing";
   const dh = $("#dh"), db = $("#db");
@@ -392,7 +388,7 @@ function openSource(cell, tab) {
   const nav = el("div", { class: "pnav" },
     el("button", { "aria-label": "Previous period", title: "Previous period (←)", disabled: idx <= 0, onclick: () => openSource(sib[idx - 1]) }, svgUse("i-left")),
     el("button", { "aria-label": "Next period", title: "Next period (→)", disabled: idx < 0 || idx >= sib.length - 1, onclick: () => openSource(sib[idx + 1]) }, svgUse("i-right")));
-  const f = cell.rec ? D.filings[cell.rec.accn] : null;
+  const f = cell.evidenceSource || (cell.rec ? D.filings[cell.rec.accn] : null);
   dh.append(
     el("div", { class: "row" }, el("span", { class: "eyebrow" }, cell.calc ? "Calculated value" : cell.derived ? "Derived from filing" : "Filed value"),
       el("div", { class: "x", style: "display:flex;gap:6px" },
@@ -401,6 +397,8 @@ function openSource(cell, tab) {
         el("button", { class: "iconbtn", onclick: closeSource, "aria-label": "Close source (Esc)" }, svgUse("i-x")))),
     el("div", { class: "row" }, el("h2", {}, `${SHORT[cell.tk] || cell.tk} · ${cell.label}`)),
     el("div", { class: "row" }, el("span", { class: "chip acc mono", style: "font-size:13.5px;height:26px" }, fmtCell(cell)), el("span", { class: "muted", style: "font-size:12.5px" }, periodText(cell) + (cell.start ? ` · ${fdate(cell.start)} – ${fdate(cell.end)}` : cell.end && cell.kind !== "TTM" ? ` · as of ${fdate(cell.end)}` : "")), el("span", { style: "margin-left:auto" }, sib.length ? nav : null)));
+  db.append(el("div", { class: "note" }, `Evidence ${evidence.id} · record ${evidence.validation.status}. ${evidence.validation.issues.join("; ")} Validation checks record structure and provenance; it is not independent filing reconciliation. Surrounding interpretation is unverified.`));
+  if (!FU_EVIDENCE.persistence().ok) db.append(el("div", { class: "note" }, "Evidence is available for this session only: browser storage could not save the ledger."));
   const tabs = el("div", { class: "dtabs", role: "tablist" });
   const T = [["filing", cell.calc ? "Calculation" : "Filing"], ["details", "Details"], ["history", "History"]];
   T.forEach(([id, n]) => tabs.append(el("button", { class: DR.tab === id ? "on" : "", role: "tab", "aria-selected": DR.tab === id ? "true" : "false", onclick: () => openSource(cell, id) }, n)));
@@ -422,9 +420,9 @@ function renderCalc(body, cell) {
   body.append(box, el("div", { class: "note" }, "Each input links to the filing it came from. Open one to see the reported line highlighted in the original statement."));
 }
 function renderDetails(body, cell) {
-  const c = D.companies[cell.tk];
+  const c = D.companies[cell.tk] || { name: cell.tk, cik: "unknown" };
   if (cell.calc) { body.append(el("dl", { class: "kv" }, el("dt", {}, "Company"), el("dd", {}, c.name), el("dt", {}, "Metric"), el("dd", {}, cell.label), el("dt", {}, "Period"), el("dd", {}, periodText(cell)), el("dt", {}, "Formula"), el("dd", { class: "mono" }, cell.calc.formula), el("dt", {}, "Inputs"), el("dd", {}, cell.calc.inputs.length + " filed values"))); return; }
-  const rec = cell.rec, f = D.filings[rec.accn];
+  const rec = cell.rec, f = cell.evidenceSource || D.filings[rec.accn];
   body.append(el("dl", { class: "kv" },
     el("dt", {}, "Company"), el("dd", {}, `${c.name} · CIK ${c.cik}`),
     el("dt", {}, "Form"), el("dd", {}, el("span", { class: "form " + formCls(rec.form) }, rec.form)),
@@ -546,7 +544,7 @@ function textFind(doc, value) {
   return out;
 }
 function renderFiling(db, cell, c) {
-  const rec = cell.rec, f = D.filings[rec.accn];
+  const rec = cell.rec, f = cell.evidenceSource || D.filings[rec.accn];
   const target = cell.derived ? { start: cell.derived.from.start, end: cell.derived.from.end, v: cell.derived.from.v } : { start: rec.start || null, end: rec.end, v: rec.v };
   if (cell.derived) db.append(el("div", { class: "note" }, "This quarter is derived: the filing reports a cumulative period. The highlighted figure is the cumulative value it starts from. See Details for the subtraction."));
   const status = el("span", { class: "faint", style: "font-size:12px" }, "Loading the filing…");
@@ -617,7 +615,7 @@ function renderFiling(db, cell, c) {
 }
 
 function renderFilingTable(db, cell, c) {
-  const rec = cell.rec, f = D.filings[rec.accn];
+  const rec = cell.rec, f = cell.evidenceSource || D.filings[rec.accn];
   const targetKey = cell.stmt === "balance" ? rec.end : `${rec.start}|${rec.end}`;
   if (cell.derived) db.append(el("div", { class: "note" }, "This quarter is derived: the filing reports a cumulative period. The highlighted figure below is the cumulative value it starts from. See Details for the subtraction."));
   const ixDoc = E?.ix?.[rec.accn]?.tables?.[cell.stmt];
@@ -633,7 +631,7 @@ function renderFilingTable(db, cell, c) {
     if (hit) { hit.classList.add("hit"); hit.closest("tr")?.classList.add("hl"); requestAnimationFrame(() => hit.scrollIntoView({ block: "center", inline: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })); }
     return;
   }
-  const st = f?.statements?.[cell.stmt];
+  const st = D.filings[rec.accn]?.statements?.[cell.stmt] || f?.statements?.[cell.stmt];
   if (!st) { db.append(el("div", { class: "note" }, "This filing's statement table is not in the prototype bundle. Use the EDGAR link above.")); return; }
   const doc = el("div", { class: "doc" });
   doc.append(el("div", { class: "dt" }, el("div", { class: "co" }, NAME[cell.tk] || c.name), el("div", { class: "st" }, STMT_DOC[cell.stmt]), el("div", { class: "un" }, "(In millions, except per-share amounts)")));
@@ -676,49 +674,64 @@ function findCell(tk, label, period) {
   return lab ? m.metric(lab, kind, end) : null;
 }
 async function findCellAsync(tk, label, period) { try { await ensureCompany(tk); } catch { return null; } return findCell(tk, label, period); }
-function compactSeries(tk, label, kind, n) {
-  const m = model(tk);
-  return m.series(label, kind).slice(-n).map(x => ({ period: plabel(tk, x.end, kind), end: x.end, value: x.cell.unit === "pct" ? +(x.cell.v * 100).toFixed(2) : x.cell.v, unit: x.cell.unit === "pct" ? "%" : x.cell.unit, source: x.cell.calc ? "calculated" : `${x.cell.rec.form} ${x.cell.rec.accn}${x.cell.derived ? " (derived)" : ""}` }));
+function evidenceForCell(cell) {
+  if (cell?.evidenceId && FU_EVIDENCE.get(cell.evidenceId)) return FU_EVIDENCE.get(cell.evidenceId);
+  const context = c => { const f = c.evidenceSource || D.filings[c.rec?.accn]; const company = D.companies[c.tk];
+    const filing = company?.filings?.find(f => f.a === c.rec?.accn);
+    const sourceUrl = f?.primary || f?.index || filing?.url || (c.rec?.accn && company?.cik ? `https://www.sec.gov/Archives/edgar/data/${Number(company.cik)}/${c.rec.accn.replace(/-/g, "")}/` : null);
+    return { sourceUrl, filing: f ? { primary: f.primary, index: f.index, filed: f.filed } : { primary: sourceUrl }, filedDate: c.rec?.filed || f?.filed || filing?.d, period: c.kind === "YTD" ? `${c.start} to ${c.end}` : c.kind === "TTM" ? `TTM to ${c.end}` : c.end ? plabel(c.tk, c.end, c.kind) : null, resolveContext: context }; };
+  return FU_EVIDENCE.fromCell(cell, context(cell));
 }
-function runJS(code, timeout = 4000) {
-  return new Promise(resolve => {
-    const data = { companies: {}, prices: {}, universe: (INDEX?.companies || []).map(c => ({ ticker: c.ticker, name: c.name, sector: c.sector, price: c.price, market_cap: c.market_cap, pe_ttm: c.pe_ttm, ps_ttm: c.ps_ttm, revenue_ttm: c.revenue_ttm, net_income_ttm: c.net_income_ttm, fcf_ttm: c.fcf_ttm, fcf_yield: c.fcf_yield, gross_margin_lq: c.gross_margin_lq, op_margin_lq: c.op_margin_lq, rev_growth_lq: c.rev_growth_lq, dividend_yield: c.dividend_yield, ret_ytd: c.ret_ytd, ret_1y: c.ret_1y, beta_1y: c.beta_1y })) };
-    for (const t of Object.keys(D.companies).filter(loaded)) { const m = model(t); data.companies[t] = { name: SHORT[t], annual: {}, quarterly: {} }; for (const l of allMetricLabels()) { if (!m.byLabel[l] && !m.ratioDefs.find(d => d.label === l)) continue; data.companies[t].annual[l] = m.series(l, "A").map(x => [plabel(t, x.end, "A"), x.end, x.cell.v]); data.companies[t].quarterly[l] = m.series(l, "Q").map(x => [plabel(t, x.end, "Q"), x.end, x.cell.v]); } }
-    for (const s of Object.keys(PX)) if (!s.includes("@")) data.prices[s] = PX[s].bars.map(b => [b.t.toISOString().slice(0, 10), b.c]);
-    const src = `const data=${JSON.stringify(data)};onmessage=async e=>{try{const fn=new Function("data",'"use strict";'+e.data);const r=await fn(data);postMessage({ok:true,result:JSON.stringify(r===undefined?null:r).slice(0,12000)})}catch(err){postMessage({ok:false,error:String(err&&err.message||err)})}}`;
-    let w;
-    try { w = new Worker(URL.createObjectURL(new Blob([src], { type: "text/javascript" }))); } catch (e) { resolve({ ok: false, error: "Workers unavailable: " + e.message }); return; }
-    const t = setTimeout(() => { w.terminate(); resolve({ ok: false, error: "Timed out after " + timeout + " ms" }); }, timeout);
-    w.onmessage = e => { clearTimeout(t); w.terminate(); resolve(e.data); };
-    w.onerror = e => { clearTimeout(t); w.terminate(); resolve({ ok: false, error: e.message }); };
-    w.postMessage(String(code));
-  });
+function compactSeries(tk, label, kind, n, offset = 0) {
+  const all = model(tk).series(label, kind).slice().reverse(), selected = all.slice(offset, offset + n);
+  return { points: selected.map(x => { const e = evidenceForCell(x.cell); return { period: e.period, end: e.periodEnd, value: e.value, unit: e.unit, evidenceId: e.id, citation: FU_EVIDENCE.citation(e.id), evidence: e }; }), total: all.length, offset, nextOffset: offset + n < all.length ? offset + n : null, truncated: offset + n < all.length };
+}
+function abortCheck(signal) { if (signal?.aborted) throw new DOMException("Cancelled", "AbortError"); }
+function boundedToolResult(out, maxBytes = 60000) {
+  const result = typeof out === "string" ? { text: out } : out;
+  const serialized = JSON.stringify(result ?? null);
+  return serialized.length <= maxBytes ? serialized : JSON.stringify({ error: "Tool result exceeds context budget", truncated: true, originalCharacters: serialized.length, instruction: "Request fewer records or use pagination; no partial JSON was retained." });
 }
 function baseTools(trace) {
-  const wrap = (name, fn) => async (input, ctx) => { const st = trace(name, input); try { const r = await fn(input || {}, ctx); st.done(r); return r; } catch (e) { st.fail(e); throw e; } };
+  const wrap = (name, fn) => async (input, ctx) => { const st = trace(name, input); try { abortCheck(ctx?.signal); const r = await fn(input || {}, ctx); abortCheck(ctx?.signal); st.done(r); return r; } catch (e) { st.fail(e); throw e; } };
   const resolveLabel = (m, lab) => m.byLabel[lab] ? lab : (m.ratioDefs.find(d => d.label.toLowerCase() === String(lab).toLowerCase())?.label || Object.keys(m.byLabel).find(l => l.toLowerCase() === String(lab).toLowerCase()));
   return [
     { name: "screen_companies", description: "Screen the covered universe (S&P 500). Returns ticker, name, sector, price, market cap, P/E, P/S, TTM revenue/net income/FCF, FCF yield, latest-quarter gross and operating margin, revenue growth YoY, dividend yield, YTD and 1Y return, beta. Optional filters: sector (exact name), sort (field name), desc (bool), limit.", inputSchema: { type: "object", properties: { sector: { type: "string" }, sort: { type: "string" }, desc: { type: "boolean" }, limit: { type: "number" } } },
       execute: wrap("screen_companies", i => { let rows = (INDEX?.companies || []).filter(c => !i.sector || c.sector === i.sector); if (i.sort) rows = rows.filter(c => c[i.sort] != null).sort((a, b) => (i.desc === false ? 1 : -1) * (a[i.sort] - b[i.sort])); return rows.slice(0, Math.min(102, Number(i.limit) || 25)).map(c => ({ ticker: c.ticker, name: c.name, sector: c.sector, price: c.price, market_cap: c.market_cap, pe_ttm: c.pe_ttm && +c.pe_ttm.toFixed(1), ps_ttm: c.ps_ttm && +c.ps_ttm.toFixed(1), revenue_ttm: c.revenue_ttm, net_income_ttm: c.net_income_ttm, fcf_ttm: c.fcf_ttm, fcf_yield: c.fcf_yield && +(c.fcf_yield * 100).toFixed(2), gross_margin_lq: c.gross_margin_lq && +(c.gross_margin_lq * 100).toFixed(1), op_margin_lq: c.op_margin_lq && +(c.op_margin_lq * 100).toFixed(1), rev_growth_lq: c.rev_growth_lq && +(c.rev_growth_lq * 100).toFixed(1), dividend_yield: c.dividend_yield && +(c.dividend_yield * 100).toFixed(2), ret_ytd: c.ret_ytd && +(c.ret_ytd * 100).toFixed(1), ret_1y: c.ret_1y && +(c.ret_1y * 100).toFixed(1), beta_1y: c.beta_1y && +c.beta_1y.toFixed(2), latest_quarter: c.latest_quarter })); }) },
-    { name: "get_financials", description: "Return a reported or calculated metric series for one company from its SEC filings. period is 'annual' or 'quarterly'. Each point has a period label (e.g. 'FY2025', 'Q3 FY26'), value, unit and the filing it came from. Percent metrics are in percent. Metric labels: " + METRIC_LABELS.join(", "), inputSchema: { type: "object", properties: { ticker: { type: "string" }, metric: { type: "string" }, period: { type: "string", enum: ["annual", "quarterly"] }, last: { type: "number", description: "How many most recent periods (default 8, max 40)" } }, required: ["ticker", "metric"] },
-      execute: wrap("get_financials", async i => { const tk = String(i.ticker).toUpperCase(); await ensureCompany(tk); const m = model(tk); const lab = resolveLabel(m, i.metric); if (!lab) throw new Error("Unknown metric for " + tk + ". Valid: " + Object.keys(m.byLabel).concat(m.ratioDefs.map(d => d.label)).join(", ")); return { ticker: tk, metric: lab, points: compactSeries(tk, lab, i.period === "annual" ? "A" : "Q", Math.min(40, Number(i.last) || 8)), ttm: m.ttm(lab)?.v ?? null }; }) },
+    { name: "get_financials", description: "Return a reported or calculated metric series for one company from its SEC filings. period is 'annual' or 'quarterly'. Each point has a period label (e.g. 'FY2025', 'Q3 FY26'), value, unit and the filing it came from. Percent metrics are exact fractions (0.15 = 15%). Results are newest first, with evidence IDs and explicit pagination. Metric labels: " + METRIC_LABELS.join(", "), inputSchema: { type: "object", properties: { ticker: { type: "string" }, metric: { type: "string" }, period: { type: "string", enum: ["annual", "quarterly"] }, last: { type: "number", description: "Page size (default 8, max 20)" }, offset: { type: "integer", minimum: 0 } }, required: ["ticker", "metric"] },
+      execute: wrap("get_financials", async (i, ctx) => { const tk = String(i.ticker).toUpperCase(); await ensureCompany(tk, ctx); const m = model(tk); const lab = resolveLabel(m, i.metric); if (!lab) throw new Error("Unknown metric for " + tk + ". Valid: " + Object.keys(m.byLabel).concat(m.ratioDefs.map(d => d.label)).join(", ")); return { ticker: tk, metric: lab, ...compactSeries(tk, lab, i.period === "annual" ? "A" : "Q", Math.max(1, Math.min(20, Math.floor(Number(i.last) || 8))), Math.max(0, Math.floor(Number(i.offset) || 0))), ttm: m.ttm(lab) ? evidenceForCell(m.ttm(lab)) : null, ttmPolicy: "Only four contiguous quarterly USD flows; balances, shares and per-share metrics excluded" }; }) },
     { name: "get_price_stats", description: "Price statistics for a symbol from daily bars: last close, 1D/1W/1M/3M/YTD/1Y returns, 20/60-day annualized volatility, 52-week range, beta and correlation to SPY over 1 year, max drawdown, RSI14, 50/200-day moving averages. Symbols: any covered ticker plus SPY, QQQ, IWM, DIA, SMH, sector SPDRs, ^VIX, ^TNX, DX=F, CL=F, GC=F, HG=F, BTC-USD.", inputSchema: { type: "object", properties: { symbol: { type: "string" } }, required: ["symbol"] },
-      execute: wrap("get_price_stats", async i => { const s = String(i.symbol).toUpperCase(); await Promise.all([ensurePrices(s), ensurePrices("SPY")]); const st = priceStats(s); if (!st) throw new Error("No price data for " + i.symbol); return Object.fromEntries(Object.entries(st).map(([k, v]) => [k, typeof v === "number" ? +v.toFixed(4) : v])); }) },
-    { name: "get_earnings_reactions", description: "For one company, list earnings-release dates (8-K Item 2.02) with the stock's next-session return, the same-day SPY return, and the 5-session drift.", inputSchema: { type: "object", properties: { ticker: { type: "string" } }, required: ["ticker"] }, execute: wrap("get_earnings_reactions", async i => { const tk = String(i.ticker).toUpperCase(); await ensureCompany(tk); return earningsReactions(tk).map(r => ({ filed: r.date, next1d: +(r.r1 * 100).toFixed(2), spy1d: r.s1 == null ? null : +(r.s1 * 100).toFixed(2), drift5d: r.r5 == null ? null : +(r.r5 * 100).toFixed(2) })); }) },
+      execute: wrap("get_price_stats", async (i, ctx) => { const s = String(i.symbol).toUpperCase(); await Promise.all([ensurePrices(s, ctx), ensurePrices("SPY", ctx)]); const st = priceStats(s); if (!st) throw new Error("No price data for " + i.symbol); return Object.fromEntries(Object.entries(st).map(([k, v]) => [k, typeof v === "number" ? +v.toFixed(4) : v])); }) },
+    { name: "get_earnings_reactions", description: "For one company, list earnings-release dates (8-K Item 2.02) with the stock's next-session return, the same-day SPY return, and the 5-session drift.", inputSchema: { type: "object", properties: { ticker: { type: "string" } }, required: ["ticker"] }, execute: wrap("get_earnings_reactions", async (i, ctx) => { const tk = String(i.ticker).toUpperCase(); await ensureCompany(tk, ctx); return earningsReactions(tk).map(r => ({ filed: r.date, next1d: +(r.r1 * 100).toFixed(2), spy1d: r.s1 == null ? null : +(r.s1 * 100).toFixed(2), drift5d: r.r5 == null ? null : +(r.r5 * 100).toFixed(2) })); }) },
     { name: "get_macro", description: "Macro series. Names: CPI, CORE_CPI, UNRATE (%), PAYEMS (thousands), EFFR (%), CURVE (latest Treasury curve), SPREAD_2S10S (daily, %). Returns the last n observations (default 24).", inputSchema: { type: "object", properties: { name: { type: "string" }, n: { type: "number" } }, required: ["name"] }, execute: wrap("get_macro", i => macroSeries(String(i.name).toUpperCase(), Math.min(120, Number(i.n) || 24))) },
-    { name: "list_filings", description: "Recent SEC filings for a company, newest first, optionally filtered by form type (10-K, 10-Q, 8-K, 4, DEF 14A).", inputSchema: { type: "object", properties: { ticker: { type: "string" }, form: { type: "string" }, limit: { type: "number" } }, required: ["ticker"] }, execute: wrap("list_filings", async i => { const tk = String(i.ticker).toUpperCase(); await ensureCompany(tk); const c = D.companies[tk]; return c.filings.filter(f => !i.form || f.f === i.form).slice(0, Math.min(30, Number(i.limit) || 10)).map(f => ({ form: f.f, filed: f.d, period: f.r, accession: f.a, items: f.i })); }) },
-    { name: "run_js", description: "Run JavaScript in a sandboxed worker for calculations. The function body receives `data` = {universe:[{ticker, name, sector, price, market_cap, pe_ttm, ...}], companies:{TICKER:{name, annual:{metric:[[label,end,value]...]}, quarterly:{...}}} (only companies already fetched with get_financials), prices:{SYMBOL:[[date,close]...]}} and must `return` a JSON-serializable result (under 12 KB). No network. 4 s limit.", inputSchema: { type: "object", properties: { code: { type: "string" } }, required: ["code"] }, execute: wrap("run_js", async i => { const r = await runJS(i.code); if (!r.ok) throw new Error(r.error); return r.result; }) },
+    { name: "list_filings", description: "Recent SEC filings for a company, newest first, optionally filtered by form type (10-K, 10-Q, 8-K, 4, DEF 14A).", inputSchema: { type: "object", properties: { ticker: { type: "string" }, form: { type: "string" }, limit: { type: "number" } }, required: ["ticker"] }, execute: wrap("list_filings", async (i, ctx) => { const tk = String(i.ticker).toUpperCase(); await ensureCompany(tk, ctx); const c = D.companies[tk]; return c.filings.filter(f => !i.form || f.f === i.form).slice(0, Math.min(30, Number(i.limit) || 10)).map(f => ({ form: f.f, filed: f.d, period: f.r, accession: f.a, items: f.i })); }) },
+    { name: "calculate", description: "Deterministic arithmetic only. Formula supports + - * / ^, parentheses, SUM AVG MIN MAX ABS SQRT, and numeric variables. Common operations: growth ([base,current]), cagr ([base,current], periods), sum, mean. No JavaScript execution. Outputs are calculations, not independently verified claims.", inputSchema: { type: "object", properties: { operation: { type: "string", enum: ["formula", "growth", "cagr", "sum", "mean"] }, expression: { type: "string" }, values: { type: "array", items: { type: "number" } }, periods: { type: "number" }, variables: { type: "object", additionalProperties: { type: "number" } } } }, execute: wrap("calculate", i => ({ value: FU_FINANCIAL.calculate(i), status: "calculated", assumptions: i })) },
+    { name: "lookup_evidence", description: "Search captured immutable evidence by ticker or metric with pagination; retrieve records for follow-up research.", inputSchema: { type: "object", properties: { ticker: { type: "string" }, metric: { type: "string" }, offset: { type: "integer" }, limit: { type: "integer" } } }, execute: wrap("lookup_evidence", i => FU_EVIDENCE.list(i)) },
+    { name: "inspect_evidence", description: "Inspect an exact immutable evidence record, original filing URL and derivation inputs.", inputSchema: { type: "object", properties: { evidenceId: { type: "string" } }, required: ["evidenceId"] }, execute: wrap("inspect_evidence", i => { const e = FU_EVIDENCE.get(i.evidenceId); if (!e) return { status: "unresolved", evidenceId: i.evidenceId }; return { evidence: e, inputs: e.inputEvidenceIds.map(id => FU_EVIDENCE.get(id)) }; }) },
+    { name: "compare_evidence", description: "Compare two records with identical metric, unit and period type. Returns exact inputs, difference, fractional growth and alignment notes.", inputSchema: { type: "object", properties: { evidenceIds: { type: "array", items: { type: "string" }, minItems: 2, maxItems: 2 } }, required: ["evidenceIds"] }, execute: wrap("compare_evidence", i => { const ids = i.evidenceIds || [], [a,b] = ids.map(id => FU_EVIDENCE.get(id)); if (ids.length !== 2 || !a || !b) throw new Error("Two known evidence IDs required"); if (a.unit !== b.unit || a.metric !== b.metric || a.periodType !== b.periodType || a.value == null || b.value == null) throw new Error("Evidence metrics, units and period types must align"); return { inputs: [a,b], difference: b.value-a.value, growth: a.value > 0 ? b.value/a.value-1 : null, samePeriod: a.periodEnd === b.periodEnd, status: "calculated", note: "Inspect dates and duration before interpreting this comparison" }; }) },
+    { name: "validate_claims", description: "Check exact numeric claims against evidence. Prose is never automatically verified. Contradicted claims must be corrected or excluded.", inputSchema: { type: "object", properties: { claims: { type: "array", items: { type: "object", properties: { evidenceId: { type: "string" }, value: { type: "number" }, unit: { type: "string" }, ticker: { type: "string" }, metric: { type: "string" }, period: { type: "string" } }, required: ["evidenceId", "value", "unit"] } } }, required: ["claims"] }, execute: wrap("validate_claims", i => (i.claims || []).slice(0, 40).map(c => ({ ...c, validation: FU_EVIDENCE.validateClaim(c) }))) },
+    ...(window.FU_TOOL_PROVIDERS || []).flatMap(provider => provider(trace) || []),
   ];
 }
-const CITE_RULE = "When you state a number that comes from get_financials, cite it right after the number as [[TICKER|Metric|Period]] using the exact metric label and period label from the tool output (period can also be TTM). Example: revenue was $46.7B [[NVDA|Revenue|Q2 FY26]]. Do not cite price or macro numbers this way.";
+const CITE_RULE = "Cite exact evidence IDs from tools as [[E:ev_...]]. Every financial report must be a JSON object {markdown:string, claims:[{evidenceId,value,unit,ticker,metric,period}]} with exact raw numeric values and units from evidence; omit optional identifying fields unless exact. Claims are checked before display. Do not fabricate IDs. Narrative interpretation and values not covered by checked claims are unverified. A citation validates only its numeric claim, never nearby sentences. Mark forecasts/assumptions explicitly. Use calculate for deterministic math; do not write or request executable JavaScript.";
+function resolveCitation(token) {
+  if (token.startsWith("E:")) return FU_EVIDENCE.get(token.slice(2));
+  const [t,m,p] = token.split("|");
+  const cell = t && m && p ? findCell(t,m,p) : null;
+  return cell ? evidenceForCell(cell) : null;
+}
+function citationHTML(token) {
+  const e = resolveCitation(token);
+  if (!e && !token.startsWith("E:")) { const [t,m,p] = token.split("|"); if (t && m && p) return `<button class="cite unresolved" data-t="${esc(t)}" data-m="${esc(m)}" data-p="${esc(p)}" title="Unresolved legacy citation; click to load its company and attempt resolution">Unresolved: ${esc(token)}</button>`; }
+  return e ? `<button class="cite" data-evidence-id="${esc(e.id)}" title="${esc(e.validation.status + ': ' + e.value + ' ' + e.unit + '. This source does not verify surrounding prose.')}">${esc(e.ticker + ' ' + e.metric + ' ' + e.period)} · ${esc(e.validation.status)}</button>` : `<span class="cite unresolved" aria-label="Unresolved citation" title="No matching evidence record">Unresolved: ${esc(token)}</span>`;
+}
 function md(text) {
   const lines = String(text).replace(/\r/g, "").split("\n");
   let html = "", list = null, tbl = null;
-  const inline = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/\[\[([A-Z.-]+)\|([^|\]]+)\|([^\]]+)\]\]/g, (_, t, m, p) => `<button class="cite" data-t="${t}" data-m="${esc(m)}" data-p="${esc(p)}" title="Open source">${t} ${esc(m)} ${esc(p)}</button>`);
+  const inline = s => String(s).split(/(\[\[(?:E:[^\]]+|[A-Z.-]+\|[^\]]+)\]\])/g).map(part => /^\[\[/.test(part) ? citationHTML(part.slice(2,-2)) : esc(part).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "<code>$1</code>")).join("");
   const flush = () => { if (list) { html += `</${list}>`; list = null; } if (tbl) { html += "</table>"; tbl = null; } };
   for (const ln of lines) {
-    if (/^\s*\|.*\|\s*$/.test(ln)) { if (/^\s*\|[\s:|-]+\|\s*$/.test(ln)) continue; const cells = ln.trim().slice(1, -1).split("|"); if (!tbl) { flush(); html += "<table>"; tbl = 1; html += "<tr>" + cells.map(c => `<th>${inline(c.trim())}</th>`).join("") + "</tr>"; } else html += "<tr>" + cells.map(c => `<td>${inline(c.trim())}</td>`).join("") + "</tr>"; continue; }
+    if (/^\s*\|.*\|\s*$/.test(ln)) { if (/^\s*\|[\s:|-]+\|\s*$/.test(ln)) continue; const tokens = []; const protectedLine = ln.replace(/\[\[[^\]]+\]\]/g, t => { tokens.push(t); return `\uE000${tokens.length - 1}\uE001`; }); const cells = protectedLine.trim().slice(1, -1).split("|").map(c => c.replace(/\uE000(\d+)\uE001/g, (_, n) => tokens[+n])); if (!tbl) { flush(); html += "<table>"; tbl = 1; html += "<tr>" + cells.map(c => `<th>${inline(c.trim())}</th>`).join("") + "</tr>"; } else html += "<tr>" + cells.map(c => `<td>${inline(c.trim())}</td>`).join("") + "</tr>"; continue; }
     let m;
     if ((m = ln.match(/^\s*[-*]\s+(.*)/))) { if (list !== "ul") { flush(); html += "<ul>"; list = "ul"; } html += `<li>${inline(m[1])}</li>`; continue; }
     if ((m = ln.match(/^\s*\d+[.)]\s+(.*)/))) { if (list !== "ol") { flush(); html += "<ol>"; list = "ol"; } html += `<li>${inline(m[1])}</li>`; continue; }
@@ -729,43 +742,84 @@ function md(text) {
   flush();
   return html;
 }
-document.addEventListener("click", async e => { const b = e.target.closest(".cite"); if (!b) return; const cell = await findCellAsync(b.dataset.t, b.dataset.m, b.dataset.p); if (cell) openSource(cell); else { b.title = "No matching filed value"; b.style.opacity = .5; } });
+document.addEventListener("click", async e => { const b = e.target.closest(".cite[data-evidence-id], .cite[data-t]"); if (!b) return; if (!b.dataset.evidenceId) { const oldCell = await findCellAsync(b.dataset.t, b.dataset.m, b.dataset.p); if (!oldCell) { b.textContent = "Unresolved citation"; return; } const oldRecord = evidenceForCell(oldCell); b.dataset.evidenceId = oldRecord.id; b.classList.remove("unresolved"); b.textContent = `${oldRecord.ticker} ${oldRecord.metric} ${oldRecord.period} · ${oldRecord.validation.status}`; } const record = FU_EVIDENCE.get(b.dataset.evidenceId), cell = FU_EVIDENCE.cell(b.dataset.evidenceId); if (cell) { if (!D.companies[cell.tk]) await ensureCompany(cell.tk).catch(() => null); openSource(cell); } else if (record) { const box = el("div", { class: "note" }, `${record.metric}: ${record.value} ${record.unit} · ${record.period} · ${record.validation.status}`); if (record.sourceUrl) box.append(el("a", { href: record.sourceUrl, target: "_blank", rel: "noopener" }, " Open original source")); b.after(box); } else { b.textContent = "Unresolved citation"; b.classList.add("unresolved"); } });
+
 
 /* Assistant client. The server route picks the model and holds the keys. */
+function validateMarkdownNumbers(markdown) {
+  const checks = [];
+  const re = /([$€£]?[-−+]?\d[\d,]*(?:\.\d+)?\s*(?:billion|million|thousand|[TBMK%×x])?)\s*\[\[([^\]]+)\]\]/gi;
+  for (const match of String(markdown).matchAll(re)) {
+    const e = resolveCitation(match[2]), raw = match[1].replace(/,/g, "").replace("−", "-").trim();
+    if (!e || e.value == null) { checks.push({ status: "unverified", reason: "Unresolved numeric citation" }); continue; }
+    const number = raw.match(/[-+]?\d+(?:\.\d+)?/)[0], suffix = raw.slice(raw.indexOf(number) + number.length).trim().toLowerCase();
+    const scale = ({ t: 1e12, b: 1e9, billion: 1e9, m: 1e6, million: 1e6, k: 1e3, thousand: 1e3, '%': .01 })[suffix] || 1;
+    const value = Number(number) * scale, decimals = (number.split('.')[1] || '').length, tolerance = .5 * 10 ** -decimals * scale + Number.EPSILON * Math.abs(e.value);
+    const wrongUnit = (suffix === '%' && e.unit !== 'pct') || (/[$]/.test(raw) && !['USD', 'USD/shares'].includes(e.unit)) || (['x', '×'].includes(suffix) && e.unit !== 'x');
+    checks.push({ evidenceId: e.id, value, status: wrongUnit || Math.abs(value - e.value) > tolerance ? "contradicted" : "verified", reason: "Displayed number checked against record, allowing displayed rounding only" });
+  }
+  return checks;
+}
+function checkedReport(content) {
+  let report;
+  const numericChecks = validateMarkdownNumbers(content);
+  if (numericChecks.some(c => c.status === "contradicted")) return { text: "**Report withheld: a displayed number contradicts its cited evidence.**", claims: numericChecks, status: "contradicted" };
+  try { report = JSON.parse(content.replace(/^```(?:json)?\s*|\s*```$/g, "")); } catch { return { text: "**Unverified narrative — numeric claims have not been checked.**\n\n" + content, claims: [], status: "unverified" }; }
+  if (!report || typeof report.markdown !== "string" || !Array.isArray(report.claims)) throw new Error("Malformed structured report");
+  const inlineChecks = validateMarkdownNumbers(report.markdown);
+  if (inlineChecks.some(c => c.status === "contradicted")) return { text: "**Report withheld: a displayed number contradicts its cited evidence.**", claims: inlineChecks, status: "contradicted" };
+  const claims = report.claims.slice(0, 80).map(c => ({ ...c, validation: FU_EVIDENCE.validateClaim(c) }));
+  if (report.claims.length > 80 || claims.some(c => c.validation.status === "contradicted")) return { text: "**Report withheld: numeric claims conflict with their evidence.**\n\n" + claims.filter(c => c.validation.status === "contradicted").map(c => `- ${c.evidenceId}: ${c.validation.reason}`).join("\n"), claims, status: "contradicted" };
+  const checked = claims.filter(c => c.validation.status === "verified");
+  const detail = claims.map(c => `- ${c.validation.status}: ${c.value} ${c.unit} ${c.evidenceId ? FU_EVIDENCE.citation(c.evidenceId) : "(no evidence)"}`).join("\n");
+  return { text: `**Claim checks: ${checked.length}/${claims.length}. Narrative interpretation remains unverified.**\n\n${report.markdown}` + (detail ? "\n\nChecked numeric claims\n" + detail : ""), claims, status: checked.length && checked.length === claims.length ? "checked_claims" : "unverified" };
+}
+function conversationWindow(turns, maxChars = 240000) {
+  const groups = [];
+  for (const t of turns) { if (t.role === "user" || !groups.length) groups.push([]); groups.at(-1).push(t); }
+  const kept = []; let size = 0;
+  for (const group of groups.slice(-4).reverse()) { const n = JSON.stringify(group).length; if (size + n > maxChars && kept.length) break; if (n > maxChars) throw new Error("Conversation step too large; start a new chat"); kept.unshift(...group); size += n; }
+  return kept;
+}
 async function agentLoop({ system, turns, tools, signal, onText }) {
   const t0 = performance.now();
-  const msgs = [{ role: "system", content: system }, ...turns];
+  const msgs = [{ role: "system", content: system }, ...conversationWindow(turns)];
   const spec = tools.map(t => ({ type: "function", function: { name: t.name, description: t.description, parameters: t.inputSchema || { type: "object", properties: {} } } }));
   let calls = 0;
   for (let round = 0; round < 10; round++) {
+    abortCheck(signal);
     const r = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: msgs, tools: spec }), signal });
     if (!r.ok) { const body = await r.json().catch(() => ({})); throw { code: r.status === 429 ? "rate_limited" : r.status === 413 ? "too_large" : r.status === 403 ? "forbidden" : "upstream_error", message: body.error || r.statusText }; }
-    const d = await r.json();
-    const m = d.choices?.[0]?.message || {};
+    const d = await r.json(), m = d.choices?.[0]?.message;
+    if (!m || (typeof m.content !== "string" && !m.tool_calls?.length)) throw new Error("Malformed assistant response");
     if (m.tool_calls?.length) {
+      if (m.tool_calls.length > 12 || m.tool_calls.some(tc => !tc.id || !tc.function?.name || typeof tc.function.arguments !== "string")) throw new Error("Malformed tool calls");
       msgs.push({ role: "assistant", content: m.content || "", tool_calls: m.tool_calls });
-      if (m.content) onText?.({ text: m.content });
       calls += m.tool_calls.length;
-      await Promise.all(m.tool_calls.map(async tc => {
-        const tool = tools.find(t => t.name === tc.function.name);
-        let out;
-        try { const args = JSON.parse(tc.function.arguments || "{}"); out = tool ? await tool.execute(args, { signal }) : { error: "Unknown tool" }; } catch (e) { out = { error: String(e.message || e) }; }
-        msgs.push({ role: "tool", tool_call_id: tc.id, content: (typeof out === "string" ? out : JSON.stringify(out)).slice(0, 14000) });
-      }));
+      // Ordered execution preserves proposal dependencies and gives cancellation an explicit boundary.
+      for (const tc of m.tool_calls) {
+        abortCheck(signal); const tool = tools.find(t => t.name === tc.function.name); let out;
+        try { const args = JSON.parse(tc.function.arguments || "{}"); if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Tool arguments must be an object"); out = tool ? await tool.execute(args, { signal }) : { error: "Unknown tool" }; }
+        catch (e) { if (e.name === "AbortError" || signal?.aborted) throw e; out = { error: String(e.message || e) }; }
+        abortCheck(signal); msgs.push({ role: "tool", tool_call_id: tc.id, content: boundedToolResult(out) });
+      }
+      if (JSON.stringify(msgs).length > 580000) throw new Error("Evidence context limit reached; narrow the question");
       continue;
     }
-    const text = (m.content || "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
-    onText?.({ text });
-    return { text, meta: `${((performance.now() - t0) / 1000).toFixed(1)}s · ${calls} data lookup${calls === 1 ? "" : "s"}` };
+    const raw = m.content.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+    if (!raw) throw new Error("Empty assistant response");
+    const report = checkedReport(raw); onText?.({ text: report.text });
+    msgs.push({ role: "assistant", content: report.status === "contradicted" ? report.text : raw });
+    return { ...report, turns: msgs.slice(1), meta: `${((performance.now() - t0) / 1000).toFixed(1)}s · ${calls} data lookup${calls === 1 ? "" : "s"} · ${report.status}` };
   }
   throw { code: "upstream_error", message: "Too many steps" };
 }
 function webTools(trace) {
-  const wrap = (name, fn) => async (i, ctx) => { const st = trace(name, i); try { const r = await fn(i || {}, ctx); st.done(r); return r; } catch (e) { st.fail(e); throw e; } };
-  const post = async (path, body) => { const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }); const d = await r.json(); if (!r.ok) throw new Error(d.error || r.statusText); return d; };
+  const wrap = (name, fn) => async (i, ctx) => { const st = trace(name, i); try { abortCheck(ctx?.signal); const r = await fn(i || {}, ctx); abortCheck(ctx?.signal); st.done(r); return r; } catch (e) { st.fail(e); throw e; } };
+  const post = async (path, body, ctx) => { const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: ctx?.signal }); const d = await r.json(); if (!r.ok) throw new Error(d.error || r.statusText); return d; };
   return [
-    { name: "web_search", description: "Search recent web and news. Returns titles, URLs, dates and short snippets. Use for events after the latest filings.", inputSchema: { type: "object", properties: { query: { type: "string" }, news: { type: "boolean" } }, required: ["query"] }, execute: wrap("web_search", i => post("/api/search", i)) },
-    { name: "read_url", description: "Fetch a web page as markdown, trimmed to 12,000 characters. Use for IR pages, press releases and filings.", inputSchema: { type: "object", properties: { url: { type: "string" } }, required: ["url"] }, execute: wrap("read_url", i => post("/api/scrape", i)) },
+    { name: "web_search", description: "Search recent web and news. Returns titles, URLs, dates and short snippets. Use for events after the latest filings.", inputSchema: { type: "object", properties: { query: { type: "string" }, news: { type: "boolean" } }, required: ["query"] }, execute: wrap("web_search", (i, ctx) => post("/api/search", i, ctx)) },
+    { name: "read_url", description: "Fetch a web page as markdown, trimmed to 12,000 characters. Use for IR pages, press releases and filings.", inputSchema: { type: "object", properties: { url: { type: "string" } }, required: ["url"] }, execute: wrap("read_url", (i, ctx) => post("/api/scrape", i, ctx)) },
   ];
 }
 
@@ -807,8 +861,8 @@ function chatPanel(host, cfg) {
       const tools = [...baseTools(trace), ...webTools(trace), ...(cfg.tools ? cfg.tools(trace) : [])];
       const ctx = cfg.context ? cfg.context() : "";
       const rules = cfg.rules + "\n\n" + CITE_RULE + (ctx ? "\n\nCurrent workspace:\n" + ctx : "");
-      const r = await agentLoop({ system: rules, turns: turns.slice(-8), tools, signal: ctl.signal, onText: ({ text }) => { out.innerHTML = md(text); log.scrollTop = log.scrollHeight; } });
-      out.innerHTML = md(r.text); meta.textContent = r.meta; turns.push({ role: "assistant", content: r.text });
+      const r = await agentLoop({ system: rules, turns, tools, signal: ctl.signal, onText: ({ text }) => { out.innerHTML = md(text); log.scrollTop = log.scrollHeight; } });
+      out.innerHTML = md(r.text); meta.textContent = r.meta; turns.splice(0, turns.length, ...conversationWindow(r.turns));
     } catch (e) {
       out.innerHTML = "";
       if (e.name !== "AbortError" && e.code !== "cancelled") out.append(el("div", { class: "note" }, AI_ERR[e.code] || AI_ERR.upstream_error));
@@ -2411,7 +2465,7 @@ async function pWorkbench() {
     rules: "Today is " + new Date().toISOString().slice(0, 10) + ". You are the Filed Under workbench assistant. The user is an equity analyst. Use the tools to read data and to edit the sheet or memo when asked. Sheet formulas: =FU(\"TICKER\",\"Metric label\",\"PERIOD\") where PERIOD is like FY2025, Q2 FY26, TTM, LQ (latest quarter) or LFY; also PRICE(\"T\"), MCAP(\"T\"), PE(\"T\"), SUM(A1:A4), AVG, MIN, MAX, + - * / ^ and cell refs A1..J24. Prefer formulas over typed numbers so values stay linked to filings. When you edit, say which cells or sections changed. Keep answers short.",
     context: () => `SHEET (ref: raw → value)\n${sheetText()}\n\nMEMO (plain text)\n${memoText()}`,
     tools: trace => {
-      const wrap = (name, fn) => async (i, ctx) => { const st = trace(name, i); try { const r = await fn(i || {}, ctx); st.done(r); return r; } catch (e) { st.fail(e); throw e; } };
+      const wrap = (name, fn) => async (i, ctx) => { const st = trace(name, i); try { abortCheck(ctx?.signal); const r = await fn(i || {}, ctx); abortCheck(ctx?.signal); st.done(r); return r; } catch (e) { st.fail(e); throw e; } };
       return [
         { name: "set_cells", description: "Write values or formulas into sheet cells. Returns the evaluated results so you can check them.", inputSchema: { type: "object", properties: { cells: { type: "array", items: { type: "object", properties: { ref: { type: "string" }, value: { type: "string" } }, required: ["ref", "value"] } } }, required: ["cells"] },
           execute: wrap("set_cells", async i => { const out = []; await Promise.all(sheetTickers(Object.fromEntries((i.cells || []).map(c => [c.ref, String(c.value)]))).map(t => ensureCompany(t).catch(() => null))); for (const c of (i.cells || []).slice(0, 80)) { const ref = String(c.ref).toUpperCase(); if (!/^[A-J]([1-9]|1\d|2[0-4])$/.test(ref)) { out.push({ ref, error: "Out of range" }); continue; } if (c.value === "") delete cells[ref]; else cells[ref] = String(c.value); } store.set("sheet", cells); renderSheet(); for (const c of (i.cells || []).slice(0, 80)) { const ref = String(c.ref).toUpperCase(); out.push({ ref, value: ev.meta[ref]?.err ? "#ERR " + ev.meta[ref].err : fmtSheet(ev.vals[ref], ref, ev.meta[ref]) }); } return out; }) },
@@ -2425,18 +2479,18 @@ async function pWorkbench() {
 /* ---------- research ---------- */
 let RESEARCH = null;
 async function pResearch() {
-  page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Research"), el("h1", {}, "Research assistant"), el("div", { class: "sub" }, "Ask about any covered company, sector or macro series. The assistant looks up filed figures, prices and macro data, searches recent news when it needs to, runs calculations, and cites every financial number back to its filing. Each lookup is shown as it runs."))));
+  page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Research"), el("h1", {}, "Research assistant"), el("div", { class: "sub" }, "Ask about any covered company, sector or macro series. The assistant looks up filed figures, prices and macro data, searches recent news when it needs to, runs deterministic calculations, and links financial values to inspectable evidence. Each lookup is shown as it runs."))));
   const g = el("div", { class: "grid", style: "grid-template-columns:minmax(0,1fr) 300px" });
   const chat = el("section", { class: "panel", style: "display:flex;flex-direction:column;min-height:68vh" });
   const side = el("div", { style: "display:flex;flex-direction:column;gap:16px" },
-    panel("What it can look up", null, el("div", { class: "bd", style: "display:flex;flex-direction:column;gap:8px;font-size:12.5px" }, ...[["Screen", "Rank the S&P 500 on valuation, margins, growth, returns"], ["Financials", "Filed and calculated series with sources"], ["Prices", "Returns, volatility, beta, RSI"], ["Earnings reactions", "Moves after each 8-K Item 2.02"], ["Macro", "CPI, jobs, rates, the curve"], ["Filings", "SEC filings by form"], ["Calculations", "Sandboxed code over the data"], ["Web", "Recent news and any public page"]].map(([n, d]) => el("div", {}, el("b", {}, n), el("div", { class: "muted" }, d))))),
+    panel("What it can look up", null, el("div", { class: "bd", style: "display:flex;flex-direction:column;gap:8px;font-size:12.5px" }, ...[["Screen", "Rank the S&P 500 on valuation, margins, growth, returns"], ["Financials", "Filed and calculated series with sources"], ["Prices", "Returns, volatility, beta, RSI"], ["Earnings reactions", "Moves after each 8-K Item 2.02"], ["Macro", "CPI, jobs, rates, the curve"], ["Filings", "SEC filings by form"], ["Calculations", "Deterministic financial formulas"], ["Web", "Recent news and any public page"]].map(([n, d]) => el("div", {}, el("b", {}, n), el("div", { class: "muted" }, d))))),
     el("div", { class: "note" }, "Citations like ", el("span", { class: "cite" }, "NVDA Revenue Q2 FY27"), " open the filing behind the number. Answers can be wrong; check the sources."));
   g.append(chat, side); page.append(g);
   if (innerWidth < 860) g.style.gridTemplateColumns = "minmax(0,1fr)";
   RESEARCH = chatPanel(chat, {
     id: "rs", tier: "default", placeholder: "e.g. Compare free cash flow conversion across all four companies over the last eight quarters. Ctrl/⌘+Enter to send.",
     suggestions: ["Top 10 by FCF yield, and what explains the leaders?", "Which megacaps grew revenue fastest last quarter?", "Compare JPM, BAC and WFC net income over eight quarters", "How did NVDA react to its last four earnings?", "Is the yield curve still inverted, and since when?"],
-    rules: "Today is " + new Date().toISOString().slice(0, 10) + ". You are Filed Under's research assistant for US equities (coverage: S&P 500). Work like a careful analyst: call tools to get facts (never guess financial figures), use screen_companies for cross-sectional questions, run_js for multi-series math, web_search only for events the data does not cover. Answer in concise markdown with a short table when comparing. Note when a quarter is derived from cumulative figures. Do not give investment advice.",
+    rules: "Today is " + new Date().toISOString().slice(0, 10) + ". You are Filed Under's research assistant for US equities (coverage: S&P 500). Work like a careful analyst: call tools to get facts (never guess financial figures), use screen_companies for cross-sectional questions, calculate for multi-series math, web_search only for events the data does not cover. Answer in concise markdown with a short table when comparing. Note when a quarter is derived from cumulative figures. Do not give investment advice.",
   });
 }
 
@@ -2513,4 +2567,6 @@ async function boot() {
   buildShell();
   route();
 }
-boot();
+// Wait for all classic page modules (and deferred export assets) before building navigation.
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once: true });
+else boot();

@@ -24,8 +24,8 @@ import urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 from operator import mul
 
-from . import sec
-from .common import HTTPError, Run, get_json, now_iso, request
+from . import sec, fundamentals
+from .common import HTTPError, Run, get_json, now_iso, request, serialized_aggregates
 from .prices import path_key
 from .universe import BY_TICKER, MARKET_SYMBOLS, SECTOR_ETF, SP100, UNIVERSE
 
@@ -35,7 +35,7 @@ EXTRA_SYMS = ["DX-Y.NYB"]  # not carried by the prices job
 HIST_SYMS = list(dict.fromkeys(MARKET_SYMBOLS + EXTRA_SYMS + TICKERS))
 HIST_YEARS = 6.3
 CLOSES_PATH, FUND_PATH, KPI_PATH = "screener/closes.json.gz", "screener/fund.json.gz", "screener/kpi.json.gz"
-FUND_VERSION = 4
+FUND_VERSION = 5
 YAHOO = "https://query2.finance.yahoo.com/v8/finance/chart/"
 
 # statement lines read from the company bundles (label as stored by etl/sec.py)
@@ -77,7 +77,7 @@ def fld(fid, g, name, unit, d, src):
     F.append({"id": fid, "g": g, "n": name, "u": unit, "d": d, "src": src})
 
 
-SEC = "SEC filings (XBRL facts, first filing that reported each period)"
+SEC = "SEC filings (latest compatible XBRL vintage; filing history for as-of analysis)"
 PX = "Daily closes (Yahoo Finance chart API, split-adjusted)"
 fld("price", "px", "Price", "usd", "Last daily close.", PX)
 fld("mcap", "val", "Market cap", "usd", "Price × shares outstanding from the cover page of the latest 10-K or 10-Q.", SEC + "; " + PX)
@@ -98,7 +98,7 @@ fld("sh_yield", "val", "Shareholder yield", "pct", "(Dividends paid + share repu
 for fid, n, *_ in VAL:
     fld(fid + "_p5", "val", n + " 5y percentile", "pctl",
         f"Where today's {n} sits in its own monthly history over five years (0 = cheapest month on record, 1 = most expensive; for yields 1 = highest yield). "
-        "History uses diluted shares and the filings available at each month end. Needs 24 months.", SEC + "; " + PX)
+        "History is a weighted diluted-share valuation proxy using filings available at each month end, not exact historical market cap. Needs 24 months.", SEC + "; " + PX)
 GROWTH = [("rev", "Revenue"), ("eps", "EPS"), ("fcf", "Free cash flow"), ("oi", "Operating income")]
 for k, n in GROWTH:
     fld(f"{k}_g_q", "grw", f"{n} growth, latest quarter YoY", "pct", f"Latest quarter {n.lower()} / same quarter a year earlier − 1. Empty when the base is ≤ 0.", SEC)
@@ -411,6 +411,7 @@ def _rec(r, concept):
     c = r.get("c") or concept
     rec.append(c)
     rec.append(1 if r.get("derived") else 0)
+    rec.append({k:r[k] for k in ("accessions", "available_at", "vintage", "validation_status", "derived", "selection_reason", "superseded_at") if k in r})
     return rec
 
 
@@ -418,7 +419,7 @@ def extract_company(sb, tk, since):
     """Quarterly statement records since `since` for the screener labels, plus extra concepts from companyfacts."""
     b = sb.get_json(f"companies/{tk}.json") or {}
     st = b.get("statements") or {}
-    q = {}
+    q, history = {}, {}
     for stmt in ("income", "balance", "cashflow"):
         for row in st.get(stmt, []):
             lab = row["label"]
@@ -427,9 +428,10 @@ def extract_company(sb, tk, since):
             if STMT_OF.get(lab, "income") != stmt:
                 continue
             q[lab] = [_rec(r, row["concept"]) for r in row["quarterly"] if r["end"] >= since]
+            history[lab] = [_rec(r, row["concept"]) for r in (row.get("filing_history") or {}).get("quarterly", []) if r["end"] >= since]
     prof = b.get("profile") or {}
     shares = prof.get("sharesOutstanding") or {}
-    out = {"q": q, "fye": prof.get("fiscalYearEnd"), "shares": {"v": shares.get("val"), "end": shares.get("end")}}
+    out = {"q": q, "filing_history": history, "fye": prof.get("fiscalYearEnd"), "shares": dict(shares, v=shares.get("val"))}
     cik = BY_TICKER[tk]["cik"]
     try:
         cf = gz_json(sb, f"sec/companyfacts/CIK{cik:010d}.json.gz")
@@ -440,31 +442,13 @@ def extract_company(sb, tk, since):
         want = {n for _l, names in EXTRA_FLOW + EXTRA_BAL for n in names}
         # only the concepts used here, and only those with reported units (a few filers carry empty unit maps)
         facts = {"us-gaap": {n: v for n, v in (facts.get("us-gaap") or {}).items() if n in want and (v.get("units") or {})}, "dei": facts.get("dei") or {}}
-        sec.CONCEPTS["_scr_flow"] = EXTRA_FLOW
-        sec.CONCEPTS["_scr_bal"] = EXTRA_BAL
-        sec.INSTANT.add("_scr_bal")
-        try:
-            for stmt in ("_scr_flow", "_scr_bal"):
-                for row in sec.build_series(facts, stmt):
-                    q[row["label"]] = [_rec(r, row["concept"]) for r in row["quarterly"] if r["end"] >= since]
-        finally:
-            sec.CONCEPTS.pop("_scr_flow", None)
-            sec.CONCEPTS.pop("_scr_bal", None)
-            sec.INSTANT.discard("_scr_bal")
-        # cover-page share count: every share class reported in the latest filing that carries the count
-        dei = (facts.get("dei") or {}).get("EntityCommonStockSharesOutstanding", {}).get("units", {}).get("shares", [])
-        hit = [r for r in dei if r.get("val") and r.get("form") in ("10-K", "10-Q", "10-K/A", "10-Q/A", "10-KT")]
-        if hit:
-            last = sorted(hit, key=lambda r: (r.get("filed", ""), r.get("end", "")), reverse=True)[0]
-            accn = last["accn"]
-            same = {}
-            for r in hit:
-                if r["accn"] == accn and r.get("end") == last.get("end"):
-                    same[r["val"]] = r
-            out["shares"]["end"] = last.get("end")
-            parts = sorted(same.values(), key=lambda r: -r["val"])
-            total = sum(r["val"] * CLASS_RATIO.get(tk, {}).get("small", 1) if (tk in CLASS_RATIO and r["val"] < CLASS_RATIO[tk]["below"]) else r["val"] for r in parts)
-            out["shares"].update({"accn": accn, "form": parts[0].get("form"), "filed": parts[0].get("filed"), "v": total, "parts": [r["val"] for r in parts]})
+        for stmt, concepts, instant in (("_scr_flow",EXTRA_FLOW,False),("_scr_bal",EXTRA_BAL,True)):
+            for row in sec.build_series(facts, stmt, concepts=concepts, instant=instant):
+                q[row["label"]] = [_rec(r, row["concept"]) for r in row["quarterly"] if r["end"] >= since]
+                history[row["label"]] = [_rec(r, row["concept"]) for r in row["filing_history"]["quarterly"] if r["end"] >= since]
+        # The same cover-page definition is used by company index and screener.
+        reported = sec.shares_outstanding(facts) or {}
+        out["shares"] = dict(reported, v=reported.get("val"))
     return out
 
 
@@ -517,7 +501,7 @@ class Prov:
         key = (label, rec[0], rec[3])
         if key not in self.idx:
             self.idx[key] = len(self.refs)
-            self.refs.append([STMT_OF.get(label, "income"), label, rec[0], rec[1], rec[2], rec[3], rec[5], rec[4], rec[6], rec[7]])
+            self.refs.append([STMT_OF.get(label, "income"), label, rec[0], rec[1], rec[2], rec[3], rec[5], rec[4], rec[6], rec[7], rec[8] if len(rec)>8 else {}])
         return self.idx[key]
 
     def put(self, fid, formula, recs=(), **kw):
@@ -530,9 +514,25 @@ class Prov:
 
 
 class Facts:
-    def __init__(self, data, splits):
-        # weighted share counts cannot be derived by subtracting cumulative periods, so derived quarters are dropped for them
-        self.q = {lab: sorted((r for r in v if not (lab in SHARE_COUNT and r[7])), key=lambda r: r[0]) for lab, v in (data.get("q") or {}).items()}
+    def __init__(self, data, splits, as_of=None):
+        self.data, self.as_of = data, as_of
+        source = data.get("filing_history") if as_of else data.get("q")
+        self.q = {}
+        for lab, records in (source or {}).items():
+            picked = {}
+            for r in records:
+                if (lab in SHARE_COUNT or lab in PER_SHARE) and r[7]:
+                    continue
+                available = (r[8].get("available_at") if len(r)>8 else None) or r[4]
+                superseded = r[8].get("superseded_at") if len(r)>8 else None
+                if superseded and (not as_of or superseded <= as_of):
+                    continue
+                if as_of and (not available or available > as_of):
+                    continue
+                prev = picked.get(r[0])
+                if not prev or (available, not bool(r[7])) > (((prev[8].get("available_at") if len(prev)>8 else None) or prev[4]), not bool(prev[7])):
+                    picked[r[0]] = r
+            self.q[lab] = sorted(picked.values(), key=lambda r:r[0])
         self.splits = splits or []
         grid = self.q.get("Net income") or self.q.get("Revenue") or []
         self.ends = [r[0] for r in grid]
@@ -563,26 +563,28 @@ class Facts:
 
     def ttm(self, label, end):
         """Sum of the four quarters ending at `end` and the records used."""
+        if label in INSTANT or label in SHARE_COUNT:
+            return None, []
         recs = []
         for k in range(4):
             r = self.at(label, self.shift(end, k))
             if not r:
                 return None, []
             recs.append(r)
-        if days_between(recs[-1][0], recs[0][0]) > 300:
+        if not fundamentals.consecutive_quarters([{ "start":r[1], "end":r[0]} for r in recs]):
             return None, []
         return sum(self.adj(label, r) for r in recs), recs
 
     def fcf_ttm(self, end):
         o, ro = self.ttm("Operating cash flow", end)
         c, rc = self.ttm("Capex", end)
-        if o is None or c is None:
+        if o is None or c is None or [(r[0],r[1]) for r in ro] != [(r[0],r[1]) for r in rc]:
             return None, []
         return o - c, [("Operating cash flow", r) for r in ro] + [("Capex", r) for r in rc]
 
     def fcf_q(self, end):
         o, c = self.at("Operating cash flow", end), self.at("Capex", end)
-        if not o or not c:
+        if not o or not c or (o[0],o[1]) != (c[0],c[1]):
             return None, []
         return o[2] - abs(c[2]), [("Operating cash flow", o), ("Capex", c)]
 
@@ -852,27 +854,28 @@ def valuation_history(fx, inputs, dates, closes):
     public by then, diluted shares (split-adjusted) times that day's close as market cap."""
     if not fx.ends:
         return {}
-    rows = []
-    for e in fx.ends[-28:]:
-        rev, rr = fx.ttm("Revenue", e)
-        ni, rn = fx.ttm("Net income", e)
-        oi, ro = fx.ttm("Operating income", e)
-        fcf, rf = fx.fcf_ttm(e)
-        sh = fx.at("Diluted shares", e)
-        eq = fx.at("Shareholders' equity", e)
-        ltd = fx.at("Long-term debt", e)
-        dc = fx.at("Debt, current", e)
-        cash = fx.at("Cash & equivalents", e)
-        ms = fx.at("Marketable securities, current", e)
-        filed = [r[4] for r in rr + rn + ro if r[4]] + [r[4] for _l, r in rf if r and r[4]]
-        if not sh or not filed:
-            continue
-        rows.append({"avail": max(filed + [sh[4] or ""]), "rev": rev, "ni": ni, "oi": oi, "fcf": fcf, "sh": fx.adj("Diluted shares", sh),
-                     "eq": eq[2] if eq else None, "debt": (ltd[2] if ltd else 0) + (dc[2] if dc else 0) if (ltd or dc) else None,
-                     "cash": (cash[2] + (ms[2] if ms else 0)) if cash else None})
-    if not rows:
-        return {}
-    rows.sort(key=lambda r: r["avail"])
+    if not fx.data.get("filing_history"):
+        return {}  # Latest-only bundles cannot support an honest historical reconstruction.
+    def snapshot(cutoff):
+        past = Facts(fx.data, fx.splits, as_of=cutoff)
+        if not past.ends:
+            return None
+        e = past.ends[-1]
+        rev, rr = past.ttm("Revenue", e)
+        ni, rn = past.ttm("Net income", e)
+        oi, ro = past.ttm("Operating income", e)
+        fcf, rf = past.fcf_ttm(e)
+        sh = past.at("Diluted shares", e)
+        eq = past.at("Shareholders' equity", e)
+        ltd = past.at("Long-term debt", e)
+        dc = past.at("Debt, current", e)
+        cash = past.at("Cash & equivalents", e)
+        ms = past.at("Marketable securities, current", e)
+        if not sh:
+            return None
+        return {"rev":rev, "ni":ni, "oi":oi, "fcf":fcf, "sh":past.adj("Diluted shares",sh),
+                "eq":eq[2] if eq else None, "debt":ltd[2]+dc[2] if ltd and dc else None,
+                "cash":cash[2]+ms[2] if cash and ms else None}
 
     def ratios(r, px):
         mc = px * r["sh"]
@@ -890,10 +893,10 @@ def valuation_history(fx, inputs, dates, closes):
         d = dates[i]
         if d < cut or closes[i] is None:
             continue
-        avail = [r for r in rows if r["avail"] <= d]
-        if not avail:
+        snap = snapshot(d)
+        if not snap:
             continue
-        for k, v in ratios(avail[-1], closes[i]).items():
+        for k, v in ratios(snap, closes[i]).items():
             if v is not None:
                 hist[k].append(v)
     last = len(dates) - 1
@@ -901,7 +904,10 @@ def valuation_history(fx, inputs, dates, closes):
         last -= 1
     if last < 0:
         return {}
-    now = ratios(rows[-1], closes[last])
+    snap = snapshot(dates[last])
+    if not snap:
+        return {}
+    now = ratios(snap, closes[last])
     out = {}
     for k, arr in hist.items():
         if now.get(k) is None or len(arr) < 24:
@@ -1352,6 +1358,7 @@ def activity(sb, fundcache, today):
 
 
 # ------------------------------------------------------------------ assembly
+@serialized_aggregates
 def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
     t0 = time.time()
     deadline = t0 + time_budget * 0.55 if time_budget else None
@@ -1400,16 +1407,8 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
             prov.f.update(pp)
             price = out.get("price")
             sh = dict((fundc.get(tk) or {}).get("shares") or {})
-            stale = not sh.get("v") or not sh.get("end") or sh["end"] < (today - dt.timedelta(days=400)).isoformat()
-            dil = (fx.q.get("Diluted shares") or [None])[-1] if fx else None
-            if stale and dil:
-                # multi-class companies tag cover-page counts by class (dimensions the companyfacts API leaves out): use diluted weighted shares
-                v = fx.adj("Diluted shares", dil)
-                if tk in CLASS_RATIO and v < CLASS_RATIO[tk]["below"]:
-                    v *= CLASS_RATIO[tk]["small"]
-                sh = {"v": v, "end": dil[0], "dil": dil}
-            if price and sh.get("v"):
-                mcap = price * sh["v"]
+            mcap = fundamentals.market_cap(price, dict(sh, val=sh.get("v")), dates[-1])
+            if mcap is not None:
                 out["mcap"] = mcap
                 share_ref = None
                 if sh.get("dil"):

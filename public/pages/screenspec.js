@@ -48,9 +48,9 @@
       if (!OPS.includes(op)) { errors.push(`Filter on ${fd.id}: unknown op "${f0.op}"`); return; }
       const f = { field: fd.id, op };
       if (fd.u === "bool" && !["true", "false", "exists"].includes(op)) {
-        const v = num(f0.value);
-        if ((op === "=" && v === 1) || (op === "!=" && v === 0) || f0.value === true) f.op = "true";
-        else if ((op === "=" && v === 0) || (op === "!=" && v === 1) || f0.value === false) f.op = "false";
+        const v = f0.value === true || f0.value === "true" ? 1 : f0.value === false || f0.value === "false" ? 0 : num(f0.value);
+        if ((op === "=" && v === 1) || (op === "!=" && v === 0)) f.op = "true";
+        else if ((op === "=" && v === 0) || (op === "!=" && v === 1)) f.op = "false";
         else { errors.push(`Filter on ${fd.id}: a yes/no field takes op "true" or "false"`); return; }
       } else if (op === "between") {
         const v = Array.isArray(f0.value) ? f0.value.map(num) : [num(f0.min), num(f0.max)];

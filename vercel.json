@@ -21,6 +21,9 @@
     },
     "api/screen.js": {
       "maxDuration": 60
+    },
+    "api/cron/analyst.js": {
+      "maxDuration": 300
     }
   },
   "crons": [
@@ -219,6 +222,10 @@
     {
       "path": "/api/cron/statements",
       "schedule": "17 9 * * *"
+    },
+    {
+      "path": "/api/cron/analyst",
+      "schedule": "5 * * * *"
     }
   ],
   "headers": [
