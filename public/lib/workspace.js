@@ -84,6 +84,7 @@
     return s;
   }
   function put(b, id, a, value, format, source) {
+    if (value === null) value = ""; // Approved clears use the persisted empty-cell representation.
     const s = sheet(b, id),
       p = address(a),
       old = s.cells[p.ref] || {};
@@ -435,6 +436,7 @@
         throw Error("Cell value must be text or number");
       return {
         ...clone(p),
+        value: p.value === null ? "" : p.value,
         sheet: s.id,
         address: a,
         before: clone(s.cells[a] || null),
@@ -498,6 +500,11 @@
       s.cells = s.cells || {};
       for (const [a, c] of Object.entries(s.cells || {})) {
         address(a);
+        // Recover clears saved by earlier builds without discarding the workbook.
+        if (c && c.value === null) {
+          c.value = "";
+          delete c.source;
+        }
         if (c == null || !["string", "number"].includes(typeof c.value))
           throw Error("Invalid cell value");
         count++;

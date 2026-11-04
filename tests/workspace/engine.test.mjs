@@ -222,3 +222,58 @@ test("enterprise valuation discounts explicit unlevered cash flow assumptions in
   assert.equal(e.value(b.sheets[0].id, "C18"), 15.6);
   assert.ok(e.value(b.sheets[0].id, "E28") > 0);
 });
+test("approved null clear normalizes to an empty cell and survives saved-workbook reload without losing other work", () => {
+  const b = book(),
+    s = b.sheets[0];
+  s.cells.A1 = { value: 42, source: { id: "old-source" } };
+  s.cells.B1 = { value: "Preserve this", format: { bold: true } };
+  b.document.html = "<p>Preserve this note</p>";
+  const history = new W.History(b);
+  const p = W.stage(b, {
+    cells: [
+      { address: "A1", value: null },
+      { address: "C1", value: null, format: { number: "percent" } },
+    ],
+  });
+  assert.equal(p.cells[0].value, "");
+  assert.equal(b.sheets[0].cells.A1.value, 42);
+  W.applyProposal(b, p);
+  history.commit(b, "Approved clear");
+  const memory = new Map(),
+    storage = {
+      getItem: (k) => memory.get(k) ?? null,
+      setItem: (k, v) => memory.set(k, v),
+    };
+  W.save(storage, b);
+  const reloaded = W.load(storage);
+  assert.equal(reloaded.sheets[0].cells.A1, undefined);
+  assert.equal(reloaded.sheets[0].cells.C1.value, "");
+  assert.equal(reloaded.sheets[0].cells.C1.format.number, "percent");
+  assert.equal(
+    JSON.stringify(reloaded.sheets[0].cells.B1),
+    JSON.stringify(b.sheets[0].cells.B1),
+  );
+  assert.equal(reloaded.document.html, "<p>Preserve this note</p>");
+  assert.equal(history.undo().sheets[0].cells.A1.source.id, "old-source");
+});
+test("previously saved null-valued cells recover as blank while retaining the rest of the workbook", () => {
+  const b = book(),
+    s = b.sheets[0];
+  s.cells.A1 = {
+    value: null,
+    format: { number: "currency" },
+    source: { id: "obsolete" },
+  };
+  s.cells.B1 = { value: "Existing work" };
+  const saved = JSON.stringify(b),
+    storage = {
+      getItem: (k) => (k === "fu:workspace:v1" ? saved : null),
+      setItem: () => {},
+    };
+  const loaded = W.load(storage);
+  assert.equal(loaded.sheets[0].cells.A1.value, "");
+  assert.equal(loaded.sheets[0].cells.A1.format.number, "currency");
+  assert.equal(loaded.sheets[0].cells.A1.source, undefined);
+  assert.equal(loaded.sheets[0].cells.B1.value, "Existing work");
+  assert.equal(b.sheets[0].cells.A1.value, null);
+});
