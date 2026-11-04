@@ -8,7 +8,7 @@ from .common import Supabase
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "compare", "sectors", "screener", "all"])
+    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "compare", "sectors", "screener", "kpistd", "all"])
     ap.add_argument("--tickers", nargs="*")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--news", action="store_true", help="refresh news for each company")
@@ -22,7 +22,7 @@ def main():
     ap.add_argument("--budget", type=float, help="compare job: time budget in seconds")
     ap.add_argument("--sec-years", type=float, default=3, help="IR job: years of EDGAR 8-K earnings exhibits to collect")
     ap.add_argument("--step", default="publish", choices=["prices", "publish", "notes"], help="sectors job step")
-    ap.add_argument("--budget", type=float, help="time budget in seconds")
+    ap.add_argument("--no-llm", action="store_true", help="kpistd job: rules only, no model proposals")
     a = ap.parse_args()
     sb = Supabase()
     if a.job in ("prices", "all"):
@@ -55,6 +55,8 @@ def main():
         print("compare history", len(done), "errors", errors)
     if a.job == "screener":
         print("screener", jobs.screener_job(sb, full=a.full_history, workers=a.workers))
+    if a.job == "kpistd":
+        print("kpistd", json.dumps(jobs.kpistd_job(sb, a.tickers, full=a.full_history, use_llm=not a.no_llm, time_budget=a.budget), default=str))
     if a.job == "index":
         print("index", jobs.build_index(sb))
     if a.job == "feed":

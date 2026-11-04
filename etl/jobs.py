@@ -787,3 +787,14 @@ def screener_job(sb, full=False, time_budget=None, workers=6):
     Runs after prices, companies and segments; full=True refetches the 10-year close history and every company."""
     from .screener import screener_job as build
     return build(sb, full=full, time_budget=time_budget, workers=workers)
+
+
+# ---------------------------------------------------------------- standardized KPIs
+def kpistd_job(sb, tickers=None, full=False, use_llm=True, time_budget=None):
+    """Maps company KPI ids onto the canonical taxonomy (rules plus reviewed model proposals) and publishes kpistd/*.json.
+    Incremental: only companies whose KPI definitions changed since the last run are remapped."""
+    from .kpistd import map_job
+    with Run(sb, "kpistd") as run:
+        st = map_job(sb, tickers=tickers, full=full, use_llm=use_llm, time_budget=time_budget)
+        run.stats.update(st)
+        return st
