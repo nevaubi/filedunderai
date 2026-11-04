@@ -854,6 +854,7 @@ const PAGES = [
   { id: "feed", name: "Filings feed", icon: "i-feed", key: "f", hidden: true },
   { id: "technicals", name: "Technicals", icon: "i-ta", key: "t" },
   { id: "sectors", name: "Sectors", icon: "i-sec", key: "s" },
+  { id: "calls", name: "Calls", icon: "i-news", key: "l" },
   { id: "macro", name: "Macro", icon: "i-mac", key: "x" },
   { id: "theses", name: "Theses", icon: "i-th", key: "h" },
   { id: "workbench", name: "Workbench", icon: "i-wb", key: "w" },
@@ -940,7 +941,7 @@ function paletteItems(v) {
   if (tk && parts.length > 1) {
     const rest = parts.slice(1).join(" ");
     allMetricLabels().filter(m => m.toLowerCase().includes(rest)).slice(0, 6).forEach(mt => add("Metrics", `${tk} ${mt}`, "latest quarter, opens the source", tk[0], async () => { await ensureCompany(tk); const m = model(tk); const cell = m.metric(mt, "Q", m.latestQ()) || m.metric(mt, "A", m.latestA()); STATE.coTab = "financials"; if (location.hash !== "#company-" + tk.toLowerCase()) { location.hash = "company-" + tk.toLowerCase(); await new Promise(r => setTimeout(r, 400)); } if (cell) openSource(cell, "filing"); else toast(`${tk} doesn't report ${mt}`); }));
-    [["financials", "Financials"], ["segments", "Segments & KPIs"], ["news", "News & narratives"], ["earnings", "Earnings & IR"], ["filings", "Filings"]].filter(([, n]) => n.toLowerCase().includes(rest)).forEach(([id, n]) => add("Companies", `${tk} · ${n}`, SHORT[tk], tk[0], () => { STATE.coTab = id; location.hash === "#company-" + tk.toLowerCase() ? route() : location.hash = "company-" + tk.toLowerCase(); }));
+    [["financials", "Financials"], ["segments", "Segments & KPIs"], ["news", "News & narratives"], ["earnings", "Earnings & IR"], ["calls", "Calls"], ["filings", "Filings"]].filter(([, n]) => n.toLowerCase().includes(rest)).forEach(([id, n]) => add("Companies", `${tk} · ${n}`, SHORT[tk], tk[0], () => { STATE.coTab = id; location.hash === "#company-" + tk.toLowerCase() ? route() : location.hash = "company-" + tk.toLowerCase(); }));
   }
   const matches = TICKERS.filter(t => { const c = IDX[t]; return !v || t.toLowerCase().startsWith(v) || (c.name || "").toLowerCase().includes(v) || (c.legal_name || "").toLowerCase().includes(v); });
   (v ? matches : watchlist()).slice(0, v ? 10 : 8).forEach(t => { const c = IDX[t]; add("Companies", `${t} · ${c.name}`, `${fnum(c.price)} · ${fsgn(c.chg_1d, 2)}`, miniLogo(t, 20), () => location.hash = "company-" + t.toLowerCase()); });
@@ -1260,10 +1261,10 @@ async function pCompany(tk) {
     stat("Market cap", fmtMoney(s.mcap)), stat("Revenue TTM", fmtMoney(s.rev?.v), s.rev), stat("Net income TTM", fmtMoney(s.ni?.v), s.ni), stat("EPS TTM", s.eps ? "$" + s.eps.v.toFixed(2) : "–", s.eps),
     stat("P/E TTM", s.pe ? s.pe.toFixed(1) : "–"), stat("P/S TTM", s.ps ? s.ps.toFixed(1) : "–"), stat("FCF yield", fpct(s.fcfy), s.fcf), stat("Gross margin LQ", fpct(s.gm?.v), s.gm), stat("Rev growth LQ", fsgn(s.growth?.v), s.growth),
     el("div", {}, el("div", { class: "l" }, "52-week range"), el("div", { class: "num", style: "font-size:12.5px;display:flex;justify-content:space-between;margin-top:4px" }, el("span", {}, fnum(st.lo52)), el("span", {}, fnum(st.hi52))), rng)));
-  const tabsDef = [["overview", "Overview"], ["financials", "Financials"], ["segments", "Segments & KPIs"], ["news", "News & narratives"], ["earnings", "Earnings & IR"], ["filings", "Filings"], ["insiders", "Insiders"]];
+  const tabsDef = [["overview", "Overview"], ["financials", "Financials"], ["segments", "Segments & KPIs"], ["news", "News & narratives"], ["earnings", "Earnings & IR"], ["calls", "Calls"], ["filings", "Filings"], ["insiders", "Insiders"]];
   const tabs = el("div", { class: "tabs", role: "tablist" });
   const body = el("div", { style: "display:flex;flex-direction:column;gap:16px" });
-  const show = id => { if (!tabsDef.find(t => t[0] === id)) id = "overview"; STATE.coTab = id; store.set("coTab", id); $("#crumb-tab").textContent = tabsDef.find(t => t[0] === id)[1]; tabs.querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.id === id); b.setAttribute("aria-selected", b.dataset.id === id); }); body.innerHTML = ""; ({ overview: coOverview, financials: coFinancials, segments: coSegments, news: coNews, filings: coFilings, earnings: coEarnings, insiders: coInsiders })[id](body, tk); };
+  const show = id => { if (!tabsDef.find(t => t[0] === id)) id = "overview"; STATE.coTab = id; store.set("coTab", id); $("#crumb-tab").textContent = tabsDef.find(t => t[0] === id)[1]; tabs.querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.id === id); b.setAttribute("aria-selected", b.dataset.id === id); }); body.innerHTML = ""; ({ overview: coOverview, financials: coFinancials, segments: coSegments, news: coNews, filings: coFilings, earnings: coEarnings, insiders: coInsiders, calls: (b, t) => window.FU_PAGES.calls.tab(b, t) })[id](body, tk); };
   tabsDef.forEach(([id, n], i) => tabs.append(el("button", { "data-id": id, role: "tab", title: `${n} (${i + 1})`, onclick: () => show(id) }, n)));
   page.append(tabs, body);
   show(STATE.coTab);

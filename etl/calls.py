@@ -36,7 +36,7 @@ PRIMARY = os.environ.get("FU_CALLS_MODEL") or os.environ.get("FU_SUMMARY_MODEL",
 FALLBACK = os.environ.get("FU_CALLS_FALLBACK") or os.environ.get("FU_SUMMARY_FALLBACK", "kimi-k3")
 PROMPT_VERSION = "calls-v1"
 ROSTER_VERSION = "roster-v1"
-PARSE_VERSION = 4  # bump when callparse changes so stored documents are parsed again
+PARSE_VERSION = 5  # bump when callparse changes so stored documents are parsed again
 STATE_PATH = "calls/state.json"
 RECENT_QUARTERS = 8
 
@@ -89,6 +89,9 @@ NEGATIVE = re.compile(r"\b(declin(e|ed|es|ing)|decrease[sd]?|weak(er|ness|ened)?
 
 # ---------------------------------------------------------------- model calls
 
+LLM_DOWN = []  # set when the provider refuses the account (billing, auth); later calls in the run fail fast
+
+
 def _model(prompt, max_tokens, temperature=0.1, effort="low"):
     """JSON completion. Reasoning is kept low so the token budget goes to the answer; when the reasoning still uses
     the whole budget the request is repeated without reasoning."""
@@ -111,6 +114,9 @@ def _model(prompt, max_tokens, temperature=0.1, effort="low"):
             except Exception as e:
                 last = e
                 print("calls model failed", model, eff, str(e)[:200])
+                if isinstance(e, HTTPError) and e.code in (401, 402, 403, 412):
+                    LLM_DOWN.append(str(e)[:200])
+                    raise
     raise last
 
 
@@ -133,6 +139,8 @@ def cached_model(sb, kind, payload, prompt, max_tokens, effort="low"):
     hit = _cache_get(sb, key)
     if hit is not None:
         return hit["result"], hit["meta"], True
+    if LLM_DOWN:
+        raise RuntimeError("model provider unavailable: " + LLM_DOWN[0])
     res, meta = _model(prompt, max_tokens, effort=effort)
     meta["at"] = now_iso()
     _cache_put(sb, key, {"result": res, "meta": meta, "payload": payload})
@@ -316,6 +324,8 @@ def process_doc(sb, row, company, use_llm=True, log=print):
             roster, _meta = roster_from_llm(sb, row["ticker"], disp or name, row.get("title"), pages, sha)
         except Exception as e:
             log("roster failed", row["id"], str(e)[:200])
+            if kind is None:
+                return {"verdict": None, "reason": "roster unavailable", "sha": sha, "retry": True}, None
         if roster:
             dk = roster.get("doc_kind")
             hints = [h for h in (roster.get("speakers") or []) if isinstance(h, dict) and h.get("label") and h.get("name")]
@@ -357,7 +367,7 @@ def process_doc(sb, row, company, use_llm=True, log=print):
             d = None
     d = d or doc_dates(row, pages)
     rec = {"verdict": kind, "reason": why, "sha": sha, "method": method, "event_type": etype, "date": d.isoformat() if d else None,
-           "has_qa": bool(parsed["exchanges"]), "turns": len(parsed["turns"]), "words": parsed["quality"]["words"], "coverage": parsed["quality"]["coverage"]}
+           "has_qa": bool(parsed["exchanges"]), "turns": len(parsed["turns"]), "words": parsed["quality"]["words"], "coverage": parsed["quality"]["coverage"], "needs_roster": bool(weak and roster is None)}
     return rec, parsed
 
 
@@ -658,7 +668,8 @@ def _companies(sb):
 
 
 def scan(sb, docs, companies, state, workers=4, use_llm=True, log=print, time_budget=None):
-    """Parses documents that are new or changed since the last scan. Returns {doc_id: parsed} for calls."""
+    """Parses documents that are new or changed since the last scan and records the verdict in state. Returns the ids
+    of documents that are calls."""
     t0 = time.time()
     todo = [d for d in docs.values() if state["docs"].get(d["id"], {}).get("fetched_at") != d.get("fetched_at") or state["docs"].get(d["id"], {}).get("pv") != PARSE_VERSION]
     # recent documents first (8-K exhibits carry their filing date in the title)
@@ -666,15 +677,15 @@ def scan(sb, docs, companies, state, workers=4, use_llm=True, log=print, time_bu
         m = re.match(r"^8-K (\d{4}-\d\d-\d\d)", d.get("title") or "")
         return (m.group(1) if m else None) or d.get("published") or d.get("period_end") or (d.get("fetched_at") or "")[:10]
     todo.sort(key=when, reverse=True)
-    parsed = {}
+    parsed = set()
 
     def one(row):
         try:
             rec, p = process_doc(sb, row, companies.get(row["ticker"], {}), use_llm=use_llm, log=log)
         except Exception as e:
             log("parse failed", row["id"], str(e)[:200])
-            return row, {"verdict": None, "reason": "error: " + str(e)[:200], "retry": True}, None
-        return row, rec, p
+            return row, {"verdict": None, "reason": "error: " + str(e)[:200], "retry": True}, False
+        return row, rec, p is not None
     n = 0
     with cf.ThreadPoolExecutor(workers) as ex:
         futs = []
@@ -684,14 +695,16 @@ def scan(sb, docs, companies, state, workers=4, use_llm=True, log=print, time_bu
             row, rec, p = f.result()
             if not rec.get("retry"):
                 rec["fetched_at"] = row.get("fetched_at")
-                rec["pv"] = PARSE_VERSION
+                # documents parsed without the model roster they needed are parsed again on a later run
+                rec["pv"] = PARSE_VERSION if not rec.get("needs_roster") else None
             rec["ticker"] = row["ticker"]
             state["docs"][row["id"]] = rec
-            if p is not None:
-                parsed[row["id"]] = p
+            if p:
+                parsed.add(row["id"])  # ids only: parsed documents are large, build_calls parses again when it analyses
             n += 1
             if n % 100 == 0:
                 log(f"scanned {n}/{len(todo)}")
+                save_state(sb, state)
             if time_budget and time.time() - t0 > time_budget:
                 for x in futs:
                     x.cancel()
@@ -699,7 +712,7 @@ def scan(sb, docs, companies, state, workers=4, use_llm=True, log=print, time_bu
     return parsed
 
 
-def build_calls(sb, ticker, docs, companies, state, parsed_cache, analyze_limit=None, deadline=None, log=print, workers=3, recent_only=False):
+def build_calls(sb, ticker, docs, companies, state, analyze_limit=None, deadline=None, log=print, workers=3, recent_only=False):
     """Groups a ticker's call documents into events, analyses calls whose inputs changed (oldest first so each call
     can be compared with the one before it) and writes calls/{T}.json plus one turn file per call."""
     from .kpitools import text_of
@@ -724,27 +737,40 @@ def build_calls(sb, ticker, docs, companies, state, parsed_cache, analyze_limit=
         want = (not recent_only or ev["date"] >= cut) and (analyze_limit is None or analysed < analyze_limit) and (deadline is None or time.time() < deadline)
         if fresh:
             c = {**o, **base}
-        elif want:
-            p = parsed_cache.get(row["id"])
-            if p is None:
-                rec2, p = process_doc(sb, row, company, log=log)
+        else:
+            has_struct = o and o.get("pv") == PARSE_VERSION and o.get("sha") == rec.get("sha") and o.get("speakers") is not None
+            p = None
+            if want and not LLM_DOWN or not has_struct:
+                _r, p = process_doc(sb, row, company, use_llm=not LLM_DOWN, log=log)
                 if p is None:
                     continue
-            try:
-                res, meta, hit = analyze(sb, {**base, "label": label}, p, company, prev_ctx)
-            except Exception as e:
-                log("analysis failed", cid, str(e)[:200])
-                c = {**(o or {}), **base, "pending": True}
-                calls.append(c)
-                continue
-            analysed += 0 if hit else 1
-            c = {**base, "summary": res["summary"], "themes": res["themes"], "guidance": res["guidance"], "changes": res["changes"],
-                 "exchanges": [{k: e.get(k) for k in ("idx", "analyst", "asked_by", "q_turns", "a_turns", "topics", "concern", "concern_quote", "answer", "reason", "answer_quote")} for e in p["exchanges"]],
-                 "speakers": speaker_stats(p), "prev_call": prev_key, "analysis_v": PROMPT_VERSION, "model": meta.get("model"), "analyzed_at": meta.get("at"),
-                 "dropped": res["dropped"]}
-            sb.put_json(f"calls/{ticker}/{cid}.json", turn_file(cid, p), cache="max-age=3600")
-        else:
-            c = {**(o or {}), **base, "pending": True}
+            if has_struct:
+                c = {**o, **base}
+            else:
+                # parsed structure without the model's reading: speakers, statistics, exchanges and passage text
+                c = {**base, "speakers": speaker_stats(p),
+                     "exchanges": [{k: e.get(k) for k in ("idx", "analyst", "asked_by", "q_turns", "a_turns")} for e in p["exchanges"]]}
+                sb.put_json(f"calls/{ticker}/{cid}.json", turn_file(cid, p), cache="max-age=3600")
+            res = None
+            if want and not LLM_DOWN:
+                try:
+                    res, meta, hit = analyze(sb, {**base, "label": label}, p, company, prev_ctx)
+                except Exception as e:
+                    log("analysis failed", cid, str(e)[:200])
+            if res is not None:
+                analysed += 0 if hit else 1
+                c = {**base, "summary": res["summary"], "themes": res["themes"], "guidance": res["guidance"], "changes": res["changes"],
+                     "exchanges": [{k: e.get(k) for k in ("idx", "analyst", "asked_by", "q_turns", "a_turns", "topics", "concern", "concern_quote", "answer", "reason", "answer_quote")} for e in p["exchanges"]],
+                     "speakers": speaker_stats(p), "prev_call": prev_key, "analysis_v": PROMPT_VERSION, "model": meta.get("model"), "analyzed_at": meta.get("at"),
+                     "dropped": res["dropped"]}
+                sb.put_json(f"calls/{ticker}/{cid}.json", turn_file(cid, p), cache="max-age=3600")
+            elif o and o.get("themes") is not None and o.get("pv") == PARSE_VERSION and o.get("sha") == rec.get("sha"):
+                # keep the earlier analysis (only the previous-call comparison is out of date)
+                c = {**o, **base, "pending": True}
+            else:
+                for k in ("summary", "themes", "guidance", "changes", "prev_call", "analysis_v", "model", "analyzed_at", "dropped"):
+                    c.pop(k, None)
+                c["pending"] = True
         calls.append(c)
         if ev["event_type"] == "earnings" and c.get("themes") is not None:
             prev_earn = {"call_id": cid, "date": ev["date"], "label": label, "summary": c.get("summary"), "themes": c.get("themes"), "guidance": c.get("guidance")}
@@ -816,7 +842,7 @@ def publish_aggregates(sb, tickers, companies, log=print):
                     e = execs.setdefault(k, {"name": s["name"], "t": t, "role": s.get("role"), "calls": []})
                     if s.get("role"):
                         e["role"] = s["role"]
-                    e["calls"].append({"c": c["call_id"], "d": c["date"], "l": c.get("label"), "et": c["event_type"], "w": s["words"], "sh": s.get("share"), "h": s.get("hedge"), "tn": s.get("tone")})
+                    e["calls"].append({"c": c["call_id"], "i": s["idx"], "d": c["date"], "l": c.get("label"), "et": c["event_type"], "w": s["words"], "sh": s.get("share"), "h": s.get("hedge"), "tn": s.get("tone")})
             for x in c.get("exchanges") or []:
                 if x.get("analyst") is None or x["analyst"] >= len(sp):
                     continue
@@ -944,7 +970,6 @@ def calls_job(sb, tickers=None, step="run", workers=4, time_budget=None, analyze
     deadline = t0 + time_budget if time_budget else None
     companies = _companies(sb)
     state = load_state(sb)
-    all_tickers = sorted({r["ticker"] for r in sb.select("ir_documents", "select=ticker&doc_type=in.(transcript,remarks)")} | set(t for t in (tickers or [])))
     if step == "publish":
         return publish_aggregates(sb, sorted({r.get("ticker") for r in state["docs"].values() if r.get("verdict")}), companies, log=log)
     if step == "db":
@@ -954,24 +979,33 @@ def calls_job(sb, tickers=None, step="run", workers=4, time_budget=None, analyze
     save_state(sb, state)
     stats = {"docs": len(docs), "scanned": len(parsed), "calls_docs": sum(1 for r in state["docs"].values() if r.get("verdict"))}
     tks = sorted({r["ticker"] for i, r in state["docs"].items() if r.get("verdict") and i in docs and (not tickers or r["ticker"] in tickers)})
-    # tickers with newly parsed documents first, then the rest (calls whose analysis is still pending)
     changed = {docs[i]["ticker"] for i in parsed}
-    tks.sort(key=lambda t: (t not in changed, t))
-    analysed, done = 0, []
+    tstate = state.setdefault("tickers", {})
+    # skip companies with nothing new and nothing pending; companies with new documents go first
+    work = [t for t in tks if t in changed or tstate.get(t, {}).get("pending", 1) or tstate.get(t, {}).get("pv") != PARSE_VERSION or tickers]
+    work.sort(key=lambda t: (t not in changed, t))
+    analysed, done = 0, set()
 
-    def one(t):
-        b, n = build_calls(sb, t, docs, companies, state, {i: p for i, p in parsed.items() if docs[i]["ticker"] == t},
-                           analyze_limit=None if analyze_limit is None else max(0, analyze_limit), deadline=deadline, log=log, recent_only=recent_only)
+    def one(t, recent):
+        b, n = build_calls(sb, t, docs, companies, state, analyze_limit=analyze_limit, deadline=deadline, log=log, recent_only=recent)
         return t, b, n
-    with cf.ThreadPoolExecutor(max(1, min(workers, 6))) as ex:
-        for t, b, n in ex.map(one, tks):
-            analysed += n
-            done.append(t)
-            pend = sum(1 for c in b["calls"] if c.get("pending"))
-            log(f"{t}: {len(b['calls'])} calls, {n} analysed now, {pend} pending")
-    stats.update({"tickers": len(done), "analysed": analysed, "pending": None})
-    stats["aggregates"] = publish_aggregates(sb, sorted(set(done) | set(all_tickers) & {r.get("ticker") for r in state["docs"].values() if r.get("verdict")}), companies, log=log)
-    if not deadline or time.time() < deadline:
-        stats["db"] = db_sync(sb, done, log=log)
+    # recent quarters for every company first, then older calls (unless recent_only)
+    for recent in ((True,) if recent_only else (True, False)):
+        if deadline and time.time() > deadline:
+            break
+        with cf.ThreadPoolExecutor(max(1, min(workers, 6))) as ex:
+            for t, b, n in ex.map(lambda t: one(t, recent), work):
+                analysed += n
+                done.add(t)
+                pend = sum(1 for c in b["calls"] if c.get("pending"))
+                tstate[t] = {"pending": pend, "calls": len(b["calls"]), "pv": PARSE_VERSION, "at": now_iso()}
+                log(f"{t}: {len(b['calls'])} calls, {n} analysed now, {pend} pending")
+        save_state(sb, state)
+        work = [t for t in work if tstate.get(t, {}).get("pending")]
+    stats.update({"tickers": len(done), "analysed": analysed, "pending": sum(v.get("pending", 0) for v in tstate.values())})
+    if done or not (deadline and time.time() > deadline):
+        stats["aggregates"] = publish_aggregates(sb, sorted({r.get("ticker") for r in state["docs"].values() if r.get("verdict")}), companies, log=log)
+    if done and (not deadline or time.time() < deadline):
+        stats["db"] = db_sync(sb, sorted(done), log=log)
     stats["seconds"] = round(time.time() - t0, 1)
     return stats

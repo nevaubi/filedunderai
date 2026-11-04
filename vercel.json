@@ -139,6 +139,18 @@
     {
       "path": "/api/cron/screener",
       "schedule": "55 22 * * *"
+    },
+    {
+      "path": "/api/cron/calls",
+      "schedule": "20 15 * * *"
+    },
+    {
+      "path": "/api/cron/calls?run=2",
+      "schedule": "20 23 * * *"
+    },
+    {
+      "path": "/api/cron/calls?run=3",
+      "schedule": "20 5 * * *"
     }
   ],
   "headers": [

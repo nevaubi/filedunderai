@@ -28,6 +28,7 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
   - `insiders.py` Form 4 XML parsing (owner, role, code, shares, price, holdings after, 10b5-1).
   - `news.py`, `summaries.py` recent coverage and written summaries.
   - `screener.py` the screener factor table: 189 fields per company (valuation and 5-year percentiles, growth, quality, balance sheet, Piotroski components, technicals, correlations to market, rates, commodities, the dollar, bitcoin and macro series, insider and filing activity, KPI families, segments), each with a definition, unit, source and per-company provenance.
+  - `calls.py`, `callparse.py` earnings-call intelligence: transcripts and prepared remarks from `ir_documents` parsed into speakers, passages, prepared/Q&A sections and analyst exchanges (deterministic, with a model-read label roster only when the labels are ambiguous), then one model analysis per call (themes on a fixed taxonomy with sentiment and management confidence, guidance statements, analyst concerns, answers that were not direct, changes vs the previous call). Every item keeps its quote as character offsets into the stored document text; items whose quote is not found verbatim are dropped. Model results are cached in `raw/calls/llm/` by input hash.
   - `jobs.py` the jobs: `companies_job`, `prices_job`, `macro_job`, `news_rotation_job`, `build_index`, `build_feed`.
 - **`public/`** is a dependency-free single-page app (D3 for charts). It reads `index.json`, `market.json`, `macro.json`, `feed.json`, `companies/{TICKER}.json` and `prices/{SYMBOL}.json` from the public bucket.
 - **`db/schema.sql`** is applied on every deploy by `scripts/migrate.mjs` (idempotent). Public tables are read-only for `anon` via RLS.
@@ -52,6 +53,10 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | | `screener.json` | Screener field catalogue (id, group, name, unit, definition, source, distribution) and one compact row per company |
 | | `screener/src/{T}.json` | Provenance per screener field: the filed facts behind it (statement line, period, value, accession, form, filing date, XBRL concept), price dates and closes, KPI document ids, Form 4 windows |
 | | `screener/corr.json` | Pairwise one-year daily return correlations (int8, upper triangle) for correlation clusters |
+| | `calls/{T}.json` | Calls per company: event, fiscal label, speakers with talk share, hedging and tone, Q&A exchanges, themes, guidance, changes, each quote with document offsets |
+| | `calls/{T}/{call_id}.json` | Passage text per call (speaker, section, offsets, page) for the Q&A browser and search |
+| | `calls/themes.json`, `calls/themes/{theme}.json` | Theme mentions by sector and quarter, and every mention with its quotes |
+| | `calls/people.json`, `calls/coverage.json` | Executives (per-call statistics), analysts and firms (companies covered, question topics); calls stored per company |
 | | `meta/*.json` | Job caches and status (fundamentals, price stats per part, rotation and check cursors, insiders index, pipeline status) |
 | `raw` (private) | `screener/closes.json.gz`, `screener/fund.json.gz`, `screener/kpi.json.gz` | Screener caches: 6 years of split-adjusted daily closes and split dates, extracted quarterly facts per company (re-extracted when a new 10-K/10-Q arrives), KPI and segment extracts |
 | | `sec/companyfacts/*.json.gz`, `sec/filings/{accn}/*.htm.gz`, `sec/releases/*.md.gz` | Archived source documents, indexed in `documents` |
@@ -70,6 +75,7 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | `/api/cron/sectors` | 22:35 Mon-Fri | Rebuilds every sector and industry file from facts, prices, macro_observations, FRED, KPIs, segments, insiders, filings; writes `sector_metrics` |
 | `/api/cron/sectors?step=notes` | 12:15 Mon | Weekly sector notes, validated so every figure comes from the data (`sector_notes`) |
 | `/api/cron/screener` | 22:55 daily | Rebuilds `screener.json` after the price runs: extends the close history from the prices files, re-extracts facts only for companies with a new report, recomputes every field, correlations and provenance |
+| `/api/cron/calls` | 15:20, 23:20, 05:20 | New transcripts and prepared remarks after the IR runs: parse, analyse (last 8 quarters first, then older calls), publish `calls/*`, copy rows into `calls`, `call_speakers`, `call_turns`, `call_exchanges`, `call_items` |
 | `/api/cron/insiders` | 15:30, 23:30 | Parses new Form 4 filings into `insider_transactions`, rewrites `insiders/{T}.json` and `meta/insiders.json` |
 
 Every run is logged in `etl_runs`; the latest runs are published to `meta/status.json` for the Data status page.
@@ -82,7 +88,7 @@ Set in Vercel (the Supabase ones come from the integration):
 
 `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `POSTGRES_URL_NON_POOLING`, `FIREWORKS_API_KEY`, `TAVILY_API_KEY`, `FIRECRAWL_API_KEY`, `CRON_SECRET`, `SEC_USER_AGENT` (SEC asks for `Name email@domain`).
 
-Optional: `FU_ASSISTANT_MODEL`, `FU_ASSISTANT_FALLBACK`, `FU_SUMMARY_MODEL`, `FU_SUMMARY_FALLBACK`.
+Optional: `FU_CALLS_MODEL`, `FU_CALLS_FALLBACK`, `FU_ASSISTANT_MODEL`, `FU_ASSISTANT_FALLBACK`, `FU_SUMMARY_MODEL`, `FU_SUMMARY_FALLBACK`.
 
 ## Running the ETL locally
 
@@ -99,6 +105,8 @@ python -m etl.run news                           # next slice of the news rotati
 python -m etl.run sectors --step prices          # monthly price cache for sector valuation history
 python -m etl.run sectors                        # sector and industry files (etl/sectors.py, mapping in etl/sector_map.py)
 python -m etl.run sectors --step notes           # weekly sector notes
+python -m etl.run calls --recent                 # call transcripts: parse everything, analyse the last 8 quarters
+python -m etl.run calls                          # then older calls; --mode publish | db for the cross-company files or the tables
 python -m etl.run screener --full-history        # screener table; --full-history refetches 10y closes and every company
 node scripts/test_screen_prompts.mjs             # screen agent accuracy on tests/screener_prompts.json
 ```

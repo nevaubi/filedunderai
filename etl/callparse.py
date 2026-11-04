@@ -203,7 +203,14 @@ _DASH = r"(?:\s+(?:-{1,2}|–|—)\s+|\s*(?:–|—)\s*)"
 def label_of(line, roster_names):
     """(name, descriptor, inline_text, form) when a line is a speaker label, else None."""
     raw = unspace(strip_md(line)).strip()
-    if not raw or len(raw) > 220:
+    if not raw:
+        return None
+    if len(raw) > 220:
+        # long lines can only be labels when the speech follows on the same line ("AMY HOOD: Thanks, ...")
+        m = re.match(r"^([A-Z][A-Za-z.'’\- ]{1,60}?)\s*(\^|:)\s+(\S.*)$", raw)
+        if m and (looks_like_name(m.group(1)) or OPERATOR_RX.match(m.group(1).strip()) or (roster_names and name_key(m.group(1)) in roster_names)):
+            strong = m.group(2) == "^" or m.group(1).isupper() or OPERATOR_RX.match(m.group(1).strip()) or (roster_names and name_key(m.group(1)) in roster_names)
+            return m.group(1).strip(), "", m.group(3).strip(), "colon" if strong else "icolon"
         return None
     m = re.match(r"^([QA])\s*[-–—]\s*([A-Z][A-Za-z.'’\- ]{2,60})$", raw)  # Bloomberg "Q - Laurent Favre" / "A - Sanjiv Lamba"
     if m and looks_like_name(m.group(2)):
