@@ -192,6 +192,60 @@ test("real workspace UI edits selection, stages changes, preserves undo and expo
     close();
   }
 });
+test("one Undo reverses font-size formatting after the browser input debounce and Redo restores it", async () => {
+  const { w, close } = await setup();
+  try {
+    click(w, "Document");
+    const editor = w.document.querySelector(".ws-document");
+    const headingText = editor.querySelector("h1").firstChild;
+    const range = w.document.createRange();
+    range.setStart(headingText, 0);
+    range.setEnd(headingText, "Research".length);
+    const selection = w.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    editor.dispatchEvent(new w.MouseEvent("mouseup", { bubbles: true }));
+    // jsdom lacks execCommand: reproduce the native DOM mutation and input
+    // event, leaving capture, debounce, normalization and history real.
+    w.document.execCommand = (name, _showUI, value) => {
+      if (name !== "fontSize") throw Error("Unexpected document command " + name);
+      const selected = w.getSelection().getRangeAt(0);
+      const font = w.document.createElement("font");
+      font.setAttribute("size", value);
+      font.append(selected.extractContents());
+      selected.insertNode(font);
+      editor.dispatchEvent(new w.InputEvent("input", {
+        bubbles: true,
+        inputType: "formatFontSize",
+      }));
+      return true;
+    };
+    const size = w.document.querySelector('select[aria-label="Font size"]');
+    size.value = "18";
+    size.dispatchEvent(new w.Event("change", { bubbles: true }));
+    assert.equal(editor.querySelector("h1 span").style.fontSize, "18pt");
+    await new Promise((resolve) => w.setTimeout(resolve, 650));
+    click(w, "↶ Undo");
+    const restored = w.document.querySelector(".ws-document h1");
+    assert.equal(restored.textContent, "Research note");
+    assert.equal(restored.querySelector('[style*="font-size"]'), null,
+      "one Undo removes the formatting, without a duplicate unchanged history step");
+    click(w, "↷ Redo");
+    assert.equal(w.document.querySelector(".ws-document h1 span").style.fontSize, "18pt");
+    // Normal typing still flushes into history before an immediate Undo.
+    const currentEditor = w.document.querySelector(".ws-document");
+    currentEditor.append(w.document.createElement("p"));
+    currentEditor.lastChild.textContent = "An additional research observation.";
+    currentEditor.dispatchEvent(new w.InputEvent("input", { bubbles: true, inputType: "insertText" }));
+    click(w, "↶ Undo");
+    assert.ok(!w.document.querySelector(".ws-document").textContent.includes("An additional research observation."));
+    assert.equal(w.document.querySelector(".ws-document h1 span").style.fontSize, "18pt");
+    click(w, "↷ Redo");
+    assert.ok(w.document.querySelector(".ws-document").textContent.includes("An additional research observation."));
+  } finally {
+    close();
+  }
+});
 test("document restore sanitizes active HTML and Word roundtrip retains formatting, tables and citations", async () => {
   const { w, close } = await setup();
   try {

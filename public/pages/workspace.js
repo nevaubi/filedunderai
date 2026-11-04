@@ -444,6 +444,9 @@ window.FU_PAGES = window.FU_PAGES || {};
   }
   function captureDoc(label = "Edit document") {
     if (!editor) return;
+    // An explicit command capture supersedes its native input debounce.
+    clearTimeout(docTimer);
+    docTimer = null;
     for (const n of [...editor.children])
       if (!n.dataset.blockId) n.dataset.blockId = W.uid();
     for (const n of [...editor.querySelectorAll("font")]) {
