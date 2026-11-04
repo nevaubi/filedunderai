@@ -233,14 +233,17 @@ def classify_company(tk, defs, uni, cache, pending):
     by = {d["kpi_id"]: d for d in defs}
     cw = company_words(uni.get(tk) or {"tk": tk})
     out = {}
+    ind = (uni.get(tk) or {}).get("industry")
     for d in defs:
         p = by.get(d.get("parent_id")) if d.get("parent_id") else None
         r = K.classify(d, p, cw)
+        if r and K.BY_ID[r["canonical"]].get("only") and ind not in K.BY_ID[r["canonical"]]["industries"]:
+            r = None
         if r:
             r["method"] = "rules"
             out[d["kpi_id"]] = r
             continue
-        opts = K.candidates(d)
+        opts = [t for t in K.candidates(d) if not t.get("only") or ind in t["industries"]]
         if opts:
             pending.append((_llm_key(d, p), d, p, opts, cw))
     promote_parents(defs, out)
@@ -258,7 +261,7 @@ def promote_parents(defs, out):
     by = {d["kpi_id"]: d for d in defs}
     for (pid, cid), ks in kids.items():
         r, d = out.get(pid), by.get(pid)
-        if len(ks) < 2 or not r or not d or d.get("parent_id") or r["canonical"] != cid or r["scope"] == "total":
+        if len(ks) < 2 or not r or not d or d.get("parent_id") or r["canonical"] != cid or r["scope"] == "total" or cid in K.SEGMENT_ONLY:
             continue
         if re.search(r"\b(" + K.GEO + r")\b", K.nn(r.get("member") or "")) and not re.search(r"\b(global|worldwide|total)\b", K.nn(r.get("member") or "")):
             continue
@@ -339,7 +342,7 @@ def choose(tk, maps, defs_by, values, fye, latest_all):
     cut = (dt.date.fromisoformat(latest_all) - dt.timedelta(days=455)).isoformat() if latest_all else "0000"
     by_c = {}
     for kid, m in maps.items():
-        if m["scope"] == "total" and m.get("confidence", 0) > 0:
+        if m["scope"] == "total" and m.get("confidence", 0) > 0 and m["canonical"] not in K.SEGMENT_ONLY:
             by_c.setdefault(m["canonical"], []).append(kid)
     series = {}
     for cid, kids in by_c.items():

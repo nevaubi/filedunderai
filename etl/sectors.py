@@ -878,7 +878,7 @@ def load_kpis(sb, uni, F, CQ, quarters, log=print):
 
     def one(t):
         ids = ",".join('"' + k.replace('"', '') + '"' for k in sorted(by_t[t]))
-        rows = fetch_all(sb, "kpi_values", f"select=kpi_id,period_kind,period_end,fiscal_label,value,unit,source_id,anchor,derived&ticker=eq.{t}&period_kind=eq.Q&kpi_id=in.({request_quote(ids)})&order=kpi_id,period_end", workers=2)
+        rows = fetch_all(sb, "kpi_values", f"select=kpi_id,period_kind,period_end,fiscal_label,value,unit,source_id,anchor,derived&ticker=eq.{t}&period_kind=in.(Q,I)&kpi_id=in.({request_quote(ids)})&order=kpi_id,period_end", workers=2)
         return t, rows
 
     with ThreadPoolExecutor(6) as ex:
@@ -902,7 +902,7 @@ def load_kpis(sb, uni, F, CQ, quarters, log=print):
                 if t in fac:
                     defs_used[t]["canonical"] = spec["canonical"]
                 ser = {}
-                for r in rows:
+                for r in sorted(rows, key=lambda r: (r["period_kind"] == "Q", r["period_end"])):   # a quarterly value wins over a point-in-time one
                     k = qkey(r["period_end"])
                     a = r.get("anchor") or {}
                     ser[k] = [_r(float(r["value"]) * fac.get(t, 1)), r["period_end"], r.get("fiscal_label"), r.get("source_id"), a.get("page"), (a.get("quote") or "")[:300], a.get("sheet"), a.get("cell"),

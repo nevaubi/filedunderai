@@ -45,9 +45,10 @@ def unit_factor(uclass, unit):
 T = []
 
 
-def kpi(id, name, family, uc, pat, desc, how="median", var=None, excl=None, ind=None, kw=None, higher=True):
+def kpi(id, name, family, uc, pat, desc, how="median", var=None, excl=None, ind=None, kw=None, higher=True, only=False):
+    """only=True: the measure is only this KPI in the listed industries (a utility's "load factor" is not an airline's)."""
     T.append({"id": id, "name": name, "family": family, "uclass": uc, "unit": UNIT_NAME[uc], "how": how, "pat": pat, "var": var, "excl": excl,
-              "definition": desc, "industries": ind or [], "kw": kw or pat, "higher_is_better": higher})
+              "definition": desc, "industries": ind or [], "kw": kw or pat, "higher_is_better": higher, "only": only})
 
 
 GROWTH_EXCL = r"\b(change|growth|increase|decrease|decline|y/y|yoy|q/q|vs\.?|versus|bps|basis points|contribution|impact|effect|delta|variance)\b"
@@ -203,16 +204,16 @@ kpi("adr", "Average daily rate", "Lodging", "usd_pu", r"^(average daily rate|adr
 
 # ---- airlines
 kpi("load_factor", "Passenger load factor", "Airlines", "pct", r"^(passenger )?load factor$", "Revenue passenger miles over available seat miles.",
-    ind=["Transportation"])
+    ind=["Transportation"], only=True)
 kpi("asm", "Available seat miles", "Airlines", "asm", r"^(available seat miles|capacity)( \(asms?\))?$|^asms?$", "Seats flown times miles flown in the period.",
-    how="sum", ind=["Transportation"])
+    how="sum", ind=["Transportation"], only=True)
 kpi("rpm", "Revenue passenger miles", "Airlines", "rpm", r"^(revenue passenger miles|traffic)( \(rpms?\))?$|^rpms?$", "Paying passengers times miles flown.",
-    how="sum", ind=["Transportation"])
+    how="sum", ind=["Transportation"], only=True)
 kpi("casm_ex", "CASM excluding fuel", "Airlines", "cents",
     r"^(casm|cost per available seat mile)[- ,]*(ex|excluding)[- ](fuel|fuel and special items|fuel and special charges|fuel, special items)( \(casm-ex\))?$|^casm-ex$",
-    "Operating cost excluding fuel and special items per available seat mile.", higher=False, ind=["Transportation"])
+    "Operating cost excluding fuel and special items per available seat mile.", higher=False, ind=["Transportation"], only=True)
 kpi("trasm", "Total revenue per ASM", "Airlines", "cents", r"^(trasm|total revenue per available seat mile|tras m)( \(trasm\))?$|^revenue per available seat mile( \(rasm\))?$|^rasm$",
-    "Total operating revenue per available seat mile.", ind=["Transportation"])
+    "Total operating revenue per available seat mile.", ind=["Transportation"], only=True)
 
 # ---- energy
 kpi("production_boe", "Total production (BOE/d)", "Energy", "boe_d",

@@ -25,7 +25,7 @@ window.FU_PAGES = window.FU_PAGES || {};
 .ks-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .ks-tbl th{font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right}
 .ks-tbl th.l,.ks-tbl td.l{text-align:left}
-.ks-tbl td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ks-tbl td{padding:6px 7px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .ks-tbl tr.focus td{background:var(--accent-soft)}
 .ks-tbl tr.alt td{color:var(--muted);font-style:italic}
 .ks-tbl td.co{min-width:150px}
@@ -54,7 +54,7 @@ window.FU_PAGES = window.FU_PAGES || {};
 .ks-map td{font-size:11.5px;white-space:normal;text-align:left;vertical-align:top}
 .ks-map td.rs{max-width:420px;color:var(--muted)}
 details.ks-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:13px}
-@media (max-width:860px){.ks-hide-sm{display:none}.ks-tbl td.co{min-width:110px}.ks-ctl input{width:90px}}
+@media (max-width:860px){.ks-hide-sm{display:none}.ks-tbl td.co{min-width:110px}.ks-tbl .sub{max-width:150px}.ks-ctl input{width:90px}}
 `));
 
   /* ---------- formatting ---------- */
@@ -214,12 +214,12 @@ details.ks-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
     const used = allCols.filter(c => series.some(r => r.cells[c.k] && r.cells[c.k].y != null));
     const n = K === "Q" ? ST.n : Math.min(ST.n, 10);
     const cols = used.slice(-n);
-    // percentiles inside the group, per period, current-basis rows only
+    // percentile inside the group of each company's latest value in the shown periods (current-basis rows only; fiscal
+    // calendars differ, so the latest values are compared rather than one column)
     const pctl = {};
-    cols.forEach(c => {
-      const vs = series.filter(r => !r.alt && r.cells[c.k]?.y != null).map(r => ({ tk: r.tk, v: r.cells[c.k].y }));
-      vs.forEach(x => { const below = vs.filter(z => z.v < x.v).length, eq = vs.filter(z => z.v === x.v).length - 1; (pctl[x.tk] ||= {})[c.k] = vs.length > 1 ? Math.round((below + eq / 2) / (vs.length - 1) * 100) : null; });
-    });
+    const latestOf = r => { for (let i = cols.length - 1; i >= 0; i--) { const c = r.cells[cols[i].k]; if (c && c.y != null) return { v: c.y, k: cols[i].k }; } return null; };
+    const lv = series.filter(r => !r.alt).map(r => ({ tk: r.tk, l: latestOf(r) })).filter(x => x.l);
+    lv.forEach(x => { const below = lv.filter(z => z.l.v < x.l.v).length, eq = lv.filter(z => z.l.v === x.l.v).length - 1; pctl[x.tk] = lv.length > 1 ? { p: Math.round((below + eq / 2) / (lv.length - 1) * 100), k: x.l.k } : null; });
     // colors: focus first
     const order = [...new Set(series.map(r => r.tk))].sort((a, b) => (b === ST.focus) - (a === ST.focus) || a.localeCompare(b));
     series.forEach(r => { r.color = colorAt(order.indexOf(r.tk)); r.focus = r.tk === ST.focus; });
@@ -237,18 +237,18 @@ details.ks-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
     // table
     const t = el("table", { class: "ks-tbl" });
     const lastK = cols.at(-1)?.k;
-    t.append(el("thead", {}, el("tr", {}, el("th", { class: "l" }, "Company"), cols.map((c, i) => el("th", { class: i < cols.length - 6 ? "ks-hide-sm" : "" }, c.k)),
+    t.append(el("thead", {}, el("tr", {}, el("th", { class: "l" }, "Company"), cols.map((c, i) => el("th", { class: i < cols.length - 3 ? "ks-hide-sm" : "" }, c.k)),
       el("th", { title: isPct(unit) ? "Latest value minus the value a year earlier" : "Latest value over the value a year earlier, minus one" }, "YoY"),
-      el("th", { title: `Percentile of the ${ST.view === "yoy" ? "change" : "value"} among the group in ${lastK || "the latest period"} (100 is the highest)` }, "Pctl"))));
+      el("th", { title: `Percentile of each company's latest ${ST.view === "yoy" ? "change" : "value"} among the group (100 is the highest)` }, "Pctl"))));
     const tb = el("tbody");
     tableRows.forEach(r => {
       const c = r.s;
       const tr = el("tr", { class: (r.focus ? "focus " : "") + (r.alt ? "alt" : "") },
         el("td", { class: "l co" }, el("a", { href: `#company-${r.tk.toLowerCase()}`, title: "Open the company" }, r.alt ? null : miniLogo(r.tk, 16), r.label),
-          el("span", { class: "sub", title: `${r.alt ? "" : (c.company || "") + ": "}${c.name}` }, r.alt ? c.name : `${c.company ? c.company + " · " : ""}${c.name}${c.unit && c.unit !== unit ? ` (${c.unit})` : ""}`)));
+          el("span", { class: "sub", title: `${r.alt ? "" : (c.company || "") + ": "}${c.name}` }, r.alt ? c.name : `${c.company ? c.company + " · " : ""}${c.name}${c.factor && c.factor !== 1 ? ` (${c.unit}, converted)` : ""}`)));
       cols.forEach((col, i) => {
         const cell = r.cells[col.k];
-        const cls = i < cols.length - 6 ? "ks-hide-sm" : "";
+        const cls = i < cols.length - 3 ? "ks-hide-sm" : "";
         if (!cell || cell.y == null) { tr.append(el("td", { class: "na " + cls }, "–")); return; }
         tr.append(el("td", { class: cls, title: cell.sub }, numBtn(cell.text, () => openPoint(S, r.tk, r.s, cell.p, K))));
       });
@@ -257,14 +257,14 @@ details.ks-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
       for (let i = pts.length - 1; i >= 0; i--) if (pts[i][1] != null) { li = i; break; }
       const g = li >= 0 ? yoyOf(pts, li, unit) : null;
       tr.append(el("td", { title: li >= 0 ? `${pts[li][2] || ""} vs a year earlier` : "" }, fmtG(g, unit)));
-      const pc = !r.alt && lastK ? pctl[r.tk]?.[lastK] : null;
-      tr.append(el("td", {}, pc == null ? "–" : el("span", { class: "ks-pc " + (pc >= 67 ? "hi" : pc <= 33 ? "lo" : "") }, ord(pc))));
+      const pq = !r.alt ? pctl[r.tk] : null, pc = pq ? pq.p : null;
+      tr.append(el("td", { title: pq ? `Latest value, ${pq.k}` : "" }, pc == null ? "–" : el("span", { class: "ks-pc " + (pc >= 67 ? "hi" : pc <= 33 ? "lo" : "") }, ord(pc))));
       tb.append(tr);
     });
     t.append(tb);
     const nSeg = seg([[8, "8"], [12, "12"], [20, "20"]], ST.n, v => { ST.n = +v; save(); redraw(); });
     host.append(panel("Peer table", nSeg, el("div", { class: "scroll" }, t),
-      el("div", { class: "src" }, `Pctl is the percentile within the group for ${lastK || "the latest period"}${meta.higher_is_better === false ? "; for this KPI a lower value is usually better" : ""}. Company definitions can differ; the row note gives each company's own name for the measure. Rows in italics are series on an older basis or another definition, kept separate.`)));
+      el("div", { class: "src" }, `Pctl is the percentile of each company's latest value within the group${meta.higher_is_better === false ? "; for this KPI a lower value is usually better" : ""}. Company definitions can differ; the row note gives each company's own name for the measure. Rows in italics are series on an older basis or another definition, kept separate.`)));
 
     // how each company's id was mapped
     if (ST.focus) mappingPanel(host, ST.focus, id);
