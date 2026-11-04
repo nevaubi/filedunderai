@@ -8,7 +8,7 @@ from .common import Supabase
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "all"])
+    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "mdata", "all"])
     ap.add_argument("--tickers", nargs="*")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--news", action="store_true", help="refresh news for each company")
@@ -20,6 +20,8 @@ def main():
     ap.add_argument("--changed", action="store_true", help="only companies with new 10-K/10-Q/8-K filings")
     ap.add_argument("--sec-only", action="store_true", help="IR job: EDGAR exhibits only, skip the IR website")
     ap.add_argument("--sec-years", type=float, default=3, help="IR job: years of EDGAR 8-K earnings exhibits to collect")
+    ap.add_argument("--source", help="mdata job: frb_daily, frb_weekly, frb_monthly, nyfed, treasury, bls, oecd, cftc, fdic, calendar, legacy, catalog")
+    ap.add_argument("--force", action="store_true", help="mdata job: reprocess Fed files even if unchanged")
     a = ap.parse_args()
     sb = Supabase()
     if a.job in ("prices", "all"):
@@ -44,6 +46,9 @@ def main():
     if a.job == "logos":
         from .logos import logos_job
         print("logos", logos_job(sb, a.tickers))
+    if a.job == "mdata":
+        from .macrojobs import mdata_job
+        print("mdata", json.dumps(mdata_job(sb, a.source, full=a.full_history, force=a.force), default=str)[:2000])
     if a.job == "index":
         print("index", jobs.build_index(sb))
     if a.job == "feed":

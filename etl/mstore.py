@@ -63,6 +63,8 @@ def display_series(meta, pts):
             if p:
                 out.append((d, (v / p - 1) * 100))
         return out
+    if kind == "mom":
+        return [(pts[i][0], (pts[i][1] / pts[i - 1][1] - 1) * 100) for i in range(1, len(pts)) if pts[i - 1][1]]
     if kind == "chg":
         return [(pts[i][0], (pts[i][1] - pts[i - 1][1]) * scale) for i in range(1, len(pts))]
     return [(d, v * scale) for d, v in pts]
@@ -154,7 +156,7 @@ def _ingest(sb, sid, rows, vt, published):
     return changed
 
 
-def save(sb, series, reg, partial=False, log=print):
+def save(sb, series, reg, partial=False, log=print, prev_reg=None):
     """Upserts metadata, ingests changed observations as new vintages, writes per-series bundles and snapshots.
 
     partial=True means `obs` only covers a recent window: the bundle merges it into the previously published history.
@@ -201,8 +203,13 @@ def save(sb, series, reg, partial=False, log=print):
         keep = {d for d, _ in pts[-120:]}
         vin = {d: v for d, v in vin.items() if d in keep}
         stats = compute_stats(meta, pts)
+        prev_stats = ((prev_reg if prev_reg is not None else reg).get(sid) or {}).get("stats")
         if stats is not None:
-            stats.update(vintage=vin.get(pts[-1][0]), published=published or prev.get("published"), retrieved=now_iso())
+            first_load = not pmap
+            new_last = bool(pts) and pts[-1][0] in set(changed) and not first_load
+            prev_new = (prev_stats or {}).get("new_last_at") if not new_last else None
+            stats.update(vintage=vin.get(pts[-1][0]), published=published or prev.get("published"), retrieved=now_iso(),
+                         new_last_at=stamp if new_last else prev_new)
         bundle = {"id": sid, "retrieved": now_iso(), "published": published, "obs": [[d, v] for d, v in pts], "vin": vin, "rev": rev}
         sb.put_json(f"macro/s/{fid(sid)}.json", bundle, cache="max-age=600")
         if s.get("snap"):
@@ -251,7 +258,7 @@ def _fmt(meta, v):
     u = meta.get("dunits") or meta.get("units") or ""
     dp = meta.get("dp", 2)
     s = f"{v:,.{dp}f}"
-    if u.startswith("Percent") or meta.get("display") == "yoy":
+    if u.startswith("Percent") or meta.get("display") in ("yoy", "mom"):
         return s + "%"
     return s + (" " + meta.get("short_units") if meta.get("short_units") else "")
 
@@ -259,7 +266,7 @@ def _fmt(meta, v):
 def _chg_text(meta, chg):
     if chg is None:
         return ""
-    pctlike = (meta.get("dunits") or meta.get("units") or "").startswith("Percent") or meta.get("display") == "yoy"
+    pctlike = (meta.get("dunits") or meta.get("units") or "").startswith("Percent") or meta.get("display") in ("yoy", "mom")
     if pctlike:
         bp = chg * 100
         return f"{'+' if bp >= 0 else '-'}{abs(bp):.0f} bp" if abs(bp) >= 1 or bp == 0 else f"{chg:+.2f} pt"
@@ -275,7 +282,8 @@ def what_changed(series, days=7):
         st, m = s.get("stats") or {}, s
         if not st or st.get("z") is None or m.get("no_changes"):
             continue
-        fresh = (st["last"][0] >= since and m.get("frequency") in ("D", "W")) or (st.get("vintage") or "") >= since or (st.get("published") or "") >= since
+        # fresh: a daily or weekly observation dated this week, or a new period first seen this week (not the initial load)
+        fresh = (st["last"][0] >= since and m.get("frequency") in ("D", "W")) or (st.get("new_last_at") or "") >= since
         if not fresh:
             continue
         cands.append((abs(st["z"]), s, st, m))
