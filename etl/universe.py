@@ -545,5 +545,6 @@ PREDECESSORS = {
     "TPL": [(97517, "2021-01-11")],      # Texas Pacific Land Trust before the corporate reorganization
     "PLD": [(899881, "2011-06-03")],     # ProLogis (the trust; accounting acquirer) before the AMB merger
     "APO": [(1411494, "2022-01-01")],    # Apollo Global Management, Inc. (now Apollo Asset Management) before the Athene merger holdco
+    "DELL": [(826083, "2013-10-29")],    # Dell Inc., public until the October 2013 take-private; Dell Technologies relisted in 2018
     "BKR": [(808362, "2017-07-03")],     # Baker Hughes Incorporated (now Baker Hughes Holdings LLC) before the GE Oil & Gas combination
 }
