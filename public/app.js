@@ -851,7 +851,7 @@ const PAGES = [
   { id: "markets", name: "Markets", icon: "i-home", key: "m" },
   { id: "screener", name: "Screener", icon: "i-co", key: "c" },
   { id: "compare", name: "Compare", icon: "i-cmp", key: "o" },
-  { id: "feed", name: "Filings feed", icon: "i-feed", key: "f" },
+  { id: "feed", name: "Filings feed", icon: "i-feed", key: "f", hidden: true },
   { id: "technicals", name: "Technicals", icon: "i-ta", key: "t" },
   { id: "sectors", name: "Sectors", icon: "i-sec", key: "s" },
   { id: "macro", name: "Macro", icon: "i-mac", key: "x" },
@@ -1059,7 +1059,7 @@ function pMarkets() {
   const fl = allFilings().filter(f => ["10-K", "10-Q", "8-K", "DEF 14A"].includes(f.f)).slice(0, 9);
   fl.forEach(f => feed.append(filingRow(f)));
   if (!fl.length) feed.append(el("div", { class: "muted", style: "padding:12px 0" }, "Loading filings…"));
-  g.append(panel("Latest filings", el("a", { href: "#feed" }, "All filings"), feed));
+  g.append(panel("Latest filings", null, feed));
   page.append(g);
 
   const g2 = el("div", { class: "grid g3" });
