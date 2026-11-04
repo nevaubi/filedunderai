@@ -858,7 +858,7 @@ const PAGES = [
   { id: "theses", name: "Theses", icon: "i-th", key: "h" },
   { id: "workbench", name: "Workbench", icon: "i-wb", key: "w" },
   { id: "research", name: "Research assistant", icon: "i-ag", key: "r" },
-  { id: "coverage", name: "Data status", icon: "i-src", key: "d" },
+  { id: "coverage", name: "Data status", icon: "i-src", key: "d", hidden: true },
 ];
 const page = $("#page");
 const WATCH_DEFAULT = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "JPM", "LLY"];
@@ -871,8 +871,8 @@ function renderRail() {
   if (!watchlist().length) wl.append(el("div", { class: "faint", style: "padding:6px 10px;font-size:12px" }, "Star a company to add it."));
 }
 function buildShell() {
-  $("#nav").append(...PAGES.map(p => el("a", { href: "#" + p.id, "data-p": p.id, title: `${p.name} (g then ${p.key})` }, svgUse(p.icon), p.name)));
-  $("#mnav").append(...PAGES.map(p => el("a", { href: "#" + p.id, "data-p": p.id }, p.name)));
+  $("#nav").append(...PAGES.filter(p => !p.hidden).map(p => el("a", { href: "#" + p.id, "data-p": p.id, title: `${p.name} (g then ${p.key})` }, svgUse(p.icon), p.name)));
+  $("#mnav").append(...PAGES.filter(p => !p.hidden).map(p => el("a", { href: "#" + p.id, "data-p": p.id }, p.name)));
   renderRail();
   const lt = last("SPY")?.t;
   $("#asof").textContent = lt ? "Prices as of " + d3.utcFormat("%b %d, %Y")(lt) : "";
@@ -943,7 +943,7 @@ function paletteItems(v) {
   const matches = TICKERS.filter(t => { const c = IDX[t]; return !v || t.toLowerCase().startsWith(v) || (c.name || "").toLowerCase().includes(v) || (c.legal_name || "").toLowerCase().includes(v); });
   (v ? matches : watchlist()).slice(0, v ? 10 : 8).forEach(t => { const c = IDX[t]; add("Companies", `${t} · ${c.name}`, `${fnum(c.price)} · ${fsgn(c.chg_1d, 2)}`, miniLogo(t, 20), () => location.hash = "company-" + t.toLowerCase()); });
   if (v) { const sec = [...new Set(Object.values(IDX).map(c => c.sector))].filter(s => s.toLowerCase().includes(v)); sec.forEach(s => add("Screener", `${s} sector`, "screener", "▤", () => { STATE.scr.sector = s; store.set("scr", STATE.scr); location.hash === "#screener" ? route() : location.hash = "screener"; })); }
-  for (const p of PAGES) if (!v || p.name.toLowerCase().includes(v)) add("Pages", p.name, `g ${p.key}`, "→", () => location.hash = p.id);
+  for (const p of PAGES) if (!p.hidden && (!v || p.name.toLowerCase().includes(v))) add("Pages", p.name, `g ${p.key}`, "→", () => location.hash = p.id);
   if (v) for (const s of Object.keys(SYMNAME)) if (s.toLowerCase().replace("^", "").startsWith(v) || SYMNAME[s].toLowerCase().includes(v)) add("Charts", `${s.replace("^", "")} · ${SYMNAME[s]}`, "technicals", "↗", () => { STATE.taSym = s; location.hash === "#technicals" ? route() : location.hash = "technicals"; });
   if (v.length > 3) add("Ask", `Ask the research assistant: “${v}”`, "assistant", "✦", () => { location.hash = "research"; setTimeout(() => RESEARCH?.ask(v), 300); });
   return out.slice(0, 26);
@@ -976,7 +976,7 @@ function setupKeys() {
     if (e.key === "/") { e.preventDefault(); openPalette(); return; }
     if (e.key === "?") { openShortcuts(); return; }
     if (e.key === "g") { g = Date.now(); return; }
-    if (Date.now() - g < 900) { const p = PAGES.find(p => p.key === e.key); if (p) { location.hash = p.id; g = 0; } return; }
+    if (Date.now() - g < 900) { const p = PAGES.find(p => p.key === e.key && !p.hidden); if (p) { location.hash = p.id; g = 0; } return; }
     if (/^[1-6]$/.test(e.key) && location.hash.startsWith("#company-")) { const b = document.querySelectorAll(".tabs button")[+e.key - 1]; b?.click(); }
     if (e.key === "s" && location.hash.startsWith("#company-")) { const t = location.hash.slice(9).toUpperCase(); if (IDX[t]) { const on = toggleWatch(t); document.querySelector("#star")?.classList.toggle("pri", on); } }
   });
