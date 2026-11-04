@@ -544,4 +544,6 @@ PREDECESSORS = {
              (69499, "2015-02-27")],     # Mylan Inc. before the Dutch reorganization
     "TPL": [(97517, "2021-01-11")],      # Texas Pacific Land Trust before the corporate reorganization
     "PLD": [(899881, "2011-06-03")],     # ProLogis (the trust; accounting acquirer) before the AMB merger
+    "APO": [(1411494, "2022-01-01")],    # Apollo Global Management, Inc. (now Apollo Asset Management) before the Athene merger holdco
+    "BKR": [(808362, "2017-07-03")],     # Baker Hughes Incorporated (now Baker Hughes Holdings LLC) before the GE Oil & Gas combination
 }
