@@ -542,7 +542,12 @@ _llm_lock = threading.Lock()
 LLM_STATS = collections.Counter()
 
 
+MODEL_DOWN = []   # set once the provider refuses the account (suspended, unpaid, bad key): later calls fail fast
+
+
 def complete_json(prompt, max_tokens=12000):
+    if MODEL_DOWN:
+        raise RuntimeError("model provider unavailable: " + MODEL_DOWN[0])
     last = None
     for model in (PRIMARY, FALLBACK):
         for attempt in range(2):
@@ -565,6 +570,9 @@ def complete_json(prompt, max_tokens=12000):
                 return j, model
             except Exception as e:
                 last = e
+                if getattr(e, "code", None) in (401, 402, 403, 412):
+                    MODEL_DOWN.append(str(e)[:200])
+                    raise
                 time.sleep(2 + attempt * 4)
     raise last
 
@@ -757,6 +765,7 @@ def process_doc(sb, tk, name, fye, doc, use_llm=True):
            "doc_kind": {"release": "earnings release", "presentation": "investor presentation", "remarks": "prepared remarks",
                         "transcript": "earnings call transcript", "supplement": "financial supplement"}.get(doc.get("doc_type"), "8-K exhibit")}
     rows, rejected, methods, models = [], collections.Counter(), set(), set()
+    llm_failed = False
     for ch in chunks:
         pat, uncovered = pattern_extract(ch)
         if uncovered == 0 and pat:
@@ -773,7 +782,17 @@ def process_doc(sb, tk, name, fye, doc, use_llm=True):
         try:
             j, model = llm_extract(ch, ctx)
         except Exception as e:
+            # model unavailable: keep the validated pattern items of this excerpt and leave the document for a later re-read
             status["error"] = str(e)[:300]
+            llm_failed = True
+            for it in pat:
+                v, why = validate_item(it, pages)
+                if v:
+                    rows.append(to_row(tk, fye, doc, issued, "guide", v, "pattern", None))
+                else:
+                    rejected[why] += 1
+            if pat:
+                methods.add("pattern")
             continue
         models.add(model)
         methods.add("llm")
@@ -815,7 +834,10 @@ def process_doc(sb, tk, name, fye, doc, use_llm=True):
     for r in rows:
         uniq.setdefault(r["id"], r)
     rows = list(uniq.values())
-    status.update({"status": "ok", "items": len(rows), "rejected": sum(rejected.values()), "method": "+".join(sorted(methods)) or None,
+    if llm_failed:
+        # version 0: the next run reads this document again with the model
+        status["version"] = 0
+    status.update({"status": "partial: model unavailable" if llm_failed else "ok", "items": len(rows), "rejected": sum(rejected.values()), "method": "+".join(sorted(methods)) or None,
                    "model": ",".join(sorted(models)) or None, "seconds": round(time.time() - t0, 2),
                    "reasons": dict(rejected) if rejected else None})
     return status, rows
