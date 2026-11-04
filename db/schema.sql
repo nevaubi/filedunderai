@@ -343,6 +343,7 @@ create table if not exists macro_releases (
 -- Rows: [{"s": series_id, "d": "YYYY-MM-DD", "v": "1.23", "vt": vintage date, "p": published date or null}].
 create or replace function macro_ingest(p_rows jsonb)
 returns table(series_id text, d date) language plpgsql security definer set search_path = public as $$
+#variable_conflict use_column
 begin
   return query
   with r as (

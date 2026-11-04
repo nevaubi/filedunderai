@@ -147,11 +147,33 @@ def _prev_bundle(sb, sid):
         return {}
 
 
+def _ingest_rest(sb, sid, rows, vt, published):
+    """Same rule as macro_ingest() done through the REST API: insert only new or changed values as a new vintage."""
+    from .common import now_iso as _now
+    import urllib.parse
+    cur = {r["d"]: float(r["value"]) for r in sb.select("macro_series_latest", f"select=d,value&series_id=eq.{urllib.parse.quote(sid)}")}
+    new = [{"series_id": sid, "d": d, "vintage": vt, "value": v, "published": published, "retrieved_at": _now()}
+           for d, v in rows if d not in cur or abs(cur[d] - float(v)) > 1e-12]
+    if new:
+        sb.upsert("macro_series_obs", new, "series_id,d,vintage")
+    return [r["d"] for r in new]
+
+
 def _ingest(sb, sid, rows, vt, published):
+    if _DB.get("rest"):
+        return _ingest_rest(sb, sid, rows, vt, published)
     changed = []
     for i in range(0, len(rows), 500):
         chunk = [{"s": sid, "d": d, "v": v, "vt": vt, "p": published or ""} for d, v in rows[i:i + 500]]
-        res = sb.rpc("macro_ingest", {"p_rows": chunk}) or []
+        try:
+            res = sb.rpc("macro_ingest", {"p_rows": chunk}) or []
+        except HTTPError as e:
+            # an older deployed copy of macro_ingest (ambiguous column error) or a missing function: use the REST path
+            if e.code in (400, 404) and ("42702" in e.body or "PGRST202" in e.body):
+                print("macro_ingest unavailable, inserting through the REST API:", e.body[:120])
+                _DB["rest"] = True
+                return changed + _ingest_rest(sb, sid, rows[i:], vt, published)
+            raise
         changed += [r["d"] for r in res]
     return changed
 
