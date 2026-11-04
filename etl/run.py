@@ -8,7 +8,7 @@ from .common import Supabase
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "all"])
+    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "screener", "all"])
     ap.add_argument("--tickers", nargs="*")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--news", action="store_true", help="refresh news for each company")
@@ -44,6 +44,8 @@ def main():
     if a.job == "logos":
         from .logos import logos_job
         print("logos", logos_job(sb, a.tickers))
+    if a.job == "screener":
+        print("screener", jobs.screener_job(sb, full=a.full_history, workers=a.workers))
     if a.job == "index":
         print("index", jobs.build_index(sb))
     if a.job == "feed":

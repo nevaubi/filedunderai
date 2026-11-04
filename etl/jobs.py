@@ -761,3 +761,11 @@ def ir_rotation_job(sb, per_run=8, time_budget=240):
     except Exception as e:
         print("coverage index failed", e)
     return done, failed
+
+
+# ---------------------------------------------------------------- screener factor table
+def screener_job(sb, full=False, time_budget=None, workers=6):
+    """Builds screener.json (150+ sourced fields per company), screener/src/{T}.json provenance and screener/corr.json.
+    Runs after prices, companies and segments; full=True refetches the 10-year close history and every company."""
+    from .screener import screener_job as build
+    return build(sb, full=full, time_budget=time_budget, workers=workers)
