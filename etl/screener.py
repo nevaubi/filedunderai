@@ -221,6 +221,29 @@ for k, n, _rx in KPI_FAM:
     fld(f"kpi_{k}", "kpi", "Reports " + n.lower(), "bool", f"The company's investor materials report a {n.lower()} KPI.", "Company IR documents (kpis/{T}.json)")
     fld(f"kpi_{k}_yoy", "kpi", n + " YoY", "pct", f"Latest reported {n.lower()} value vs the same period a year earlier − 1 (company-specific definition; first matching KPI).", "Company IR documents (kpis/{T}.json)")
     fld(f"kpi_{k}_v", "kpi", n + ", latest", "num", f"Latest reported {n.lower()} value in the company's own unit (see the source panel).", "Company IR documents (kpis/{T}.json)")
+# standardized KPIs (etl/kpistd.py): one total-company series per company and measure, comparable across companies
+FAM_CANON = {"units": ["units_shipped"], "customers": ["subscribers", "customers", "mau"], "arr": ["arr"], "backlog": ["backlog", "rpo"],
+             "comps": ["same_store_sales_growth"], "nim": ["nim"], "combined": ["combined_ratio"], "arpu": ["arpu"], "production": ["production_boe"],
+             "occupancy": ["occupancy"], "stores": ["store_count"], "retention": ["net_revenue_retention"], "loans": ["loans", "avg_loans", "deposits", "avg_deposits"],
+             "aum": ["aum"]}
+STD_FIELDS = ["same_store_sales_growth", "organic_growth", "revenue_growth_cc", "arr", "net_revenue_retention", "rpo", "backlog", "book_to_bill", "subscribers", "arpu",
+              "nim", "efficiency_ratio", "cet1_ratio", "rotce", "net_charge_off_rate", "combined_ratio", "medical_care_ratio", "ffo_per_share", "occupancy",
+              "load_factor", "production_boe", "adjusted_ebitda_margin", "adjusted_operating_margin", "fcf_margin", "net_leverage"]
+STD_UNIT = {"%": "pct", "pp": "pct", "USD": "usd", "x": "x"}
+try:
+    from .kpi_taxonomy import BY_ID as _STD
+except Exception:   # the taxonomy ships with the kpistd workstream; without it the fields are simply absent
+    _STD = {}
+for cid in STD_FIELDS:
+    t = _STD.get(cid)
+    if not t:
+        continue
+    u = STD_UNIT.get(t["unit"], "num")
+    fld(f"std_{cid}", "kpi", t["name"] + " (standardized)", u, t["definition"] + " Latest reported value; the company's own KPI series mapped to this standard measure (one series, never joined across reporting bases).",
+        "Company IR documents (kpistd/t/{T}.json)")
+    fld(f"std_{cid}_yoy", "kpi", t["name"] + (" change YoY" if t["unit"] == "%" else " YoY"), "pct",
+        ("Latest value minus the value a year earlier, in percentage points." if t["unit"] == "%" else "Latest value over the value a year earlier − 1.") + " Standardized series.",
+        "Company IR documents (kpistd/t/{T}.json)")
 FIELD_IDS = [f["id"] for f in F]
 ID_COLS = ["ticker", "name", "sector", "industry", "sp100", "cik"]
 
@@ -1093,8 +1116,47 @@ def _kpi_yoy(vals):
     return None
 
 
-def kpi_extract(kpi, seg):
+def _std_fields(tf, out, prov):
+    """std_<id> and std_<id>_yoy from the company's standardized series, with the source documents of both points."""
+    docs = (tf or {}).get("docs") or {}
+
+    def doc(p, s):
+        d = docs.get(p[3]) or [None] * 6
+        return {"doc": p[3], "title": d[0], "path": d[1], "ext": d[2], "url": d[3], "page": p[4], "quote": p[5], "printed": None, "sheet": p[6], "cell": p[7],
+                "v": p[9], "end": p[0], "label": p[2]}
+    for cid in STD_FIELDS:
+        t = _STD.get(cid)
+        s = ((tf or {}).get("series") or {}).get(cid)
+        if not t or not s or s.get("current") is False:
+            continue
+        pts = s["Q"] if s["Q"] and (not s["A"] or s["Q"][-1][0] >= s["A"][-1][0]) else s["A"]
+        if not pts:
+            continue
+        p = pts[-1]
+        if days_between(p[0], dt.date.today().isoformat()) > 550:
+            continue   # the company stopped reporting it
+        scale = 0.01 if t["unit"] in ("%", "pp") else 1
+        out[f"std_{cid}"] = p[1] * scale
+        prov[f"std_{cid}"] = {"x": f"{s['name']} ({s.get('unit') or ''}), {p[2] or p[0]}; standardized as {t['name']}", "kpi": s["kpi_id"], "unit": s.get("unit"), "docs": [doc(p, s)]}
+        prior = next((x for x in reversed(pts[:-1]) if abs(days_between(x[0], p[0]) - 365) <= 25), None)
+        if prior and prior[1] is not None and p[1] is not None:
+            if t["unit"] in ("%", "pp"):
+                yoy = (p[1] - prior[1]) / 100
+                how = f"{p[2] or p[0]} minus {prior[2] or prior[0]}, percentage points"
+            elif prior[1] > 0:
+                yoy = p[1] / prior[1] - 1
+                how = f"{p[2] or p[0]} / {prior[2] or prior[0]} − 1"
+            else:
+                continue
+            out[f"std_{cid}_yoy"] = yoy
+            prov[f"std_{cid}_yoy"] = {"x": f"{s['name']}: {how}", "kpi": s["kpi_id"], "unit": s.get("unit"), "docs": [doc(p, s), doc(prior, s)]}
+
+
+def kpi_extract(kpi, seg, std=None):
     out, prov = {}, {}
+    std_ids = {cid: s["kpi_id"] for cid, s in ((std or {}).get("series") or {}).items()}
+    if std:
+        _std_fields(std, out, prov)
     items = []
     for g in (kpi or {}).get("groups") or []:
         for it in g.get("items") or []:
@@ -1112,10 +1174,12 @@ def kpi_extract(kpi, seg):
         out[f"kpi_{fam}"] = bool(hits)
         if not hits:
             continue
-        hits.sort(key=lambda x: (x[1].get("depth") or 0, not x[1].get("is_total"), -len((x[1].get("values") or {}).get("Q") or {})))
+        # the company's standardized total-company series for this family comes first when it exists
+        canon = {std_ids[c] for c in FAM_CANON.get(fam, []) if c in std_ids}
+        hits.sort(key=lambda x: (x[1].get("id") not in canon, x[1].get("depth") or 0, not x[1].get("is_total"), -len((x[1].get("values") or {}).get("Q") or {})))
         g, it = hits[0]
         r = _kpi_yoy(it.get("values") or {})
-        prov[f"kpi_{fam}"] = {"x": f"Matched KPIs: " + "; ".join(h[1].get("name", "") for h in hits[:6]), "kpi": it.get("id")}
+        prov[f"kpi_{fam}"] = {"x": ("Standardized KPI first. " if it.get("id") in canon else "") + "Matched KPIs: " + "; ".join(h[1].get("name", "") for h in hits[:6]), "kpi": it.get("id")}
         if not r:
             continue
         K, e, cur, prior, yoy = r
@@ -1178,10 +1242,10 @@ def list_objects(sb, prefix):
 def update_kpis(sb, full=False, workers=6, log=print, deadline=None):
     cache = (None if full else gz_json(sb, KPI_PATH)) or {}
     stamps = {}
-    for pre in ("kpis", "segments"):
+    for pre in ("kpis", "segments", "kpistd/t"):
         for o in list_objects(sb, pre):
             if o.get("name", "").endswith(".json"):
-                stamps.setdefault(o["name"][:-5], {})[pre] = o.get("updated_at")
+                stamps.setdefault(o["name"][:-5], {})[pre.split("/")[0]] = o.get("updated_at")
     todo = [tk for tk in TICKERS if (cache.get(tk) or {}).get("stamp") != stamps.get(tk)]
 
     def one(tk):
@@ -1191,7 +1255,8 @@ def update_kpis(sb, full=False, workers=6, log=print, deadline=None):
         try:
             kpi = sb.get_json(f"kpis/{tk}.json") if st.get("kpis") else None
             seg = sb.get_json(f"segments/{tk}.json") if st.get("segments") else None
-            o, p = kpi_extract(kpi, seg)
+            std = sb.get_json(f"kpistd/t/{tk}.json") if st.get("kpistd") else None
+            o, p = kpi_extract(kpi, seg, std)
             return tk, {"stamp": st, "out": o, "prov": p}
         except Exception as e:
             log("kpi extract failed", tk, str(e)[:160])

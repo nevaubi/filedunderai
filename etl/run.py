@@ -8,7 +8,7 @@ from .common import Supabase
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "compare", "sectors", "screener", "technicals", "mdata", "all"])
+    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "compare", "sectors", "screener", "technicals", "mdata", "kpistd", "all"])
     ap.add_argument("--tickers", nargs="*")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--news", action="store_true", help="refresh news for each company")
@@ -28,6 +28,7 @@ def main():
     ap.add_argument("--merge", action="store_true", help="technicals job: only merge the part results")
     ap.add_argument("--pace", type=float, default=2.0, help="technicals backfill: seconds between Yahoo requests")
     ap.add_argument("--source", help="mdata job: frb_daily, frb_weekly, frb_monthly, nyfed, treasury, bls, oecd, cftc, fdic, calendar, legacy, catalog")
+    ap.add_argument("--no-llm", action="store_true", help="kpistd job: rules only, no model proposals")
     a = ap.parse_args()
     sb = Supabase()
     if a.job in ("prices", "all"):
@@ -76,6 +77,8 @@ def main():
     if a.job == "mdata":
         from .macrojobs import mdata_job
         print("mdata", json.dumps(mdata_job(sb, a.source, full=a.full_history, force=a.force), default=str)[:2000])
+    if a.job == "kpistd":
+        print("kpistd", json.dumps(jobs.kpistd_job(sb, a.tickers, full=a.full_history, use_llm=not a.no_llm, time_budget=a.budget), default=str))
     if a.job == "index":
         print("index", jobs.build_index(sb))
     if a.job == "feed":

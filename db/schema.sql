@@ -457,3 +457,50 @@ begin
   end loop;
 end $$;
 notify pgrst, 'reload schema';
+
+-- ---------------------------------------------------------------- workstream: kpistd (standardized KPIs, etl/kpistd.py)
+-- Canonical KPI taxonomy (etl/kpi_taxonomy.py) and the mapping of every company KPI id onto it. Each company KPI id
+-- (one per reporting basis) is mapped on its own; role 'primary' marks the one series per company and canonical id
+-- used for peer comparison, 'alt' an older basis or alternative definition kept as its own series.
+create table if not exists kpi_canonical (
+  id                text primary key,
+  name              text not null,
+  family            text,
+  unit              text,
+  how               text,
+  definition        text,
+  higher_is_better  boolean,
+  match             text,
+  industries        jsonb,
+  taxonomy_version  integer,
+  updated_at        timestamptz not null default now()
+);
+create table if not exists kpi_std_map (
+  ticker            text not null,
+  kpi_id            text not null,
+  canonical_id      text not null,
+  scope             text not null check (scope in ('total','segment','variant')),
+  member            text,
+  era               text,
+  role              text,
+  basis             text,
+  confidence        numeric,
+  method            text,
+  reason            text,
+  factor            numeric,
+  taxonomy_version  integer,
+  mapped_at         timestamptz not null default now(),
+  primary key (ticker, kpi_id)
+);
+create index if not exists kpi_std_map_canonical on kpi_std_map (canonical_id, scope, role);
+do $$
+declare t text;
+begin
+  foreach t in array array['kpi_canonical','kpi_std_map'] loop
+    execute format('alter table %I enable row level security', t);
+    if not exists (select 1 from pg_policies where tablename = t and policyname = 'public read') then
+      execute format('create policy "public read" on %I for select to anon, authenticated using (true)', t);
+    end if;
+  end loop;
+end $$;
+notify pgrst, 'reload schema';
