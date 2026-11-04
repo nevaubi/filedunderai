@@ -52,7 +52,9 @@
 
 **Files:** Design/verification documentation and screenshots only, plus fixes from review.
 
-- [ ] Independently review task diffs for design compliance and functional regressions.
-- [ ] Run the complete JavaScript suite and production build; use required CI gates before merging.
-- [ ] Publish a reviewable branch/PR, verify checks, merge and inspect the production result under the existing authorization.
-- [ ] Check company, brief, source drawer, assistant and editors in the live UI. Save screenshots of representative changed screens and report limitations.
+- [x] Independently review task diffs for design compliance and functional regressions.
+- [x] Run the complete JavaScript suite and production build; use required CI gates before merging.
+- [x] Publish a reviewable branch/PR, verify checks, merge and inspect the production result under the existing authorization.
+- [x] Check company, brief, source drawer, assistant and editors in the live UI. Save screenshots of representative changed screens and report limitations.
+
+Production results and captured screenshots: `docs/verification/2026-11-04-reference-ui/REPORT.md`.
