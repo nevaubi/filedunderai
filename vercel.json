@@ -159,6 +159,18 @@
     {
       "path": "/api/cron/technicals?merge=1&parts=4",
       "schedule": "10 23 * * 1-5"
+    },
+    {
+      "path": "/api/cron/guidance",
+      "schedule": "20 15 * * *"
+    },
+    {
+      "path": "/api/cron/guidance?run=2",
+      "schedule": "50 23 * * *"
+    },
+    {
+      "path": "/api/cron/guidance?run=3",
+      "schedule": "20 5 * * *"
     }
   ],
   "headers": [

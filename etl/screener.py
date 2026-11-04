@@ -69,7 +69,7 @@ SHARE_COUNT = {"Diluted shares"}
 
 # ------------------------------------------------------------------ field catalogue
 GROUPS = [("id", "Identity"), ("val", "Valuation"), ("grw", "Growth"), ("qual", "Quality and profitability"), ("risk", "Balance sheet and risk"),
-          ("px", "Price and technicals"), ("corr", "Correlations"), ("act", "Ownership and activity"), ("kpi", "Company KPIs")]
+          ("px", "Price and technicals"), ("corr", "Correlations"), ("act", "Ownership and activity"), ("kpi", "Company KPIs"), ("gd", "Guidance")]
 F = []
 
 
@@ -221,6 +221,19 @@ for k, n, _rx in KPI_FAM:
     fld(f"kpi_{k}", "kpi", "Reports " + n.lower(), "bool", f"The company's investor materials report a {n.lower()} KPI.", "Company IR documents (kpis/{T}.json)")
     fld(f"kpi_{k}_yoy", "kpi", n + " YoY", "pct", f"Latest reported {n.lower()} value vs the same period a year earlier − 1 (company-specific definition; first matching KPI).", "Company IR documents (kpis/{T}.json)")
     fld(f"kpi_{k}_v", "kpi", n + ", latest", "num", f"Latest reported {n.lower()} value in the company's own unit (see the source panel).", "Company IR documents (kpis/{T}.json)")
+GD_SRC = "Company guidance in earnings releases, remarks, slides and transcripts, scored against reported actuals (guidance/{T}.json)"
+GD_FIELDS = [
+    ("gd_n", "Guidance periods scored", "num", "Guided periods (one metric, basis and fiscal period) whose actual has been reported and scored against the last guidance before the report."),
+    ("gd_hit", "Guidance met or beat", "pct", "Share of scored guidance periods where the actual was at or above the last guided range (at or below it for costs, inside it for neutral items such as tax rate or capex)."),
+    ("gd_in", "Actual inside guidance range", "pct", "Share of scored guidance periods where the actual landed inside the last guided range."),
+    ("gd_above", "Actual above guidance range", "pct", "Share of scored guidance periods where the actual landed above the top of the last guided range."),
+    ("gd_surp", "Average surprise vs guidance", "pct", "Average of (actual − guidance midpoint) / |midpoint| over scored amounts and per-share figures, signed so that positive is better (higher revenue or EPS, lower costs)."),
+    ("gd_raise_fy", "Annual guidance raised", "pct", "Share of scored fiscal-year targets (revenue, earnings, margins) whose last midpoint before the report was above the first one given."),
+    ("gd_raises_1y", "Guidance raises, 1y", "num", "Revisions in the last 365 days that moved guidance in the good direction (up for revenue, earnings and margins, down for costs)."),
+    ("gd_cuts_1y", "Guidance cuts, 1y", "num", "Revisions in the last 365 days that moved guidance in the bad direction."),
+    ("gd_defchg", "Guidance definition changes", "num", "Times a guided metric switched basis (GAAP, adjusted, organic) or form (amount or growth) from one fiscal year to the next.")]
+for _fid, _n, _u, _d in GD_FIELDS:
+    fld(_fid, "gd", _n, _u, _d, GD_SRC)
 FIELD_IDS = [f["id"] for f in F]
 ID_COLS = ["ticker", "name", "sector", "industry", "sp100", "cik"]
 
@@ -1299,6 +1312,10 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
         splits = hist.get("splits") or {}
         fundc = update_fund(sb, fundmeta, hist, full=full, workers=workers, log=log, deadline=deadline)
         kpic = update_kpis(sb, full=full, workers=workers, log=log, deadline=deadline)
+        try:
+            gdx = (sb.get_json("guidance/index.json") or {}).get("screener") or {}
+        except Exception:
+            gdx = {}
         act, actp = activity(sb, fundc, today)
         macro = macro_monthly(sb)
         log("inputs loaded", round(time.time() - t0, 1), "s")
@@ -1434,6 +1451,11 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
                     out["corrm_n"] = mn
             out.update(act.get(tk, {}))
             prov.f.update(actp.get(tk, {}))
+            for fid, n_, _u, _d in GD_FIELDS:
+                gv = (gdx.get(tk) or {}).get(fid)
+                if gv is not None:
+                    out[fid] = gv
+                    prov.f[fid] = {"x": f"{n_} from the guidance record (last guidance issued {(gdx.get(tk) or {}).get('gd_last')}); the company Guidance tab lists every period behind it"}
             kc = kpic.get(tk) or {}
             out.update(kc.get("out") or {})
             prov.f.update(kc.get("prov") or {})

@@ -364,3 +364,152 @@ begin
   end loop;
 end $$;
 notify pgrst, 'reload schema';
+
+-- ---------------------------------------------------------------- workstream: guidance
+-- Quantitative guidance statements, adjusted actuals the company reported, and withdrawals, each with its verbatim quote,
+-- document and page (etl/guidance.py). Values in printed units: dollars and counts in base units, per-share in dollars,
+-- margins, rates and growth in percent. action / prev_id chain the revisions of one series and period.
+create table if not exists guidance_items (
+  id                text primary key,
+  ticker            text not null references companies(ticker) on delete cascade,
+  kind              text not null check (kind in ('guide','reported','withdrawn')),
+  metric            text not null,
+  label             text,
+  segment           text,
+  basis             text not null,
+  measure           text not null,
+  unit              text,
+  series_key        text not null,
+  period_type       text not null,
+  fiscal_year       integer,
+  quarter           integer,
+  fiscal_label      text not null,
+  period_end        date,
+  low               numeric,
+  high              numeric,
+  point             numeric,
+  mid               numeric,
+  bound             text,
+  precision         numeric,
+  status_words      text,
+  printed           jsonb,
+  issued            date not null,
+  doc_id            text not null,
+  page              integer,
+  quote             text not null,
+  method            text not null,
+  model             text,
+  action            text,
+  prev_id           text,
+  extracted_at      timestamptz not null default now()
+);
+create index if not exists guidance_items_series on guidance_items (ticker, series_key, fiscal_label, issued);
+create index if not exists guidance_items_issued on guidance_items (issued desc);
+create index if not exists guidance_items_doc on guidance_items (doc_id);
+
+-- Extraction log per document (resumable runs; version re-reads documents after an extractor change).
+create table if not exists guidance_docs (
+  doc_id            text primary key,
+  ticker            text,
+  issued            date,
+  version           integer not null,
+  status            text,
+  windows           integer,
+  items             integer,
+  rejected          integer,
+  reasons           jsonb,
+  method            text,
+  model             text,
+  error             text,
+  seconds           numeric,
+  processed_at      timestamptz not null default now()
+);
+create index if not exists guidance_docs_ticker on guidance_docs (ticker);
+
+-- The last guidance before the actual was reported, scored against the actual (XBRL facts, company-reported adjusted
+-- figures or published KPI values; actual_ref holds the accession or document, page and quote).
+create table if not exists guidance_outcomes (
+  ticker            text not null references companies(ticker) on delete cascade,
+  series_key        text not null,
+  fiscal_label      text not null,
+  metric            text not null,
+  basis             text,
+  measure           text,
+  unit              text,
+  label             text,
+  segment           text,
+  period_type       text,
+  period_end        date,
+  initial_id        text,
+  final_id          text,
+  revisions         integer,
+  initial_mid       numeric,
+  final_low         numeric,
+  final_high        numeric,
+  final_mid         numeric,
+  actual            numeric,
+  actual_source     text,
+  actual_ref        jsonb,
+  reported_on       date,
+  surprise_abs      numeric,
+  surprise_rel      numeric,
+  result            text,
+  direction         integer,
+  met               boolean,
+  updated_at        timestamptz not null default now(),
+  primary key (ticker, series_key, fiscal_label)
+);
+
+-- Per-company guidance record.
+create table if not exists guidance_credibility (
+  ticker            text primary key references companies(ticker) on delete cascade,
+  n_scored          integer,
+  n_met             integer,
+  hit_rate          numeric,
+  in_range_rate     numeric,
+  above_rate        numeric,
+  below_rate        numeric,
+  avg_surprise      numeric,
+  median_surprise   numeric,
+  raise_rate        numeric,
+  tendency          text,
+  definition_changes jsonb,
+  n_series          integer,
+  n_points          integer,
+  first_issued      date,
+  last_issued       date,
+  updated_at        timestamptz not null default now()
+);
+
+-- Consensus estimates from a licensed feed (none connected yet). One row per provider snapshot.
+create table if not exists consensus_estimates (
+  ticker            text not null references companies(ticker) on delete cascade,
+  metric            text not null,
+  basis             text not null default 'adjusted',
+  fiscal_label      text not null,
+  period_end        date,
+  as_of             date not null,
+  mean              numeric,
+  median            numeric,
+  high              numeric,
+  low               numeric,
+  n_estimates       integer,
+  unit              text,
+  provider          text not null,
+  source_url        text,
+  retrieved_at      timestamptz not null default now(),
+  primary key (ticker, metric, basis, fiscal_label, provider, as_of)
+);
+
+do $$
+declare t text;
+begin
+  foreach t in array array['guidance_items','guidance_outcomes','guidance_credibility','consensus_estimates'] loop
+    execute format('alter table %I enable row level security', t);
+    if not exists (select 1 from pg_policies where tablename = t and policyname = 'public read') then
+      execute format('create policy "public read" on %I for select to anon, authenticated using (true)', t);
+    end if;
+  end loop;
+  execute 'alter table guidance_docs enable row level security';
+end $$;
+notify pgrst, 'reload schema';

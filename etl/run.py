@@ -8,7 +8,7 @@ from .common import Supabase
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "compare", "sectors", "screener", "technicals", "all"])
+    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "compare", "sectors", "screener", "technicals", "guidance", "all"])
     ap.add_argument("--tickers", nargs="*")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--news", action="store_true", help="refresh news for each company")
@@ -27,6 +27,9 @@ def main():
     ap.add_argument("--events", action="store_true", help="technicals job: EDGAR 8-K/10-K/10-Q history since 2008 per company")
     ap.add_argument("--merge", action="store_true", help="technicals job: only merge the part results")
     ap.add_argument("--pace", type=float, default=2.0, help="technicals backfill: seconds between Yahoo requests")
+    ap.add_argument("--since", help="guidance job: earliest issue date (YYYY-MM-DD)")
+    ap.add_argument("--until", help="guidance job: latest issue date (YYYY-MM-DD)")
+    ap.add_argument("--rebuild", action="store_true", help="guidance job: rebuild company files and the index without reading documents")
     a = ap.parse_args()
     sb = Supabase()
     if a.job in ("prices", "all"):
@@ -72,6 +75,9 @@ def main():
             print("technicals backfill", len(done), "failed", json.dumps(failed)[:2000])
         else:
             print("technicals", json.dumps(jobs.technicals_job(sb, part=a.part, parts=a.parts if a.parts > 1 else 4), default=str)[:3000])
+    if a.job == "guidance":
+        from .guidance import guidance_job
+        print("guidance", json.dumps(guidance_job(sb, a.tickers, since=a.since, until=a.until, workers=a.workers, time_budget=a.budget, rebuild=a.rebuild), default=str)[:3000])
     if a.job == "index":
         print("index", jobs.build_index(sb))
     if a.job == "feed":
