@@ -380,6 +380,8 @@ MET_WORDS = [
     (r"free cash flow", "fcf"),
     (r"operating expenses|\bopex\b", "opex"),
     (r"(?:adjusted )?ebitda", "ebitda"),
+    (r"operating (?:profit|income)|segment profit|\bebit\b", "operating_income"),
+    (r"net income|net earnings", "net_income"),
     (r"net interest income", "net_interest_income"),
 ]
 NUMTOK = r"\(?\$?\s?\d[\d,]*(?:\.\d+)?\)?"
@@ -446,6 +448,9 @@ def pattern_extract(chunk):
                     continue
                 lead = m.group("lead")
                 met = _metric_in(lead)
+                # a business unit named in the sentence ("DPT continues to expect ...") is not company guidance: leave it to the model
+                if re.search(r"\bsegments?\b|\b(?!GAAP\b|EPS\b|FY\b|EBITDA\b|EBIT\b|USD?\b|Q[1-4]\b|CEO\b|CFO\b)[A-Z]{2,6}\b", lead):
+                    continue
                 per = _period_in(lead + s[m.end():m.end() + 80]) or _period_in(s) or ctx_period
                 if not met or not per:
                     continue
@@ -1203,6 +1208,20 @@ def build_company(sb, store, state, tk, name, sector, fye, log=print):
     sb.put_json(f"guidance/{tk}.json", bundle, cache="max-age=600")
     # mirror
     store.mirror("guidance_items", [{c: r.get(c) for c in ITEM_COLS} for r in rows], "id")
+    if store.db:
+        # rows from earlier reads that a re-read replaced, and outcomes no longer produced
+        try:
+            live = {r["id"] for r in rows}
+            stale = [r["id"] for r in sb.select("guidance_items", f"select=id&ticker=eq.{tk}") if r["id"] not in live]
+            for i in range(0, len(stale), 100):
+                store.mirror_delete("guidance_items", f"ticker=eq.{tk}&id=in.({','.join(stale[i:i + 100])})")
+            keep = {(o["series_key"], o["fiscal_label"]) for o in outcomes}
+            import urllib.parse as _up
+            for o in sb.select("guidance_outcomes", f"select=series_key,fiscal_label&ticker=eq.{tk}"):
+                if (o["series_key"], o["fiscal_label"]) not in keep:
+                    store.mirror_delete("guidance_outcomes", f"ticker=eq.{tk}&series_key=eq.{_up.quote(o['series_key'])}&fiscal_label=eq.{_up.quote(o['fiscal_label'])}")
+        except Exception as e:
+            log(f"  {tk} stale row cleanup failed: {str(e)[:120]}")
     store.mirror("guidance_outcomes", outcomes, "ticker,series_key,fiscal_label")
     store.mirror("guidance_credibility", [{"ticker": tk, **{k: v for k, v in cred.items() if k in CRED_COLS}, "updated_at": now_iso()}], "ticker")
     return bundle
