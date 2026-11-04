@@ -350,11 +350,17 @@ details.sx-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
   };
 
   /* ---------- notes ---------- */
+  // One-line plain summary for the collapsed row, built from the note's own facts (no model-written headline).
+  function noteLead(n) {
+    const f = n.facts || {}, txt = k => { const x = f[k]; if (!x) return null; const v = noteVal(x); return typeof v === "string" ? v : v.textContent; };
+    const parts = [["revenue growth", "rev_growth"], ["operating margin", "om"], ["P/E", "pe_now"], ["1M", "ret_1m"]].map(([l, k]) => { const v = txt(k); return v ? `${l} ${v}` : null; }).filter(Boolean);
+    return parts.length ? " · " + parts.join(", ") : "";
+  }
   function noteCard(n, slug, full = true) {
     const p = el("p", {});
     const parts = n.text.split(/(\{\{\s*[a-z0-9_]+\s*\}\})/);
     parts.forEach(t => { const m = /^\{\{\s*([a-z0-9_]+)\s*\}\}$/.exec(t); if (m && n.facts[m[1]]) { const f = n.facts[m[1]]; p.append(el("button", { class: "fig", title: f.label, onclick: () => openNoteFact(slug, f) }, noteVal(f))); } else p.append(t); });
-    return el("div", { class: "sx-note" }, el("div", { style: "display:flex;gap:8px;align-items:baseline;flex-wrap:wrap" }, full ? null : el("a", { href: "#sectors-" + slug }, el("b", {}, n.sector)), el("b", {}, n.title), el("span", { class: "faint", style: "font-size:11.5px;margin-left:auto" }, `Week of ${fdate(n.week)}`)), p,
+    return el("div", { class: "sx-note" }, el("div", { style: "display:flex;gap:8px;align-items:baseline;flex-wrap:wrap" }, full ? null : el("a", { href: "#sectors-" + slug }, el("b", {}, n.sector)), el("span", { class: "faint", style: "font-size:11.5px;margin-left:auto" }, `Week of ${fdate(n.week)}`)), p,
       el("div", { class: "faint", style: "font-size:11px" }, "Written by a language model from the computed figures only; every figure is inserted from the data and opens its derivation."));
   }
   const ordinal = n => n + (n % 100 >= 10 && n % 100 <= 20 ? "th" : { 1: "st", 2: "nd", 3: "rd" }[n % 10] || "th");
@@ -368,7 +374,7 @@ details.sx-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
       el("div", { class: "right" }, el("span", { class: "faint", style: "font-size:12px" }, `Built ${fdate(ov.generated.slice(0, 10))} · prices to ${fdate(ov.as_of)}`))));
     const wk = (notes.notes || []).filter(n => n.week === notes.notes[0]?.week);
     if (wk.length) page.append(panel("This week's sector notes", el("span", { class: "faint", style: "font-size:12px" }, `Week of ${fdate(wk[0].week)}`), el("div", { class: "bd", style: "display:flex;flex-direction:column;gap:8px" },
-      ...wk.map(n => el("details", { class: "sx-ndet" }, el("summary", {}, el("b", {}, n.sector), el("span", { class: "muted" }, " · " + n.title)), noteCard(n, n.slug, false))))));
+      ...wk.map(n => el("details", { class: "sx-ndet" }, el("summary", {}, el("b", {}, n.sector), el("span", { class: "muted" }, noteLead(n))), noteCard(n, n.slug, false))))));
     page.append(overviewTable(ov));
     page.append(rotationSection(ov));
     page.append(macroHeat(ov));
