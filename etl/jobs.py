@@ -761,3 +761,21 @@ def ir_rotation_job(sb, per_run=8, time_budget=240):
     except Exception as e:
         print("coverage index failed", e)
     return done, failed
+
+
+# ---------------------------------------------------------------- sectors
+def sectors_job(sb, step="publish", time_budget=None):
+    """step: "prices" refreshes the monthly price cache, "publish" rebuilds every sector and industry file,
+    "notes" writes the weekly sector notes."""
+    from . import sectors
+    from .universe import UNIVERSE as _U
+    with Run(sb, "sectors" if step == "publish" else f"sectors_{step}") as run:
+        if step == "prices":
+            syms = [t for t, *_ in _U] + list(SECTOR_ETF.values()) + ["SPY"]
+            _, st = sectors.refresh_pxm(sb, syms, time_budget=time_budget or 240)
+        elif step == "notes":
+            st = sectors.notes(sb)
+        else:
+            st = sectors.publish(sb, time_budget=time_budget)
+        run.stats.update(st if isinstance(st, dict) else {"result": st})
+        return st
