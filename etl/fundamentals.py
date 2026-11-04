@@ -26,6 +26,9 @@ FYE_HISTORY = {
     "AMCR": [("0000-00-00", "0630"), ("2026-07-01", "1231")],
     # Archer-Daniels-Midland moved from a June 30 to a December 31 year end, with a transition period July 1 to December 31, 2012
     "ADM": [("0000-00-00", "0630"), ("2012-07-01", "1231")],
+    # Best Buy's year ended on the Saturday nearest the end of February through fiscal 2012 (March 3, 2012), then on the
+    # Saturday nearest January 31 from fiscal 2013 (a 48-week year with a 14-week first quarter)
+    "BBY": [("0000-00-00", "0228"), ("2012-03-04", "0130")],
 }
 # companies that name a fiscal year after the calendar year in which it mostly falls, although it ends in January or
 # early February of the next year (Home Depot's "fiscal 2024" ended February 2, 2025). Their labels are one year lower.
