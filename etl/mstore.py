@@ -228,7 +228,9 @@ def save(sb, series, reg, partial=False, log=print, prev_reg=None):
         prev_stats = ((prev_reg if prev_reg is not None else reg).get(sid) or {}).get("stats")
         if stats is not None:
             first_load = not pmap
-            new_last = bool(pts) and pts[-1][0] in set(changed) and not first_load
+            # a new or revised latest period compared with the previously published bundle (not the database ingest)
+            ld = pts[-1][0] if pts else None
+            new_last = bool(pts) and not first_load and (pmap.get(ld) is None or abs(pmap[ld] - pts[-1][1]) > 1e-12)
             prev_new = (prev_stats or {}).get("new_last_at") if not new_last else None
             stats.update(vintage=vin.get(pts[-1][0]), published=published or prev.get("published"), retrieved=now_iso(),
                          new_last_at=stamp if new_last else prev_new)
