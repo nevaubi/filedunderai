@@ -31,6 +31,8 @@ FYE_HISTORY = {
     "BBY": [("0000-00-00", "0228"), ("2012-03-04", "0130")],
     # EDGAR lists Brown & Brown's year end as 0119, but its fiscal year is the calendar year
     "BRO": [("0000-00-00", "1231")],
+    # Deckers moved from a December 31 to a March 31 year end, with a transition period January 1 to March 31, 2014
+    "DECK": [("0000-00-00", "1231"), ("2014-01-01", "0331")],
 }
 # companies that name a fiscal year after the calendar year in which it mostly falls, although it ends in January or
 # early February of the next year (Home Depot's "fiscal 2024" ended February 2, 2025). Their labels are one year lower.
@@ -40,6 +42,7 @@ TRANSITIONS = {
     "FDX": [("2026-06-01", "2026-12-31")],
     "AMCR": [("2026-07-01", "2026-12-31")],
     "ADM": [("2012-07-01", "2012-12-31")],
+    "DECK": [("2014-01-01", "2014-03-31")],
 }
 
 
