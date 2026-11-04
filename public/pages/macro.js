@@ -98,12 +98,11 @@ window.FU_PAGES = window.FU_PAGES || {};
   }
   function metaLine(ids) {
     const m = META(ids[0]); if (!m) return null;
-    const provs = [...new Map(ids.map(META).filter(Boolean).map(x => [x.source_url, x])).values()];
+    const provs = [...new Map(ids.map(META).filter(Boolean).map(x => [x.provider + x.source, x])).values()];
     const st = m.stats || {};
-    const rel = st.published || st.vintage;
     const nx = m.next_release;
     return el("div", { class: "mx-meta" },
-      rel ? el("span", {}, `Released ${fdate(rel)}`) : null,
+      st.published ? el("span", {}, `Released ${fdate(st.published)}`) : st.vintage ? el("span", {}, `First seen ${fdate(st.vintage)}`) : null,
       nx ? el("span", {}, `Next ${fdate(nx[0])}${nx[1] ? " " + nx[1] : ""}`) : el("span", {}, FREQ_LABEL[m.frequency] || ""),
       ...provs.slice(0, 3).map(x => el("a", { href: x.source_url, target: "_blank", rel: "noopener" }, `${x.provider}, ${x.source} ↗`)));
   }
@@ -291,8 +290,8 @@ window.FU_PAGES = window.FU_PAGES || {};
       tb.append(el("tr", {}, el("td", {}, m.market), el("td", { class: "muted" }, NAME[m.measure] || m.measure),
         el("td", { class: "c", title: "Open the CFTC source row", onclick: () => openMacro(id, st.last[0]) }, fv(m, st.last[1])),
         el("td", { class: "c " + cls(st.chg), onclick: () => openMacro(id, st.last[0]) }, fchg(m, st.chg)),
-        el("td", { class: "r num " + (Math.abs(st.z || 0) >= 2 ? "down" : "") }, st.z == null ? "–" : st.z.toFixed(1)),
-        el("td", { class: "r num" }, st.pctile == null ? "–" : Math.round(st.pctile * 100) + "%"),
+        el("td", { class: "c " + (Math.abs(st.z || 0) >= 2 ? "down" : ""), title: "Computed from the published history. Open the source row", onclick: () => openMacro(id, st.last[0], "history") }, st.z == null ? "–" : st.z.toFixed(1)),
+        el("td", { class: "c", title: "Share of the past ten years at or below the latest value. Open the history", onclick: () => openMacro(id, st.last[0], "history") }, st.pctile == null ? "–" : Math.round(st.pctile * 100) + "%"),
         el("td", { class: "r faint" }, fdate(st.last[0]))));
     });
     t.append(tb);
@@ -310,10 +309,11 @@ window.FU_PAGES = window.FU_PAGES || {};
       el("div", { class: "mx-meta" }, el("span", {}, "Ranked by the size of the latest move (five trading days for daily series, one period otherwise) in standard deviations of past moves.")));
   }
   function calendarPanel(c) {
-    const rows = (c.calendar || []).slice(0, 18);
+    // one row per release: its next scheduled date (daily releases would otherwise fill the list)
+    const seen = new Set(), rows = (c.calendar || []).filter(r => !seen.has(r.release) && seen.add(r.release));
     const t = el("table", { class: "mx-cal" });
     rows.forEach(r => t.append(el("tr", {}, el("td", { class: "dt" }, fdate(r.release_date), el("div", { class: "faint", style: "font-size:11px" }, r.release_time || "")),
-      el("td", {}, el("a", { href: r.source_url, target: "_blank", rel: "noopener" }, r.title), el("div", { class: "faint", style: "font-size:11px" }, `${r.provider} · ${r.series.length} series on this page`)))));
+      el("td", {}, el("a", { href: r.source_url, target: "_blank", rel: "noopener" }, r.title), el("div", { class: "faint", style: "font-size:11px" }, `${r.provider} · ${r.series.length} series on this page${(c.calendar || []).filter(x => x.release === r.release).length > 3 ? " · then " + (c.calendar || []).filter(x => x.release === r.release).slice(1, 3).map(x => fdate(x.release_date).replace(/, \d{4}$/, "")).join(", ") : ""}`)))));
     if (!rows.length) t.append(el("tr", {}, el("td", { class: "faint" }, "No scheduled releases in the next 45 days.")));
     return panel("Release calendar", el("span", { class: "faint", style: "font-size:12px" }, "From the publishers' schedules"), el("div", { style: "max-height:420px;overflow:auto" }, t));
   }
