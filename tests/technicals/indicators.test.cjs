@@ -184,7 +184,7 @@ test("Summary sentences only contain computed numbers", () => {
   assert.ok(S.length >= 4);
   const values = { ...st, vs200: st.vs200, vs50: st.vs50 };
   assert.deepEqual(TA.validateSummary(S, values), []);
-  assert.ok(TA.validateSummary([{ text: "RSI is 99.9" }], values).length === 1);
+  assert.ok(TA.validateSummary([{ text: "RSI is 99.9", refs: ["rsi"] }], values).length === 1);
 });
 
 test.after(() => { console.log("\nIndicator checks\n  " + RESULTS.join("\n  ")); });

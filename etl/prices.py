@@ -18,7 +18,7 @@ def yahoo_symbol(t):
 
 
 def chart(sym, rng="2y", interval="1d"):
-    url = f"https://query2.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(yahoo_symbol(sym))}?range={rng}&interval={interval}&includePrePost=false"
+    url = f"https://query2.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(yahoo_symbol(sym))}?range={rng}&interval={interval}&includePrePost=false" + ("&events=div" if interval == "1d" else "")
     for attempt in range(4):
         try:
             j = get_json(url, timeout=30, retries=1)
@@ -37,9 +37,10 @@ def chart(sym, rng="2y", interval="1d"):
             continue
         o, h, l = q["open"][i] or c, q["high"][i] or c, q["low"][i] or c
         bars.append([t, round(o, 4), round(h, 4), round(l, 4), round(c, 4), q["volume"][i] or 0])
+    divs = sorted([dt.datetime.fromtimestamp(int(k), dt.timezone.utc).date().isoformat(), round(float(v["amount"]), 6)] for k, v in ((r.get("events") or {}).get("dividends") or {}).items())
     m = r["meta"]
     meta = {k: m.get(k) for k in ("symbol", "longName", "shortName", "currency", "exchangeName", "regularMarketPrice", "fiftyTwoWeekHigh", "fiftyTwoWeekLow", "gmtoffset")}
-    return {"meta": meta, "bars": bars}
+    return {"meta": meta, "bars": bars, "dv": divs}
 
 
 def fetch_many(symbols, rng="2y", interval="1d", workers=3, pause=0.35, deadline=None):

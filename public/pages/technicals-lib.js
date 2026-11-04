@@ -187,7 +187,7 @@
     const L = c.length, from = Math.max(0, L - look);
     const sw = swings(h.slice(from), l.slice(from), k);
     const a = atr(h, l, c, 14), lastAtr = a[L - 1] || (c[L - 1] * 0.02);
-    const tol = opt.tol || Math.max(0.006 * c[L - 1], 0.5 * lastAtr);
+    const tol = opt.tol || Math.max(0.01 * c[L - 1], 0.75 * lastAtr);
     const pts = [...sw.highs.map(i => ({ i: i + from, p: h[i + from], kind: "high" })), ...sw.lows.map(i => ({ i: i + from, p: l[i + from], kind: "low" }))].sort((x, y) => x.p - y.p);
     const clusters = [];
     for (const p of pts) { const cl = clusters.at(-1); if (cl && p.p - cl.members.at(-1).p <= tol) cl.members.push(p); else clusters.push({ members: [p] }); }
@@ -196,7 +196,7 @@
       const price = cl.members.reduce((s, m) => s + m.p, 0) / cl.members.length;
       const idx = cl.members.map(m => m.i).sort((x, y) => x - y);
       return { price, touches: cl.members.length, bars: idx, first: idx[0], last: idx.at(-1), kind: price >= last ? "resistance" : "support", highs: cl.members.filter(m => m.kind === "high").length, lows: cl.members.filter(m => m.kind === "low").length, distance: price / last - 1 };
-    }).sort((x, y) => Math.abs(x.distance) - Math.abs(y.distance)).slice(0, opt.max || 8);
+    }).sort((x, y) => Math.abs(x.distance) - Math.abs(y.distance)).slice(0, opt.max || 6);
   }
   // Trend lines through pairs of swing points (lows for rising support, highs for falling resistance) within the lookback.
   // A line is kept if no close between its anchors and the last bar crosses it by more than tol; touches count swing
@@ -447,15 +447,51 @@
     const nums = Object.values(values).filter(v => typeof v === "number" && isFinite(v));
     const bad = [];
     for (const s of sentences) {
-      for (const m of s.text.matchAll(/[+−-]?\d+(?:\.\d+)?%?/g)) {
-        const t = m[0]; const isPct = t.endsWith("%"); const x = parseFloat(t.replace("−", "-").replace("%", ""));
-        if (!isFinite(x) || /^\d{4}$/.test(t) || [14, 20, 25, 30, 50, 52, 63, 70, 200].includes(Math.abs(x)) && !isPct) continue;
-        const ok = nums.some(v => { const cands = isPct ? [v * 100, Math.abs(v * 100), v] : [v, Math.abs(v), v * 100]; return cands.some(cv => Math.abs(cv - Math.abs(x)) <= Math.max(0.051, Math.abs(cv) * 0.001) || Math.abs(cv - x) <= 0.051); });
+      if (!s.refs || !s.refs.length) continue; // sentences without computed values (dates of recent signals only)
+      const parts = s.text.split(/([+−-]?\d[\d,]*(?:\.\d+)?%?)/);
+      for (let j = 1; j < parts.length; j += 2) {
+        const t = parts[j];
+        if (fixedNumber(parts[j - 1], parts[j + 1], t)) continue;
+        const isPct = t.endsWith("%"), x = parseFloat(t.replace("−", "-").replace(/[%,]/g, "")), dec = (t.split(".")[1] || "").replace("%", "").length;
+        const tol = dec ? 0.5 * Math.pow(10, -dec) + 1e-9 : 0.5 + 1e-9;
+        const ok = nums.some(v => (isPct ? [v * 100] : [v, v * 100]).some(cv => Math.abs(Math.abs(cv) - Math.abs(x)) <= tol));
         if (!ok) bad.push(t);
       }
     }
     return bad;
   }
+  // Numbers that are parameters or labels rather than computed values: "RSI(14)", "200-day", "line of 70", "Over 63", years.
+  function fixedNumber(prev, next, t) {
+    prev = prev || ""; next = next || "";
+    return /\($/.test(prev) || /^(-day|-week|-bar|\))/.test(next) || /line of $/.test(prev) || /Over $/.test(prev) || /since $/.test(prev) || /^\d{4}$/.test(t) && /since $/.test(prev);
+  }
 
-  return { sma, ema, rma, wma, stdev, rollMax, rollMin, bollinger, trueRange, atr, keltner, donchian, ichimoku, supertrend, rsi, stochastic, macd, adx, obv, mfi, cmf, vwapSession, anchoredVwap, relStrength, swings, levels, trendLines, SIGNALS, detect, gapFills, quantile, median, meanOf, sdOf, wilson, nEff, summarize, backtest, logRets, realizedVol, volCone, drawdown, maxDrawdown, moments, histogram, rollingBetaCorr, seasonality, state, summary, validateSummary };
+
+
+  /* ---------- bundles (run in the Web Worker) ---------- */
+  // Full per-symbol analysis: events, levels, trend lines, gaps, backtest, risk statistics, state and summary inputs.
+  function analyze(x) {
+    const { o, h, l, c, v, tr, d } = x;
+    const det = detect(o, h, l, c);
+    const bt = backtest(det.events, tr);
+    const lr = logRets(tr).slice(1);
+    const dd = drawdown(tr);
+    return {
+      events: det.events, squeeze: det.squeeze, levels: levels(h, l, c), trend: trendLines(h, l, c), gaps: gapFills(det.events, h, l),
+      backtest: bt, cone: volCone(c), moments: moments(lr.map(r => Math.exp(r) - 1)), hist: histogram(lr.map(r => Math.exp(r) - 1), 70),
+      dd: dd.map(z => z.dd), mdd: maxDrawdown(tr), seas: seasonality(d, tr), state: state(o, h, l, c, v),
+    };
+  }
+  // Rolling beta/correlation of daily returns against benchmark series aligned to the symbol's dates.
+  // `rates` marks benchmarks (yields) whose daily change, not return, is used.
+  function risk(x) {
+    const { c, bench, windows } = x, ra = c.map((p, i) => i && p && c[i - 1] ? p / c[i - 1] - 1 : null), out = {};
+    for (const [k, b] of Object.entries(bench)) {
+      const rb = b.v.map((p, i) => i && p != null && b.v[i - 1] != null ? (b.rate ? p - b.v[i - 1] : (b.v[i - 1] ? p / b.v[i - 1] - 1 : null)) : null);
+      out[k] = {}; for (const w of windows) out[k][w] = rollingBetaCorr(ra, rb, w);
+    }
+    return out;
+  }
+
+  return { analyze, risk, sma, ema, rma, wma, stdev, rollMax, rollMin, bollinger, trueRange, atr, keltner, donchian, ichimoku, supertrend, rsi, stochastic, macd, adx, obv, mfi, cmf, vwapSession, anchoredVwap, relStrength, swings, levels, trendLines, SIGNALS, detect, gapFills, quantile, median, meanOf, sdOf, wilson, nEff, summarize, backtest, logRets, realizedVol, volCone, drawdown, maxDrawdown, moments, histogram, rollingBetaCorr, seasonality, state, summary, validateSummary, fixedNumber };
 });
