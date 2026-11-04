@@ -5,7 +5,7 @@
   "use strict";
   const ST = { view: store.get("stView", "reported"), filing: null, report: null, kind: "A", basis: "latest", n: 8 };
   const STC = {};
-  document.head.append(el("style", {}, "table.fin td.c.rst::before{content:\"\";position:absolute;left:3px;top:5px;width:4px;height:4px;border-radius:50%;background:var(--c5)}"));
+  document.head.append(el("style", {}, "table.fin td.c.rst::before{content:\"\";position:absolute;left:3px;top:5px;width:4px;height:4px;border-radius:50%;background:var(--c5)} .st-reps{overflow-x:auto;padding:10px 16px;border-bottom:1px solid var(--line)} .st-sel{max-width:calc(100vw - 72px);text-overflow:ellipsis} @media (max-width:600px){.st-fin table.fin .lab{min-width:150px;max-width:150px}}"));
   const STMT_LABEL = { BS: "Balance sheet", IS: "Income statement", CI: "Comprehensive income", CF: "Cash flow", EQ: "Shareholders' equity", UN: "Other statement" };
   const STMT_ORDER = { IS: 1, CI: 2, BS: 3, CF: 4, EQ: 5, UN: 6 };
   const TEMPLATE_NAME = { industrial: "Industrial and services", bank: "Bank and broker-dealer", insurer: "Insurer", reit: "REIT", utility: "Utility" };
@@ -60,7 +60,10 @@
     return x < 0 ? `(${s})` : s;
   }
   function memberText(seg, coreg) {
-    const parts = (seg || "").split(";").filter(Boolean).map(p => { const [ax, mem] = p.split("="); return (mem || ax).replace(/Member$/, "").replace(/([a-z])([A-Z])/g, "$1 $2").replace(/([A-Z])([A-Z][a-z])/g, "$1 $2"); });
+    let items = (seg || "").split(";").filter(Boolean).map(p => p.split("="));
+    // "operating segments" (ConsolidationItems axis) only qualifies another member; the full axis list stays in the tooltip
+    if (items.length > 1) items = items.filter(([ax, mem]) => !/^(OperatingSegments|SegmentReportingSegments)(Member)?$/.test(mem || ""));
+    const parts = items.map(([ax, mem]) => (mem || ax).replace(/Member$/, "").replace(/([a-z])([A-Z])/g, "$1 $2").replace(/([A-Z]{2,})([A-Z][a-z])/g, "$1 $2"));
     if (coreg) parts.push(coreg.replace(/([a-z])([A-Z])/g, "$1 $2"));
     return parts.join(" · ");
   }
@@ -104,14 +107,14 @@
   function filingName(f) { return `${f.form} · ${f.fp && f.fy ? (f.fp === "FY" ? "FY" : f.fp + " ") + f.fy : fdate(f.period)} · filed ${fdate(f.filed)}`; }
   async function reported(host, tk, idx) {
     const filings = idx.filings;
-    const sel = el("select", { class: "btn", style: "max-width:100%", "aria-label": "Filing" },
+    const sel = el("select", { class: "btn st-sel", "aria-label": "Filing" },
       el("option", { value: "" }, `Latest: ${filingName(filings[0])}`), filings.map(f => el("option", { value: f.a }, filingName(f) + (f.prevrpt ? " (amended later)" : ""))));
     if (ST.filing && filings.find(f => f.a === ST.filing)) sel.value = ST.filing;
     const repHost = el("span");
-    const wrap = el("div", { class: "fin-wrap" });
+    const wrap = el("div", { class: "fin-wrap st-fin" });
     const head = el("div", { class: "legend", style: "padding:8px 16px;border-bottom:1px solid var(--line)" });
     const foot = el("div", { class: "src", style: "padding-top:10px" });
-    host.append(el("section", { class: "panel" }, el("div", { class: "hd" }, el("h3", {}, "As reported"), el("div", { class: "r" }, sel)), el("div", { style: "padding:10px 16px;border-bottom:1px solid var(--line)" }, repHost), head, wrap, foot));
+    host.append(el("section", { class: "panel" }, el("div", { class: "hd" }, el("h3", {}, "As reported"), el("div", { class: "r" }, sel)), el("div", { class: "st-reps" }, repHost), head, wrap, foot));
     sel.onchange = () => { ST.filing = sel.value || null; ST.report = null; load(); };
     async function load() {
       const meta = filings.find(f => f.a === (ST.filing || filings[0].a));
@@ -246,7 +249,7 @@
     const tpl = latest.template;
     const lines = map.templates[tpl];
     const series = stdSeries(std);
-    const wrap = el("div", { class: "fin-wrap" });
+    const wrap = el("div", { class: "fin-wrap st-fin" });
     const mapHost = el("div");
     box.innerHTML = "";
     box.append(el("div", { class: "hd" }, el("h3", {}, `Standardized · ${TEMPLATE_NAME[tpl]} template`),
@@ -358,10 +361,11 @@
     { id: "ebitda", name: "Adjusted EBITDA", rx: /ebitda/i, gaap: "is_net_income" },
     { id: "fcf", name: "Free cash flow", rx: /free cash flow/i, gaap: "cf_operating" },
   ];
+  const fmtPS = v => v < 0 ? `(${Math.abs(v).toFixed(2)})` : v.toFixed(2);
   function kpiItems(kpi) { const out = []; (kpi?.groups || []).forEach(g => g.items.forEach(it => out.push({ ...it, category: g.category, subcategory: it.subcategory || g.subcategory }))); return out; }
   function nvals(it, K) { return Object.keys(it.values?.[K] || {}).length; }
   function pickMeasures(items, fam, K) {
-    const cand = items.filter(it => fam.rx.test(it.name) && !/%|pct|percent/i.test(it.unit || "") && !/margin|growth|ratio|per unit|guidance|outlook|segment/i.test(it.name) && !/segment/i.test(it.category || "") && nvals(it, K) > 0);
+    const cand = items.filter(it => fam.rx.test(it.name) && !/%|pct|percent/i.test(it.unit || "") && !/\b(margins?|growth|ratios?|per unit|guidance|outlook|segments?)\b/i.test(it.name) && !/segment/i.test(it.category || "") && nvals(it, K) > 0);
     const top = cand.filter(it => !it.parent || !cand.some(c => c.id === it.parent));
     top.sort((a, b) => (b.is_total - a.is_total) || (items.filter(x => x.parent === b.id).length - items.filter(x => x.parent === a.id).length) || (nvals(b, K) - nvals(a, K)));
     return top.slice(0, 2);
@@ -399,7 +403,7 @@
             const list = (series[fam.gaap] || {})[nearKey(series[fam.gaap] || {}, e, gl.stmt === "BS" ? 0 : K === "A" ? 4 : 1)];
             if (!list?.length) { tr.append(el("td", { class: "faint", "data-i": i }, "–")); return; }
             const p = list[list.length - 1];
-            const td = el("td", { "data-i": i, class: p.v < 0 ? "neg" : "", title: `Filed as "${p.plabel}" (${p.tag}) · ${p.f.form} filed ${p.f.filed}` }, fam.id === "eps" ? p.v.toFixed(2) : fmtM(p.v, "USD"));
+            const td = el("td", { "data-i": i, class: p.v < 0 ? "neg" : "", title: `Filed as "${p.plabel}" (${p.tag}) · ${p.f.form} filed ${p.f.filed}` }, fam.id === "eps" ? fmtPS(p.v) : fmtM(p.v, "USD"));
             const gc = stdCell(tk, gl.label, { ...p, lid: gl.id, sign: gl.sign }, K);
             gaapCells[i] = gc;
             clickCell(td, gc);
@@ -415,7 +419,7 @@
           ends.forEach((e, i) => {
             const v = vals[e];
             if (!v) { tr.append(el("td", { class: "faint", "data-i": i }, "–")); return; }
-            const td = el("td", { "data-i": i, class: "c" + (v.v < 0 ? " neg" : ""), tabindex: "0", title: `${v.doc_title || "Source document"}${v.quote ? "\n" + v.quote : ""}` }, (QMARK[v.q] || "") + fmtKpi(v.v, it.unit));
+            const td = el("td", { "data-i": i, class: "c" + (v.v < 0 ? " neg" : ""), tabindex: "0", title: `${v.doc_title || "Source document"}${v.quote ? "\n" + v.quote : ""}` }, (QMARK[v.q] || "") + (fam.id === "eps" ? (v.v < 0 ? `(${Math.abs(v.v).toFixed(2)})` : v.v.toFixed(2)) : fmtKpi(v.v, it.unit)));
             td.onclick = () => openKpiSource(tk, it, K, e, v);
             td.onkeydown = ev => { if (ev.key === "Enter") td.click(); };
             tr.append(td);
@@ -428,8 +432,8 @@
             const v = m.values?.[K]?.[e], g = gaapCells[i];
             if (!v || !g) { tr.append(el("td", { class: "faint", "data-i": i }, "–")); return; }
             const d = v.v - g.v;
-            const td = el("td", { "data-i": i, class: d < 0 ? "neg" : "" }, fam.id === "eps" ? d.toFixed(2) : fmtM(d, "USD"));
-            clickCell(td, { tk, stmt: "adjusted", label: `${m.name} minus GAAP`, unit: fam.id === "eps" ? "USD/shares" : "USD", kind: K, end: e, v: d, calc: { formula: `${m.name} (${fmtKpi(v.v, m.unit)}, company document) - GAAP ${gl.label}`, inputs: [g] } });
+            const td = el("td", { "data-i": i, class: d < 0 ? "neg" : "" }, fam.id === "eps" ? fmtPS(d) : fmtM(d, "USD"));
+            clickCell(td, { tk, stmt: "adjusted", label: `${m.name} minus GAAP`, unit: fam.id === "eps" ? "USD/shares" : "USD", kind: K, end: e, v: d, calc: { formula: `${m.name} (${fam.id === "eps" ? v.v.toFixed(2) : fmtKpi(v.v, m.unit)}, company document) - GAAP ${gl.label}`, inputs: [g] } });
             tr.append(td);
           });
           tb.append(tr);
