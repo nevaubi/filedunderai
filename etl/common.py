@@ -41,7 +41,7 @@ class HTTPError(RuntimeError):
         self.body = body
 
 
-def request(url, method="GET", data=None, headers=None, timeout=60, retries=3, raw=False):
+def request(url, method="GET", data=None, headers=None, timeout=60, retries=6, raw=False):
     hdrs = {"User-Agent": WEB_UA, "Accept-Encoding": "gzip"}
     hdrs.update(headers or {})
     body = None
@@ -73,14 +73,15 @@ def request(url, method="GET", data=None, headers=None, timeout=60, retries=3, r
             raise last
         except Exception as e:  # network errors
             last = e
+            # connection resets come in bursts when many jobs share the proxy, so back off longer before giving up
             if attempt < retries - 1:
-                time.sleep(2 * (attempt + 1))
+                time.sleep(min(30, 3 * (attempt + 1) ** 1.5))
                 continue
             raise
     raise last
 
 
-def get_json(url, headers=None, timeout=60, retries=3):
+def get_json(url, headers=None, timeout=60, retries=6):
     return json.loads(request(url, headers=headers, timeout=timeout, retries=retries))
 
 
