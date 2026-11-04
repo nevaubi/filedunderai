@@ -35,7 +35,7 @@ EXTRA_SYMS = ["DX-Y.NYB"]  # not carried by the prices job
 HIST_SYMS = list(dict.fromkeys(MARKET_SYMBOLS + EXTRA_SYMS + TICKERS))
 HIST_YEARS = 6.3
 CLOSES_PATH, FUND_PATH, KPI_PATH = "screener/closes.json.gz", "screener/fund.json.gz", "screener/kpi.json.gz"
-FUND_VERSION = 3
+FUND_VERSION = 4
 YAHOO = "https://query2.finance.yahoo.com/v8/finance/chart/"
 
 # statement lines read from the company bundles (label as stored by etl/sec.py)
@@ -62,6 +62,9 @@ for _l, _ in EXTRA_BAL:
     INSTANT.add(_l)
 STMT_OF["Shares outstanding (cover page)"] = "cover"
 PER_SHARE = {"EPS diluted"}
+OUTFLOWS = {"Capex", "Buybacks", "Dividends paid"}  # payments, read as positive amounts whatever the sign tagged
+# share classes that convert at a ratio: Berkshire Class A counts as 1,500 Class B shares for market cap
+CLASS_RATIO = {"BRK-B": {"below": 5_000_000, "small": 1500}}
 SHARE_COUNT = {"Diluted shares"}
 
 # ------------------------------------------------------------------ field catalogue
@@ -406,11 +409,14 @@ def extract_company(sb, tk, since):
     out = {"q": q, "fye": prof.get("fiscalYearEnd"), "shares": {"v": shares.get("val"), "end": shares.get("end")}}
     cik = BY_TICKER[tk]["cik"]
     try:
-        cf = gz_json(sb, f"sec/companyfacts/CIK{cik:010d}.json")
+        cf = gz_json(sb, f"sec/companyfacts/CIK{cik:010d}.json.gz")
     except Exception:
         cf = None
     if cf:
         facts = cf.get("facts") or {}
+        want = {n for _l, names in EXTRA_FLOW + EXTRA_BAL for n in names}
+        # only the concepts used here, and only those with reported units (a few filers carry empty unit maps)
+        facts = {"us-gaap": {n: v for n, v in (facts.get("us-gaap") or {}).items() if n in want and (v.get("units") or {})}, "dei": facts.get("dei") or {}}
         sec.CONCEPTS["_scr_flow"] = EXTRA_FLOW
         sec.CONCEPTS["_scr_bal"] = EXTRA_BAL
         sec.INSTANT.add("_scr_bal")
@@ -422,12 +428,20 @@ def extract_company(sb, tk, since):
             sec.CONCEPTS.pop("_scr_flow", None)
             sec.CONCEPTS.pop("_scr_bal", None)
             sec.INSTANT.discard("_scr_bal")
-        # cover-page share count: the filing it came from
+        # cover-page share count: every share class reported in the latest filing that carries the count
         dei = (facts.get("dei") or {}).get("EntityCommonStockSharesOutstanding", {}).get("units", {}).get("shares", [])
-        hit = [r for r in dei if r.get("end") == shares.get("end") and r.get("val") == shares.get("val")]
+        hit = [r for r in dei if r.get("val") and r.get("form") in ("10-K", "10-Q", "10-K/A", "10-Q/A", "10-KT")]
         if hit:
-            h = sorted(hit, key=lambda r: r.get("filed", ""))[0]
-            out["shares"].update({"accn": h["accn"], "form": h.get("form"), "filed": h.get("filed")})
+            last = sorted(hit, key=lambda r: (r.get("filed", ""), r.get("end", "")), reverse=True)[0]
+            accn = last["accn"]
+            same = {}
+            for r in hit:
+                if r["accn"] == accn and r.get("end") == last.get("end"):
+                    same[r["val"]] = r
+            out["shares"]["end"] = last.get("end")
+            parts = sorted(same.values(), key=lambda r: -r["val"])
+            total = sum(r["val"] * CLASS_RATIO.get(tk, {}).get("small", 1) if (tk in CLASS_RATIO and r["val"] < CLASS_RATIO[tk]["below"]) else r["val"] for r in parts)
+            out["shares"].update({"accn": accn, "form": parts[0].get("form"), "filed": parts[0].get("filed"), "v": total, "parts": [r["val"] for r in parts]})
     return out
 
 
@@ -504,7 +518,7 @@ class Facts:
         """Split-adjusted value: per-share figures and share counts filed before a split are restated to today's basis."""
         if not rec:
             return None
-        v = rec[2]
+        v = abs(rec[2]) if label in OUTFLOWS else rec[2]
         if label in PER_SHARE or label in SHARE_COUNT:
             f = 1.0
             for d, ratio in self.splits:
@@ -547,7 +561,7 @@ class Facts:
         o, c = self.at("Operating cash flow", end), self.at("Capex", end)
         if not o or not c:
             return None, []
-        return o[2] - c[2], [("Operating cash flow", o), ("Capex", c)]
+        return o[2] - abs(c[2]), [("Operating cash flow", o), ("Capex", c)]
 
     def bal(self, label, end, tol=20):
         r = self.at(label, end, tol)
@@ -1205,7 +1219,29 @@ def activity(sb, fundcache, today):
     by_news = {}
     for n in news:
         by_news.setdefault(n["ticker"], []).append(n)
-    ins = (sb.get_json("meta/insiders.json") or {}).get("companies", {})
+    cut = (today - dt.timedelta(days=365)).isoformat()
+    tx = sb.select("insider_transactions", f"select=ticker,owner,code,shares,price,tx_date&tx_date=gte.{cut}&code=in.(P,S)&derivative=is.false&seq=gte.0")
+    ins = {}
+    for days, key in ((90, "w90"), (365, "w365")):
+        c0 = (today - dt.timedelta(days=days)).isoformat()
+        for r in tx:
+            if r["tx_date"] < c0:
+                continue
+            w = ins.setdefault(r["ticker"], {}).setdefault(key, {"buys": 0, "sells": 0, "buy_value": 0, "sell_value": 0, "buyers": set(), "sellers": set()})
+            v = (r.get("shares") or 0) * (r.get("price") or 0)
+            if r["code"] == "P":
+                w["buys"] += 1
+                w["buy_value"] += v
+                w["buyers"].add(r["owner"])
+            else:
+                w["sells"] += 1
+                w["sell_value"] += v
+                w["sellers"].add(r["owner"])
+    for t in TICKERS:
+        for key in ("w90", "w365"):
+            w = ins.setdefault(t, {}).setdefault(key, {"buys": 0, "sells": 0, "buy_value": 0, "sell_value": 0, "buyers": set(), "sellers": set()})
+            w["buyers"], w["sellers"] = len(w["buyers"]), len(w["sellers"])
+            w["buy_value"], w["sell_value"] = round(w["buy_value"]), round(w["sell_value"])
     out, prov = {}, {}
     for tk in TICKERS:
         o, p = {}, {}
@@ -1240,6 +1276,8 @@ def activity(sb, fundcache, today):
             gaps = [g for g in gaps if 40 <= g <= 140] or gaps
             med = statistics.median(gaps)
             nxt = D(base[0][0]) + dt.timedelta(days=round(med))
+            while nxt < today - dt.timedelta(days=21):  # cadence missed: roll to the next expected date
+                nxt += dt.timedelta(days=round(med))
             o["next_earn_days"] = (nxt - today).days
             via8k = len(earn) >= 3
             p["next_earn_days"] = {"x": f"Estimated {nxt.isoformat()}: last {'results 8-K (Item 2.02)' if via8k else 'periodic report'} filed {base[0][0]} + median gap of {round(med)} days. An estimate, not a company date.",
@@ -1296,14 +1334,28 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
             out.update(po)
             prov.f.update(pp)
             price = out.get("price")
-            sh = (fundc.get(tk) or {}).get("shares") or {}
+            sh = dict((fundc.get(tk) or {}).get("shares") or {})
+            stale = not sh.get("v") or not sh.get("end") or sh["end"] < (today - dt.timedelta(days=400)).isoformat()
+            dil = (fx.q.get("Diluted shares") or [None])[-1] if fx else None
+            if stale and dil:
+                # multi-class companies tag cover-page counts by class (dimensions the companyfacts API leaves out): use diluted weighted shares
+                v = fx.adj("Diluted shares", dil)
+                if tk in CLASS_RATIO and v < CLASS_RATIO[tk]["below"]:
+                    v *= CLASS_RATIO[tk]["small"]
+                sh = {"v": v, "end": dil[0], "dil": dil}
             if price and sh.get("v"):
                 mcap = price * sh["v"]
                 out["mcap"] = mcap
                 share_ref = None
-                if sh.get("accn"):
-                    share_ref = ("Shares outstanding (cover page)", [sh.get("end"), "", sh["v"], sh["accn"], sh.get("filed") or "", sh.get("form") or "", "EntityCommonStockSharesOutstanding", 0])
-                prov.put("mcap", f"Close {price} on {dates[-1]} × {sh['v']:,.0f} shares outstanding (cover page, as of {sh.get('end')})", [share_ref] if share_ref else [], p=[[dates[-1], price]])
+                if sh.get("dil"):
+                    share_ref = ("Diluted shares", sh["dil"])
+                    basis = f"diluted weighted shares for the quarter ended {sh['end']} (split-adjusted{'; Class A at 1,500 Class B' if tk in CLASS_RATIO else ''}), used because the cover page count is reported by share class"
+                else:
+                    if sh.get("accn"):
+                        share_ref = ("Shares outstanding (cover page)", [sh.get("end"), "", sh["v"], sh["accn"], sh.get("filed") or "", sh.get("form") or "", "EntityCommonStockSharesOutstanding", 0])
+                    classes = f" (share classes {' + '.join(f'{x:,.0f}' for x in sh['parts'])})" if len(sh.get("parts") or []) > 1 else ""
+                    basis = f"shares outstanding{classes} (cover page, as of {sh.get('end')})"
+                prov.put("mcap", f"Close {price} on {dates[-1]} × {sh['v']:,.0f} {basis}", [share_ref] if share_ref else [], p=[[dates[-1], price]])
                 if inp:
                     R = inp["recs"]
                     srefs = [share_ref] if share_ref else []
@@ -1372,7 +1424,7 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
                 for fid, ser, kind, n_, d_ in CORR_M:
                     ch = macro[fid]["chg"]
                     ks = [k for k in mr if k in ch]
-                    if len(ks) >= 36:
+                    if len(ks) >= 24:
                         r = pearson([mr[k] for k in ks], [ch[k] for k in ks])
                         if r is not None:
                             out[fid] = r

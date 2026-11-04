@@ -812,6 +812,11 @@ window.FU_PAGES = window.FU_PAGES || {};
           el("span", {}, el("b", {}, label), " ", el("span", { class: "muted" }, start ? `${fdate(start)} – ${fdate(end)}` : `as of ${fdate(end)}`), " ", el("span", { class: "form " + formCls(form), style: "margin-left:4px" }, form)),
           el("span", { class: "mono" }, unit === "USD" ? fmtM(val) + "M" : unit === "shares" ? fmtMoney(val, "shares") : fmtMoney(val, "USD/shares"))));
       });
+      // totals per line for trailing-four-quarter inputs, so the arithmetic can be checked
+      const by = new Map();
+      refs.forEach(ref => { const k = ref[1]; if (!by.has(k)) by.set(k, []); by.get(k).push(ref); });
+      const sums = [...by.entries()].filter(([lab, list]) => list.length === 4 && list.every(x => x[3]) && (UNIT_OF[lab] || "USD") !== "shares");
+      if (sums.length) fb.append(el("div", { class: "faint", style: "font-size:12px" }, "Sum of four quarters: " + sums.map(([lab, list]) => { const t = list.reduce((a, x) => a + (["Capex", "Buybacks", "Dividends paid"].includes(lab) ? Math.abs(x[4]) : x[4]), 0); return `${lab} ${(UNIT_OF[lab] || "USD") === "USD" ? fmtM(t) + "M" : fnum(t)}`; }).join(" · ") + (sums.some(([lab]) => lab === "EPS diluted") ? " (EPS before split adjustment)" : "")));
       body.append(fb);
     }
     if (p.xbrl) {
@@ -936,7 +941,8 @@ window.FU_PAGES = window.FU_PAGES || {};
 .sx-chat .sx-ai{flex:1;min-height:0;display:flex;flex-direction:column}
 .sx-chat .log{min-height:120px}
 .sx-chatbtn.on,.sx-grid:not(.nochat) .sx-chatbtn{display:none}
-.sx-presets .picker button{font-size:12px;padding:4px 10px}
+.sx-presets .picker{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.sx-presets .picker button{font-size:12px;padding:4px 10px;flex:none}
 .sx-why{margin-top:10px;font-size:12.5px;color:var(--muted);max-width:110ch}
 .scr-tools .btn.on{border-color:var(--ink)}
 .sx-chips{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;border-bottom:1px solid var(--line);align-items:center}
@@ -984,8 +990,10 @@ window.FU_PAGES = window.FU_PAGES || {};
 .sx-mix span{height:100%;min-width:2px}
 table.sx td.c{cursor:pointer}
 table.sx td.c:hover{background:var(--accent-soft);color:var(--accent)}
-table.sx td.sx-name{max-width:240px}
-table.sx td.sx-name div:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+table.sx td.sx-name{max-width:220px}
+table.sx td.sx-name div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+table.sx th.r{white-space:normal;min-width:64px;max-width:118px;vertical-align:bottom;line-height:1.25}
+table.sx td{padding-top:6px;padding-bottom:6px}
 table.sx tr.sx-grp td{background:var(--sunk);font-size:12px;cursor:default;font-weight:600}
 table.sx thead th{position:sticky;top:0;background:var(--surface);z-index:1}
 .sx-table .scroll{max-height:none}
