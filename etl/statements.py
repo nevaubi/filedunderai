@@ -67,10 +67,17 @@ def dataset_links():
 
 
 def head(url):
-    sec_throttle()
-    req = urllib.request.Request(url, method="HEAD", headers={"User-Agent": SEC_UA})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return {"size": int(r.headers.get("Content-Length") or 0), "last_modified": r.headers.get("Last-Modified")}
+    for attempt in range(5):
+        try:
+            sec_throttle()
+            req = urllib.request.Request(url, method="HEAD", headers={"User-Agent": SEC_UA})
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return {"size": int(r.headers.get("Content-Length") or 0), "last_modified": r.headers.get("Last-Modified")}
+        except Exception as e:
+            if attempt == 4:
+                raise
+            log("head retry", url, str(e)[:120])
+            time.sleep(5 * (attempt + 1))
 
 
 def download(url, path):
@@ -372,8 +379,13 @@ def statements_job(sb, quarters=None, since="2009q2", force=False, time_budget=N
                 state["quarters"][name] = q = {"url": url}
             if deadline and time.time() > deadline - 60:
                 break
-            meta = head(url)
-            complete, tickers = process_quarter(sb, name, url, state, workdir, deadline=deadline, db=db, workers=workers, defer_dir=os.path.join(workdir, "deferred") if defer else None)
+            try:
+                meta = head(url)
+                complete, tickers = process_quarter(sb, name, url, state, workdir, deadline=deadline, db=db, workers=workers, defer_dir=os.path.join(workdir, "deferred") if defer else None)
+            except Exception as e:  # one failed quarter (network) is retried by the next run; keep going
+                log(name, "failed:", str(e)[:300])
+                out[name] = {"error": str(e)[:300]}
+                continue
             state["quarters"][name].update(meta)
             sb.put_json(STATE, state, cache="no-store")
             out[name] = {"complete": complete, "tickers": tickers, "filings": state["quarters"][name].get("filings")}
