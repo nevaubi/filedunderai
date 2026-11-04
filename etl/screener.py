@@ -219,7 +219,7 @@ for k, n, _rx in KPI_FAM:
     fld(f"kpi_{k}_yoy", "kpi", n + " YoY", "pct", f"Latest reported {n.lower()} value vs the same period a year earlier − 1 (company-specific definition; first matching KPI).", "Company IR documents (kpis/{T}.json)")
     fld(f"kpi_{k}_v", "kpi", n + ", latest", "num", f"Latest reported {n.lower()} value in the company's own unit (see the source panel).", "Company IR documents (kpis/{T}.json)")
 FIELD_IDS = [f["id"] for f in F]
-ID_COLS = ["ticker", "name", "sector", "industry", "sp100"]
+ID_COLS = ["ticker", "name", "sector", "industry", "sp100", "cik"]
 
 
 # ------------------------------------------------------------------ small helpers
@@ -1447,7 +1447,7 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
                 continue
             fm = fundmeta.get(tk) or {}
             v = values[tk]
-            row = [tk, name, sector, fm.get("sic") or "", 1 if tk in SP100 else 0, latest_q[tk][0], latest_q[tk][1]]
+            row = [tk, name, sector, fm.get("sic") or "", 1 if tk in SP100 else 0, _cik, latest_q[tk][0], latest_q[tk][1]]
             for fid in FIELD_IDS:
                 x = v.get(fid)
                 if isinstance(x, bool):

@@ -798,7 +798,7 @@ window.FU_PAGES = window.FU_PAGES || {};
     body.append(box);
     if (p.p && p.p.length) {
       const pb = el("div", { class: "calc-box" }, el("div", { class: "eyebrow" }, "Prices used"));
-      p.p.filter(x => x && x[0]).forEach(([d, c]) => pb.append(el("div", { class: "in", onclick: () => { location.hash = "technicals"; }, title: "Daily close" }, el("span", {}, el("b", {}, fdate(d)), " ", el("span", { class: "muted" }, "close")), el("span", { class: "mono" }, c != null ? fnum(c) : "–"))));
+      p.p.filter(x => x && x[0]).forEach(([d, c]) => pb.append(el("div", { class: "in sx-static", title: "Daily close" }, el("span", {}, el("b", {}, fdate(d)), " ", el("span", { class: "muted" }, "close")), el("span", { class: "mono" }, c != null ? fnum(c) : "–"))));
       pb.append(el("div", { class: "faint", style: "font-size:11.5px" }, `${f.id === "price" ? "" : "Split-adjusted daily closes, "}Yahoo Finance chart API.`));
       body.append(pb);
     }
@@ -828,10 +828,9 @@ window.FU_PAGES = window.FU_PAGES || {};
     }
     if (p.a) {
       const ab = el("div", { class: "calc-box" }, el("div", { class: "eyebrow" }, "Filings"));
-      const cik = String(D.companies[tk]?.cik || "");
+      const cik = String(r.cik || D.companies[tk]?.cik || "");
       p.a.forEach(([accn, form, d, pdoc]) => ab.append(el("div", { class: "in", onclick: () => window.open(`https://www.sec.gov/Archives/edgar/data/${cik || ""}/${accn.replace(/-/g, "")}/${pdoc || ""}`, "_blank", "noopener"), title: "Open on EDGAR" },
         el("span", {}, el("span", { class: "form " + formCls(form) }, form), " ", el("b", {}, fdate(d))), el("span", { class: "mono faint" }, accn))));
-      if (!cik) ensureCompany(tk).catch(() => { });
       body.append(ab);
       if (p.est) body.append(el("div", { class: "note" }, `Estimated next results date: ${fdate(p.est)}. This is an estimate from the filing cadence, not a date the company announced.`));
     }
@@ -847,7 +846,7 @@ window.FU_PAGES = window.FU_PAGES || {};
         ib.lastChild.remove();
         const rows = (ins.rows || []).filter(x => !x.derivative && ["P", "S"].includes(x.code) && x.tx_date >= p.r[0]).slice(0, 40);
         if (!rows.length) ib.append(el("div", { class: "faint" }, "No open-market purchases or sales in this window."));
-        const cik = String(D.companies[tk]?.cik || "");
+        const cik = String(r.cik || D.companies[tk]?.cik || "");
         rows.forEach(x => ib.append(el("a", { class: "in", href: `https://www.sec.gov/Archives/edgar/data/${cik}/${x.accession.replace(/-/g, "")}/`, target: "_blank", rel: "noopener", title: `Form 4 ${x.accession}` },
           el("span", {}, el("b", {}, x.code === "P" ? "Buy" : "Sell"), " ", x.owner, el("span", { class: "muted" }, ` · ${fdate(x.tx_date)}${x.plan_10b5 ? " · 10b5-1 plan" : ""}`)), el("span", { class: "mono " + (x.code === "P" ? "up" : "down") }, fmtMoney((x.shares || 0) * (x.price || 0))))));
       }).catch(e => { ib.lastChild.textContent = "Transactions could not load: " + e.message; });
@@ -1001,6 +1000,7 @@ table.sx thead th{position:sticky;top:0;background:var(--surface);z-index:1}
 .sx-saved{display:flex;gap:6px;align-items:center}
 .sx-saved .t{flex:1;text-align:left;border:0;background:none;padding:7px 8px;border-radius:6px;cursor:pointer}
 .sx-saved .t:hover{background:var(--sunk)}
+.calc-box .in.sx-static{cursor:default}.calc-box .in.sx-static:hover{outline:0}
 .sx-diff{list-style:none;padding:0;margin:6px 0;display:flex;flex-direction:column;gap:3px;font-size:12.5px}
 .sx-diff li.add b{color:var(--up)} .sx-diff li.rem b{color:var(--down)} .sx-diff li.chg b{color:var(--accent)}
 .sx-turn ul{margin:4px 0 0;padding-left:18px}
