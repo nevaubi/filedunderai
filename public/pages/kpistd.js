@@ -11,7 +11,7 @@ window.FU_PAGES = window.FU_PAGES || {};
   const loadLatest = () => C.latest ? Promise.resolve(C.latest) : getJSON("kpistd/latest.json").then(j => (C.latest = j)).catch(() => (C.latest = { kpis: {} }));
   const loadSer = id => C.ser[id] ? Promise.resolve(C.ser[id]) : getJSON(`kpistd/series/${id}.json`).then(j => (C.ser[id] = j));
   const loadT = tk => tk in C.t ? Promise.resolve(C.t[tk]) : getJSON(`kpistd/t/${tk}.json`).then(j => (C.t[tk] = j)).catch(() => (C.t[tk] = null));
-  const ST = Object.assign({ K: "Q", align: "fiscal", view: "value", group: "industry", focus: null, custom: [], alts: false, n: 12 }, store.get("kpistd", {}));
+  const ST = Object.assign({ K: "Q", align: "calendar", view: "value", group: "industry", focus: null, custom: [], alts: false, n: 10 }, store.get("kpistd", {}));
   const save = () => store.set("kpistd", { K: ST.K, align: ST.align, view: ST.view, group: ST.group, custom: ST.custom, alts: ST.alts, n: ST.n });
 
   if (!document.getElementById("ks-css")) document.head.append(el("style", { id: "ks-css" }, `
@@ -104,9 +104,20 @@ details.ks-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
   }
 
   /* ---------- sources ---------- */
+  // the figure as printed in the quote (so the viewer highlights that exact token, not another number with the same digits)
+  function printedIn(quote, v) {
+    if (v == null || !quote) return null;
+    const a = Math.abs(v);
+    for (const t of String(quote).match(/\(?[-−]?\$?\d[\d,]*(\.\d+)?\)?%?/g) || []) {
+      const n = parseFloat(t.replace(/[^\d.]/g, ""));
+      if (!isFinite(n)) continue;
+      if ([1, 1e3, 1e6, 1e9, 0.01].some(f => Math.abs(n * f - a) <= Math.max(0.005, a * 0.0015))) return t.replace(/[()%−-]/g, "").trim();
+    }
+    return null;
+  }
   function openPoint(S, tk, s, p, K) {
     const d = (S.docs || {})[p[3]] || [];
-    openKpiSource(tk, { name: s.name, unit: s.unit }, K, p[0], { v: p[9], doc: p[3], page: p[4], quote: p[5], sheet: p[6], cell: p[7], derived: p[8] ? { formula: p[8] } : null,
+    openKpiSource(tk, { name: s.name, unit: s.unit }, K, p[0], { v: p[9], printed: printedIn(p[5], p[9]), doc: p[3], page: p[4], quote: p[5], sheet: p[6], cell: p[7], derived: p[8] ? { formula: p[8] } : null,
       doc_title: d[0], path: d[1], ext: d[2], url: d[3], label: p[2] });
   }
   const numBtn = (text, onclick, title) => el("button", { class: "ks-n", title: title || "Open the source document at this value", onclick: e => { e.stopPropagation(); onclick(); } }, text);
@@ -262,7 +273,7 @@ details.ks-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
       tb.append(tr);
     });
     t.append(tb);
-    const nSeg = seg([[8, "8"], [12, "12"], [20, "20"]], ST.n, v => { ST.n = +v; save(); redraw(); });
+    const nSeg = seg([[6, "6"], [10, "10"], [20, "20"]], ST.n, v => { ST.n = +v; save(); redraw(); });
     host.append(panel("Peer table", nSeg, el("div", { class: "scroll" }, t),
       el("div", { class: "src" }, `Pctl is the percentile of each company's latest value within the group${meta.higher_is_better === false ? "; for this KPI a lower value is usually better" : ""}. Company definitions can differ; the row note gives each company's own name for the measure. Rows in italics are series on an older basis or another definition, kept separate.`)));
 
