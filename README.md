@@ -23,6 +23,7 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
   - `sec.py` submissions, XBRL company facts, statement series with filing attribution, per-filing statement tables, derived quarters.
   - `docs.py` original 10-K/10-Q statement tables with inline XBRL anchors, earnings release text (8-K EX-99.1).
   - `prices.py` daily and 5-minute bars, return/volatility/beta stats.
+  - `statements.py` financial statements as filed from the SEC Financial Statement Data Sets (quarterly ZIPs: sub, pre, num, tag): every 10-K/10-Q of covered companies since 2009, keyed by accession, with filed line order, labels, tags, values, periods, axis/member segments and co-registrants. `stdmap.py` holds the standardized templates (industrial, bank, insurer, REIT, utility) and the documented tag mapping.
   - `fundamentals.py` TTM and latest-quarter metrics for screening.
   - `macro.py` Treasury par curve, FRED series (CPI, core CPI, unemployment, payrolls, fed funds, 2s10s), H.15.
   - `insiders.py` Form 4 XML parsing (owner, role, code, shares, price, holdings after, 10b5-1).
@@ -44,6 +45,7 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | | `filings/{accession}.html.gz` | Full filed documents for the source panel (scripts removed, EDGAR base URL added), gzipped and inflated in the browser |
 | | `logos/{T}.png` | Company logos (497 of 500) |
 | | `insiders/{T}.json` | Form 4 transactions, open-market summaries, largest traders |
+| | `statements/{T}/index.json`, `statements/{T}/{accession}.json.gz`, `statements/{T}/std.json.gz`, `statements/std_map.json` | As-filed statements per filing (gzipped, inflated in the browser), standardized values per filing, the template mapping |
 | | `meta/*.json` | Job caches and status (fundamentals, price stats per part, rotation and check cursors, insiders index, pipeline status) |
 | `raw` (private) | `sec/companyfacts/*.json.gz`, `sec/filings/{accn}/*.htm.gz`, `sec/releases/*.md.gz` | Archived source documents, indexed in `documents` |
 
@@ -58,6 +60,8 @@ Coverage today: the S&P 500 (S&P 100 flagged in the index).
 | `/api/cron/segments` | 12:50, 00:50 | Recomputes XBRL segment tables for companies with a new 10-K or 10-Q |
 | `/api/cron/ir` | 14:40, 22:40, 04:40 | Collects IR documents: companies that just reported earnings first, then a rolling cursor (8 per run) |
 | `/api/cron/insiders` | 15:30, 23:30 | Parses new Form 4 filings into `insider_transactions`, rewrites `insiders/{T}.json` and `meta/insiders.json` |
+
+| `/api/cron/statements` | 09:17 daily | Loads any new or republished quarter of the SEC Financial Statement Data Sets (resumes a partial one within a 250s budget) |
 
 Every run is logged in `etl_runs`; the latest runs are published to `meta/status.json` for the Data status page.
 
@@ -83,6 +87,8 @@ python -m etl.run companies --changed            # only those with new reports
 python -m etl.run insiders                       # Form 4 backfill / refresh
 python -m etl.run companies --tickers AAPL MSFT  # a subset
 python -m etl.run news                           # next slice of the news rotation
+python -m etl.run statements --defer --workdir /tmp/fsds   # as-filed statements, every quarter not yet loaded
+python -m etl.run statements --quarters 2026q3 --force     # reload one quarter
 ```
 
 Adding a company: append it to `etl/universe.py` and run `python -m etl.run companies --tickers NEW` then `python -m etl.run prices`.

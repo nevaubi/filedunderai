@@ -8,7 +8,7 @@ from .common import Supabase
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "all"])
+    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "statements", "all"])
     ap.add_argument("--tickers", nargs="*")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--news", action="store_true", help="refresh news for each company")
@@ -20,6 +20,11 @@ def main():
     ap.add_argument("--changed", action="store_true", help="only companies with new 10-K/10-Q/8-K filings")
     ap.add_argument("--sec-only", action="store_true", help="IR job: EDGAR exhibits only, skip the IR website")
     ap.add_argument("--sec-years", type=float, default=3, help="IR job: years of EDGAR 8-K earnings exhibits to collect")
+    ap.add_argument("--quarters", nargs="*", help="statements job: quarters to load, e.g. 2024q1 (default: every quarter not yet loaded)")
+    ap.add_argument("--force", action="store_true", help="statements job: reload quarters already loaded")
+    ap.add_argument("--no-db", action="store_true", help="statements job: publish bundles only, skip the fs_* tables")
+    ap.add_argument("--workdir", help="statements job: where quarterly ZIPs are kept while they load")
+    ap.add_argument("--defer", action="store_true", help="statements job: publish ticker index files once at the end (backfills)")
     a = ap.parse_args()
     sb = Supabase()
     if a.job in ("prices", "all"):
@@ -39,6 +44,9 @@ def main():
     if a.job == "segments":
         done, failed = jobs.segments_job(sb, a.tickers, workers=a.workers)
         print("segments", len(done), "failed", failed)
+    if a.job == "statements":
+        from .statements import statements_job
+        print("statements", json.dumps(statements_job(sb, quarters=a.quarters, force=a.force, db=not a.no_db, workdir=a.workdir, workers=a.workers, defer=a.defer), default=str)[:2000])
     if a.job == "viewer":
         print("viewer copies", jobs.publish_filings_job(sb, a.tickers, workers=a.workers))
     if a.job == "logos":
