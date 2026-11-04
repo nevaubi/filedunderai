@@ -924,14 +924,33 @@ function toggleWatch(t) { const w = store.get("watch", WATCH_DEFAULT); const i =
 const STATE = { coTab: store.get("coTab", "overview"), finStmt: "income", finKind: "A", finView: "values", finRange: "all", finDense: store.get("dense", false), taSym: "NVDA", taRange: "1Y", taInd: { sma: true, bb: false, vol: true }, cmp: ["AAPL", "MSFT", "NVDA", "GOOGL"], cmpMetric: "Revenue", cmpKind: "Q", scr: store.get("scr", { sector: "", sort: "market_cap", desc: true, q: "" }) };
 function renderRail() {
   const wl = $("#wl"); wl.innerHTML = "";
-  watchlist().forEach(t => { const c = IDX[t]; wl.append(el("a", { href: "#company-" + t.toLowerCase(), "data-t": t, title: `${c.name} · ${fnum(c.price)}` }, el("span", { class: "t" }, t), sparkSVG((c.spark || []).slice(-30), c.chg_1d >= 0 ? css("--up") : css("--down"), 80, 20), el("span", { class: "p num " + cls(c.chg_1d) }, fsgn(c.chg_1d)))); });
+  const current = location.hash.startsWith("#company-") ? location.hash.slice(9).toUpperCase() : null;
+  watchlist().forEach(t => {
+    const c = IDX[t], price = Number.isFinite(c.price) ? "$" + fnum(c.price) : "–";
+    wl.append(el("a", { href: "#company-" + t.toLowerCase(), "data-t": t, class: t === current ? "on" : "", "aria-current": t === current ? "page" : null, title: `${c.name} · ${price}` },
+      el("span", { class: "t" }, miniLogo(t, 18), t), el("span", { class: "price num" }, price), el("span", { class: "p num " + cls(c.chg_1d) }, fsgn(c.chg_1d))));
+  });
   if (!watchlist().length) wl.append(el("div", { class: "faint", style: "padding:6px 10px;font-size:12px" }, "Star a company to add it."));
+}
+function renderMarketTape() {
+  const tape = $("#market-tape");
+  if (!tape) return;
+  tape.replaceChildren();
+  for (const symbol of ["SPY", "QQQ", "IWM"]) {
+    const bar = last(symbol);
+    if (!bar || !Number.isFinite(bar.c)) continue;
+    const rawChange = dayChg(symbol), change = Number.isFinite(rawChange) ? rawChange : null;
+    const date = bar.t != null && Number.isFinite(+bar.t) ? d3.utcFormat("%b %d, %Y")(bar.t) : "date unavailable";
+    tape.append(el("a", { href: "#technicals-" + symbol, title: `${SYMNAME[symbol]} · close ${date}`, "aria-label": `${symbol} closing price ${fnum(bar.c)}, ${fsgn(change, 2)}, ${date}` },
+      el("b", {}, symbol), el("span", {}, fnum(bar.c)), el("span", { class: cls(change) }, fsgn(change, 2))));
+  }
 }
 function buildShell() {
   const nav = $("#nav"), visible = PAGES.filter(p => !p.hidden), used = new Set();
   const sections = [
-    ["Research", ["analyst", "research", "watchlists", "ideas", "theses", "workbench"]],
-    ["Market data", ["markets", "screener", "compare", "technicals", "sectors", "kpis", "macro"]],
+    ["Research", ["analyst", "screener", "watchlists", "compare"]],
+    ["Markets", ["markets", "technicals", "sectors", "ideas", "kpis", "macro"]],
+    ["Workspace", ["theses", "research", "workbench"]],
   ];
   for (const [label, ids] of sections) {
     const entries = ids.map(id => visible.find(p => p.id === id)).filter(Boolean);
@@ -945,8 +964,9 @@ function buildShell() {
   for (const p of visible.filter(p => !used.has(p.id))) nav.append(el("a", { href: "#" + p.id, "data-p": p.id, title: `${p.name} (g then ${p.key})` }, svgUse(p.icon), p.name));
   $("#mnav").append(...PAGES.filter(p => !p.hidden).map(p => el("a", { href: "#" + p.id, "data-p": p.id }, p.name)));
   renderRail();
+  renderMarketTape();
   const lt = last("SPY")?.t;
-  $("#asof").textContent = lt ? "Prices as of " + d3.utcFormat("%b %d, %Y")(lt) : "";
+  $("#asof").textContent = lt ? "Close " + d3.utcFormat("%b %d, %Y")(lt) : "";
   $("#built").textContent = new Date(D.generated).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
   $("#kbhelp").onclick = openShortcuts;
   $("#kbclose").onclick = () => $("#kbsheet").hidden = true;
@@ -970,7 +990,7 @@ async function route() {
     a.classList.toggle("on", current);
     if (current) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   });
-  document.querySelectorAll("#wl a").forEach(a => a.classList.toggle("on", a.dataset.t === arg));
+  document.querySelectorAll("#wl a").forEach(a => { const current = pid === "company" && a.dataset.t === arg; a.classList.toggle("on", current); if (current) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   const reg = window.FU_PAGES && window.FU_PAGES[pid];
   const fn = reg ? () => reg(arg) : { markets: pMarkets, screener: pScreener, company: () => pCompany(arg), compare: pCompare, feed: pFeed, technicals: pTechnicals, sectors: pSectors, macro: pMacro, theses: pTheses, workbench: pWorkbench, research: pResearch, coverage: pCoverage }[pid] || pMarkets;
   document.title = (pid === "company" && arg ? `${arg} · ${SHORT[arg] || ""} · ` : (PAGES.find(p => p.id === pid)?.name ? PAGES.find(p => p.id === pid).name + " · " : "")) + "Filed Under";
@@ -1307,40 +1327,48 @@ async function pCompany(tk) {
   await ensureCompany(tk);
   page.innerHTML = "";
   const s = snapshot(tk), c = s.c, a = c.address || {};
-  const st = priceStats(tk);
-  const crumbs = el("div", { class: "crumbs" }, el("a", { href: "#companies" }, "Companies"), el("span", { class: "sep" }, "/"), el("span", {}, SHORT[tk]), el("span", { class: "sep" }, "/"), el("span", { id: "crumb-tab" }, ""));
-  const head = el("div", { class: "co-head" },
-    logoTile(tk),
-    el("div", { style: "min-width:0" },
-      el("div", { class: "eyebrow" }, `${tk} · ${[...new Set((c.exchanges || []).filter(Boolean))].join(", ")} · ${IDX[tk].sector} · CIK ${String(c.cik).padStart(10, "0")}`),
-      el("h1", {}, c.name.replace(/\b([A-Z])([A-Z]+)\b/g, (w, a, b) => w.length <= 3 ? w : a + b.toLowerCase()).replace(/ \/[A-Z]{2}\/?$/, "")),
-      el("div", { class: "co-meta" },
-        el("span", {}, el("b", {}, c.sicDescription || "–"), ` (SIC ${c.sic || "–"})`),
-        el("span", {}, [a.street1, a.city, a.stateOrCountry, a.zipCode].filter(Boolean).map(x => x.replace(/\b\w+/g, w => w.length > 2 && w === w.toUpperCase() && !/^\d/.test(w) ? w[0] + w.slice(1).toLowerCase() : w)).join(", ")),
-        c.phone ? el("span", {}, c.phone) : null,
-        el("span", {}, "FY ends ", el("b", {}, fdate("2000-" + c.fiscalYearEnd.slice(0, 2) + "-" + c.fiscalYearEnd.slice(2)).replace(", 2000", ""))),
-        el("span", {}, "Inc. ", el("b", {}, c.stateOfIncorporation || "–"))),
-      el("div", { class: "co-meta", style: "margin-top:8px" },
-        WEB[tk] ? el("a", { href: "https://" + WEB[tk], target: "_blank", rel: "noopener" }, WEB[tk] + " ↗") : null,
-        IR[tk] ? el("a", { href: IR[tk], target: "_blank", rel: "noopener" }, "Investor relations ↗") : null,
-        el("a", { href: `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${c.cik}&type=&dateb=&owner=include&count=40`, target: "_blank", rel: "noopener" }, "EDGAR ↗"),
-        (() => { const k = c.filings.find(f => f.f === "10-K"); return k ? el("a", { href: filingUrl(tk, k), target: "_blank", rel: "noopener" }, "Latest 10-K ↗") : null; })(),
-        (() => { const k = c.filings.find(f => f.f === "10-Q"); return k ? el("a", { href: filingUrl(tk, k), target: "_blank", rel: "noopener" }, "Latest 10-Q ↗") : null; })(),
-        el("button", { class: "chip link", onclick: () => { location.hash = "research"; setTimeout(() => RESEARCH?.ask(`Give me a one-page brief on ${tk}: latest quarter vs prior year, margin trend, cash returns vs free cash flow, recent news, and how the stock reacted to earnings. Cite every financial number.`), 300); } }, svgUse("i-spark"), "Write a brief"))),
-    el("div", { class: "px" }, el("div", { style: "display:flex;justify-content:flex-end;margin-bottom:6px" }, el("button", { id: "star", class: "btn" + (watchlist().includes(tk) ? " pri" : ""), title: "Add to watchlist (s)", onclick: e => { const on = toggleWatch(tk); e.currentTarget.classList.toggle("pri", on); } }, "★ Watch")), el("div", { class: "big num" }, "$" + fnum(s.px)), el("div", { class: "num " + cls(st.chg1d), style: "font-weight:600" }, `${fsgn(st.chg1d, 2)} today`), el("div", { class: "faint", style: "font-size:11.5px" }, "Close " + fdate(st.date)), el("div", { style: "width:180px;margin-left:auto;margin-top:6px" }, sparkSVG((PX[tk + "@5m"]?.bars || []).map(b => b.c), st.chg1d >= 0 ? css("--up") : css("--down"), 180, 34)), el("div", { class: "faint", style: "font-size:11px" }, "Last 5 sessions, 5-minute bars")));
+  const st = priceStats(tk), filings = c.filings || [];
+  const officialName = c.name || IDX[tk].name || tk;
+  const displayName = SHORT[tk] || officialName;
+  const exchanges = [...new Set((c.exchanges || []).filter(Boolean))].join(", ");
+  const titleCase = value => String(value).replace(/\b\w+/g, w => w.length > 2 && w === w.toUpperCase() && !/^\d/.test(w) ? w[0] + w.slice(1).toLowerCase() : w);
+  const address = [a.street1, a.street2, a.city, a.stateOrCountry, a.zipCode].filter(Boolean).map(titleCase).join(", ");
+  const fiscalYearEnd = /^\d{4}$/.test(c.fiscalYearEnd || "") ? fdate("2000-" + c.fiscalYearEnd.slice(0, 2) + "-" + c.fiscalYearEnd.slice(2)).replace(", 2000", "") : "Unavailable";
+  const edgarUrl = `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${c.cik || ""}&type=&dateb=&owner=include&count=40`;
+  const crumbs = el("div", { class: "crumbs co-crumbs" }, el("a", { href: "#companies" }, "Companies"), el("span", { class: "sep" }, "/"), el("span", {}, displayName), el("span", { class: "sep" }, "/"), el("span", { id: "crumb-tab" }, ""));
+  const head = el("header", { class: "co-head" },
+    logoTile(tk, 64),
+    el("div", { class: "co-identity" },
+      el("div", { class: "co-title-row" }, el("h1", {}, displayName), el("span", { class: "co-ticker" }, [exchanges, tk].filter(Boolean).join(": "))),
+      el("div", { class: "co-meta co-registrant" }, el("span", {}, officialName), IDX[tk].sector ? el("span", {}, IDX[tk].sector) : null),
+      el("div", { class: "co-meta co-industry" }, c.sicDescription ? el("span", {}, c.sicDescription) : null, [a.city, a.stateOrCountry].some(Boolean) ? el("span", {}, [a.city, a.stateOrCountry].filter(Boolean).map(titleCase).join(", ")) : null)),
+    el("div", { class: "px co-quote" }, el("div", { class: "big num" }, s.px == null ? "–" : "$" + fnum(s.px)), el("div", { class: "num co-change " + cls(st.chg1d) }, fsgn(st.chg1d, 2) + " last session"), el("div", { class: "co-price-date" }, st.date ? "Close " + fdate(st.date) : "Close date unavailable")),
+    el("div", { class: "co-actions" },
+      el("button", { id: "star", class: "btn" + (watchlist().includes(tk) ? " pri" : ""), title: "Add to watchlist (s)", onclick: e => { const on = toggleWatch(tk); e.currentTarget.classList.toggle("pri", on); } }, "★ Watch"),
+      ...["10-K", "10-Q"].map(form => { const filing = filings.find(f => f.f === form); return filing ? el("a", { class: "btn", href: filingUrl(tk, filing), target: "_blank", rel: "noopener" }, `Latest ${form} ↗`) : null; }),
+      IR[tk] ? el("a", { class: "btn co-text-action", href: IR[tk], target: "_blank", rel: "noopener" }, "IR ↗") : null,
+      el("a", { class: "btn co-text-action", href: edgarUrl, target: "_blank", rel: "noopener" }, "EDGAR ↗"),
+      el("button", { class: "btn co-text-action", onclick: () => { location.hash = "research"; setTimeout(() => RESEARCH?.ask(`Give me a one-page brief on ${tk}: latest quarter vs prior year, margin trend, cash returns vs free cash flow, recent news, and how the stock reacted to earnings. Cite every financial number.`), 300); } }, svgUse("i-spark"), "Write a brief")));
+  const profileItem = (label, value) => el("div", {}, el("dt", {}, label), el("dd", {}, value || "Unavailable"));
+  const profile = el("details", { class: "co-profile" }, el("summary", {}, "Company details"),
+    el("dl", {}, profileItem("Registrant", officialName), profileItem("Address", address), profileItem("Phone", c.phone), profileItem("Fiscal year end", fiscalYearEnd), profileItem("Incorporation", c.stateOfIncorporation), profileItem("CIK", c.cik ? String(c.cik).padStart(10, "0") : null), profileItem("Industry", [c.sicDescription, c.sic ? `SIC ${c.sic}` : null].filter(Boolean).join(" · ")), profileItem("Website", WEB[tk] ? el("a", { href: "https://" + WEB[tk], target: "_blank", rel: "noopener" }, WEB[tk] + " ↗") : null)),
+    el("div", { class: "co-history" }, sparkSVG((PX[tk + "@5m"]?.bars || []).map(b => b.c), st.chg1d >= 0 ? css("--up") : css("--down"), 180, 34), el("span", {}, "Last 5 sessions, 5-minute bars")));
+  head.querySelector(".co-identity").append(profile);
   page.append(crumbs, head);
-  const rng = el("div", { class: "rng" }, el("i", { style: `left:calc(${((s.px - st.lo52) / (st.hi52 - st.lo52)) * 100}% - 1px)` }));
-  const stat = (l, v, cell) => el("div", {}, el("div", { class: "l" }, l), el("div", { class: "v num" + (cell ? " src" : ""), onclick: cell ? () => openSource(cell) : null, title: cell ? "Open source" : null }, v));
-  page.append(el("div", { class: "stats" },
+  const rangeSpan = st.hi52 - st.lo52;
+  const rangePosition = rangeSpan > 0 && s.px != null ? Math.max(0, Math.min(100, ((s.px - st.lo52) / rangeSpan) * 100)) : 50;
+  const rng = el("div", { class: "rng" }, el("i", { style: `left:calc(${rangePosition}% - 1px)` }));
+  const stat = (l, v, cell) => el("div", {}, el("div", { class: "l" }, l), el(cell ? "button" : "div", { class: "v num" + (cell ? " src" : ""), onclick: cell ? () => openSource(cell) : null, title: cell ? "Open source" : null, "aria-label": cell ? `${l}: ${v}. Open source` : null }, v));
+  const metrics = el("div", { class: "stats co-stats", role: "group", "aria-label": "Company metrics" },
     stat("Market cap", fmtMoney(s.mcap)), stat("Revenue TTM", fmtMoney(s.rev?.v), s.rev), stat("Net income TTM", fmtMoney(s.ni?.v), s.ni), stat("EPS TTM", s.eps ? "$" + s.eps.v.toFixed(2) : "–", s.eps),
     stat("P/E TTM", s.pe ? s.pe.toFixed(1) : "–"), stat("P/S TTM", s.ps ? s.ps.toFixed(1) : "–"), stat("FCF yield", fpct(s.fcfy), s.fcf), stat("Gross margin LQ", fpct(s.gm?.v), s.gm), stat("Rev growth LQ", fsgn(s.growth?.v), s.growth),
-    el("div", {}, el("div", { class: "l" }, "52-week range"), el("div", { class: "num", style: "font-size:12.5px;display:flex;justify-content:space-between;margin-top:4px" }, el("span", {}, fnum(st.lo52)), el("span", {}, fnum(st.hi52))), rng)));
+    el("div", {}, el("div", { class: "l" }, "52-week range"), el("div", { class: "num co-range-values" }, el("span", {}, fnum(st.lo52)), el("span", {}, fnum(st.hi52))), rng));
   const tabsDef = [["overview", "Overview"], ["financials", "Financials"], ["segments", "Segments & KPIs"], ["news", "News & narratives"], ["earnings", "Earnings & IR"], ["filings", "Filings"], ["insiders", "Insiders"]];
   const extra = window.FU_COTABS || [];
   extra.forEach(t => tabsDef.splice(Math.max(0, tabsDef.findIndex(x => x[0] === t.after) + 1) || tabsDef.length, 0, [t.id, t.name]));
-  const tabs = el("div", { class: "tabs", role: "tablist" });
-  const body = el("div", { style: "display:flex;flex-direction:column;gap:16px" });
-  const show = id => { if (!tabsDef.find(t => t[0] === id)) id = "overview"; STATE.coTab = id; store.set("coTab", id); $("#crumb-tab").textContent = tabsDef.find(t => t[0] === id)[1]; tabs.querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.id === id); b.setAttribute("aria-selected", b.dataset.id === id); }); body.innerHTML = ""; ({ overview: coOverview, financials: coFinancials, segments: coSegments, news: coNews, filings: coFilings, earnings: coEarnings, insiders: coInsiders, ...Object.fromEntries(extra.map(t => [t.id, t.render])) })[id](body, tk); };
+  const tabs = el("div", { class: "tabs co-tabs", role: "tablist", "aria-label": "Company research" });
+  const body = el("div", { class: "co-body" });
+  const show = id => { if (!tabsDef.find(t => t[0] === id)) id = "overview"; STATE.coTab = id; store.set("coTab", id); $("#crumb-tab").textContent = tabsDef.find(t => t[0] === id)[1]; tabs.querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.id === id); b.setAttribute("aria-selected", b.dataset.id === id); }); body.innerHTML = ""; if (id === "overview") body.append(metrics); ({ overview: coOverview, financials: coFinancials, segments: coSegments, news: coNews, filings: coFilings, earnings: coEarnings, insiders: coInsiders, ...Object.fromEntries(extra.map(t => [t.id, t.render])) })[id](body, tk); };
   tabsDef.forEach(([id, n], i) => tabs.append(el("button", { "data-id": id, role: "tab", title: `${n} (${i + 1})`, onclick: () => show(id) }, n)));
   page.append(tabs, body);
   show(STATE.coTab);
@@ -2499,7 +2527,7 @@ async function pWorkbench() {
 /* ---------- research ---------- */
 let RESEARCH = null;
 async function pResearch() {
-  page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Research"), el("h1", {}, "Research assistant"), el("div", { class: "sub" }, "Ask about any covered company, sector or macro series. The assistant looks up filed figures, prices and macro data, searches recent news when it needs to, runs deterministic calculations, and links financial values to inspectable evidence. Each lookup is shown as it runs."))));
+  page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Research"), el("h1", {}, "Research assistant"), el("div", { class: "sub" }, "Research companies, compare filed financials, and inspect the evidence behind each answer."))));
   const g = el("div", { class: "grid", style: "grid-template-columns:minmax(0,1fr) 300px" });
   const chat = el("section", { class: "panel", style: "display:flex;flex-direction:column;min-height:68vh" });
   const side = el("div", { style: "display:flex;flex-direction:column;gap:16px" },
