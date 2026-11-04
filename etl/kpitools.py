@@ -54,13 +54,46 @@ def docs_for(sb, ticker):
     return sb.select("ir_documents", f"select=id,url,title,doc_type,fiscal_label,period_end,ext,bytes,pages,text_path,storage_path,fetched_at&ticker=eq.{ticker}")
 
 
+TEXT_CACHE_DIR = os.environ.get("FU_TEXT_CACHE") or os.path.join(os.path.expanduser("~"), ".cache", "filedunderai", "text")
+
+
+def _cache_file(doc):
+    # keyed by storage path and fetch time, so a re-fetched document gets a new entry
+    key = re.sub(r"[^A-Za-z0-9._-]", "_", f"{doc['text_path']}@{doc.get('fetched_at') or ''}")
+    return os.path.join(TEXT_CACHE_DIR, key[-200:])
+
+
 def text_of(sb, doc):
     if doc["id"] in _TEXT_CACHE:
         return _TEXT_CACHE[doc["id"]]
     if not doc.get("text_path"):
         return None
-    with urllib.request.urlopen(_ir_public(sb) + doc["text_path"], timeout=60) as r:
-        raw = r.read()
+    path = _cache_file(doc)
+    raw = None
+    try:
+        with open(path, "rb") as f:
+            raw = f.read()
+    except OSError:
+        pass
+    if raw is None:
+        import time
+        for attempt in range(6):
+            try:
+                with urllib.request.urlopen(_ir_public(sb) + doc["text_path"], timeout=60) as r:
+                    raw = r.read()
+                break
+            except Exception:
+                if attempt == 5:
+                    raise
+                time.sleep(min(30, 3 * (attempt + 1) ** 1.5))
+        try:
+            os.makedirs(TEXT_CACHE_DIR, exist_ok=True)
+            tmp = f"{path}.{os.getpid()}.tmp"
+            with open(tmp, "wb") as f:
+                f.write(raw)
+            os.replace(tmp, path)
+        except OSError:
+            pass
     try:
         raw = gzip.decompress(raw)
     except OSError:
