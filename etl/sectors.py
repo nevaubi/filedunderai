@@ -1255,7 +1255,7 @@ def note_facts(doc):
     if vr:
         facts["pe_10y_med"] = {"label": "10-year median aggregate P/E", "value": vr["med"], "unit": "x", "ref": {"type": "val_range", "metric": "pe"}}
         if vr.get("pct") is not None:
-            facts["pe_pct"] = {"label": "Percentile of today's P/E within its 10-year range", "value": vr["pct"], "unit": "pct", "ref": {"type": "val_range", "metric": "pe"}}
+            facts["pe_pct"] = {"label": "Percentile of today's P/E within its 10-year range", "value": vr["pct"], "unit": "pctile", "ref": {"type": "val_range", "metric": "pe"}}
     r = doc["returns"]
     for w in ("1M", "YTD"):
         if r["cw"].get(w) is not None:
@@ -1282,6 +1282,9 @@ def fmt_fact(f):
         return f"{v:.1f}x"
     if u == "num":
         return f"{v:.2f}"
+    if u == "pctile":
+        n = round(v * 100)
+        return f"{n}{'th' if 10 <= n % 100 <= 20 else {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')}"
     return str(v)
 
 
@@ -1305,7 +1308,7 @@ def notes(sb, log=print):
         note = None
         for attempt in range(3):
             try:
-                j = complete_json(NOTE_PROMPT.format(name=sec, n=len(doc["members"]), week=week, facts=lines), max_tokens=1500)
+                j = complete_json(NOTE_PROMPT.format(name=sec, n=len(doc["members"]), week=week, facts=lines), max_tokens=8000)
             except Exception as e:
                 log(f"  note {slug} failed: {str(e)[:120]}")
                 break

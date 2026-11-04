@@ -355,7 +355,8 @@ details.sx-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
     return el("div", { class: "sx-note" }, el("div", { style: "display:flex;gap:8px;align-items:baseline;flex-wrap:wrap" }, full ? null : el("a", { href: "#sectors-" + slug }, el("b", {}, n.sector)), el("b", {}, n.title), el("span", { class: "faint", style: "font-size:11.5px;margin-left:auto" }, `Week of ${fdate(n.week)}`)), p,
       el("div", { class: "faint", style: "font-size:11px" }, "Written by a language model from the computed figures only; every figure is inserted from the data and opens its derivation."));
   }
-  const noteVal = f => f.text ? f.text : f.unit === "pct" ? fpct(f.value) : f.unit === "x" ? fx(f.value) : fnum(f.value, 2);
+  const ordinal = n => n + (n % 100 >= 10 && n % 100 <= 20 ? "th" : { 1: "st", 2: "nd", 3: "rd" }[n % 10] || "th");
+  const noteVal = f => f.text ? f.text : f.unit === "pctile" || /^Percentile/.test(f.label || "") ? ordinal(Math.round(f.value * 100)) : f.unit === "pct" ? fpct(f.value) : f.unit === "x" ? fx(f.value) : fnum(f.value, 2);
 
   /* ================= overview ================= */
   async function overview() {
