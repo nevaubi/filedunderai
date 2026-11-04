@@ -23,7 +23,7 @@
   --shadow-sm: none;
   --shadow: 0 8px 32px rgb(23 32 43 / 12%);
 }
-body { font-size: 13px; }
+body { margin: 0; font-size: 13px; }
 button, input, select, textarea { accent-color: var(--accent); }
 h1 { font-size: 26px; letter-spacing: -.7px; line-height: 1.25; }
 h2, h3 { letter-spacing: -.2px; }
