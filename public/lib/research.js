@@ -12,7 +12,8 @@
     const p = profile(body.profile), capped = (v, max, name) => { if (v == null) return max; if (!Number.isFinite(v) || v <= 0 || !Number.isInteger(v)) throw new Error('Invalid ' + name); return Math.min(v, max); };
     const remainingTokens = capped(body.remainingTokens, p.totalTokens, 'remaining tokens');
     if (body.round != null && (!Number.isInteger(body.round) || body.round < 0 || body.round >= p.maxCalls)) throw new Error('Research call limit reached');
-    return { profile: p, remainingTokens, maxTokens: Math.min(remainingTokens, capped(body.maxTokens, p.maxTokens, 'token budget')), timeoutMs: capped(body.timeoutMs, p.requestMs, 'timeout') };
+    const remainingCalls = capped(body.remainingCalls, p.maxCalls - (body.round ?? 0), 'remaining calls');
+    return { profile: p, remainingTokens, remainingCalls, maxTokens: Math.min(remainingTokens, capped(body.maxTokens, p.maxTokens, 'token budget')), timeoutMs: capped(body.timeoutMs, p.requestMs, 'timeout') };
   }
   const dimensions = unit => { if (['ratio','pct','x'].includes(unit)) return {}; if (!/^[A-Za-z]+(?:\/[A-Za-z]+)?$/.test(unit || '')) throw new Error('Unsupported unit: ' + unit); const [a,b] = unit.split('/'), d = { [a]: 1 }; if (b) d[b] = (d[b] || 0) - 1; return d; };
   const dimKey = d => JSON.stringify(Object.entries(d).filter(([,v]) => v).sort(([a],[b]) => a.localeCompare(b)));
