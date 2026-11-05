@@ -14,7 +14,7 @@ import urllib.parse
 import xml.etree.ElementTree as ET
 import zipfile
 
-from .common import AggregateLease, HTTPError, SEC_UA, Supabase, now_iso, request, sec_throttle
+from .common import AggregateLease, HTTPError, SEC_UA, Supabase, dedupe_conflict_rows, now_iso, request, sec_throttle
 
 DOC_EXT = (".pdf", ".xlsx", ".xls", ".xlsm", ".csv", ".pptx", ".ppt", ".docx", ".doc")
 RESULT_HINT = re.compile(r"(quarter|earning|result|financial-?(info|data|result|report)|supplement|presentation|press-?release|news|events|reports?)", re.I)
@@ -762,7 +762,7 @@ class IRClient(Supabase):
 
     def upsert(self, table, rows, on_conflict, batch=500):
         self._check_lease()
-        rows = list(rows)
+        rows = dedupe_conflict_rows(rows, on_conflict)
         for start in range(0, len(rows), batch):
             self._check_lease()
             self._call(f"{self.url}/rest/v1/{table}?on_conflict={on_conflict}", method="POST", data=rows[start:start + batch],

@@ -8,7 +8,7 @@ from _common import serve  # noqa: E402
 
 def run(sb):
     from etl import jobs
-    done, failed = jobs.segments_changed_job(sb, time_budget=240)
+    done, failed = jobs.segments_changed_job(sb, time_budget=680)
     return {"updated": list(done), "failed": failed}
 
 

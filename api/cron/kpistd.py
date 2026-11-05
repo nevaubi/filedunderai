@@ -9,7 +9,7 @@ from _common import serve  # noqa: E402
 def run(sb):
     # incremental: only companies whose KPI definitions changed since the last run; the rest finishes on the next run
     from etl import jobs
-    return jobs.kpistd_job(sb, time_budget=230)
+    return jobs.kpistd_job(sb, time_budget=640)
 
 
 class handler(BaseHTTPRequestHandler):
