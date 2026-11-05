@@ -10,9 +10,11 @@ Backfill now persists discovery, document-download and extraction queues in priv
 
 Full-history scope survives maintenance. A missing/corrupt/unavailable checkpoint cannot silently replace progress with an empty state. An IR-specific Supabase adapter bounds each I/O attempt by the remaining run deadline, including lease acquisition, relational pagination, storage and aggregate publication. Per-company and aggregate leases protect writes without attaching worker leases to a shared client.
 
-Coverage records separate source enumeration, pending/failed work and text-extraction quality. Web crawling remains unverified even after all known links are followed. Legacy text paths remain unverified until checked. The company IR library displays all stored records through search, document-type filtering and 50-row pagination; the previous 200-record display cap is removed. Actual publication dates are preferred, with explicitly labeled mapped fiscal periods or unavailable dates as fallbacks.
+Incremental coverage publication validates and reuses the previous KPI/segment counts and their separate as-of timestamps. It reads document rows only for companies changed in that run. It never scans the 227,953 KPI definitions or 3,944,368 KPI values during routine IR maintenance. An absent or inconsistent prior count snapshot fails explicitly; a full rebuild is an operator action. This prevents a small backfill from spending its entire deadline rebuilding unrelated aggregates.
 
-Spreadsheet repair preserves original bytes and previous text objects. XLS is supported through pinned `xlrd==2.0.2`; XLSX files with Windows ZIP member separators are normalized only in memory, with collision/path/archive safety checks. Extraction limits and blank/failed pages are explicit. CSV parsing preserves quoted separators/newlines and numeric precision.
+Coverage records separate source enumeration, pending/failed work and text-extraction quality. Web crawling remains unverified even after all known links are followed. Legacy text paths remain unverified until checked. The Earnings & IR tab and company IR library display all stored records through search, document-type filtering and 50-row pagination; the previous 200-record display cap is removed. Actual publication dates are preferred, with explicitly labeled mapped fiscal periods or unavailable dates as fallbacks.
+
+Spreadsheet repair preserves original bytes and previous text objects. XLS is supported through pinned `xlrd==2.0.2`; XLSX files with Windows ZIP member separators are normalized only in memory, with collision/path/archive safety checks. Extraction limits and blank/failed pages are explicit. CSV parsing preserves quoted separators/newlines and numeric precision. Date repair validates the exact SEC hostname and anchored archive path; lookalike or embedded SEC URLs cannot receive filing dates. A PDF containing only the known access/password-screen template is rejected as failed extraction, while articles quoting the notice remain valid.
 
 ### Screener and workspace
 
@@ -22,7 +24,7 @@ Workspace surfaces and dialogs use scoped white/neutral tokens. Mode controls sh
 
 ### Research and code capabilities
 
-Brief, Detailed (default) and Report profiles use explicit request, tool, time, output and claim bounds. A valid length-limited answer can continue within the profile budget, with reserved final synthesis capacity. Cancellation stops further requests; malformed/truncated tool arguments are never executed. Completed continuation fragments are retained as one complete answer with the original question and tool evidence. Large histories compact intact tool payloads rather than slicing JSON or erasing a completed response.
+Brief, Detailed (default) and Report profiles use explicit request, tool, time, output and claim bounds. A valid length-limited answer can continue within the profile budget, with reserved final synthesis capacity. Both primary and fallback provider attempts count toward the limit; unknown attempt metadata is charged conservatively. Request allowances are validated and capped, and evidence collection reserves an attempt for synthesis. Cancellation stops further requests; malformed/truncated tool arguments are never executed. Completed continuation fragments are retained as one complete answer with the original question and tool evidence. Large histories compact intact tool payloads rather than slicing JSON or erasing a completed response.
 
 `FU_RESEARCH_RUNTIME` is separate from the existing analyst-page `FU_RESEARCH` API. Integration tests load the actual index scripts in browser order to detect namespace collisions.
 
@@ -52,16 +54,22 @@ Full metadata and original pre-repair rows were backed up privately before broad
 
 ## Verification
 
-- 160 JavaScript tests passed, including actual-page integration, screener interaction, formula-draft preservation, evidence calculations and research continuation/history regressions.
-- 74 Python financial/IR tests passed, including 46 focused IR regressions.
+- 168 JavaScript tests passed, including actual-page integration, screener interaction, formula-draft preservation, evidence calculations and research continuation/history regressions.
+- 82 Python financial/IR tests passed, including 54 focused IR regressions.
 - 1,698 technical events matched between Python and JavaScript implementations.
 - Production build passed with 27 fingerprinted assets and the Office export bundle.
 - Python compilation and `git diff --check` passed.
+- A clean-checkout CI failure exposed a test dependency on an ignored local Office bundle. The integration harness now builds the actual production entry point in memory; all five integration tests and the full JavaScript suite pass without a local generated bundle. GitHub CI passed after that correction.
+- Additional scoped reviews accepted exact SEC origin validation, protection-screen PDF rejection, the Earnings & IR entry point and the provider-attempt budget correction. Six new budget regressions include the actual client/server path under controlled provider responses.
 - Independent UI, research and IR reviews accepted their cohesive correction waves. The final integrated branch review also found no blocking integration or regression issue.
 
 ## Publication and browser verification
 
-Pending final publication of the prepared 500-company manifests, reviewed code deployment and live browser checks. This section is updated with actual outcomes before final delivery.
+All 500 company manifests were published and independently read back in full, with exact equality against the prepared snapshot. The verification completed at `2026-11-05T00:00:52Z`: 73,420 documents, 8,694 known publication dates, 19 structurally verified extractions and 73,401 queued legacy extractions, with no manifest failures. Ninety-six companies exceed the former 200-document display cap. All 500 private checkpoints preserve the pending work. Coverage is deliberately 499 partial and one unverified; none is labeled historically complete.
+
+An interrupted publication was resumed only after validating the private backup and rereading every previously completed manifest. The resumed publisher finished all 500 companies. Its subsequent broad aggregate scan was stopped before index publication; an audited grouped-count snapshot supplies the aggregate index without downloading millions of KPI rows. The incremental implementation now prevents that scan in normal maintenance.
+
+Reviewed code deployment and live browser checks are pending. This section is updated with actual outcomes before final delivery.
 
 ## Limits
 
