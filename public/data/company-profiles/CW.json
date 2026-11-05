@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "ticker": "CW",
+  "cik": 26324,
+  "name": "CURTISS WRIGHT CORP",
+  "description": "curtiss-wright corporation is a diversified, multinational provider of highly engineered, technologically advanced products and services. we are the corporate descendants of the wright brothers, the fathers of flight, and mr. glenn curtiss, the father of naval aviation. in 1929, the companies founded by these three great aviation pioneers merged to form the largest aircraft company at the time, curtiss-wright corporation. today, we design and manufacture highly engineered, advanced technologies that perform critical functions in demanding conditions in the commercial, industrial, defense, and energy markets, and have operations in the united states, the united kingdom, canada, and internationally. we are listed on the new york stock exchange and trade under the symbol cw.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "uRTPMDyy4MMDBVE2C4rCjgfcaQat",
+    "observed_at": "2026-11-05T19:43:57Z",
+    "match": {
+      "ticker": "CW",
+      "domain": "curtisswright.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://curtisswright.com",
+  "industry": "Defense & Space",
+  "headquarters": "Davidson, North Carolina, United States",
+  "linkedin_url": "https://linkedin.com/company/curtiss-wright-corporation",
+  "founded": 1929,
+  "employees": null,
+  "professional_profile_count": 4033,
+  "employee_size_range": "5001-10000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "uRTPMDyy4MMDBVE2C4rCjgfcaQat",
+    "observed_at": "2026-11-05T19:43:57Z",
+    "match": {
+      "ticker": "CW",
+      "domain": "curtisswright.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "uRTPMDyy4MMDBVE2C4rCjgfcaQat",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "uRTPMDyy4MMDBVE2C4rCjgfcaQat",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "CW",
+        "domain": "curtisswright.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:43:57Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "uRTPMDyy4MMDBVE2C4rCjgfcaQat",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "CW",
+        "domain": "curtisswright.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "uRTPMDyy4MMDBVE2C4rCjgfcaQat",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "CW",
+        "domain": "curtisswright.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "uRTPMDyy4MMDBVE2C4rCjgfcaQat",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "CW",
+        "domain": "curtisswright.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "uRTPMDyy4MMDBVE2C4rCjgfcaQat",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "CW",
+        "domain": "curtisswright.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "uRTPMDyy4MMDBVE2C4rCjgfcaQat",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "CW",
+        "domain": "curtisswright.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "uRTPMDyy4MMDBVE2C4rCjgfcaQat",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "CW",
+        "domain": "curtisswright.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "uRTPMDyy4MMDBVE2C4rCjgfcaQat",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "CW",
+        "domain": "curtisswright.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:57Z",
+      "industry": "2026-11-05T19:43:57Z",
+      "headquarters": "2026-11-05T19:43:57Z",
+      "founded": "2026-11-05T19:43:57Z",
+      "professional_profile_count": "2026-11-05T19:43:57Z",
+      "employee_size_range": "2026-11-05T19:43:57Z",
+      "linkedin_url": "2026-11-05T19:43:57Z",
+      "description": "2026-11-05T19:43:57Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

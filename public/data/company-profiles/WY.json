@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "WY",
+  "cik": 106535,
+  "name": "Weyerhaeuser",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://weyerhaeuser.com",
+  "industry": "paper & forest products",
+  "headquarters": "seattle, washington, united states",
+  "linkedin_url": "https://linkedin.com/company/weyerhaeuser",
+  "founded": 1900,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "7jLpYNAT55XojHKvmTtgsARWfz7s",
+    "observed_at": "2026-11-05T20:10:35Z",
+    "match": {
+      "ticker": "WY",
+      "domain": "weyerhaeuser.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.298454378673753
+    }
+  },
+  "provider_record_id": "7jLpYNAT55XojHKvmTtgsARWfz7s",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "7jLpYNAT55XojHKvmTtgsARWfz7s",
+      "observed_at": "2026-11-05T20:10:35Z",
+      "match": {
+        "ticker": "WY",
+        "domain": "weyerhaeuser.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.298454378673753
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:10:35Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "7jLpYNAT55XojHKvmTtgsARWfz7s",
+      "observed_at": "2026-11-05T20:10:35Z",
+      "match": {
+        "ticker": "WY",
+        "domain": "weyerhaeuser.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.298454378673753
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "7jLpYNAT55XojHKvmTtgsARWfz7s",
+      "observed_at": "2026-11-05T20:10:35Z",
+      "match": {
+        "ticker": "WY",
+        "domain": "weyerhaeuser.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.298454378673753
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "7jLpYNAT55XojHKvmTtgsARWfz7s",
+      "observed_at": "2026-11-05T20:10:35Z",
+      "match": {
+        "ticker": "WY",
+        "domain": "weyerhaeuser.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.298454378673753
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "7jLpYNAT55XojHKvmTtgsARWfz7s",
+      "observed_at": "2026-11-05T20:10:35Z",
+      "match": {
+        "ticker": "WY",
+        "domain": "weyerhaeuser.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.298454378673753
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "7jLpYNAT55XojHKvmTtgsARWfz7s",
+      "observed_at": "2026-11-05T20:10:35Z",
+      "match": {
+        "ticker": "WY",
+        "domain": "weyerhaeuser.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.298454378673753
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "7jLpYNAT55XojHKvmTtgsARWfz7s",
+      "observed_at": "2026-11-05T20:10:35Z",
+      "match": {
+        "ticker": "WY",
+        "domain": "weyerhaeuser.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.298454378673753
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "7jLpYNAT55XojHKvmTtgsARWfz7s",
+      "observed_at": "2026-11-05T20:10:35Z",
+      "match": {
+        "ticker": "WY",
+        "domain": "weyerhaeuser.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.298454378673753
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:10:35Z",
+      "industry": "2026-11-05T20:10:35Z",
+      "headquarters": "2026-11-05T20:10:35Z",
+      "founded": "2026-11-05T20:10:35Z",
+      "employee_size_range": "2026-11-05T20:10:35Z",
+      "linkedin_url": "2026-11-05T20:10:35Z"
+    }
+  }
+}

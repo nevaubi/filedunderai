@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "ticker": "FNF",
+  "cik": 1331875,
+  "name": "Fidelity National Financial, Inc.",
+  "description": "fidelity national financial, inc. (nyse: fnf) is a leading provider of title insurance and transaction services to the real estate and mortgage industries. ranked #359 on the fortune 500(r) list for 2023, fnf is the nation's largest title insurance company through our title insurance underwriters (fidelity national title, chicago title, commonwealth land title, alamo title and national title insurance of new york) that collectively issue more title insurance policies than any other title company in the united states. our mission is to advance, expand, and protect the experience of property ownership by making the safety of our customers our primary focus. we pride ourselves on being extremely customer-oriented, motivated, and quick to provide solutions for all of your title insurance needs. we strongly encourage employee ownership of company stock so our fnf family can share in our company’s continuous growth and be a valuable part of something bigger than themselves.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "QW44W1By1TiG89zKVNbZ9ApT3b5d",
+    "observed_at": "2026-11-05T19:44:56Z",
+    "match": {
+      "ticker": "FNF",
+      "domain": "fnf.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 9
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+  "website": "https://fnf.com",
+  "industry": "Financial Services",
+  "headquarters": "Jacksonville, Florida, United States",
+  "linkedin_url": "https://linkedin.com/company/fidelity-national-financial",
+  "founded": null,
+  "employees": null,
+  "professional_profile_count": 4240,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "QW44W1By1TiG89zKVNbZ9ApT3b5d",
+    "observed_at": "2026-11-05T19:44:56Z",
+    "match": {
+      "ticker": "FNF",
+      "domain": "fnf.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 9
+    }
+  },
+  "provider_record_id": "QW44W1By1TiG89zKVNbZ9ApT3b5d",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "QW44W1By1TiG89zKVNbZ9ApT3b5d",
+      "observed_at": "2026-11-05T19:44:56Z",
+      "match": {
+        "ticker": "FNF",
+        "domain": "fnf.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:44:56Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "QW44W1By1TiG89zKVNbZ9ApT3b5d",
+      "observed_at": "2026-11-05T19:44:56Z",
+      "match": {
+        "ticker": "FNF",
+        "domain": "fnf.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "QW44W1By1TiG89zKVNbZ9ApT3b5d",
+      "observed_at": "2026-11-05T19:44:56Z",
+      "match": {
+        "ticker": "FNF",
+        "domain": "fnf.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "QW44W1By1TiG89zKVNbZ9ApT3b5d",
+      "observed_at": "2026-11-05T19:44:56Z",
+      "match": {
+        "ticker": "FNF",
+        "domain": "fnf.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "QW44W1By1TiG89zKVNbZ9ApT3b5d",
+      "observed_at": "2026-11-05T19:44:56Z",
+      "match": {
+        "ticker": "FNF",
+        "domain": "fnf.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "QW44W1By1TiG89zKVNbZ9ApT3b5d",
+      "observed_at": "2026-11-05T19:44:56Z",
+      "match": {
+        "ticker": "FNF",
+        "domain": "fnf.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "QW44W1By1TiG89zKVNbZ9ApT3b5d",
+      "observed_at": "2026-11-05T19:44:56Z",
+      "match": {
+        "ticker": "FNF",
+        "domain": "fnf.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "QW44W1By1TiG89zKVNbZ9ApT3b5d",
+      "observed_at": "2026-11-05T19:44:56Z",
+      "match": {
+        "ticker": "FNF",
+        "domain": "fnf.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:44:56Z",
+      "industry": "2026-11-05T19:44:56Z",
+      "headquarters": "2026-11-05T19:44:56Z",
+      "professional_profile_count": "2026-11-05T19:44:56Z",
+      "employee_size_range": "2026-11-05T19:44:56Z",
+      "linkedin_url": "2026-11-05T19:44:56Z",
+      "description": "2026-11-05T19:44:56Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

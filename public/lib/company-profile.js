@@ -144,15 +144,17 @@
       const employees = profile?.employees?.count ?? profile?.employees;
       const workforceScope = { full_time_equivalent: 'Full-time equivalent', full_time: 'Full-time', employees: 'Reported workforce' }[profile?.employees?.scope];
       const workforce = finite(employees) ? node('span', {}, (profile?.employees?.approximate ? '≈ ' : '') + employees.toLocaleString('en-US'), profile?.employees?.as_of ? node('small', { class: 'cp-fact-detail' }, [workforceScope, dateLabel(profile.employees.as_of)].filter(Boolean).join(' · ')) : null) : null;
+      const sizeBand = /^\d+(?:-\d+|\+)$/.test(profile?.employee_size_range || '') ? node('span', {}, profile.employee_size_range.replace('-', '–'), node('small', { class: 'cp-fact-detail' }, 'Provider size band')) : null;
       const exchanges = [...new Set((company.exchanges || []).filter(Boolean))].join(', ');
       const founded = profile?.founded ? node('span', { title: profile.founded_note }, profile.founded) : null;
-      const items = [['Sector', summary.sector || company.sector], ['Industry', profile?.industry || company.sicDescription || summary.industry], ['Headquarters', location], ['Exchange', exchanges || summary.exchange], ['Founded', founded], ['Employees', workforce], ['Fiscal year end', /^\d{4}$/.test(company.fiscalYearEnd || '') ? new Date('2000-' + company.fiscalYearEnd.slice(0, 2) + '-' + company.fiscalYearEnd.slice(2) + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' }) : null]];
+      const items = [['Sector', summary.sector || company.sector], ['Industry', profile?.industry || company.sicDescription || summary.industry], ['Headquarters', location], ['Exchange', exchanges || summary.exchange], ['Founded', founded], [workforce ? 'Employees' : 'Employee range', workforce || sizeBand], ['Fiscal year end', /^\d{4}$/.test(company.fiscalYearEnd || '') ? new Date('2000-' + company.fiscalYearEnd.slice(0, 2) + '-' + company.fiscalYearEnd.slice(2) + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' }) : null]];
       const dl = node('dl', { class: 'cp-fact-list' });
       for (const [label, value] of items) dl.append(node('div', {}, node('dt', {}, label), node('dd', {}, value || 'Not available')));
       if (website) dl.append(node('div', {}, node('dt', {}, 'Website'), node('dd', {}, sourceLink(website, new URL(website).hostname.replace(/^www\./, '')))));
       const workforceNote = finite(employees) ? (profile?.employees?.basis === 'reported' ? ' Employee count is company-reported.' : ' Employee count follows its attributed source.') : '';
       facts.append(dl, node('p', { class: 'cp-footnote' }, profile?.updated_at ? 'Company context updated ' + dateLabel(profile.updated_at) + '.' + workforceNote : 'Company identity from SEC filings. Additional context appears when sourced.', finite(employees) ? sourceLink(profile?.employees?.source_url, 'Workforce source') : null));
-      const text = typeof profile?.description === 'string' ? profile.description.trim() : profile?.description?.text;
+      const rawDescription = typeof profile?.description === 'string' ? profile.description : profile?.description?.text;
+      const text = typeof rawDescription === 'string' ? rawDescription.trim() : '';
       if (text) {
         const paragraphs = text.split(/\n\s*\n|\n/).map(x => x.trim()).filter(Boolean);
         const prose = node('div', { class: 'cp-business-prose' });
@@ -165,7 +167,7 @@
       const tenK = company.filings?.find(f => /10-K|20-F|40-F/.test(f.f));
       if (tenK && helpers.filingUrl) aboutLinks.append(sourceLink(helpers.filingUrl(ticker, tenK), 'Business in the annual report'));
       const descSource = profile?.description_source?.url || profile?.description_source || profile?.description?.source_url || profile?.source_url;
-      if (safeUrl(descSource)) aboutLinks.append(sourceLink(descSource, profile?.description_provider || 'Business description source'));
+      if (text && safeUrl(descSource)) aboutLinks.append(sourceLink(descSource, profile?.description_provider || 'Business description source'));
       if (website) aboutLinks.append(sourceLink(website, 'Company website'));
       if (safeUrl(profile?.linkedin_url)) aboutLinks.append(sourceLink(profile.linkedin_url, 'Company LinkedIn'));
       if (safeUrl(profile?.ir_url || summary.ir_url)) aboutLinks.append(sourceLink(profile?.ir_url || summary.ir_url, 'Investor relations'));
@@ -209,7 +211,8 @@
           }
           leadership.append(node('div', { class: 'cp-role-group' }, node('h3', {}, group), grid));
         }
-        leadership.append(node('p', { class: 'cp-footnote' }, (profile.coverage?.leadership_scope ? profile.coverage.leadership_scope + ' ' : '') + 'Tenure uses the sourced role start date. “With company since” indicates employment tenure when a role start is unavailable.' + (profile.updated_at ? ' Profiles checked ' + dateLabel(profile.updated_at) + '.' : ' Observation dates are unavailable.')));
+        const checkedAt = profile.coverage?.official_updated_at || profile.updated_at;
+        leadership.append(node('p', { class: 'cp-footnote' }, (profile.coverage?.leadership_scope ? profile.coverage.leadership_scope + ' ' : '') + 'Tenure uses the sourced role start date. “With company since” indicates employment tenure when a role start is unavailable.' + (checkedAt ? ' Profiles checked ' + dateLabel(checkedAt) + '.' : ' Observation dates are unavailable.')));
       }
       const validImages = (profile?.images || []).filter(image => safeUrl(image.url) && safeUrl(image.source_url)).slice(0, 3);
       const publicationTime = item => Date.parse(item.published_at || item.date || '') || 0;

@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "ABNB",
+  "cik": 1559720,
+  "name": "Airbnb",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://airbnb.com",
+  "industry": "computer software",
+  "headquarters": "san francisco, california, united states",
+  "linkedin_url": "https://linkedin.com/company/airbnb",
+  "founded": 2007,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "5001-10000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "9fGW9Je0KfwfNPtyouflTQneENKN",
+    "observed_at": "2026-11-05T19:55:58Z",
+    "match": {
+      "ticker": "ABNB",
+      "domain": "airbnb.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.2985203820083098
+    }
+  },
+  "provider_record_id": "9fGW9Je0KfwfNPtyouflTQneENKN",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "9fGW9Je0KfwfNPtyouflTQneENKN",
+      "observed_at": "2026-11-05T19:55:58Z",
+      "match": {
+        "ticker": "ABNB",
+        "domain": "airbnb.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2985203820083098
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:55:58Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "9fGW9Je0KfwfNPtyouflTQneENKN",
+      "observed_at": "2026-11-05T19:55:58Z",
+      "match": {
+        "ticker": "ABNB",
+        "domain": "airbnb.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2985203820083098
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "9fGW9Je0KfwfNPtyouflTQneENKN",
+      "observed_at": "2026-11-05T19:55:58Z",
+      "match": {
+        "ticker": "ABNB",
+        "domain": "airbnb.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2985203820083098
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "9fGW9Je0KfwfNPtyouflTQneENKN",
+      "observed_at": "2026-11-05T19:55:58Z",
+      "match": {
+        "ticker": "ABNB",
+        "domain": "airbnb.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2985203820083098
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "9fGW9Je0KfwfNPtyouflTQneENKN",
+      "observed_at": "2026-11-05T19:55:58Z",
+      "match": {
+        "ticker": "ABNB",
+        "domain": "airbnb.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2985203820083098
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "9fGW9Je0KfwfNPtyouflTQneENKN",
+      "observed_at": "2026-11-05T19:55:58Z",
+      "match": {
+        "ticker": "ABNB",
+        "domain": "airbnb.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2985203820083098
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "9fGW9Je0KfwfNPtyouflTQneENKN",
+      "observed_at": "2026-11-05T19:55:58Z",
+      "match": {
+        "ticker": "ABNB",
+        "domain": "airbnb.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2985203820083098
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "9fGW9Je0KfwfNPtyouflTQneENKN",
+      "observed_at": "2026-11-05T19:55:58Z",
+      "match": {
+        "ticker": "ABNB",
+        "domain": "airbnb.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2985203820083098
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:55:58Z",
+      "industry": "2026-11-05T19:55:58Z",
+      "headquarters": "2026-11-05T19:55:58Z",
+      "founded": "2026-11-05T19:55:58Z",
+      "employee_size_range": "2026-11-05T19:55:58Z",
+      "linkedin_url": "2026-11-05T19:55:58Z"
+    }
+  }
+}

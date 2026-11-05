@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "ticker": "IBM",
+  "cik": 51143,
+  "name": "IBM",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://newsroom.ibm.com/executive-bios",
+  "website": "https://www.ibm.com/",
+  "industry": null,
+  "headquarters": null,
+  "founded": null,
+  "employees": null,
+  "leadership": [
+    {
+      "name": "Arvind Krishna",
+      "role": "Chairman, President and Chief Executive Officer",
+      "profile_url": "https://newsroom.ibm.com/Arvind-Krishna",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://newsroom.ibm.com/executive-bios",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.ibm.com/executive-bios",
+      "photo_credit": "IBM",
+      "photo_original_url": "https://newsroom.ibm.com/image/IBM-2020-AR-Arvind_1800x2400_1b_crop+385x422.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "James J. Kavanaugh",
+      "role": "Chief Financial Officer and Senior Vice President of Finance & Operations",
+      "profile_url": "https://newsroom.ibm.com/James-J-Kavanaugh",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://newsroom.ibm.com/executive-bios",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.ibm.com/executive-bios",
+      "photo_credit": "IBM",
+      "photo_original_url": "https://newsroom.ibm.com/image/JK_headshot_385x422.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Jonathan H. Adashek",
+      "role": "Senior Vice President and Chief Global Affairs Officer",
+      "profile_url": "https://newsroom.ibm.com/Jonathan-Adashek",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://newsroom.ibm.com/executive-bios",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.ibm.com/executive-bios",
+      "photo_credit": "IBM",
+      "photo_original_url": "https://newsroom.ibm.com/image/Jonathan_Adashek_bio_new_385x422.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Mohamad Ali",
+      "role": "Senior Vice President, IBM Consulting",
+      "profile_url": "https://newsroom.ibm.com/Mohamad-Ali",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://newsroom.ibm.com/executive-bios",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.ibm.com/executive-bios",
+      "photo_credit": "IBM",
+      "photo_original_url": "https://newsroom.ibm.com/image/Ali_Headshot_thumbnail_crop1.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Ana Paula Assis",
+      "role": "Senior Vice President, EMEA and Growth Markets",
+      "profile_url": "https://newsroom.ibm.com/Ana-Paula-Assis",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://newsroom.ibm.com/executive-bios",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.ibm.com/executive-bios",
+      "photo_credit": "IBM",
+      "photo_original_url": "https://newsroom.ibm.com/image/Ana+Paula+Assis+IBM+385x422.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Barry Baker",
+      "role": "Senior Vice President, Infrastructure",
+      "profile_url": "https://newsroom.ibm.com/barry-baker",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://newsroom.ibm.com/executive-bios",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.ibm.com/executive-bios",
+      "photo_credit": "IBM",
+      "photo_original_url": "https://newsroom.ibm.com/image/Barry_baker_385x422.png",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Andy Baldwin",
+      "role": "Senior Vice President, Consulting Offerings and Growth",
+      "profile_url": "https://newsroom.ibm.com/Andy-Baldwin",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://newsroom.ibm.com/executive-bios",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.ibm.com/executive-bios",
+      "photo_credit": "IBM",
+      "photo_original_url": "https://newsroom.ibm.com/image/Andy+Baldwin+385x422.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Neil Dhar",
+      "role": "Senior Vice President, Americas Consulting",
+      "profile_url": "https://newsroom.ibm.com/Neil-Dhar",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://newsroom.ibm.com/executive-bios",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.ibm.com/executive-bios",
+      "photo_credit": "IBM",
+      "photo_original_url": "https://newsroom.ibm.com/image/Neil+Dahr+Headshot_II+385x422.png",
+      "photo_status": "source_unavailable"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "IBM official leadership roster",
+      "url": "https://newsroom.ibm.com/executive-bios",
+      "observed_at": "2026-11-05T19:45:54Z"
+    },
+    {
+      "name": "Arvind Krishna official biography",
+      "url": "https://newsroom.ibm.com/Arvind-Krishna",
+      "observed_at": "2026-11-05T19:52:11Z"
+    },
+    {
+      "name": "James J. Kavanaugh official biography",
+      "url": "https://newsroom.ibm.com/James-J-Kavanaugh",
+      "observed_at": "2026-11-05T19:52:11Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "IBM official leadership roster",
+      "url": "https://newsroom.ibm.com/executive-bios",
+      "observed_at": "2026-11-05T19:45:54Z"
+    }
+  },
+  "coverage": {
+    "status": "official_sources",
+    "description": "unavailable",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T19:52:11Z",
+    "leadership_scope": "Selected corporate executives from the current official leadership page; not a complete officer or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:45:54Z",
+      "leadership": "2026-11-05T19:45:54Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  }
+}

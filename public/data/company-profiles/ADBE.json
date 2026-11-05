@@ -1,0 +1,276 @@
+{
+  "schema_version": 1,
+  "ticker": "ADBE",
+  "cik": 796343,
+  "name": "Adobe",
+  "description": "adobe is the global leader in digital media and digital marketing solutions. our creative, marketing and document solutions empower everyone – from emerging artists to global brands – to bring digital creations to life and deliver immersive, compelling experiences to the right person at the right moment for the best results. in short, adobe is everywhere, and we’re changing the world through digital experiences.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "FDkOPkxCv4NsmBv5LbiJKwl5Ca6U",
+    "observed_at": "2026-11-05T19:43:14Z",
+    "match": {
+      "ticker": "ADBE",
+      "domain": "adobe.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://www.adobe.com",
+  "industry": "Computer Software",
+  "headquarters": "San Jose, California, United States",
+  "linkedin_url": "https://linkedin.com/company/adobe",
+  "founded": 1982,
+  "employees": null,
+  "professional_profile_count": 62454,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "FDkOPkxCv4NsmBv5LbiJKwl5Ca6U",
+    "observed_at": "2026-11-05T19:43:14Z",
+    "match": {
+      "ticker": "ADBE",
+      "domain": "adobe.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "FDkOPkxCv4NsmBv5LbiJKwl5Ca6U",
+  "leadership": [
+    {
+      "name": "Shantanu Narayen",
+      "role": "Chair and Chief Executive Officer",
+      "profile_url": "https://www.adobe.com/about-adobe/leaders/shantanu-narayen.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/054c752ec6ca56a145b06712.png",
+      "start_date": null,
+      "source_url": "https://www.adobe.com/about-adobe/leaders.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.adobe.com/about-adobe/leaders.html",
+      "photo_credit": "Adobe",
+      "photo_original_url": "https://www.adobe.com/about-adobe/media_1bf1ae24d05e67f4d0377e84321c24c20e1d09ab1.png?width=750&format=png&optimize=medium",
+      "photo_sha256": "3675f7ee64477923e07a1a05a45832f95b1aaec181dd96aee86360a1d0f9c3ad",
+      "photo_cached_at": "2026-11-05T20:26:05Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Lara Balazs",
+      "role": "Chief Marketing Officer and Executive Vice President, Global Marketing",
+      "profile_url": "https://www.adobe.com/about-adobe/leaders/lara-balazs.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/156b9a3c35c34addc32395be.png",
+      "start_date": null,
+      "source_url": "https://www.adobe.com/about-adobe/leaders.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.adobe.com/about-adobe/leaders.html",
+      "photo_credit": "Adobe",
+      "photo_original_url": "https://www.adobe.com/about-adobe/media_1a86a57645791171dc8b686ffd109300d1866a642.png?width=750&format=png&optimize=medium",
+      "photo_sha256": "67c703ffccc976ee4cebeda99d7b5287e6a5288ff4cd215acdb6259923d2d07c",
+      "photo_cached_at": "2026-11-05T20:25:56Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Anil Chakravarthy",
+      "role": "President, Customer Experience Orchestration Business",
+      "profile_url": "https://www.adobe.com/about-adobe/leaders/anil-chakravarthy.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/72559b84a2966962f277028f.png",
+      "start_date": null,
+      "source_url": "https://www.adobe.com/about-adobe/leaders.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.adobe.com/about-adobe/leaders.html",
+      "photo_credit": "Adobe",
+      "photo_original_url": "https://www.adobe.com/about-adobe/media_1f9893654a77e6e4c88b8ada1e81553e6c668dca5.png?width=750&format=png&optimize=medium",
+      "photo_sha256": "5e70093bea99b9dcfb0e6c3e59aec1564176f2c579277722778f19d646b85be3",
+      "photo_cached_at": "2026-11-05T20:26:16Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Gloria Chen",
+      "role": "Chief People Officer and Executive Vice President, Employee Experience",
+      "profile_url": "https://www.adobe.com/about-adobe/leaders/gloria-chen.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/80cbc3d70795eadfe7e1edee.png",
+      "start_date": null,
+      "source_url": "https://www.adobe.com/about-adobe/leaders.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.adobe.com/about-adobe/leaders.html",
+      "photo_credit": "Adobe",
+      "photo_original_url": "https://www.adobe.com/about-adobe/media_1959fef6eb2c0852fa70a1c537d80f2c323096cd5.png?width=750&format=png&optimize=medium",
+      "photo_sha256": "fdab59604cae5681d4dbb5f261adbbb68758a4865878c151ebbac47f6c96a79a",
+      "photo_cached_at": "2026-11-05T20:25:56Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Steve Day",
+      "role": "Interim Chief Financial Officer and Senior Vice President, Finance, Technology, Security and Operations",
+      "profile_url": "https://www.adobe.com/about-adobe/leaders/steve-day.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/262064a42b05b029893634a1.jpg",
+      "start_date": null,
+      "source_url": "https://www.adobe.com/about-adobe/leaders.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.adobe.com/about-adobe/leaders.html",
+      "photo_credit": "Adobe",
+      "photo_original_url": "https://www.adobe.com/about-adobe/media_1641aeb1b5cf8301623f728d46b1e120ce6e418d7.jpg?width=750&format=jpg&optimize=medium",
+      "photo_sha256": "f6820d91d252345ae1756e6166d01b2dc93d52d4a5058557f02e9c8da0bb42cc",
+      "photo_cached_at": "2026-11-05T20:25:56Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Louise Pentland",
+      "role": "Chief Legal Officer and Executive Vice President, Legal and Government Relations",
+      "profile_url": "https://www.adobe.com/about-adobe/leaders/louise-pentland.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/fd3878942ff8b4b8773cc1e9.png",
+      "start_date": null,
+      "source_url": "https://www.adobe.com/about-adobe/leaders.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.adobe.com/about-adobe/leaders.html",
+      "photo_credit": "Adobe",
+      "linkedin_url": "https://linkedin.com/in/louisepentland",
+      "linkedin_source": {
+        "name": "People Data Labs",
+        "url": "https://docs.peopledatalabs.com/docs/person-search-api",
+        "observed_at": "2026-11-05T20:16:24Z",
+        "provider_verified_at": "2026-10-01"
+      },
+      "photo_original_url": "https://www.adobe.com/about-adobe/media_1f9d8aaceffb908251a758d6454dae04d9d187cea.png?width=750&format=png&optimize=medium",
+      "photo_sha256": "ac3ffd6ce657181c4ccf936a0914e24989fe0571f17dbb807c6de325b77f4f8e",
+      "photo_cached_at": "2026-11-05T20:26:16Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Adobe official leadership roster",
+      "url": "https://www.adobe.com/about-adobe/leaders.html",
+      "observed_at": "2026-11-05T20:00:35Z"
+    },
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "FDkOPkxCv4NsmBv5LbiJKwl5Ca6U",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "ADBE",
+        "domain": "adobe.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:28:47Z",
+  "field_sources": {
+    "website": {
+      "name": "Adobe official leadership roster",
+      "url": "https://www.adobe.com/about-adobe/leaders.html",
+      "observed_at": "2026-11-05T20:00:35Z"
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "FDkOPkxCv4NsmBv5LbiJKwl5Ca6U",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "ADBE",
+        "domain": "adobe.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "FDkOPkxCv4NsmBv5LbiJKwl5Ca6U",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "ADBE",
+        "domain": "adobe.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "FDkOPkxCv4NsmBv5LbiJKwl5Ca6U",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "ADBE",
+        "domain": "adobe.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "FDkOPkxCv4NsmBv5LbiJKwl5Ca6U",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "ADBE",
+        "domain": "adobe.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "FDkOPkxCv4NsmBv5LbiJKwl5Ca6U",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "ADBE",
+        "domain": "adobe.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "FDkOPkxCv4NsmBv5LbiJKwl5Ca6U",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "ADBE",
+        "domain": "adobe.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T20:00:35Z",
+    "leadership_scope": "Leaders listed on the current official company leadership roster; business-unit roles retain their published scope. This is not a complete board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:00:35Z",
+      "industry": "2026-11-05T19:43:14Z",
+      "headquarters": "2026-11-05T19:43:14Z",
+      "founded": "2026-11-05T19:43:14Z",
+      "professional_profile_count": "2026-11-05T19:43:14Z",
+      "employee_size_range": "2026-11-05T19:43:14Z",
+      "linkedin_url": "2026-11-05T19:43:14Z",
+      "description": "2026-11-05T19:43:14Z",
+      "leadership": "2026-11-05T20:00:35Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  },
+  "description_provider": "People Data Labs"
+}

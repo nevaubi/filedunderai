@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "ticker": "MS",
+  "cik": 895421,
+  "name": "Morgan Stanley",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://www.morganstanley.com/about-us-governance/operating-committee",
+  "website": "https://www.morganstanley.com/",
+  "industry": null,
+  "headquarters": null,
+  "founded": null,
+  "employees": null,
+  "leadership": [
+    {
+      "name": "Ted Pick",
+      "role": "Chairman and Chief Executive Officer",
+      "profile_url": "https://www.morganstanley.com/about-us-governance/operating-committee/ted-pick",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/6c8a758c3949df43195e5eb9.jpg",
+      "start_date": "2025-01",
+      "source_url": "https://www.morganstanley.com/about-us-governance/operating-committee/ted-pick",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:49:06Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.morganstanley.com/about-us-governance/operating-committee/ted-pick",
+      "photo_credit": "Morgan Stanley",
+      "start_date_source_url": "https://www.morganstanley.com/about-us-governance/operating-committee/ted-pick",
+      "tenure_note": "CEO since January 2024; chairman since January 2025. The start date reflects the combined chairman and CEO role.",
+      "photo_original_url": "https://www.morganstanley.com/content/dam/msdotcom/people/profile-hero/ted-pick.jpg/_jcr_content/renditions/extrawide_3x1.jpg",
+      "photo_sha256": "1f58408fbd271bb1006a79c95f97b54fb8fd36812160616b117331d534980cf3",
+      "photo_cached_at": "2026-11-05T20:02:17Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Sharon Yeshaya",
+      "role": "Executive Vice President and Chief Financial Officer",
+      "profile_url": "https://www.morganstanley.com/about-us-governance/operating-committee/sharon-yeshaya",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/29731b0e93d1803484622f81.jpg",
+      "start_date": "2021-06",
+      "source_url": "https://www.morganstanley.com/about-us-governance/operating-committee/sharon-yeshaya",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:49:06Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.morganstanley.com/about-us-governance/operating-committee/sharon-yeshaya",
+      "photo_credit": "Morgan Stanley",
+      "start_date_source_url": "https://www.morganstanley.com/about-us-governance/operating-committee/sharon-yeshaya",
+      "tenure_note": "The official biography dates the CFO appointment to June 2021; it does not separately date the Executive Vice President title.",
+      "photo_original_url": "https://www.morganstanley.com/content/dam/msdotcom/people/profile-hero/Sharon-Yeshaya.jpg/_jcr_content/renditions/extrawide_3x1.jpg",
+      "photo_sha256": "143a4b61b1d269fd4342cb68ec9928ac876b39a6323bad5cfeb6d5cae0a67044",
+      "photo_cached_at": "2026-11-05T20:02:04Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Andy Saperstein",
+      "role": "Co-President",
+      "profile_url": "https://www.morganstanley.com/about-us-governance/operating-committee/andy-saperstein",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/cd7b4a5073e8f0b049a922d1.jpg",
+      "start_date": "2021",
+      "source_url": "https://www.morganstanley.com/about-us-governance/operating-committee/andy-saperstein",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:49:06Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.morganstanley.com/about-us-governance/operating-committee/andy-saperstein",
+      "photo_credit": "Morgan Stanley",
+      "start_date_source_url": "https://www.morganstanley.com/about-us-governance/operating-committee/andy-saperstein",
+      "tenure_note": "The official biography gives the appointment year only.",
+      "photo_original_url": "https://www.morganstanley.com/content/dam/msdotcom/people/profile-hero/Andy-Saperstein.jpg/_jcr_content/renditions/extrawide_3x1.jpg",
+      "photo_sha256": "01cba40e5a20c204e2136d9381d0c97616af13c840accbd601f48f2440b2b870",
+      "photo_cached_at": "2026-11-05T20:02:04Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Daniel Simkowitz",
+      "role": "Co-President",
+      "profile_url": "https://www.morganstanley.com/about-us-governance/operating-committee/daniel-simkowitz",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/2d49a72c01761c5bc5384309.jpg",
+      "start_date": null,
+      "source_url": "https://www.morganstanley.com/about-us-governance/operating-committee/daniel-simkowitz",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:49:06Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.morganstanley.com/about-us-governance/operating-committee/daniel-simkowitz",
+      "photo_credit": "Morgan Stanley",
+      "photo_original_url": "https://www.morganstanley.com/content/dam/msdotcom/people/profile-hero/Daniel-Simkowitz.jpg/_jcr_content/renditions/extrawide_3x1.jpg",
+      "photo_sha256": "ff80d23b4dd8a622ca4c702a7f0d7255f8d4ccf35a0664b8a27d3aaae8e45b27",
+      "photo_cached_at": "2026-11-05T20:02:05Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Matt Berke",
+      "role": "Chief Operating Officer, Institutional Securities Group",
+      "profile_url": "https://www.morganstanley.com/about-us-governance/operating-committee/matt-berke",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/e5cc5275af83e7704d9537bf.jpg",
+      "start_date": null,
+      "source_url": "https://www.morganstanley.com/about-us-governance/operating-committee/matt-berke",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:49:06Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.morganstanley.com/about-us-governance/operating-committee/matt-berke",
+      "photo_credit": "Morgan Stanley",
+      "photo_original_url": "https://www.morganstanley.com/content/dam/msdotcom/about-us/about-us-opco/wide-matt-berke.jpg/_jcr_content/renditions/extrawide_3x1.jpg",
+      "photo_sha256": "1cd9c5eec3bd7307518cee362966fe04e143530bd52876c5b71f9ee82227ac2b",
+      "photo_cached_at": "2026-11-05T20:02:05Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Ted Pick official biography",
+      "url": "https://www.morganstanley.com/about-us-governance/operating-committee/ted-pick",
+      "observed_at": "2026-11-05T19:49:06Z"
+    },
+    {
+      "name": "Sharon Yeshaya official biography",
+      "url": "https://www.morganstanley.com/about-us-governance/operating-committee/sharon-yeshaya",
+      "observed_at": "2026-11-05T19:49:06Z"
+    },
+    {
+      "name": "Andy Saperstein official biography",
+      "url": "https://www.morganstanley.com/about-us-governance/operating-committee/andy-saperstein",
+      "observed_at": "2026-11-05T19:49:06Z"
+    },
+    {
+      "name": "Daniel Simkowitz official biography",
+      "url": "https://www.morganstanley.com/about-us-governance/operating-committee/daniel-simkowitz",
+      "observed_at": "2026-11-05T19:49:06Z"
+    },
+    {
+      "name": "Matt Berke official biography",
+      "url": "https://www.morganstanley.com/about-us-governance/operating-committee/matt-berke",
+      "observed_at": "2026-11-05T19:49:06Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "Morgan Stanley official leadership source",
+      "url": "https://www.morganstanley.com/about-us-governance/operating-committee",
+      "observed_at": "2026-11-05T19:49:06Z"
+    }
+  },
+  "coverage": {
+    "status": "official_sources",
+    "description": "unavailable",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T19:49:06Z",
+    "leadership_scope": "Selected corporate executives verified in current official biographies; not a complete officer or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:49:06Z",
+      "leadership": "2026-11-05T19:49:06Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  }
+}

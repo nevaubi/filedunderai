@@ -1,0 +1,344 @@
+{
+  "schema_version": 1,
+  "ticker": "HD",
+  "cik": 354950,
+  "name": "Home Depot",
+  "description": "the home depot, the world’s largest home improvement specialty retailer, values and rewards dedicated, knowledgeable, and experienced professionals.\n\nwe operate more than 2,300 retail stores in all 50 states, the district of columbia, puerto rico, the u.s. virgin islands, guam, canada, and mexico. all of our associates have one thing in mind — helping our customers build and improve their homes. \n\njoin the home depot team today and see for yourself why we are consistently ranked as a top fortune 500 company.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "3TrcoLNClIoXAH3S1S1maQz3qEnM",
+    "observed_at": "2026-11-05T19:41:48Z",
+    "match": {
+      "ticker": "HD",
+      "domain": "homedepot.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://www.homedepot.com/",
+  "industry": "Retail",
+  "headquarters": "Atlanta, Georgia, United States",
+  "linkedin_url": "https://linkedin.com/company/the-home-depot",
+  "founded": 1979,
+  "employees": null,
+  "professional_profile_count": 88944,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "3TrcoLNClIoXAH3S1S1maQz3qEnM",
+    "observed_at": "2026-11-05T19:41:48Z",
+    "match": {
+      "ticker": "HD",
+      "domain": "homedepot.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "3TrcoLNClIoXAH3S1S1maQz3qEnM",
+  "leadership": [
+    {
+      "name": "Ted Decker",
+      "role": "Chair, President & Chief Executive Officer",
+      "profile_url": "https://corporate.homedepot.com/bio/ted-decker-chair-president-chief-executive-officer",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/edcb8d0a46f191e422ffc887.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "photo_credit": "Home Depot",
+      "linkedin_url": "https://www.linkedin.com/in/teddecker/",
+      "linkedin_source_url": "https://corporate.homedepot.com/bio/ted-decker-chair-president-chief-executive-officer",
+      "photo_original_url": "https://corporate.homedepot.com/sites/default/files/image_gallery/TedDecker.jpg",
+      "photo_sha256": "e397a17f11e79da59050d0461bff50c97e6993ed10d86bb80d947860abc12957",
+      "photo_cached_at": "2026-11-05T19:54:21Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Richard McPhail",
+      "role": "Executive Vice President & Chief Financial Officer",
+      "profile_url": "https://corporate.homedepot.com/bio/richard-mcphail-executive-vice-president-chief-financial-officer",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/8d2734d21bcd825598c5e36d.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "photo_credit": "Home Depot",
+      "photo_original_url": "https://corporate.homedepot.com/sites/default/files/2026-09/richard_mcphail_headshot.jpg",
+      "photo_sha256": "6923dab248ba1d7009ae4aa36444341151360a75537d70c93de9557332a42aab",
+      "photo_cached_at": "2026-11-05T19:54:21Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Ann-Marie Campbell",
+      "role": "Senior Executive Vice President",
+      "profile_url": "https://corporate.homedepot.com/bio/ann-marie-campbell-senior-executive-vice-president",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/31dae53bd5b64c010bc499c1.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "photo_credit": "Home Depot",
+      "photo_original_url": "https://corporate.homedepot.com/sites/default/files/2024-03/Ann-Marie%20Campbell%20Aprroved%20-%201200x1800.jpg",
+      "photo_sha256": "94cf859f0a7c912d227071ab6610b78120039ddd1678d0518641cf7c81f0005b",
+      "photo_cached_at": "2026-11-05T19:54:10Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Billy Bastek",
+      "role": "Executive Vice President – Merchandising",
+      "profile_url": "https://corporate.homedepot.com/bio/billy-bastek-executive-vice-president-merchandising",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/3bb94eb4b81a89c5fdca74bc.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "photo_credit": "Home Depot",
+      "photo_original_url": "https://corporate.homedepot.com/sites/default/files/2023-03/Billy%20Bastek_1200x1800.jpg",
+      "photo_sha256": "3eecc415e62e99f081bb9444231bd42d1fbed660da7150055257e4e83adbc68a",
+      "photo_cached_at": "2026-11-05T19:54:10Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Franziska \"Fran\" Bell",
+      "role": "Executive Vice President & Chief Technology Officer",
+      "profile_url": "https://corporate.homedepot.com/bio/franziska-fran-bell-executive-vice-president-chief-technology-officer",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/33e115e77060411ce1b2207c.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "photo_credit": "Home Depot",
+      "photo_original_url": "https://corporate.homedepot.com/sites/default/files/2026-05/2026%20%20_%20Fran%20Bell%20_%20414%20v2.jpg",
+      "photo_sha256": "4f8b93deb044ac983d46522ced18b29a854cf01935063818a1e64a8324e51eaf",
+      "photo_cached_at": "2026-11-05T19:54:10Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Jordan Broggi",
+      "role": "Executive Vice President – Interconnected Retail",
+      "profile_url": "https://corporate.homedepot.com/bio/jordan-broggi-executive-vice-president-interconnected-retail",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/4b7fda095b1ca4c39eb94caa.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "photo_credit": "Home Depot",
+      "photo_original_url": "https://corporate.homedepot.com/sites/default/files/image_gallery/BFS-Cropped-Broggi.jpg",
+      "photo_sha256": "4217192a242b25d8be78fa36a36637a1586a93ddfef7d459121b85605e18b47a",
+      "photo_cached_at": "2026-11-05T19:54:21Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Angie Brown",
+      "role": "Executive Vice President & Chief Information Officer",
+      "profile_url": "https://corporate.homedepot.com/bio/angie-brown-executive-vice-president-chief-information-officer",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/83666d5df51251093af0f585.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "photo_credit": "Home Depot",
+      "photo_original_url": "https://corporate.homedepot.com/sites/default/files/2022-10/angie-brown-bfs-square.jpg",
+      "photo_sha256": "72a34e87c4195b21c97021716eb828d12f11cb86ca10eabadc69dc5d63269976",
+      "photo_cached_at": "2026-11-05T19:54:10Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "John Deaton",
+      "role": "Executive Vice President – Supply Chain & Product Development",
+      "profile_url": "https://corporate.homedepot.com/bio/john-deaton-executive-vice-president-supply-chain-product-development",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/7e1fcdd6bdcc41ddff4cd081.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "photo_credit": "Home Depot",
+      "photo_original_url": "https://corporate.homedepot.com/sites/default/files/image_gallery/JohnDeaton.jpg",
+      "photo_sha256": "7b1e2f9c31a64cfaf9f2de5e7515ae159cecb549d9070d680d0f24e877e56b46",
+      "photo_cached_at": "2026-11-05T19:54:21Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Teresa Wynn Roseborough",
+      "role": "Executive Vice President – General Counsel & Corporate Secretary",
+      "profile_url": "https://corporate.homedepot.com/bio/teresa-wynn-roseborough-executive-vice-president-general-counsel-corporate-secretary",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/3599209f5d762c95e2062b21.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "photo_credit": "Home Depot",
+      "photo_original_url": "https://corporate.homedepot.com/sites/default/files/image_gallery/TeresaRoseborough.jpg",
+      "photo_sha256": "bba36e3796b494ef2924f86e2cbc8c56d1728bd9309cbd2d8c7033ba11b7e241",
+      "photo_cached_at": "2026-11-05T19:54:21Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Michael Rowe",
+      "role": "Executive Vice President – Pro",
+      "profile_url": "https://corporate.homedepot.com/bio/michael-rowe-executive-vice-president-pro",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/7a4e145deaee85b61989ac5f.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "photo_credit": "Home Depot",
+      "photo_original_url": "https://corporate.homedepot.com/sites/default/files/image_gallery/MikeRowe_Canada.jpg",
+      "photo_sha256": "2136629aa040a780813e7bf677b042ec38e317481858d9143520c4f49866e3f9",
+      "photo_cached_at": "2026-11-05T19:54:21Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Home Depot official leadership roster",
+      "url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "observed_at": "2026-11-05T19:45:54Z"
+    },
+    {
+      "name": "Ted Decker official biography",
+      "url": "https://corporate.homedepot.com/bio/ted-decker-chair-president-chief-executive-officer",
+      "observed_at": "2026-11-05T19:52:11Z"
+    },
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "3TrcoLNClIoXAH3S1S1maQz3qEnM",
+      "observed_at": "2026-11-05T19:41:48Z",
+      "match": {
+        "ticker": "HD",
+        "domain": "homedepot.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "Home Depot official leadership roster",
+      "url": "https://corporate.homedepot.com/page/home-depot-leadership-0",
+      "observed_at": "2026-11-05T19:45:54Z"
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "3TrcoLNClIoXAH3S1S1maQz3qEnM",
+      "observed_at": "2026-11-05T19:41:48Z",
+      "match": {
+        "ticker": "HD",
+        "domain": "homedepot.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "3TrcoLNClIoXAH3S1S1maQz3qEnM",
+      "observed_at": "2026-11-05T19:41:48Z",
+      "match": {
+        "ticker": "HD",
+        "domain": "homedepot.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "3TrcoLNClIoXAH3S1S1maQz3qEnM",
+      "observed_at": "2026-11-05T19:41:48Z",
+      "match": {
+        "ticker": "HD",
+        "domain": "homedepot.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "3TrcoLNClIoXAH3S1S1maQz3qEnM",
+      "observed_at": "2026-11-05T19:41:48Z",
+      "match": {
+        "ticker": "HD",
+        "domain": "homedepot.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "3TrcoLNClIoXAH3S1S1maQz3qEnM",
+      "observed_at": "2026-11-05T19:41:48Z",
+      "match": {
+        "ticker": "HD",
+        "domain": "homedepot.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "3TrcoLNClIoXAH3S1S1maQz3qEnM",
+      "observed_at": "2026-11-05T19:41:48Z",
+      "match": {
+        "ticker": "HD",
+        "domain": "homedepot.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T19:52:11Z",
+    "leadership_scope": "Selected corporate executives from the current official leadership page; not a complete officer or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:45:54Z",
+      "industry": "2026-11-05T19:41:48Z",
+      "headquarters": "2026-11-05T19:41:48Z",
+      "founded": "2026-11-05T19:41:48Z",
+      "professional_profile_count": "2026-11-05T19:41:48Z",
+      "employee_size_range": "2026-11-05T19:41:48Z",
+      "linkedin_url": "2026-11-05T19:41:48Z",
+      "description": "2026-11-05T19:41:48Z",
+      "leadership": "2026-11-05T19:45:54Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  },
+  "description_provider": "People Data Labs"
+}

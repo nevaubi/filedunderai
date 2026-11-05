@@ -48,9 +48,13 @@
       "observed_at": "2026-11-05T14:15:13Z",
       "group": "Executive leadership",
       "start_date_source_url": "https://www.apple.com/newsroom/2026/04/tim-cook-to-become-apple-executive-chairman-john-ternus-to-become-apple-ceo/",
-      "photo_url": "https://www.apple.com/leadership/images/bio/John_Ternus_bio.png.small_2x.png",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/cbf482e2c10ce87a7b284c30.png",
       "photo_source_url": "https://www.apple.com/leadership/john-ternus/",
-      "photo_credit": "Apple"
+      "photo_credit": "Apple",
+      "photo_original_url": "https://www.apple.com/leadership/images/bio/John_Ternus_bio.png.small_2x.png",
+      "photo_sha256": "c16bc5693669a59e61ae943e7da66cef7387196c19b0414f497e65c607a43370",
+      "photo_cached_at": "2026-11-05T19:58:31Z",
+      "photo_status": "cached_and_verified"
     },
     {
       "name": "Kevan Parekh",
@@ -62,9 +66,13 @@
       "observed_at": "2026-11-05T14:15:13Z",
       "group": "Executive leadership",
       "start_date_source_url": "https://www.apple.com/newsroom/2024/08/apple-announces-chief-financial-officer-transition/",
-      "photo_url": "https://www.apple.com/leadership/images/bio/Kevan_Parekh_bio.png.small_2x.png",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/802c81149f049ab902b94bf0.png",
       "photo_source_url": "https://www.apple.com/leadership/kevan-parekh/",
-      "photo_credit": "Apple"
+      "photo_credit": "Apple",
+      "photo_original_url": "https://www.apple.com/leadership/images/bio/Kevan_Parekh_bio.png.small_2x.png",
+      "photo_sha256": "730b217cc34aa5255a6b1c6b61968dc903b82d9b98f7a2716cdf893fb956f0a6",
+      "photo_cached_at": "2026-11-05T19:58:31Z",
+      "photo_status": "cached_and_verified"
     },
     {
       "name": "Sabih Khan",
@@ -76,10 +84,14 @@
       "observed_at": "2026-11-05T14:15:13Z",
       "group": "Executive leadership",
       "start_date_source_url": "https://www.apple.com/newsroom/2025/07/apple-announces-chief-operating-officer-transition/",
-      "photo_url": "https://www.apple.com/leadership/images/bio/Sabih_Khan_image.png.small_2x.png",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/83ac8c4cb526352fe77f90e8.png",
       "photo_source_url": "https://www.apple.com/leadership/sabih-khan/",
       "photo_credit": "Apple",
-      "tenure_note": "Apple announced the appointment on July 8, 2025, to take effect later that month; the source does not give an exact start day."
+      "tenure_note": "Apple announced the appointment on July 8, 2025, to take effect later that month; the source does not give an exact start day.",
+      "photo_original_url": "https://www.apple.com/leadership/images/bio/Sabih_Khan_image.png.small_2x.png",
+      "photo_sha256": "f005e39f34495c1d5ed020d3e0799209bac238bc257f7705731b7b3887c68007",
+      "photo_cached_at": "2026-11-05T19:58:31Z",
+      "photo_status": "cached_and_verified"
     },
     {
       "name": "Tim Cook",
@@ -91,9 +103,13 @@
       "observed_at": "2026-11-05T14:15:13Z",
       "group": "Board of directors",
       "start_date_source_url": "https://www.apple.com/newsroom/2026/04/tim-cook-to-become-apple-executive-chairman-john-ternus-to-become-apple-ceo/",
-      "photo_url": "https://www.apple.com/leadership/images/bio/Tim_Cook_bio.png.small_2x.png",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/ecf6a8b6621e40ad981f20e3.png",
       "photo_source_url": "https://www.apple.com/leadership/tim-cook/",
-      "photo_credit": "Apple"
+      "photo_credit": "Apple",
+      "photo_original_url": "https://www.apple.com/leadership/images/bio/Tim_Cook_bio.png.small_2x.png",
+      "photo_sha256": "5e7685a652e0c14daa2b640fb7f5984ee123be16e5a007b51c8ab7ba2f9e2660",
+      "photo_cached_at": "2026-11-05T19:58:31Z",
+      "photo_status": "cached_and_verified"
     }
   ],
   "images": [
@@ -183,7 +199,7 @@
       "as_of": "2026-09-26"
     }
   ],
-  "updated_at": "2026-11-05T14:33:09Z",
+  "updated_at": "2026-11-05T20:24:21Z",
   "field_sources": {
     "website": {
       "name": "Apple company overview and 50th anniversary",
@@ -250,8 +266,8 @@
       "founded": "2026-11-05T14:15:13Z",
       "professional_profile_count": "2026-11-05T14:09:43Z",
       "description": "2026-11-05T14:15:13Z",
-      "leadership": "2026-11-05T14:15:13Z",
-      "employees": "2026-11-05T14:33:09Z"
+      "employees": "2026-11-05T14:33:09Z",
+      "leadership": "2026-11-05T14:15:13Z"
     }
   },
   "employees_source": {

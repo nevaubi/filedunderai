@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "ticker": "DT",
+  "cik": 1773383,
+  "name": "Dynatrace, Inc.",
+  "description": "dynatrace keeps today’s ai-driven world working by advancing observability for today’s digital business. the world relies on software, but what isn’t seen is just how much complexity goes on behind the scenes to make sure everything stays up and running. most businesses today have huge digital ecosystems made up of software, data flows, applications, and hybrid-cloud environments. as these ecosystems grow in complexity, so do the points of failure. outages and glitches resulting in grounded flights or failed financial transactions prove how critical it is that software works as expected, making ai-powered observability an essential capability to ensure digital businesses run smoothly and recover quickly — keeping the world working. dynatrace provides businesses with a holistic view of their entire digital ecosystem, removing the burden of operational monitoring and alert management. by automating these tasks, teams are empowered to transform complexity into their greatest asset and to drive their business forward by focusing on high-impact initiatives, driving topline acceleration, fueling innovation, and delivering experiences customers love.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "xYpbVNAkOZAgocoESJBnvQVyO5wg",
+    "observed_at": "2026-11-05T19:44:24Z",
+    "match": {
+      "ticker": "DT",
+      "domain": "dynatrace.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 9
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+  "website": "https://dynatrace.com",
+  "industry": "Computer Software",
+  "headquarters": "Boston, Massachusetts, United States",
+  "linkedin_url": "https://linkedin.com/company/dynatrace",
+  "founded": 2005,
+  "employees": null,
+  "professional_profile_count": 5518,
+  "employee_size_range": "1001-5000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "xYpbVNAkOZAgocoESJBnvQVyO5wg",
+    "observed_at": "2026-11-05T19:44:24Z",
+    "match": {
+      "ticker": "DT",
+      "domain": "dynatrace.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 9
+    }
+  },
+  "provider_record_id": "xYpbVNAkOZAgocoESJBnvQVyO5wg",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "xYpbVNAkOZAgocoESJBnvQVyO5wg",
+      "observed_at": "2026-11-05T19:44:24Z",
+      "match": {
+        "ticker": "DT",
+        "domain": "dynatrace.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:44:24Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "xYpbVNAkOZAgocoESJBnvQVyO5wg",
+      "observed_at": "2026-11-05T19:44:24Z",
+      "match": {
+        "ticker": "DT",
+        "domain": "dynatrace.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "xYpbVNAkOZAgocoESJBnvQVyO5wg",
+      "observed_at": "2026-11-05T19:44:24Z",
+      "match": {
+        "ticker": "DT",
+        "domain": "dynatrace.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "xYpbVNAkOZAgocoESJBnvQVyO5wg",
+      "observed_at": "2026-11-05T19:44:24Z",
+      "match": {
+        "ticker": "DT",
+        "domain": "dynatrace.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "xYpbVNAkOZAgocoESJBnvQVyO5wg",
+      "observed_at": "2026-11-05T19:44:24Z",
+      "match": {
+        "ticker": "DT",
+        "domain": "dynatrace.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "xYpbVNAkOZAgocoESJBnvQVyO5wg",
+      "observed_at": "2026-11-05T19:44:24Z",
+      "match": {
+        "ticker": "DT",
+        "domain": "dynatrace.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "xYpbVNAkOZAgocoESJBnvQVyO5wg",
+      "observed_at": "2026-11-05T19:44:24Z",
+      "match": {
+        "ticker": "DT",
+        "domain": "dynatrace.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "xYpbVNAkOZAgocoESJBnvQVyO5wg",
+      "observed_at": "2026-11-05T19:44:24Z",
+      "match": {
+        "ticker": "DT",
+        "domain": "dynatrace.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:44:24Z",
+      "industry": "2026-11-05T19:44:24Z",
+      "headquarters": "2026-11-05T19:44:24Z",
+      "founded": "2026-11-05T19:44:24Z",
+      "professional_profile_count": "2026-11-05T19:44:24Z",
+      "employee_size_range": "2026-11-05T19:44:24Z",
+      "linkedin_url": "2026-11-05T19:44:24Z",
+      "description": "2026-11-05T19:44:24Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

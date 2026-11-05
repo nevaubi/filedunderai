@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "ticker": "CVS",
+  "cik": 64803,
+  "name": "CVS Health",
+  "description": "cvs health is the leading health solutions company, delivering care like no one else can. we reach more people and improve the health of communities across america through our local presence, digital channels and over 300,000 dedicated colleagues. \n\nwherever and whenever people need us, we help them with their health – whether that’s managing chronic diseases, staying compliant with their medications or accessing affordable health and wellness services in the most convenient ways. we help people navigate the health care system – and their personal health care – by simplifying health care one person, one family and one community at a time. follow @cvshealth on social media.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "JEyXm8WNb6kEUMGlaJurZAARgi4u",
+    "observed_at": "2026-11-05T19:43:14Z",
+    "match": {
+      "ticker": "CVS",
+      "domain": "cvshealth.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://www.cvshealth.com",
+  "industry": "Hospital & Health Care",
+  "headquarters": "Woonsocket, Rhode Island, United States",
+  "linkedin_url": "https://linkedin.com/company/cvs-health",
+  "founded": 1963,
+  "employees": null,
+  "professional_profile_count": 73235,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "JEyXm8WNb6kEUMGlaJurZAARgi4u",
+    "observed_at": "2026-11-05T19:43:14Z",
+    "match": {
+      "ticker": "CVS",
+      "domain": "cvshealth.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "JEyXm8WNb6kEUMGlaJurZAARgi4u",
+  "leadership": [
+    {
+      "name": "David Joyner",
+      "role": "Chairman and CEO, CVS Health",
+      "profile_url": "https://www.cvshealth.com/about/leadership/david-joyner.html",
+      "photo_url": null,
+      "start_date": "2026-01-01",
+      "source_url": "https://www.cvshealth.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://www.cvshealth.com/news/company-news/cvs-health-names-david-joyner-chair-of-the-board-of-directors.html",
+      "tenure_note": "Chairman since January 1, 2026; CEO since October 17, 2024. The start date reflects the combined current title."
+    },
+    {
+      "name": "Heidi Capozzi",
+      "role": "Executive Vice President and Chief People Officer, CVS Health",
+      "profile_url": "https://www.cvshealth.com/about/leadership/heidi-capozzi.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.cvshealth.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Sree Chaguturu, MD",
+      "role": "Executive Vice President and President of Health Care Delivery",
+      "profile_url": "https://www.cvshealth.com/about/leadership/sree-chaguturu.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.cvshealth.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Amy Compton-Phillips, MD",
+      "role": "Executive Vice President and Chief Medical Officer, CVS Health",
+      "profile_url": "https://www.cvshealth.com/about/leadership/amy-compton-phillips.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.cvshealth.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Ed DeVaney",
+      "role": "Executive Vice President and President, Caremark",
+      "profile_url": "https://www.cvshealth.com/about/leadership/ed-devaney.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.cvshealth.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Katerina Guerraz",
+      "role": "Executive Vice President, CVS Health and Chief Operating Officer, Aetna and President of Medicaid, Aetna",
+      "profile_url": "https://www.cvshealth.com/about/leadership/katerina-guerraz.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.cvshealth.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Sam Khichi",
+      "role": "Executive Vice President, Corporate Affairs and Chief Legal Officer",
+      "profile_url": "https://www.cvshealth.com/about/leadership/sam-khichi.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.cvshealth.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Tilak Mandadi",
+      "role": "President, Health100 and EVP, Ventures and Chief Experience and Technology Officer",
+      "profile_url": "https://www.cvshealth.com/about/leadership/tilak-mandadi.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.cvshealth.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Steve Nelson",
+      "role": "Executive Vice President and President, Aetna",
+      "profile_url": "https://www.cvshealth.com/about/leadership/steve-nelson.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.cvshealth.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Brian Newman",
+      "role": "Executive Vice President and Chief Financial Officer, CVS Health",
+      "profile_url": "https://www.cvshealth.com/about/leadership/brian-newman.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.cvshealth.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "linkedin_url": "https://linkedin.com/in/briannewmanups",
+      "linkedin_source": {
+        "name": "People Data Labs",
+        "url": "https://docs.peopledatalabs.com/docs/person-search-api",
+        "observed_at": "2026-11-05T20:16:24Z",
+        "provider_verified_at": "2026-10-01"
+      }
+    },
+    {
+      "name": "Prem Shah",
+      "role": "Executive Vice President and Group President, CVS Health",
+      "profile_url": "https://www.cvshealth.com/about/leadership/prem-shah.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.cvshealth.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Len Shankman",
+      "role": "Executive Vice President and President, Pharmacy Services, CVS Health",
+      "profile_url": "https://www.cvshealth.com/about/leadership/len-shankman.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.cvshealth.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Siddharth Tenneti",
+      "role": "Senior Vice President and Interim President, Pharmacy and Consumer Wellness",
+      "profile_url": "https://www.cvshealth.com/about/leadership/siddharth-tenneti.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.cvshealth.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "CVS Health official leadership roster",
+      "url": "https://www.cvshealth.com/about/leadership",
+      "observed_at": "2026-11-05T20:00:35Z"
+    },
+    {
+      "name": "Official company biography or appointment announcement",
+      "url": "https://www.cvshealth.com/news/company-news/cvs-health-names-david-joyner-chair-of-the-board-of-directors.html",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "Official company biography or appointment announcement",
+      "url": "https://www.cvshealth.com/news/company-news/cvs-health-appoints-david-joyner-president-and-chief-executive-officer.html",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "JEyXm8WNb6kEUMGlaJurZAARgi4u",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "CVS",
+        "domain": "cvshealth.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:06:57Z",
+  "field_sources": {
+    "website": {
+      "name": "CVS Health official leadership roster",
+      "url": "https://www.cvshealth.com/about/leadership",
+      "observed_at": "2026-11-05T20:00:35Z"
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "JEyXm8WNb6kEUMGlaJurZAARgi4u",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "CVS",
+        "domain": "cvshealth.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "JEyXm8WNb6kEUMGlaJurZAARgi4u",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "CVS",
+        "domain": "cvshealth.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "JEyXm8WNb6kEUMGlaJurZAARgi4u",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "CVS",
+        "domain": "cvshealth.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "JEyXm8WNb6kEUMGlaJurZAARgi4u",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "CVS",
+        "domain": "cvshealth.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "JEyXm8WNb6kEUMGlaJurZAARgi4u",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "CVS",
+        "domain": "cvshealth.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "JEyXm8WNb6kEUMGlaJurZAARgi4u",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "CVS",
+        "domain": "cvshealth.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T20:00:35Z",
+    "leadership_scope": "Leaders listed on the current official company leadership roster; business-unit roles retain their published scope. This is not a complete board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:00:35Z",
+      "industry": "2026-11-05T19:43:14Z",
+      "headquarters": "2026-11-05T19:43:14Z",
+      "founded": "2026-11-05T19:43:14Z",
+      "professional_profile_count": "2026-11-05T19:43:14Z",
+      "employee_size_range": "2026-11-05T19:43:14Z",
+      "linkedin_url": "2026-11-05T19:43:14Z",
+      "description": "2026-11-05T19:43:14Z",
+      "leadership": "2026-11-05T20:00:35Z"
+    },
+    "portraits": "unavailable"
+  },
+  "description_provider": "People Data Labs"
+}

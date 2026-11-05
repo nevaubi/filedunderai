@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "ticker": "PAG",
+  "cik": 1019849,
+  "name": "PENSKE AUTOMOTIVE GROUP, INC.",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://penskeautomotive.com",
+  "industry": "automotive",
+  "headquarters": "bloomfield hills, michigan, united states",
+  "linkedin_url": "https://linkedin.com/company/penskeautomotive",
+  "founded": null,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "AVshe18hZVieHmrNeQglJgX83nuV",
+    "observed_at": "2026-11-05T20:06:00Z",
+    "match": {
+      "ticker": "PAG",
+      "domain": "penskeautomotive.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.313741936541085
+    }
+  },
+  "provider_record_id": "AVshe18hZVieHmrNeQglJgX83nuV",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "AVshe18hZVieHmrNeQglJgX83nuV",
+      "observed_at": "2026-11-05T20:06:00Z",
+      "match": {
+        "ticker": "PAG",
+        "domain": "penskeautomotive.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.313741936541085
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:06:00Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "AVshe18hZVieHmrNeQglJgX83nuV",
+      "observed_at": "2026-11-05T20:06:00Z",
+      "match": {
+        "ticker": "PAG",
+        "domain": "penskeautomotive.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.313741936541085
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "AVshe18hZVieHmrNeQglJgX83nuV",
+      "observed_at": "2026-11-05T20:06:00Z",
+      "match": {
+        "ticker": "PAG",
+        "domain": "penskeautomotive.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.313741936541085
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "AVshe18hZVieHmrNeQglJgX83nuV",
+      "observed_at": "2026-11-05T20:06:00Z",
+      "match": {
+        "ticker": "PAG",
+        "domain": "penskeautomotive.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.313741936541085
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "AVshe18hZVieHmrNeQglJgX83nuV",
+      "observed_at": "2026-11-05T20:06:00Z",
+      "match": {
+        "ticker": "PAG",
+        "domain": "penskeautomotive.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.313741936541085
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "AVshe18hZVieHmrNeQglJgX83nuV",
+      "observed_at": "2026-11-05T20:06:00Z",
+      "match": {
+        "ticker": "PAG",
+        "domain": "penskeautomotive.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.313741936541085
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "AVshe18hZVieHmrNeQglJgX83nuV",
+      "observed_at": "2026-11-05T20:06:00Z",
+      "match": {
+        "ticker": "PAG",
+        "domain": "penskeautomotive.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.313741936541085
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "AVshe18hZVieHmrNeQglJgX83nuV",
+      "observed_at": "2026-11-05T20:06:00Z",
+      "match": {
+        "ticker": "PAG",
+        "domain": "penskeautomotive.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.313741936541085
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:06:00Z",
+      "industry": "2026-11-05T20:06:00Z",
+      "headquarters": "2026-11-05T20:06:00Z",
+      "employee_size_range": "2026-11-05T20:06:00Z",
+      "linkedin_url": "2026-11-05T20:06:00Z"
+    }
+  }
+}

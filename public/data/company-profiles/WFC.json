@@ -1,0 +1,500 @@
+{
+  "schema_version": 1,
+  "ticker": "WFC",
+  "cik": 72971,
+  "name": "Wells Fargo",
+  "description": "wells fargo & company (nyse: wfc) is a diversified, community-based financial services company with approximately $1.9 trillion in assets. wells fargo’s vision is to satisfy our customers’ financial needs and help them succeed financially. founded in 1852 and headquartered in san francisco, wells fargo provides banking, investment and mortgage products and services, as well as consumer and commercial finance, through more than 7,300 locations, 12,000 atms, the internet (wellsfargo.com) and mobile banking, and has offices in over 40 countries and territories to support customers who conduct business in the global economy. with approximately 250,000 team members, wells fargo serves one in three households in the united states. wells fargo & company was ranked no. 41 on fortune’s 2022 rankings of america’s largest corporations. news, insights and perspectives from wells fargo are also available at wells fargo stories. \n\nrelevant military experience is considered for veterans and transitioning service men and women. all qualified applicants will receive consideration for employment without regard to race, color, religion, sex, sexual orientation, gender identity, national origin, disability, status as a protected veteran, or any other legally protected characteristic.© 2016 wells fargo bank, n.a. all rights reserved. member fdic.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "WrpKsHJ2God7yU275ANuSAuvj1FH",
+    "observed_at": "2026-11-05T19:43:44Z",
+    "match": {
+      "ticker": "WFC",
+      "domain": "wellsfargo.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://www.wellsfargo.com",
+  "industry": "Financial Services",
+  "headquarters": "San Francisco, California, United States",
+  "linkedin_url": "https://linkedin.com/company/wellsfargo",
+  "founded": null,
+  "employees": null,
+  "professional_profile_count": 185548,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "WrpKsHJ2God7yU275ANuSAuvj1FH",
+    "observed_at": "2026-11-05T19:43:44Z",
+    "match": {
+      "ticker": "WFC",
+      "domain": "wellsfargo.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "WrpKsHJ2God7yU275ANuSAuvj1FH",
+  "leadership": [
+    {
+      "name": "Charlie Scharf",
+      "role": "Chairman and Chief Executive Officer",
+      "profile_url": "https://www.wellsfargo.com/about/corporate/governance/scharf/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/c6becdbe48184531f3137f6e.avif",
+      "start_date": "2025-10",
+      "source_url": "https://www.wellsfargo.com/about/corporate/governance/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.wellsfargo.com/about/corporate/governance/scharf/",
+      "photo_credit": "Wells Fargo",
+      "start_date_source_url": "https://www.wellsfargo.com/about/corporate/governance/scharf/",
+      "tenure_note": "Chairman since October 2025; CEO since October 2019. The date reflects the combined current title.",
+      "photo_original_url": "https://www17.wellsfargomedia.com/assets/images/photography/portrait/155x198/scharf_155x198_Jan24.jpg",
+      "photo_sha256": "0950514473cef4d60fec6b83a23c5129e06d22b8f948c78d5a038a4c7715fc90",
+      "photo_cached_at": "2026-11-05T20:35:26Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Bridget Engle",
+      "role": "Senior EVP, Head of Technology",
+      "profile_url": "https://www.wellsfargo.com/about/corporate/governance/engle/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/313af60528fcc3a4be1adf36.avif",
+      "start_date": null,
+      "source_url": "https://www.wellsfargo.com/about/corporate/governance/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.wellsfargo.com/about/corporate/governance/engle/",
+      "photo_credit": "Wells Fargo",
+      "company_start_date": "2024",
+      "company_start_date_source_url": "https://www.wellsfargo.com/about/corporate/governance/engle/",
+      "photo_original_url": "https://www17.wellsfargomedia.com/assets/images/rwd/photography/740x740/about/Bridget-Engle_740x740.png",
+      "photo_sha256": "1435006797fa0d8a581b219766786209c40a2beed79dd50ae514f11766656bd3",
+      "photo_cached_at": "2026-11-05T20:36:00Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Derek A. Flowers",
+      "role": "Senior EVP, Chief Risk Officer",
+      "profile_url": "https://www.wellsfargo.com/about/corporate/governance/flowers/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/e6e3425cb962cf6946fe455e.avif",
+      "start_date": null,
+      "source_url": "https://www.wellsfargo.com/about/corporate/governance/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.wellsfargo.com/about/corporate/governance/flowers/",
+      "photo_credit": "Wells Fargo",
+      "photo_original_url": "https://www17.wellsfargomedia.com/assets/images/rwd/photography/740x740/about/Derek_Flowers_740x740.png",
+      "photo_sha256": "c5a0f8b887aa9e728499d339050e213ab05a6fdc4af8fc1f176feb5a3fa21689",
+      "photo_cached_at": "2026-11-05T20:36:00Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Kyle G. Hranicky",
+      "role": "Senior EVP, CEO of Commercial Banking",
+      "profile_url": "https://www.wellsfargo.com/about/corporate/governance/hranicky/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/bbb9d94abadc84743127b286.avif",
+      "start_date": "2021-09",
+      "source_url": "https://www.wellsfargo.com/about/corporate/governance/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.wellsfargo.com/about/corporate/governance/hranicky/",
+      "photo_credit": "Wells Fargo",
+      "start_date_source_url": "https://www.wellsfargo.com/about/corporate/governance/hranicky/",
+      "company_start_date": "1995",
+      "company_start_date_source_url": "https://www.wellsfargo.com/about/corporate/governance/hranicky/",
+      "photo_original_url": "https://www17.wellsfargomedia.com/assets/images/photography/portrait/155x198/kyle_hranicky_155x198_April24.jpg",
+      "photo_sha256": "d0c5e3c0546716783c144a077b0386aaba936e52f30edce4a2bb73bbb3ea3af1",
+      "photo_cached_at": "2026-11-05T20:35:26Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Bei Ling",
+      "role": "Senior EVP, Head of Human Resources",
+      "profile_url": "https://www.wellsfargo.com/about/corporate/governance/ling/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/32866fb879a84ee9d907d62d.avif",
+      "start_date": null,
+      "source_url": "https://www.wellsfargo.com/about/corporate/governance/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.wellsfargo.com/about/corporate/governance/ling/",
+      "photo_credit": "Wells Fargo",
+      "company_start_date": "2021",
+      "company_start_date_source_url": "https://www.wellsfargo.com/about/corporate/governance/ling/",
+      "photo_original_url": "https://www17.wellsfargomedia.com/assets/images/rwd/photography/740x740/about/BeiLingB_740x740.png",
+      "photo_sha256": "e59356a5cec6e9eb5a19572c1bd2518101c99ac51d369b09d315e6256d38b7e5",
+      "photo_cached_at": "2026-11-05T20:36:00Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Ellen R. Patterson",
+      "role": "Senior EVP, General Counsel",
+      "profile_url": "https://www.wellsfargo.com/about/corporate/governance/patterson/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/af874263f36965548cccecca.avif",
+      "start_date": "2020-03",
+      "source_url": "https://www.wellsfargo.com/about/corporate/governance/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.wellsfargo.com/about/corporate/governance/patterson/",
+      "photo_credit": "Wells Fargo",
+      "start_date_source_url": "https://www.wellsfargo.com/about/corporate/governance/patterson/",
+      "company_start_date": "2020-03",
+      "company_start_date_source_url": "https://www.wellsfargo.com/about/corporate/governance/patterson/",
+      "photo_original_url": "https://www17.wellsfargomedia.com/assets/images/rwd/photography/740x740/about/Ellen_Patterson_740x740.png",
+      "photo_sha256": "8ab19e7f6e6a2097f65e2a01e229564771971a808faaa2c91079dc071a0881e1",
+      "photo_cached_at": "2026-11-05T20:36:05Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Scott E. Powell",
+      "role": "Senior EVP, Chief Operating Officer",
+      "profile_url": "https://www.wellsfargo.com/about/corporate/governance/powell/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/cf3062ada20c60ff94574760.webp",
+      "start_date": null,
+      "source_url": "https://www.wellsfargo.com/about/corporate/governance/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.wellsfargo.com/about/corporate/governance/powell/",
+      "photo_credit": "Wells Fargo",
+      "photo_original_url": "https://www17.wellsfargomedia.com/assets/images/rwd/photography/740x740/about/scott_powell_740x740.png",
+      "photo_sha256": "5556620ba89505da9764f77bddd491b8f13dcb2806878dc9b7e4c2863733f1aa",
+      "photo_cached_at": "2026-11-05T20:36:20Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Paul Ricci",
+      "role": "Senior EVP, Chief Auditor, Internal Audit",
+      "profile_url": "https://www.wellsfargo.com/about/corporate/governance/ricci/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/9d3e94a58202cbfa9b59679f.avif",
+      "start_date": "2022",
+      "source_url": "https://www.wellsfargo.com/about/corporate/governance/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.wellsfargo.com/about/corporate/governance/ricci/",
+      "photo_credit": "Wells Fargo",
+      "start_date_source_url": "https://www.wellsfargo.com/about/corporate/governance/ricci/",
+      "company_start_date": "2019",
+      "company_start_date_source_url": "https://www.wellsfargo.com/about/corporate/governance/ricci/",
+      "photo_original_url": "https://www17.wellsfargomedia.com/assets/images/rwd/photography/740x740/Paul-Ricci_740x740.png",
+      "photo_sha256": "3c49d72b430adf86ed38858cf7fe46acf10df12d895b5cd3b2c5979b4a42303e",
+      "photo_cached_at": "2026-11-05T20:35:41Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Fernando S Rivas",
+      "role": "Senior EVP, CEO of Corporate & Investment Banking",
+      "profile_url": "https://www.wellsfargo.com/about/corporate/governance/rivas/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/d1aa823046e27533b6df6aae.avif",
+      "start_date": null,
+      "source_url": "https://www.wellsfargo.com/about/corporate/governance/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.wellsfargo.com/about/corporate/governance/rivas/",
+      "photo_credit": "Wells Fargo",
+      "photo_original_url": "https://www17.wellsfargomedia.com/assets/images/rwd/photography/740x740/Fernando_Rivas_740x740.png",
+      "photo_sha256": "dcc7548bff661fb15260ddba334f5de82612dc40fc7bb62ec04de7c5cd69b525",
+      "photo_cached_at": "2026-11-05T20:35:41Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Jason Rosenberg",
+      "role": "Senior EVP, Head of Public Affairs",
+      "profile_url": "https://www.wellsfargo.com/about/corporate/governance/rosenberg/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/66eeac094c10161be5be3dab.avif",
+      "start_date": "2024",
+      "source_url": "https://www.wellsfargo.com/about/corporate/governance/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.wellsfargo.com/about/corporate/governance/rosenberg/",
+      "photo_credit": "Wells Fargo",
+      "start_date_source_url": "https://www.wellsfargo.com/about/corporate/governance/rosenberg/",
+      "company_start_date": "2024",
+      "company_start_date_source_url": "https://www.wellsfargo.com/about/corporate/governance/rosenberg/",
+      "photo_original_url": "https://www17.wellsfargomedia.com/assets/images/rwd/photography/740x740/JasonRosenberg_740x740.png",
+      "photo_sha256": "dae079a91207bcc749c09f753b067788d71fcd5b7c10848dbeaee831af31cb20",
+      "photo_cached_at": "2026-11-05T20:35:41Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Michael P. Santomassimo",
+      "role": "Senior EVP, Chief Financial Officer",
+      "profile_url": "https://www.wellsfargo.com/about/corporate/governance/santomassimo/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/b1c8df350a685d2e37729636.avif",
+      "start_date": null,
+      "source_url": "https://www.wellsfargo.com/about/corporate/governance/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.wellsfargo.com/about/corporate/governance/santomassimo/",
+      "photo_credit": "Wells Fargo",
+      "photo_original_url": "https://www17.wellsfargomedia.com/assets/images/rwd/photography/740x740/Santomassimo_740x740.png",
+      "photo_sha256": "d5d5980a81e3ed72fbf03da598da561ee3921120ee5a636b9cc32b1b4e75c6e6",
+      "photo_cached_at": "2026-11-05T20:35:50Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Kleber R. Santos",
+      "role": "Senior Executive Vice President, CEO of Consumer Banking and Lending",
+      "profile_url": "https://www.wellsfargo.com/about/corporate/governance/santos/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/5129eed7c76f01364503aff9.avif",
+      "start_date": null,
+      "source_url": "https://www.wellsfargo.com/about/corporate/governance/santos/",
+      "source_name": "Official executive biography",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.wellsfargo.com/about/corporate/governance/santos/",
+      "photo_credit": "Wells Fargo",
+      "source_note": "The individual biography identifies the former co-CEO position as a previous role.",
+      "company_start_date": "2020",
+      "company_start_date_source_url": "https://www.wellsfargo.com/about/corporate/governance/santos/",
+      "photo_original_url": "https://www17.wellsfargomedia.com/assets/images/rwd/photography/740x740/kleber_santos_740x740.png",
+      "photo_sha256": "51c5d1a55b281fcf70f68328df864b08d43d4b8525a8f3ff8f0014e72ad74b01",
+      "photo_cached_at": "2026-11-05T20:36:20Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Barry Sommers",
+      "role": "Senior EVP, CEO of Wealth & Investment Management",
+      "profile_url": "https://www.wellsfargo.com/about/corporate/governance/sommers/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/274b82fb75fd690c699275d2.avif",
+      "start_date": null,
+      "source_url": "https://www.wellsfargo.com/about/corporate/governance/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.wellsfargo.com/about/corporate/governance/sommers/",
+      "photo_credit": "Wells Fargo",
+      "company_start_date": "2020",
+      "company_start_date_source_url": "https://www.wellsfargo.com/about/corporate/governance/sommers/",
+      "photo_original_url": "https://www17.wellsfargomedia.com/assets/images/rwd/photography/740x740/2022_Barry_Sommers_740x740.png",
+      "photo_sha256": "a2847177896cf30fe30a2007e36769a1aa94a8ef2f613878a4dd56597046f8dc",
+      "photo_cached_at": "2026-11-05T20:35:32Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Saul Van Beurden",
+      "role": "Senior Executive Vice President, Head of Artificial Intelligence",
+      "profile_url": "https://www.wellsfargo.com/about/corporate/governance/vanbeurden/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/17bd619d1de898249589d6fb.avif",
+      "start_date": null,
+      "source_url": "https://www.wellsfargo.com/about/corporate/governance/vanbeurden/",
+      "source_name": "Official executive biography",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.wellsfargo.com/about/corporate/governance/vanbeurden/",
+      "photo_credit": "Wells Fargo",
+      "source_note": "The individual biography identifies the co-CEO of Consumer Banking and Lending position as a previous role.",
+      "company_start_date": "2019",
+      "company_start_date_source_url": "https://www.wellsfargo.com/about/corporate/governance/vanbeurden/",
+      "photo_original_url": "https://www17.wellsfargomedia.com/assets/images/photography/portrait/155x198/Saul-Van-Beurden_155x198_0523.jpg",
+      "photo_sha256": "2acede1f25b8e3a3c8b3615847eab99adc74e94462286bc5849166e76ece4eca",
+      "photo_cached_at": "2026-11-05T20:35:26Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Wells Fargo official leadership roster",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/",
+      "observed_at": "2026-11-05T20:00:35Z"
+    },
+    {
+      "name": "Official Wells Fargo executive biography",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/hranicky/",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "Official Wells Fargo executive biography",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/ling/",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "Official Wells Fargo executive biography",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/flowers/",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "Official Wells Fargo executive biography",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/rivas/",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "Official Wells Fargo executive biography",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/scharf/",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "Official Wells Fargo executive biography",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/engle/",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "Official Wells Fargo executive biography",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/powell/",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "Official Wells Fargo executive biography",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/santomassimo/",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "Official Wells Fargo executive biography",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/rosenberg/",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "Official Wells Fargo executive biography",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/patterson/",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "Official Wells Fargo executive biography",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/vanbeurden/",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "Official Wells Fargo executive biography",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/santos/",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "Official Wells Fargo executive biography",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/ricci/",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "Official Wells Fargo executive biography",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/sommers/",
+      "observed_at": "2026-11-05T20:06:57Z"
+    },
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "WrpKsHJ2God7yU275ANuSAuvj1FH",
+      "observed_at": "2026-11-05T19:43:44Z",
+      "match": {
+        "ticker": "WFC",
+        "domain": "wellsfargo.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:36:53Z",
+  "field_sources": {
+    "website": {
+      "name": "Wells Fargo official leadership roster",
+      "url": "https://www.wellsfargo.com/about/corporate/governance/",
+      "observed_at": "2026-11-05T20:00:35Z"
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "WrpKsHJ2God7yU275ANuSAuvj1FH",
+      "observed_at": "2026-11-05T19:43:44Z",
+      "match": {
+        "ticker": "WFC",
+        "domain": "wellsfargo.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "WrpKsHJ2God7yU275ANuSAuvj1FH",
+      "observed_at": "2026-11-05T19:43:44Z",
+      "match": {
+        "ticker": "WFC",
+        "domain": "wellsfargo.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "WrpKsHJ2God7yU275ANuSAuvj1FH",
+      "observed_at": "2026-11-05T19:43:44Z",
+      "match": {
+        "ticker": "WFC",
+        "domain": "wellsfargo.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "WrpKsHJ2God7yU275ANuSAuvj1FH",
+      "observed_at": "2026-11-05T19:43:44Z",
+      "match": {
+        "ticker": "WFC",
+        "domain": "wellsfargo.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "WrpKsHJ2God7yU275ANuSAuvj1FH",
+      "observed_at": "2026-11-05T19:43:44Z",
+      "match": {
+        "ticker": "WFC",
+        "domain": "wellsfargo.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "WrpKsHJ2God7yU275ANuSAuvj1FH",
+      "observed_at": "2026-11-05T19:43:44Z",
+      "match": {
+        "ticker": "WFC",
+        "domain": "wellsfargo.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T20:00:35Z",
+    "leadership_scope": "Leaders listed on the current official company leadership roster; business-unit roles retain their published scope. This is not a complete board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:00:35Z",
+      "industry": "2026-11-05T19:43:44Z",
+      "headquarters": "2026-11-05T19:43:44Z",
+      "professional_profile_count": "2026-11-05T19:43:44Z",
+      "employee_size_range": "2026-11-05T19:43:44Z",
+      "linkedin_url": "2026-11-05T19:43:44Z",
+      "description": "2026-11-05T19:43:44Z",
+      "leadership": "2026-11-05T20:00:35Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  },
+  "description_provider": "People Data Labs"
+}

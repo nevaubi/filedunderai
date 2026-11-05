@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "ticker": "BNY",
+  "cik": 1390777,
+  "name": "BNY",
+  "description": "bny is a global financial services platforms company at the heart of the world’s capital markets.\n\nfor more than 240 years bny has partnered alongside clients, using its expertise and platforms to help them operate more efficiently and accelerate growth. today bny serves over 90% of fortune 100 companies and nearly all the top 100 banks globally. bny supports governments in funding local projects and works with over 90% of the top 100 pension plans to safeguard investments for millions of individuals. as of june 30, 2026, bny oversees $62.6 trillion in assets under custody and/or administration and $2.2 trillion in assets under management. (nyse: bny)\n\nfollow bny on instagram & x: @bnyglobal",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "qscd2gEF5Yp27w5oHhSB7Q1J8eGD",
+    "observed_at": "2026-11-05T19:43:14Z",
+    "match": {
+      "ticker": "BNY",
+      "domain": "bny.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://bny.com",
+  "industry": "Financial Services",
+  "headquarters": "New York, New York, United States",
+  "linkedin_url": "https://linkedin.com/company/bnyglobal",
+  "founded": 1784,
+  "employees": null,
+  "professional_profile_count": 47945,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "qscd2gEF5Yp27w5oHhSB7Q1J8eGD",
+    "observed_at": "2026-11-05T19:43:14Z",
+    "match": {
+      "ticker": "BNY",
+      "domain": "bny.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "qscd2gEF5Yp27w5oHhSB7Q1J8eGD",
+  "leadership": [
+    {
+      "name": "Robin Vince",
+      "role": "Chief Executive Officer",
+      "profile_url": "https://www.bny.com/corporate/global/en/about-us/leadership/vince.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/d71a61e438127f88dd83d1d4.jpg",
+      "linkedin_url": "https://www.linkedin.com/in/robin-vince/",
+      "start_date": null,
+      "linkedin_source_url": "https://www.bny.com/corporate/global/en/about-us/leadership/vince.html",
+      "source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "photo_credit": "BNY",
+      "photo_original_url": "https://www.bny.com/content/dam/bnymellon/images/leadership/2025-headshots/ec/2025-robin-vince-410x410-v3.jpg",
+      "photo_sha256": "3fa5ff05d3f3d11010a596adeaa395958c2d411b0411c702bcd4faa9aa9eb4c4",
+      "photo_cached_at": "2026-11-05T20:29:25Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Dermot McDonogh",
+      "role": "Chief Financial Officer",
+      "profile_url": "https://www.bny.com/corporate/global/en/about-us/leadership/mcdonogh.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/82b7b9d8c9b8b0056eebbcc0.jpg",
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "photo_credit": "BNY",
+      "photo_original_url": "https://www.bny.com/content/dam/bnymellon/images/leadership/2025-headshots/ec/dermot-m-410x410-2.jpg",
+      "photo_sha256": "3e05da07b00cb9ed95f0feb2bdb12398abf165f64aecc7ca822f76b7e63fa325",
+      "photo_cached_at": "2026-11-05T20:29:34Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Jennifer Barker",
+      "role": "Global Head of Payments & Trade and Depositary Receipts, Head of Europe (including UK)",
+      "profile_url": "https://www.bny.com/corporate/global/en/about-us/leadership/barker.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/b33ee66287397fde069727fc.jpg",
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "photo_credit": "BNY",
+      "photo_original_url": "https://www.bny.com/content/dam/bnymellon/images/leadership/2025-headshots/ec/jennifer-barker-410x410-2.jpg",
+      "photo_sha256": "f2d9712d1691587184e9a97d8c623a252a9059cbf1dbc09b662cc86d73c2b9e1",
+      "photo_cached_at": "2026-11-05T20:29:45Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Rajashree Datta",
+      "role": "Chief Risk Officer",
+      "profile_url": "https://www.bny.com/corporate/global/en/about-us/leadership/datta.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/666ad360f5b4ff26f8d481d9.jpg",
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "photo_credit": "BNY",
+      "photo_original_url": "https://www.bny.com/content/dam/bnymellon/images/leadership/2025-headshots/ec/rajashree-410x410-2.jpg",
+      "photo_sha256": "a539bda44fbf5d781cd5fe19b166b8cbe41c109b35b64855e6e9b94815324b39",
+      "photo_cached_at": "2026-11-05T20:29:59Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Jayee Koffey",
+      "role": "Chief Global Affairs Officer",
+      "profile_url": "https://www.bny.com/corporate/global/en/about-us/leadership/koffey.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/ff6db93e6def51173bf9b612.jpg",
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "photo_credit": "BNY",
+      "photo_original_url": "https://www.bny.com/content/dam/bnymellon/images/leadership/2025-headshots/ec/jayee-koffey-410x410-2.jpg",
+      "photo_sha256": "108b9bed52cb536fb859c1c56ceb5518a1b75c57dbe795559b2b4d570b4624be",
+      "photo_cached_at": "2026-11-05T20:29:45Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Hani Kablawi",
+      "role": "Executive Vice Chair",
+      "profile_url": "https://www.bny.com/corporate/global/en/about-us/leadership/kablawi.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/acb329d8ab3af7bf8511e79a.jpg",
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "photo_credit": "BNY",
+      "photo_original_url": "https://www.bny.com/content/dam/bnymellon/images/leadership/2025-headshots/ec/hani-410x410-3.jpg",
+      "photo_sha256": "199d89dd7d4ae2ecb39b89a38f4dd4d4174ec201a458df8dfef933894a64a7a2",
+      "photo_cached_at": "2026-11-05T20:29:45Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "J. Kevin McCarthy",
+      "role": "General Counsel",
+      "profile_url": "https://www.bny.com/corporate/global/en/about-us/leadership/mccarthy.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/9f86a0ca390c0dc42799eb50.jpg",
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "photo_credit": "BNY",
+      "photo_original_url": "https://www.bny.com/content/dam/bnymellon/images/leadership/2025-headshots/ec/kevin-410x410-4.jpg",
+      "photo_sha256": "bab1833dfe19d1a9848d54170c4f7cbfa59c7f045cbe7a53ba03f65aae9e2396",
+      "photo_cached_at": "2026-11-05T20:29:50Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Laide Majiyagbe",
+      "role": "Global Head of Markets",
+      "profile_url": "https://www.bny.com/corporate/global/en/about-us/leadership/majiyagbe.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/316e178044d480a34ecca5f8.png",
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "photo_credit": "BNY",
+      "photo_original_url": "https://www.bny.com/content/dam/bnymellon/images/leadership/laide-headshot-410x410.png",
+      "photo_sha256": "8c00060cea7e241c351b0a21d0526c9caf615600b313c41cac8ce65ceebf0ffe",
+      "photo_cached_at": "2026-11-05T20:30:00Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "qscd2gEF5Yp27w5oHhSB7Q1J8eGD",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BNY",
+        "domain": "bny.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    {
+      "name": "Official leadership source",
+      "url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+      "observed_at": "2026-11-05T20:19:29Z"
+    },
+    {
+      "name": "Official leadership source",
+      "url": "https://www.bny.com/corporate/global/en/about-us/leadership/vince.html",
+      "observed_at": "2026-11-05T20:19:29Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:36:53Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "qscd2gEF5Yp27w5oHhSB7Q1J8eGD",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BNY",
+        "domain": "bny.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "qscd2gEF5Yp27w5oHhSB7Q1J8eGD",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BNY",
+        "domain": "bny.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "qscd2gEF5Yp27w5oHhSB7Q1J8eGD",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BNY",
+        "domain": "bny.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "qscd2gEF5Yp27w5oHhSB7Q1J8eGD",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BNY",
+        "domain": "bny.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "qscd2gEF5Yp27w5oHhSB7Q1J8eGD",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BNY",
+        "domain": "bny.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "qscd2gEF5Yp27w5oHhSB7Q1J8eGD",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BNY",
+        "domain": "bny.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "qscd2gEF5Yp27w5oHhSB7Q1J8eGD",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BNY",
+        "domain": "bny.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "leadership_scope": "Selected corporate and business-unit executives verified against current official company sources; not a complete roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:14Z",
+      "industry": "2026-11-05T19:43:14Z",
+      "headquarters": "2026-11-05T19:43:14Z",
+      "founded": "2026-11-05T19:43:14Z",
+      "professional_profile_count": "2026-11-05T19:43:14Z",
+      "employee_size_range": "2026-11-05T19:43:14Z",
+      "linkedin_url": "2026-11-05T19:43:14Z",
+      "description": "2026-11-05T19:43:14Z",
+      "leadership": "2026-11-05T20:19:29Z"
+    },
+    "official_updated_at": "2026-11-05T20:19:29Z",
+    "portraits": "available_for_all_selected_leaders"
+  },
+  "description_provider": "People Data Labs"
+}

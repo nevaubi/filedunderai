@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "ticker": "CVX",
+  "cik": 93410,
+  "name": "Chevron",
+  "description": "Chevron is an energy company with operations organized across upstream, downstream, midstream and chemicals, and new energies. Its corporate functions include technology and engineering, finance, legal affairs, human resources and business development.",
+  "description_source": {
+    "name": "Chevron business context",
+    "url": "https://www.chevron.com/who-we-are/leadership",
+    "observed_at": "2026-11-05T19:40:50Z"
+  },
+  "source_url": "https://www.chevron.com/who-we-are/leadership",
+  "website": "https://www.chevron.com/",
+  "industry": null,
+  "headquarters": null,
+  "founded": null,
+  "employees": null,
+  "leadership": [
+    {
+      "name": "Mike Wirth",
+      "role": "Chairman of the Board and Chief Executive Officer",
+      "profile_url": "https://www.chevron.com/who-we-are/leadership/michael-wirth",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/f4705e192276cf218fd5b164.jpg",
+      "start_date": "2018",
+      "source_url": "https://www.chevron.com/who-we-are/leadership/michael-wirth",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.chevron.com/who-we-are/leadership",
+      "photo_credit": "Chevron",
+      "linkedin_url": "https://www.linkedin.com/in/mike-wirth-chevron/",
+      "linkedin_source_url": "https://www.chevron.com/who-we-are/leadership/michael-wirth",
+      "start_date_source_url": "https://www.chevron.com/who-we-are/leadership/michael-wirth",
+      "tenure_note": "The official biography specifies the start year only.",
+      "photo_original_url": "https://www.chevron.com/-/media/chevron/who-we-are/leadership/redesign-leader-thumbnail/thumb-leaders-wirth-mike.jpg?la=en&h=768&w=1024&hash=69090732CB3929CB3F45F669D3994648",
+      "photo_sha256": "af75ebe8227a1bac912dd4a395cd6dc4dc9f7daf1978dfaf9bfbfcf8262e694b",
+      "photo_cached_at": "2026-11-05T19:59:25Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Eimear P. Bonner",
+      "role": "Chief Financial Officer",
+      "profile_url": "https://www.chevron.com/who-we-are/leadership/eimear-bonner",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/5059edc7f484b710d112e9c7.jpg",
+      "start_date": "2024",
+      "source_url": "https://www.chevron.com/who-we-are/leadership/eimear-bonner",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.chevron.com/who-we-are/leadership",
+      "photo_credit": "Chevron",
+      "start_date_source_url": "https://www.chevron.com/who-we-are/leadership/eimear-bonner",
+      "tenure_note": "The official biography specifies the CFO start year only.",
+      "photo_original_url": "https://www.chevron.com/-/media/chevron/who-we-are/leadership/redesign-leader-thumbnail/bios-leaders_Bonner-thm-2.jpg?la=en&h=768&w=1024&hash=D5F26C02EB4824E1A3595B57958EC8B9",
+      "photo_sha256": "eaef21ab2d52f3c053afd7a7475b520255033db6034b49830b3c2e0145e9a2d0",
+      "photo_cached_at": "2026-11-05T19:59:14Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Mark A. Nelson",
+      "role": "Vice Chairman",
+      "profile_url": "https://www.chevron.com/who-we-are/leadership/mark-nelson",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/5f1c6b8bcdf18e464f57056a.jpg",
+      "start_date": null,
+      "source_url": "https://www.chevron.com/who-we-are/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.chevron.com/who-we-are/leadership",
+      "photo_credit": "Chevron",
+      "photo_original_url": "https://www.chevron.com/-/media/chevron/who-we-are/leadership/redesign-leader-thumbnail/thumb-leaders-Mark_Nelson-0238.jpg?la=en&h=768&w=1024&hash=1E78AE51DCB798FEECC3F5268E0CB3D0",
+      "photo_sha256": "7a2e2eba8beb6a91614bf57f0135462acba6f44dfc7e031e2caa86aef30d4174",
+      "photo_cached_at": "2026-11-05T19:59:25Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "T. Ryder Booth",
+      "role": "Chief Technology and Engineering Officer",
+      "profile_url": "https://www.chevron.com/who-we-are/leadership/t-ryder-booth",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/19cea43f5c0fb840a77f0015.jpg",
+      "start_date": null,
+      "source_url": "https://www.chevron.com/who-we-are/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.chevron.com/who-we-are/leadership",
+      "photo_credit": "Chevron",
+      "photo_original_url": "https://www.chevron.com/-/media/chevron/who-we-are/leadership/redesign-leader-thumbnail/thumb-booth-ryder.jpg?la=en&h=768&w=1024&hash=BBD147966EA77C01991E38CE748B22F1",
+      "photo_sha256": "bf7fe2ac2b56a041e68cb1729ca80be4cfa1a12e573f17f74b3e2afac4c4ff65",
+      "photo_cached_at": "2026-11-05T19:59:14Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "R. Hewitt Pate",
+      "role": "Chief Legal Officer",
+      "profile_url": "https://www.chevron.com/who-we-are/leadership/r-hewitt-pate",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/fabb618b6e5aef35c0f4280c.jpg",
+      "start_date": null,
+      "source_url": "https://www.chevron.com/who-we-are/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.chevron.com/who-we-are/leadership",
+      "photo_credit": "Chevron",
+      "photo_original_url": "https://www.chevron.com/-/media/chevron/who-we-are/leadership/redesign-leader-thumbnail/thumb-leaders-Pate_Hewitt.jpg?la=en&h=768&w=1024&hash=DC61DD797107B5B133D4434110EFD40A",
+      "photo_sha256": "1d1d056cb2a2da3df1dbc538ea9f776dbf5f1a24729e7a71bde7e20f87ea9b8c",
+      "photo_cached_at": "2026-11-05T19:59:25Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Robert Clay Neff",
+      "role": "President, Upstream",
+      "profile_url": "https://www.chevron.com/who-we-are/leadership/robert-c-neff",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/1926a3d76b44dc6957a007e0.jpg",
+      "start_date": null,
+      "source_url": "https://www.chevron.com/who-we-are/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.chevron.com/who-we-are/leadership",
+      "photo_credit": "Chevron",
+      "photo_original_url": "https://www.chevron.com/-/media/chevron/who-we-are/leadership/redesign-leader-thumbnail/thumb-leader-clay-neff-720w.jpg?la=en&h=768&w=1024&hash=C3B8F1CF28DFA977D9F128A58C22BE57",
+      "photo_sha256": "a096fc07df474335cec6fb7a8055bb623c7f541c749bf5070692c8f69ba98b92",
+      "photo_cached_at": "2026-11-05T19:59:25Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Andy Walz",
+      "role": "President, Downstream, Midstream & Chemicals",
+      "profile_url": "https://www.chevron.com/who-we-are/leadership/andy-walz",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/41b2efba4c5ca74d0d9c4547.jpg",
+      "start_date": null,
+      "source_url": "https://www.chevron.com/who-we-are/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.chevron.com/who-we-are/leadership",
+      "photo_credit": "Chevron",
+      "photo_original_url": "https://www.chevron.com/-/media/chevron/who-we-are/leadership/redesign-leader-thumbnail/thumb-leader-andy-walz.jpg?la=en&h=768&w=1024&hash=E7B7BD0438F6BFC2A4535110FF4CBF5E",
+      "photo_sha256": "36f2cf4a30c5ce6268bd4fefcf248e161e74ad8712cb4ab5ea61d1ad82d7ccb3",
+      "photo_cached_at": "2026-11-05T19:59:14Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Michelle R. Green",
+      "role": "Chief Human Resources Officer",
+      "profile_url": "https://www.chevron.com/who-we-are/leadership/michelle-green",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/706a3a6fc3ec616f81f5ae60.jpg",
+      "start_date": null,
+      "source_url": "https://www.chevron.com/who-we-are/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.chevron.com/who-we-are/leadership",
+      "photo_credit": "Chevron",
+      "photo_original_url": "https://www.chevron.com/-/media/chevron/who-we-are/leadership/redesign-leader-thumbnail/thumbs-leaders-green-michelle.jpg?la=en&h=768&w=1024&hash=0DA544E65FEAAAC2C874D5659D144324",
+      "photo_sha256": "421f9405ad8c8ba2f0b7c87f9d02592655b1f99bd47090bb99a1c1d814ff8ea0",
+      "photo_cached_at": "2026-11-05T19:59:25Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Chevron official leadership roster",
+      "url": "https://www.chevron.com/who-we-are/leadership",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Mike Wirth official biography",
+      "url": "https://www.chevron.com/who-we-are/leadership/michael-wirth",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Mike Wirth role start evidence",
+      "url": "https://www.chevron.com/who-we-are/leadership/michael-wirth",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Eimear P. Bonner official biography",
+      "url": "https://www.chevron.com/who-we-are/leadership/eimear-bonner",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Eimear P. Bonner role start evidence",
+      "url": "https://www.chevron.com/who-we-are/leadership/eimear-bonner",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Chevron business context",
+      "url": "https://www.chevron.com/who-we-are/leadership",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "Official company source",
+      "url": "https://www.chevron.com/who-we-are/leadership",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    "description": {
+      "name": "Chevron business context",
+      "url": "https://www.chevron.com/who-we-are/leadership",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  },
+  "coverage": {
+    "status": "official_sources",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T19:40:50Z",
+    "leadership_scope": "Selected leaders from the company’s published leadership roster; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:40:50Z",
+      "description": "2026-11-05T19:40:50Z",
+      "leadership": "2026-11-05T19:40:50Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  }
+}

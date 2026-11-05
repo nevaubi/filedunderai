@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "CDP",
+  "cik": 860546,
+  "name": "COPT DEFENSE PROPERTIES",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://copt.com",
+  "industry": "commercial real estate",
+  "headquarters": "columbia, maryland, united states",
+  "linkedin_url": "https://linkedin.com/company/copt-defense-properties",
+  "founded": 1988,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "201-500",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "ASAZPevr1VBDHC8OiJNShglptf71",
+    "observed_at": "2026-11-05T19:58:09Z",
+    "match": {
+      "ticker": "CDP",
+      "domain": "copt.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.0
+    }
+  },
+  "provider_record_id": "ASAZPevr1VBDHC8OiJNShglptf71",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "ASAZPevr1VBDHC8OiJNShglptf71",
+      "observed_at": "2026-11-05T19:58:09Z",
+      "match": {
+        "ticker": "CDP",
+        "domain": "copt.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:58:09Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "ASAZPevr1VBDHC8OiJNShglptf71",
+      "observed_at": "2026-11-05T19:58:09Z",
+      "match": {
+        "ticker": "CDP",
+        "domain": "copt.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "ASAZPevr1VBDHC8OiJNShglptf71",
+      "observed_at": "2026-11-05T19:58:09Z",
+      "match": {
+        "ticker": "CDP",
+        "domain": "copt.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "ASAZPevr1VBDHC8OiJNShglptf71",
+      "observed_at": "2026-11-05T19:58:09Z",
+      "match": {
+        "ticker": "CDP",
+        "domain": "copt.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "ASAZPevr1VBDHC8OiJNShglptf71",
+      "observed_at": "2026-11-05T19:58:09Z",
+      "match": {
+        "ticker": "CDP",
+        "domain": "copt.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "ASAZPevr1VBDHC8OiJNShglptf71",
+      "observed_at": "2026-11-05T19:58:09Z",
+      "match": {
+        "ticker": "CDP",
+        "domain": "copt.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "ASAZPevr1VBDHC8OiJNShglptf71",
+      "observed_at": "2026-11-05T19:58:09Z",
+      "match": {
+        "ticker": "CDP",
+        "domain": "copt.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "ASAZPevr1VBDHC8OiJNShglptf71",
+      "observed_at": "2026-11-05T19:58:09Z",
+      "match": {
+        "ticker": "CDP",
+        "domain": "copt.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:58:09Z",
+      "industry": "2026-11-05T19:58:09Z",
+      "headquarters": "2026-11-05T19:58:09Z",
+      "founded": "2026-11-05T19:58:09Z",
+      "employee_size_range": "2026-11-05T19:58:09Z",
+      "linkedin_url": "2026-11-05T19:58:09Z"
+    }
+  }
+}

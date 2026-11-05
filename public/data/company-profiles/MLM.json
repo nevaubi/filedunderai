@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "ticker": "MLM",
+  "cik": 916076,
+  "name": "Martin Marietta Materials",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://martinmarietta.com",
+  "industry": "mining & metals",
+  "headquarters": "raleigh, north carolina, united states",
+  "linkedin_url": "https://linkedin.com/company/martinmarietta",
+  "founded": 1994,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "5001-10000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "L5BbqxyQUBh9aogL857H5w2vz2Db",
+    "observed_at": "2026-11-05T20:04:35Z",
+    "match": {
+      "ticker": "MLM",
+      "domain": "martinmarietta.com",
+      "basis": "ticker_and_verified_domain",
+      "domain_source": {
+        "name": "Official issuer domain verification",
+        "url": "https://ir.martinmarietta.com/news-releases/news-release-details/martin-marietta-reports-first-quarter-2026-results",
+        "observed_at": "2026-11-05T20:15:15Z",
+        "reason": "The official company earnings release identifies Martin Marietta Materials, Inc., ticker MLM, and its Martin Marietta brand."
+      },
+      "provider_fuzzy_match": true,
+      "provider_score": 1.0011704374693862
+    }
+  },
+  "provider_record_id": "L5BbqxyQUBh9aogL857H5w2vz2Db",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "L5BbqxyQUBh9aogL857H5w2vz2Db",
+      "observed_at": "2026-11-05T20:04:35Z",
+      "match": {
+        "ticker": "MLM",
+        "domain": "martinmarietta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://ir.martinmarietta.com/news-releases/news-release-details/martin-marietta-reports-first-quarter-2026-results",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official company earnings release identifies Martin Marietta Materials, Inc., ticker MLM, and its Martin Marietta brand."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0011704374693862
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:04:35Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "L5BbqxyQUBh9aogL857H5w2vz2Db",
+      "observed_at": "2026-11-05T20:04:35Z",
+      "match": {
+        "ticker": "MLM",
+        "domain": "martinmarietta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://ir.martinmarietta.com/news-releases/news-release-details/martin-marietta-reports-first-quarter-2026-results",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official company earnings release identifies Martin Marietta Materials, Inc., ticker MLM, and its Martin Marietta brand."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0011704374693862
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "L5BbqxyQUBh9aogL857H5w2vz2Db",
+      "observed_at": "2026-11-05T20:04:35Z",
+      "match": {
+        "ticker": "MLM",
+        "domain": "martinmarietta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://ir.martinmarietta.com/news-releases/news-release-details/martin-marietta-reports-first-quarter-2026-results",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official company earnings release identifies Martin Marietta Materials, Inc., ticker MLM, and its Martin Marietta brand."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0011704374693862
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "L5BbqxyQUBh9aogL857H5w2vz2Db",
+      "observed_at": "2026-11-05T20:04:35Z",
+      "match": {
+        "ticker": "MLM",
+        "domain": "martinmarietta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://ir.martinmarietta.com/news-releases/news-release-details/martin-marietta-reports-first-quarter-2026-results",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official company earnings release identifies Martin Marietta Materials, Inc., ticker MLM, and its Martin Marietta brand."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0011704374693862
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "L5BbqxyQUBh9aogL857H5w2vz2Db",
+      "observed_at": "2026-11-05T20:04:35Z",
+      "match": {
+        "ticker": "MLM",
+        "domain": "martinmarietta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://ir.martinmarietta.com/news-releases/news-release-details/martin-marietta-reports-first-quarter-2026-results",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official company earnings release identifies Martin Marietta Materials, Inc., ticker MLM, and its Martin Marietta brand."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0011704374693862
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "L5BbqxyQUBh9aogL857H5w2vz2Db",
+      "observed_at": "2026-11-05T20:04:35Z",
+      "match": {
+        "ticker": "MLM",
+        "domain": "martinmarietta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://ir.martinmarietta.com/news-releases/news-release-details/martin-marietta-reports-first-quarter-2026-results",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official company earnings release identifies Martin Marietta Materials, Inc., ticker MLM, and its Martin Marietta brand."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0011704374693862
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "L5BbqxyQUBh9aogL857H5w2vz2Db",
+      "observed_at": "2026-11-05T20:04:35Z",
+      "match": {
+        "ticker": "MLM",
+        "domain": "martinmarietta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://ir.martinmarietta.com/news-releases/news-release-details/martin-marietta-reports-first-quarter-2026-results",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official company earnings release identifies Martin Marietta Materials, Inc., ticker MLM, and its Martin Marietta brand."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0011704374693862
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "L5BbqxyQUBh9aogL857H5w2vz2Db",
+      "observed_at": "2026-11-05T20:04:35Z",
+      "match": {
+        "ticker": "MLM",
+        "domain": "martinmarietta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://ir.martinmarietta.com/news-releases/news-release-details/martin-marietta-reports-first-quarter-2026-results",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official company earnings release identifies Martin Marietta Materials, Inc., ticker MLM, and its Martin Marietta brand."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.0011704374693862
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:04:35Z",
+      "industry": "2026-11-05T20:04:35Z",
+      "headquarters": "2026-11-05T20:04:35Z",
+      "founded": "2026-11-05T20:04:35Z",
+      "employee_size_range": "2026-11-05T20:04:35Z",
+      "linkedin_url": "2026-11-05T20:04:35Z"
+    }
+  }
+}

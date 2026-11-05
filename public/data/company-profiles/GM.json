@@ -1,0 +1,300 @@
+{
+  "schema_version": 1,
+  "ticker": "GM",
+  "cik": 1467858,
+  "name": "General Motors",
+  "description": "general motors’ vision is to create a world with zero crashes, zero emissions and zero congestion, and we have committed ourselves to leading the way toward this future. today, we are in the midst of a transportation revolution, and we have the ambition, the talent and the technology to realize the safer, better and more sustainable world we want. as an open, inclusive company, we’re also creating an environment where everyone feels welcomed and valued for who they are. one team, where all ideas are considered and heard, where everyone can contribute to their fullest potential, with a culture based in respect, integrity, accountability and equality. our team brings wide-ranging perspectives and experiences to solving the complex transportation challenges of today and tomorrow.\n\nfor information on the gm privacy statement, please visit http://www.gm.com/privacy-statement.html",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "i0Zj5e4h2Cbn1rPv8MOBxACkYtmx",
+    "observed_at": "2026-11-05T19:43:20Z",
+    "match": {
+      "ticker": "GM",
+      "domain": "gm.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://gm.com",
+  "industry": "Automotive",
+  "headquarters": "Detroit, Michigan, United States",
+  "linkedin_url": "https://linkedin.com/company/general-motors",
+  "founded": null,
+  "employees": null,
+  "professional_profile_count": 78092,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "i0Zj5e4h2Cbn1rPv8MOBxACkYtmx",
+    "observed_at": "2026-11-05T19:43:20Z",
+    "match": {
+      "ticker": "GM",
+      "domain": "gm.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "i0Zj5e4h2Cbn1rPv8MOBxACkYtmx",
+  "leadership": [
+    {
+      "name": "Mary T. Barra",
+      "role": "Chair and Chief Executive Officer",
+      "profile_url": "https://www.gm.com/content/public/us/en/gm/home/company/leadership.detail.html/Pages/bios/global/en/corporate-officers/Mary-Barra.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/62f7254e9b71cab61af83013.jpg",
+      "start_date": null,
+      "source_url": "https://www.gm.com/company/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.gm.com/company/leadership",
+      "photo_credit": "General Motors",
+      "photo_original_url": "https://www.gm.com/content/Pages/bios/global/en/corporate-officers/Mary-Barra/jcr:content/image.img.jpg/1776694713164.jpg",
+      "photo_sha256": "6ed0d6ac9d87befa771d09a2da2ce92f04084a846a94cbf52a6e21a3fb455e59",
+      "photo_cached_at": "2026-11-05T20:33:26Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Sterling Anderson",
+      "role": "Executive Vice President, Global Product and Chief Product Officer",
+      "profile_url": "https://www.gm.com/content/public/us/en/gm/home/company/leadership.detail.html/Pages/bios/global/en/corporate-officers/Sterling-Anderson.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/9ddccf08fb6b1411c4e32d65.jpg",
+      "start_date": null,
+      "source_url": "https://www.gm.com/company/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.gm.com/company/leadership",
+      "photo_credit": "General Motors",
+      "photo_original_url": "https://www.gm.com/content/Pages/bios/global/en/corporate-officers/Sterling-Anderson/jcr:content/image.img.jpg/1771444557867.jpg",
+      "photo_sha256": "d94e2553d6b5e886e741e3bd6660ce283b721aea7abe9ede402b735d6064bed2",
+      "photo_cached_at": "2026-11-05T20:33:40Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Grant Dixton",
+      "role": "Executive Vice President, Chief Legal & Public Policy Officer",
+      "profile_url": "https://www.gm.com/content/public/us/en/gm/home/company/leadership.detail.html/Pages/bios/global/en/corporate-officers/Grant-Dixton.html",
+      "photo_url": "https://www.gm.com/content/Pages/bios/global/en/corporate-officers/Grant-Dixton/jcr:content/image.img.jpg/1771444925025.jpg",
+      "start_date": null,
+      "source_url": "https://www.gm.com/company/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.gm.com/company/leadership",
+      "photo_credit": "General Motors"
+    },
+    {
+      "name": "Rory Harvey",
+      "role": "Executive Vice President and President, Global Markets",
+      "profile_url": "https://www.gm.com/content/public/us/en/gm/home/company/leadership.detail.html/Pages/bios/global/en/corporate-officers/Rory-Harvey.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/842f853aa29b1cda36926b09.jpg",
+      "start_date": null,
+      "source_url": "https://www.gm.com/company/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.gm.com/company/leadership",
+      "photo_credit": "General Motors",
+      "photo_original_url": "https://www.gm.com/content/Pages/bios/global/en/corporate-officers/Rory-Harvey/jcr:content/image.img.jpg/1776882750805.jpg",
+      "photo_sha256": "6b467c6e32c226a8b64334f93ed30d3b9e3c032ee9599e1162e183afda1742ef",
+      "photo_cached_at": "2026-11-05T20:33:27Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Arden Hoffman",
+      "role": "Executive Vice President and Chief People Officer",
+      "profile_url": "https://www.gm.com/content/public/us/en/gm/home/company/leadership.detail.html/Pages/bios/global/en/corporate-officers/Arden-Hoffman.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/c7367942a1066acd1db90da7.jpg",
+      "start_date": null,
+      "source_url": "https://www.gm.com/company/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.gm.com/company/leadership",
+      "photo_credit": "General Motors",
+      "photo_original_url": "https://www.gm.com/content/Pages/bios/global/en/corporate-officers/Arden-Hoffman/jcr:content/image.img.jpg/1784840494925.jpg",
+      "photo_sha256": "13cba94e4c8782b3b7ffbaf07b277e889d0d56d1dfed5752637aa91beb3292a2",
+      "photo_cached_at": "2026-11-05T20:33:06Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Paul A. Jacobson",
+      "role": "Executive Vice President and Chief Financial Officer",
+      "profile_url": "https://www.gm.com/content/public/us/en/gm/home/company/leadership.detail.html/Pages/bios/global/en/corporate-officers/Paul-Jacobson.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/85b348c2757bd1cfaa9d39f9.jpg",
+      "start_date": null,
+      "source_url": "https://www.gm.com/company/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.gm.com/company/leadership",
+      "photo_credit": "General Motors",
+      "photo_original_url": "https://www.gm.com/content/Pages/bios/global/en/corporate-officers/Paul-Jacobson/jcr:content/image.img.jpg/1778254058456.jpg",
+      "photo_sha256": "4b4f73245af57cf5faf76d396760b64d65425fe6e0323282cf78b5a84538f1e2",
+      "photo_cached_at": "2026-11-05T20:33:26Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Mark Reuss",
+      "role": "President, General Motors",
+      "profile_url": "https://www.gm.com/content/public/us/en/gm/home/company/leadership.detail.html/Pages/bios/global/en/corporate-officers/Mark-Reuss.html",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/2b31553ce9e717a9c4a60907.jpg",
+      "start_date": null,
+      "source_url": "https://www.gm.com/company/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.gm.com/company/leadership",
+      "photo_credit": "General Motors",
+      "photo_original_url": "https://www.gm.com/content/Pages/bios/global/en/corporate-officers/Mark-Reuss/jcr:content/image.img.jpg/1780410412730.jpg",
+      "photo_sha256": "ae088d1e51ebaf1d959dfc682976915a0f0bcb6d65b6810c80be945b1ba80e7d",
+      "photo_cached_at": "2026-11-05T20:33:26Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Lin-Hua Wu",
+      "role": "Executive Vice President and Chief Marketing and Communications Officer",
+      "profile_url": "https://www.gm.com/content/public/us/en/gm/home/company/leadership.detail.html/Pages/bios/global/en/corporate-officers/Lin-Hua-Wu.html",
+      "photo_url": "https://www.gm.com/content/Pages/bios/global/en/corporate-officers/Lin-Hua-Wu/jcr:content/image.img.jpg/1793364109083.jpg",
+      "start_date": null,
+      "source_url": "https://www.gm.com/company/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.gm.com/company/leadership",
+      "photo_credit": "General Motors"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "i0Zj5e4h2Cbn1rPv8MOBxACkYtmx",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "GM",
+        "domain": "gm.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    {
+      "name": "General Motors official leadership roster",
+      "url": "https://www.gm.com/company/leadership",
+      "observed_at": "2026-11-05T20:20:23Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:36:53Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "i0Zj5e4h2Cbn1rPv8MOBxACkYtmx",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "GM",
+        "domain": "gm.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "i0Zj5e4h2Cbn1rPv8MOBxACkYtmx",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "GM",
+        "domain": "gm.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "i0Zj5e4h2Cbn1rPv8MOBxACkYtmx",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "GM",
+        "domain": "gm.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "i0Zj5e4h2Cbn1rPv8MOBxACkYtmx",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "GM",
+        "domain": "gm.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "i0Zj5e4h2Cbn1rPv8MOBxACkYtmx",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "GM",
+        "domain": "gm.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "i0Zj5e4h2Cbn1rPv8MOBxACkYtmx",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "GM",
+        "domain": "gm.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "i0Zj5e4h2Cbn1rPv8MOBxACkYtmx",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "GM",
+        "domain": "gm.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "leadership_scope": "Current official leadership roster; published regional and subsidiary role scopes are retained. Non-executive directors and memorial entries are excluded.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:20Z",
+      "industry": "2026-11-05T19:43:20Z",
+      "headquarters": "2026-11-05T19:43:20Z",
+      "professional_profile_count": "2026-11-05T19:43:20Z",
+      "employee_size_range": "2026-11-05T19:43:20Z",
+      "linkedin_url": "2026-11-05T19:43:20Z",
+      "description": "2026-11-05T19:43:20Z",
+      "leadership": "2026-11-05T20:20:23Z"
+    },
+    "official_updated_at": "2026-11-05T20:20:23Z",
+    "portraits": "available_for_all_selected_leaders"
+  },
+  "description_provider": "People Data Labs"
+}

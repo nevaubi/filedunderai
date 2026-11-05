@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "ticker": "LMT",
+  "cik": 936468,
+  "name": "Lockheed Martin",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+  "website": "https://www.lockheedmartin.com/",
+  "industry": null,
+  "headquarters": null,
+  "founded": null,
+  "employees": null,
+  "leadership": [
+    {
+      "name": "Jim Taiclet",
+      "role": "Chairman, President & CEO",
+      "profile_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance/james-taiclet.html",
+      "photo_url": null,
+      "start_date": "2021-03",
+      "source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:52:11Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "photo_credit": "Lockheed Martin",
+      "start_date_source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance/james-taiclet.html",
+      "tenure_note": "President and CEO since June 2020; chairman since March 2021. The start date reflects the combined chairman, president and CEO role.",
+      "linkedin_url": "https://www.linkedin.com/in/james-taiclet/",
+      "linkedin_source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance/james-taiclet.html",
+      "photo_original_url": "https://www.lockheedmartin.com/content/dam/lockheed-martin/eo/photo/leadership-governance/portraits/jim-taiclet-280.jpg.pc-adaptive.full.medium.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Evan Scott",
+      "role": "Chief Financial Officer",
+      "profile_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance/evan-scott.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:47:27Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "photo_credit": "Lockheed Martin",
+      "photo_original_url": "https://www.lockheedmartin.com/content/dam/lockheed-martin/eo/photo/leadership-governance/portraits/evan-scott-280.jpg.pc-adaptive.full.medium.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Frank St. John",
+      "role": "Chief Operating Officer",
+      "profile_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance/frank-st--john.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:47:27Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "photo_credit": "Lockheed Martin",
+      "photo_original_url": "https://www.lockheedmartin.com/content/dam/lockheed-martin/eo/photo/leadership-governance/portraits/frank-st-john-280.jpg.pc-adaptive.full.medium.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Tim Cahill",
+      "role": "President, Missiles and Fire Control",
+      "profile_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance/tim-cahill.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:47:27Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "photo_credit": "Lockheed Martin",
+      "photo_original_url": "https://www.lockheedmartin.com/content/dam/lockheed-martin/eo/photo/leadership-governance/portraits/tim-cahill-280.jpg.pc-adaptive.full.medium.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Maria Demaree",
+      "role": "Senior Vice President, Enterprise Business and Digital Transformation and CIO",
+      "profile_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance/maria-demaree.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:47:27Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "photo_credit": "Lockheed Martin",
+      "photo_original_url": "https://www.lockheedmartin.com/content/dam/lockheed-martin/eo/photo/leadership-governance/portraits/maria-demaree-280.jpg.pc-adaptive.full.medium.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Dr. Anthony DeSimone",
+      "role": "Chief Engineer and Senior Vice President, Enterprise Engineering",
+      "profile_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance/anthony-desimone.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:47:27Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "photo_credit": "Lockheed Martin",
+      "photo_original_url": "https://www.lockheedmartin.com/content/dam/lockheed-martin/eo/photo/leadership-governance/portraits/tony-desimone-280.jpg.pc-adaptive.full.medium.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Robert Head",
+      "role": "Senior Vice President, Government Affairs",
+      "profile_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance/robert-head.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:47:27Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "photo_credit": "Lockheed Martin",
+      "photo_original_url": "https://www.lockheedmartin.com/content/dam/lockheed-martin/eo/photo/leadership-governance/portraits/robert-head-280.jpg.pc-adaptive.full.medium.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Stephanie C. Hill",
+      "role": "President, Rotary and Mission Systems",
+      "profile_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance/stephanie-hill.html",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:47:27Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "photo_credit": "Lockheed Martin",
+      "photo_original_url": "https://www.lockheedmartin.com/content/dam/lockheed-martin/eo/photo/leadership-governance/portraits/stephanie-hill-280.jpg.pc-adaptive.full.medium.jpg",
+      "photo_status": "source_unavailable"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Lockheed Martin official leadership roster",
+      "url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "observed_at": "2026-11-05T19:47:27Z"
+    },
+    {
+      "name": "Jim Taiclet appointment evidence",
+      "url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance/james-taiclet.html",
+      "observed_at": "2026-11-05T19:52:11Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "Lockheed Martin official leadership roster",
+      "url": "https://www.lockheedmartin.com/en-us/who-we-are/leadership-governance.html",
+      "observed_at": "2026-11-05T19:47:27Z"
+    }
+  },
+  "coverage": {
+    "status": "official_sources",
+    "description": "unavailable",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T19:52:11Z",
+    "leadership_scope": "Selected corporate executives from the current official leadership page; not a complete officer or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:47:27Z",
+      "leadership": "2026-11-05T19:52:11Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  }
+}

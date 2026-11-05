@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "ticker": "AVTR",
+  "cik": 1722482,
+  "name": "Avantor, Inc.",
+  "description": "avantor® is a leading global provider of mission-critical products and services to customers in the biopharma, healthcare, education & government, and advanced technologies & applied materials industries. \n\nour portfolio is used in virtually every stage of the most important research, development and production activities in the industries we serve. \n\nour global footprint enables us to serve more than 300,000 customer locations and gives us extensive access to research laboratories and scientists in more than 180 countries. we set science in motion to create a better world.\n\nmore than 14,500 strong, our associates are passionate about our mission to set science in motion to create a better world. we share enthusiasm for innovation, excellence, and achievement. whether we are collaborating with our customers to advance science or solve multifaceted problems, we help them reach their goals more efficiently and effectively. \n\nvisit our website to learn more about avantor.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "NhJMdTJTKxBUnIozHIiHRQNkUVXo",
+    "observed_at": "2026-11-05T19:45:12Z",
+    "match": {
+      "ticker": "AVTR",
+      "domain": "avantorsciences.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 9
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+  "website": "https://avantorsciences.com",
+  "industry": "Biotechnology",
+  "headquarters": "Radnor, Pennsylvania, United States",
+  "linkedin_url": "https://linkedin.com/company/avantorinc",
+  "founded": 1904,
+  "employees": null,
+  "professional_profile_count": 4974,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "NhJMdTJTKxBUnIozHIiHRQNkUVXo",
+    "observed_at": "2026-11-05T19:45:12Z",
+    "match": {
+      "ticker": "AVTR",
+      "domain": "avantorsciences.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 9
+    }
+  },
+  "provider_record_id": "NhJMdTJTKxBUnIozHIiHRQNkUVXo",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "NhJMdTJTKxBUnIozHIiHRQNkUVXo",
+      "observed_at": "2026-11-05T19:45:12Z",
+      "match": {
+        "ticker": "AVTR",
+        "domain": "avantorsciences.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:45:12Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "NhJMdTJTKxBUnIozHIiHRQNkUVXo",
+      "observed_at": "2026-11-05T19:45:12Z",
+      "match": {
+        "ticker": "AVTR",
+        "domain": "avantorsciences.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "NhJMdTJTKxBUnIozHIiHRQNkUVXo",
+      "observed_at": "2026-11-05T19:45:12Z",
+      "match": {
+        "ticker": "AVTR",
+        "domain": "avantorsciences.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "NhJMdTJTKxBUnIozHIiHRQNkUVXo",
+      "observed_at": "2026-11-05T19:45:12Z",
+      "match": {
+        "ticker": "AVTR",
+        "domain": "avantorsciences.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "NhJMdTJTKxBUnIozHIiHRQNkUVXo",
+      "observed_at": "2026-11-05T19:45:12Z",
+      "match": {
+        "ticker": "AVTR",
+        "domain": "avantorsciences.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "NhJMdTJTKxBUnIozHIiHRQNkUVXo",
+      "observed_at": "2026-11-05T19:45:12Z",
+      "match": {
+        "ticker": "AVTR",
+        "domain": "avantorsciences.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "NhJMdTJTKxBUnIozHIiHRQNkUVXo",
+      "observed_at": "2026-11-05T19:45:12Z",
+      "match": {
+        "ticker": "AVTR",
+        "domain": "avantorsciences.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "NhJMdTJTKxBUnIozHIiHRQNkUVXo",
+      "observed_at": "2026-11-05T19:45:12Z",
+      "match": {
+        "ticker": "AVTR",
+        "domain": "avantorsciences.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:45:12Z",
+      "industry": "2026-11-05T19:45:12Z",
+      "headquarters": "2026-11-05T19:45:12Z",
+      "founded": "2026-11-05T19:45:12Z",
+      "professional_profile_count": "2026-11-05T19:45:12Z",
+      "employee_size_range": "2026-11-05T19:45:12Z",
+      "linkedin_url": "2026-11-05T19:45:12Z",
+      "description": "2026-11-05T19:45:12Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

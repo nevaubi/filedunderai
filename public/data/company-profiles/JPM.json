@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "ticker": "JPM",
+  "cik": 19617,
+  "name": "JPMorgan Chase",
+  "description": "JPMorgan Chase & Co. is a global financial services firm. Its businesses include investment banking, services for consumers and small businesses, commercial banking, financial transaction processing and asset management. Its leadership oversees Consumer & Community Banking, the Commercial & Investment Bank, and Asset & Wealth Management.",
+  "description_source": {
+    "name": "JPMorgan Chase business context",
+    "url": "https://www.jpmorganchase.com/about/leadership/jamie-dimon",
+    "observed_at": "2026-11-05T19:40:50Z"
+  },
+  "source_url": "https://www.jpmorganchase.com/about/leadership/jamie-dimon",
+  "website": "https://www.jpmorganchase.com/",
+  "industry": null,
+  "headquarters": null,
+  "founded": null,
+  "employees": null,
+  "leadership": [
+    {
+      "name": "Jamie Dimon",
+      "role": "Chairman and Chief Executive Officer, JPMorganChase",
+      "profile_url": "https://www.jpmorganchase.com/about/leadership/jamie-dimon",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/425144f59a1a70f9096710f2.jpg",
+      "start_date": "2007",
+      "source_url": "https://www.jpmorganchase.com/about/leadership/jamie-dimon",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jpmorganchase.com/about/leadership",
+      "photo_credit": "JPMorgan Chase",
+      "start_date_source_url": "https://www.jpmorganchase.com/about/leadership/jamie-dimon",
+      "tenure_note": "CEO since January 1, 2006; Chairman one year later. Tenure shown begins with the combined current title at year precision.",
+      "photo_original_url": "https://www.jpmorganchase.com/content/dam/jpmorganchase/images/ir/ceo-letters/2025/chairman-and-ceo/dimon-800x800b.jpg",
+      "photo_sha256": "5b28b70b3b09c563749b93881403cf6ce7ee0ec72df1cc568b7dcab1b2db98c4",
+      "photo_cached_at": "2026-11-05T20:01:39Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Jeremy Barnum",
+      "role": "Chief Financial Officer",
+      "profile_url": "https://www.jpmorganchase.com/about/leadership/jeremy-barnum",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/9bf9a873d8b8697b6bac27aa.jpg",
+      "start_date": null,
+      "source_url": "https://www.jpmorganchase.com/about/leadership/jeremy-barnum",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jpmorganchase.com/about/leadership",
+      "photo_credit": "JPMorgan Chase",
+      "photo_original_url": "https://www.jpmorganchase.com/content/dam/jpmorganchase/images/headshots/headshot-jeremy-barnum.jpg",
+      "photo_sha256": "896ca93368284ffe33aae9c92430f4a6827f90d995920d9bdce060a7e2e23d5f",
+      "photo_cached_at": "2026-11-05T20:01:26Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Jennifer Piepszak",
+      "role": "Chief Operating Officer of JPMorganChase",
+      "profile_url": "https://www.jpmorganchase.com/about/leadership/jennifer-piepszak",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/873d33e4c7e6a67aac3eae44.jpg",
+      "start_date": null,
+      "source_url": "https://www.jpmorganchase.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jpmorganchase.com/about/leadership",
+      "photo_credit": "JPMorgan Chase",
+      "photo_original_url": "https://www.jpmorganchase.com/content/dam/jpmorganchase/images/headshots/headshot-jpiepszak.jpg",
+      "photo_sha256": "a81a49f603a298eb97eae740b8ce34028d5ae4c16ad54826393123c5e3731476",
+      "photo_cached_at": "2026-11-05T20:01:26Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Doug Petno",
+      "role": "Co-President of JPMorganChase & CEO of Commercial & Investment Bank",
+      "profile_url": "https://www.jpmorganchase.com/about/leadership/douglas-petno",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/4cbbedc1784662f3381a3ab3.jpg",
+      "start_date": null,
+      "source_url": "https://www.jpmorganchase.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jpmorganchase.com/about/leadership",
+      "photo_credit": "JPMorgan Chase",
+      "photo_original_url": "https://www.jpmorganchase.com/content/dam/jpmorganchase/images/headshots/dougpetno-color-hs.jpg",
+      "photo_sha256": "b2bc9a6f253ef5b225d1a759028029dc3213d19f605cddb16b45a4acfcc9b271",
+      "photo_cached_at": "2026-11-05T20:01:26Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Troy Rohrbaugh",
+      "role": "Co-President of JPMorganChase and CEO of Consumer & Community Banking",
+      "profile_url": "https://www.jpmorganchase.com/about/leadership/troy-rohrbaugh",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/799c201a20834b8a080349f8.jpg",
+      "start_date": null,
+      "source_url": "https://www.jpmorganchase.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jpmorganchase.com/about/leadership",
+      "photo_credit": "JPMorgan Chase",
+      "photo_original_url": "https://www.jpmorganchase.com/content/dam/jpmorganchase/images/headshots/headshot-troy.jpg",
+      "photo_sha256": "d06a83a69190827256e85fb7e9061932f9b5a53b08f02d83da139fafa92e8af8",
+      "photo_cached_at": "2026-11-05T20:01:39Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Mary Callahan Erdoes",
+      "role": "CEO, Asset & Wealth Management",
+      "profile_url": "https://www.jpmorganchase.com/about/leadership/mary-callahan-erdoes",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/582cd28f8128dbbaeaa6e4ed.png",
+      "start_date": null,
+      "source_url": "https://www.jpmorganchase.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jpmorganchase.com/about/leadership",
+      "photo_credit": "JPMorgan Chase",
+      "photo_original_url": "https://www.jpmorganchase.com/content/dam/jpmorganchase/images/ir/ceo-letters/2024/awm/awm-thumbnail.png",
+      "photo_sha256": "a83b4d322db4ac2df4ba700a9431ba6020006cd497612c58e1747975e2c2759f",
+      "photo_cached_at": "2026-11-05T20:01:39Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Stacey Friedman",
+      "role": "General Counsel",
+      "profile_url": "https://www.jpmorganchase.com/about/leadership/stacey-friedman",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/4f9fd12f69ea55e4e75b7eab.jpg",
+      "start_date": null,
+      "source_url": "https://www.jpmorganchase.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jpmorganchase.com/about/leadership",
+      "photo_credit": "JPMorgan Chase",
+      "photo_original_url": "https://www.jpmorganchase.com/content/dam/jpmorganchase/images/headshots/headshot-sfriedman.jpg",
+      "photo_sha256": "68595b7b80902e6190406cbd90c175eb8d95e93a325d1b1c4294bbad709da9c3",
+      "photo_cached_at": "2026-11-05T20:01:39Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Lori Beer",
+      "role": "Global Chief Information Officer",
+      "profile_url": "https://www.jpmorganchase.com/about/leadership/lori-beer",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/594d3f1d874d121348b486c1.jpg",
+      "start_date": null,
+      "source_url": "https://www.jpmorganchase.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jpmorganchase.com/about/leadership",
+      "photo_credit": "JPMorgan Chase",
+      "photo_original_url": "https://www.jpmorganchase.com/content/dam/jpmorganchase/images/headshots/headshot-lbeer.jpg",
+      "photo_sha256": "dc0d6ad46265d22517f1d222ea872cf114bdb176a14b5799e5d75c9f9488526d",
+      "photo_cached_at": "2026-11-05T20:01:39Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "JPMorgan Chase official leadership roster",
+      "url": "https://www.jpmorganchase.com/about/leadership",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Jamie Dimon official biography",
+      "url": "https://www.jpmorganchase.com/about/leadership/jamie-dimon",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Jamie Dimon role start evidence",
+      "url": "https://www.jpmorganchase.com/about/leadership/jamie-dimon",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Jeremy Barnum official biography",
+      "url": "https://www.jpmorganchase.com/about/leadership/jeremy-barnum",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "JPMorgan Chase business context",
+      "url": "https://www.jpmorganchase.com/about/leadership/jamie-dimon",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "Official company source",
+      "url": "https://www.jpmorganchase.com/about/leadership",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    "description": {
+      "name": "JPMorgan Chase business context",
+      "url": "https://www.jpmorganchase.com/about/leadership/jamie-dimon",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  },
+  "coverage": {
+    "status": "official_sources",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T19:40:50Z",
+    "leadership_scope": "Selected leaders from the company’s published leadership roster; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:40:50Z",
+      "description": "2026-11-05T19:40:50Z",
+      "leadership": "2026-11-05T19:40:50Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "ticker": "BMRN",
+  "cik": 1048477,
+  "name": "BIOMARIN PHARMACEUTICAL INC",
+  "description": "founded in 1997, biomarin is a global biotechnology company dedicated to transforming lives through genetic discovery. the company develops and commercializes targeted therapies that address the root cause of the genetic conditions that it seeks to treat, helping to better the lives of those struggling with rare genetic disease. biomarin discoveries have led to eight first or best-in-class commercial treatments and a pipeline of multiple product candidates applying the same science-driven, patient-forward approach to broader group of genetic disorders. the more innovative solutions developed, the more lives biomarin can impact.\n\n\nrecruitment fraud alert notice\n \nplease be aware of fraud or scams from individuals, organizations and/or internet sites claiming to represent biomarin in recruitment activities. we have an established recruitment process which is required for all posted positions by biomarin prior to issuing an offer of employment. this biomarin process requires formal interviews conducted live with personnel representing biomarin and never requires payments or fees from job applicants. biomarin does not conduct interviews via texting tools such as ringcentral.\n \nin the event you receive a suspicious email message about recruiting on behalf of biomarin, unless it’s from a biomarin authorized recruiting partner, do not provide any personal information or pay any fees. qualified and interested candidates should apply to current openings directly through this biomarin website. biomarin accepts no responsibility for any costs or charges incurred as a result of fraudulent activity.\n \nif you have lost money or provided your personal identifying information, please contact your bank and report the matter to the fbi via www.ic3.gov. we would also suggest you notify your local police department and monitor your credit.\n\nwe appreciate your interest in biomarin & encourage you to visit http://careers.biomarin.com/career-areas to review job opportunities.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "aDP7efe05zEfSfoORASNCgCRgTDi",
+    "observed_at": "2026-11-05T19:45:04Z",
+    "match": {
+      "ticker": "BMRN",
+      "domain": "biomarin.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 8
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+  "website": "https://biomarin.com",
+  "industry": "Biotechnology",
+  "headquarters": "San Rafael, California, United States",
+  "linkedin_url": "https://linkedin.com/company/biomarin",
+  "founded": 1997,
+  "employees": null,
+  "professional_profile_count": 3666,
+  "employee_size_range": "1001-5000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "aDP7efe05zEfSfoORASNCgCRgTDi",
+    "observed_at": "2026-11-05T19:45:04Z",
+    "match": {
+      "ticker": "BMRN",
+      "domain": "biomarin.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 8
+    }
+  },
+  "provider_record_id": "aDP7efe05zEfSfoORASNCgCRgTDi",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "aDP7efe05zEfSfoORASNCgCRgTDi",
+      "observed_at": "2026-11-05T19:45:04Z",
+      "match": {
+        "ticker": "BMRN",
+        "domain": "biomarin.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:45:04Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "aDP7efe05zEfSfoORASNCgCRgTDi",
+      "observed_at": "2026-11-05T19:45:04Z",
+      "match": {
+        "ticker": "BMRN",
+        "domain": "biomarin.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "aDP7efe05zEfSfoORASNCgCRgTDi",
+      "observed_at": "2026-11-05T19:45:04Z",
+      "match": {
+        "ticker": "BMRN",
+        "domain": "biomarin.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "aDP7efe05zEfSfoORASNCgCRgTDi",
+      "observed_at": "2026-11-05T19:45:04Z",
+      "match": {
+        "ticker": "BMRN",
+        "domain": "biomarin.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "aDP7efe05zEfSfoORASNCgCRgTDi",
+      "observed_at": "2026-11-05T19:45:04Z",
+      "match": {
+        "ticker": "BMRN",
+        "domain": "biomarin.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "aDP7efe05zEfSfoORASNCgCRgTDi",
+      "observed_at": "2026-11-05T19:45:04Z",
+      "match": {
+        "ticker": "BMRN",
+        "domain": "biomarin.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "aDP7efe05zEfSfoORASNCgCRgTDi",
+      "observed_at": "2026-11-05T19:45:04Z",
+      "match": {
+        "ticker": "BMRN",
+        "domain": "biomarin.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "aDP7efe05zEfSfoORASNCgCRgTDi",
+      "observed_at": "2026-11-05T19:45:04Z",
+      "match": {
+        "ticker": "BMRN",
+        "domain": "biomarin.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:45:04Z",
+      "industry": "2026-11-05T19:45:04Z",
+      "headquarters": "2026-11-05T19:45:04Z",
+      "founded": "2026-11-05T19:45:04Z",
+      "professional_profile_count": "2026-11-05T19:45:04Z",
+      "employee_size_range": "2026-11-05T19:45:04Z",
+      "linkedin_url": "2026-11-05T19:45:04Z",
+      "description": "2026-11-05T19:45:04Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

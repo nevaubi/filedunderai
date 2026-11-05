@@ -48,9 +48,13 @@
       "observed_at": "2026-11-05T14:15:13Z",
       "group": "Executive leadership",
       "start_date_source_url": "https://nvidianews.nvidia.com/bios/jensen-huang",
-      "photo_url": "https://s201.q4cdn.com/141608511/files/images/founders/nvidia-jensenhuang-headshots-js0400-c-w-lightened2x2.png",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/1b13f4186dfaafd7c4efaed9.png",
       "photo_source_url": "https://investor.nvidia.com/governance/management-team/default.aspx",
-      "photo_credit": "NVIDIA"
+      "photo_credit": "NVIDIA",
+      "photo_original_url": "https://s201.q4cdn.com/141608511/files/images/founders/nvidia-jensenhuang-headshots-js0400-c-w-lightened2x2.png",
+      "photo_sha256": "d605426aafdb06b415fcdc34e2dbea5cc530952f3213b2e2bef666223542d85c",
+      "photo_cached_at": "2026-11-05T20:03:06Z",
+      "photo_status": "cached_and_verified"
     },
     {
       "name": "Colette Kress",
@@ -62,10 +66,14 @@
       "observed_at": "2026-11-05T14:15:13Z",
       "group": "Executive leadership",
       "start_date_source_url": "https://nvidianews.nvidia.com/news/nvidia-appoints-colette-kress-as-chief-financial-officer",
-      "photo_url": "https://s201.q4cdn.com/141608511/files/images/management/Colette_Kress_s.jpg",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/17820391bb02063c087876bb.jpg",
       "photo_source_url": "https://investor.nvidia.com/governance/management-team/default.aspx",
       "photo_credit": "NVIDIA",
-      "tenure_note": "NVIDIA announced the appointment on September 16, 2013, to take effect later that month; the source does not give an exact start day."
+      "tenure_note": "NVIDIA announced the appointment on September 16, 2013, to take effect later that month; the source does not give an exact start day.",
+      "photo_original_url": "https://s201.q4cdn.com/141608511/files/images/management/Colette_Kress_s.jpg",
+      "photo_sha256": "6f635d5f2feb43a8f50b6cf34b8bd3a10d8c1880203dbd4dda8d6dbcac419cec",
+      "photo_cached_at": "2026-11-05T19:56:30Z",
+      "photo_status": "cached_and_verified"
     },
     {
       "name": "Debora Shoquist",
@@ -77,10 +85,14 @@
       "observed_at": "2026-11-05T14:15:13Z",
       "group": "Executive leadership",
       "start_date_source_url": "https://www.nvidia.com/en-us/about-nvidia/governance/management-team/debora-shoquist/",
-      "photo_url": "https://s201.q4cdn.com/141608511/files/images/management/Debora-Shoquist.jpg",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/a149e857c5332e5a7c696433.jpg",
       "photo_source_url": "https://investor.nvidia.com/governance/management-team/default.aspx",
       "photo_credit": "NVIDIA",
-      "tenure_note": "The official biography says Shoquist joined in 2007 and was promoted to executive vice president two years later; 2009 is calculated from those dates."
+      "tenure_note": "The official biography says Shoquist joined in 2007 and was promoted to executive vice president two years later; 2009 is calculated from those dates.",
+      "photo_original_url": "https://s201.q4cdn.com/141608511/files/images/management/Debora-Shoquist.jpg",
+      "photo_sha256": "fc728a9fba453da9d0550d6ab2f3cc218c0f9032c90897849331995daf542956",
+      "photo_cached_at": "2026-11-05T19:56:33Z",
+      "photo_status": "cached_and_verified"
     },
     {
       "name": "Tim Teter",
@@ -91,7 +103,7 @@
       "source_name": "Official biography",
       "observed_at": "2026-11-05T14:15:13Z",
       "group": "Executive leadership",
-      "photo_url": "https://s201.q4cdn.com/141608511/files/images/management/Tim_Tetersquare_s.jpg",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/be479e7006cd4ce6aed4e8d7.jpg",
       "photo_source_url": "https://investor.nvidia.com/governance/management-team/default.aspx",
       "photo_credit": "NVIDIA",
       "tenure_note": "The official biography gives a company join year but does not explicitly date appointment to the current role.",
@@ -99,7 +111,11 @@
         "name": "NVIDIA 2026 Form 10-K, Executive Officers",
         "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm",
         "observed_at": "2026-11-05T14:33:09Z"
-      }
+      },
+      "photo_original_url": "https://s201.q4cdn.com/141608511/files/images/management/Tim_Tetersquare_s.jpg",
+      "photo_sha256": "f09d6e091c32668baf0afba81e5542c03b112f056b43f6ee974db5da826a6102",
+      "photo_cached_at": "2026-11-05T19:56:34Z",
+      "photo_status": "cached_and_verified"
     }
   ],
   "images": [
@@ -178,7 +194,7 @@
       "as_of": "2026-01-25"
     }
   ],
-  "updated_at": "2026-11-05T14:33:09Z",
+  "updated_at": "2026-11-05T20:24:21Z",
   "field_sources": {
     "website": {
       "name": "NVIDIA in Brief, 2026",

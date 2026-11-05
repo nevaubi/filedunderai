@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "ticker": "MRK",
+  "cik": 310158,
+  "name": "Merck",
+  "description": "at merck, known as msd outside of the united states and canada, we are unified around our purpose: we use the power of leading-edge science to save and improve lives around the world. for more than 130 years, we have brought hope to humanity through the development of important medicines and vaccines. we aspire to be the premier research-intensive biopharmaceutical company in the world – and today, we are at the forefront of research to deliver innovative health solutions that advance the prevention and treatment of diseases in people and animals. we foster a diverse and inclusive global workforce and operate responsibly every day to enable a safe, sustainable and healthy future for all people and communities. for more information, visit www.merck.com. \n\nthis site is intended for residents of the united states and canada and their territories only. fls: http://merck.us/3tkxnuz",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "ClO5BpY7fpAR9MK3c0edCQXpTDN9",
+    "observed_at": "2026-11-05T19:41:48Z",
+    "match": {
+      "ticker": "MRK",
+      "domain": "merck.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://www.merck.com",
+  "industry": "Pharmaceuticals",
+  "headquarters": "Rahway, New Jersey, United States",
+  "linkedin_url": "https://linkedin.com/company/merck",
+  "founded": 1891,
+  "employees": null,
+  "professional_profile_count": 38878,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "ClO5BpY7fpAR9MK3c0edCQXpTDN9",
+    "observed_at": "2026-11-05T19:41:48Z",
+    "match": {
+      "ticker": "MRK",
+      "domain": "merck.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "ClO5BpY7fpAR9MK3c0edCQXpTDN9",
+  "leadership": [
+    {
+      "name": "Robert M. Davis",
+      "role": "Chairman and chief executive officer",
+      "profile_url": "https://www.merck.com/leadership/robert-m-davis/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/01e90fb8a10fa9c74f5252ae.webp",
+      "start_date": null,
+      "source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "photo_credit": "Merck",
+      "photo_original_url": "https://www.merck.com/wp-content/uploads/sites/124/2020/04/RobDavis_293x212.png?resize=293%2C195&quality=70&allow_lossy=1",
+      "photo_sha256": "a34d71bac77b438a377dab09af97c41a7acc0b7b2a2d6ccaa25fd5688b1a59eb",
+      "photo_cached_at": "2026-11-05T20:19:52Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Richard R. DeLuca, Jr.",
+      "role": "Executive vice president and president, Merck Animal Health",
+      "profile_url": "https://www.merck.com/leadership/richard-r-deluca-jr/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/4083f1238c68d02abc9db021.webp",
+      "start_date": null,
+      "source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "photo_credit": "Merck",
+      "photo_original_url": "https://www.merck.com/wp-content/uploads/sites/124/2020/04/EC-Rick-DeLuca-1.jpg?resize=293%2C195&quality=70&allow_lossy=1",
+      "photo_sha256": "396af421161b838cda8d9559c137afdc821c0a686f2efade01a6a07e3e679cda",
+      "photo_cached_at": "2026-11-05T20:19:52Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Brian Foard",
+      "role": "Executive vice president and president, Specialty, Pharma & Infectious Diseases",
+      "profile_url": "https://www.merck.com/leadership/brian-foard/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/b86bafdf29ede4ee214847c4.webp",
+      "start_date": null,
+      "source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "photo_credit": "Merck",
+      "photo_original_url": "https://www.merck.com/wp-content/uploads/sites/124/2026/03/Brian-Foard_293x212_2.jpg?resize=293%2C195&quality=70&allow_lossy=1",
+      "photo_sha256": "9f43214824df38b6ef918b2a50556a6c1c041f864bd1fc0bdb9a235614f2c74e",
+      "photo_cached_at": "2026-11-05T20:33:40Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Chirfi Guindo",
+      "role": "Executive vice president, Strategic Access, Policy & Communications",
+      "profile_url": "https://www.merck.com/leadership/chirfi-guindo/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/dc8b41af708267a863569750.webp",
+      "start_date": null,
+      "source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "photo_credit": "Merck",
+      "photo_original_url": "https://www.merck.com/wp-content/uploads/sites/124/2022/07/Chirfi-Guindo_293x212.jpg?resize=293%2C195&quality=70&allow_lossy=1",
+      "photo_sha256": "72776247c13083e1144179749fcd440cb7541f550917ab7db7b7064087a5c284",
+      "photo_cached_at": "2026-11-05T20:33:35Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Gaurav Gupta",
+      "role": "Executive vice president and chief information and digital officer",
+      "profile_url": "https://www.merck.com/leadership/gaurav-gupta/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/a27ad8ceae173057fd0e2cbc.webp",
+      "start_date": null,
+      "source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "photo_credit": "Merck",
+      "photo_original_url": "https://www.merck.com/wp-content/uploads/sites/124/2026/08/Gaurav-GuptaThumbnail_293x212.jpg?resize=293%2C195&quality=70&allow_lossy=1",
+      "photo_sha256": "1504facbcb66de47421e9d289f31b92a71ec97bed59e7f2c0fb77225d37dce41",
+      "photo_cached_at": "2026-11-05T20:33:40Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Betty Larson",
+      "role": "Executive vice president and chief human resources officer",
+      "profile_url": "https://www.merck.com/leadership/betty-larson/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/3a82edec090317d589cbb6cb.webp",
+      "start_date": null,
+      "source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "photo_credit": "Merck",
+      "photo_original_url": "https://www.merck.com/wp-content/uploads/sites/124/2024/04/BettyLarson_293x212.jpg?resize=293%2C195&quality=70&allow_lossy=1",
+      "photo_sha256": "c71032a071b65f81d5d32fe168b0a8ca0d44266a121108edd887fbce9c94af22",
+      "photo_cached_at": "2026-11-05T20:33:35Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Dean Y. Li, M.D., Ph.D.",
+      "role": "Executive vice president and president, Merck Research Laboratories",
+      "profile_url": "https://www.merck.com/leadership/dean-y-li/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/254c0b36042452cfe59573ee.webp",
+      "start_date": null,
+      "source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "photo_credit": "Merck",
+      "photo_original_url": "https://www.merck.com/wp-content/uploads/sites/124/2023/08/Dean-Li_293x212-1.jpg?resize=293%2C195&quality=70&allow_lossy=1",
+      "photo_sha256": "b024aaef17e8865e1414835d983937dd1c0d8a5fe58df6fc6a02d73ae5d1a1b9",
+      "photo_cached_at": "2026-11-05T20:33:36Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Caroline Litchfield",
+      "role": "Executive vice president and chief financial officer",
+      "profile_url": "https://www.merck.com/leadership/caroline-litchfield/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/2be69978566ba46bc9a26963.webp",
+      "start_date": null,
+      "source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "photo_credit": "Merck",
+      "linkedin_url": "https://linkedin.com/in/caroline-litchfield-4569a9a8",
+      "linkedin_source": {
+        "name": "People Data Labs",
+        "url": "https://docs.peopledatalabs.com/docs/person-search-api",
+        "observed_at": "2026-11-05T20:16:25Z",
+        "provider_verified_at": "2026-10-04"
+      },
+      "photo_original_url": "https://www.merck.com/wp-content/uploads/sites/124/2020/04/ec-caroline-litchfield-th.jpg?resize=293%2C195&quality=70&allow_lossy=1",
+      "photo_sha256": "f5a67b53db173b410b97cf2f3dcea92a8c9b7f742d63139a7d903a998f788c43",
+      "photo_cached_at": "2026-11-05T20:19:52Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Dave Maraldo, Ph.D.",
+      "role": "Executive vice president and president, Merck Manufacturing Division",
+      "profile_url": "https://www.merck.com/leadership/dave-maraldo/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/da1aa6354d961b9d19d3cd7f.webp",
+      "start_date": null,
+      "source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "photo_credit": "Merck",
+      "photo_original_url": "https://www.merck.com/wp-content/uploads/sites/124/2026/04/Dave-Maraldo_293x212.jpg?resize=293%2C195&quality=70&allow_lossy=1",
+      "photo_sha256": "6f9fee34d0e637663b80f0f67285fb5ef492e9ba670e766826287621ec691789",
+      "photo_cached_at": "2026-11-05T20:33:41Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Jannie Oosthuizen",
+      "role": "Executive vice president and president, Oncology and MSD International",
+      "profile_url": "https://www.merck.com/leadership/jannie-oosthuizen/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/bd893e605652f547d0cf92fa.webp",
+      "start_date": null,
+      "source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "photo_credit": "Merck",
+      "photo_original_url": "https://www.merck.com/wp-content/uploads/sites/124/2022/02/Jannie_Oosthuizen_293x212_4be637.jpg?resize=293%2C195&quality=70&allow_lossy=1",
+      "photo_sha256": "ebca8de71c6c534269fc0221551b6ca997f2945a4226c10fbfd3c08cf08b20e6",
+      "photo_cached_at": "2026-11-05T20:19:52Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Jennifer Zachary",
+      "role": "Executive vice president and general counsel",
+      "profile_url": "https://www.merck.com/leadership/jennifer-zachary/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/dadc6a83a0580f8ac0b1ecdc.webp",
+      "start_date": null,
+      "source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "photo_credit": "Merck",
+      "linkedin_url": "https://linkedin.com/in/jennifer-zachary-6b11328",
+      "linkedin_source": {
+        "name": "People Data Labs",
+        "url": "https://docs.peopledatalabs.com/docs/person-search-api",
+        "observed_at": "2026-11-05T20:16:25Z",
+        "provider_verified_at": "2026-10-03"
+      },
+      "photo_original_url": "https://www.merck.com/wp-content/uploads/sites/124/2020/04/JenniferZachary_293x212.png?resize=293%2C195&quality=70&allow_lossy=1",
+      "photo_sha256": "5e11cd3c1fe808a68d28b1c5d2522bf299d83ababd118e37fb5d686c6f590bc5",
+      "photo_cached_at": "2026-11-05T20:19:52Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Merck official leadership roster",
+      "url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "observed_at": "2026-11-05T20:00:35Z"
+    },
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "ClO5BpY7fpAR9MK3c0edCQXpTDN9",
+      "observed_at": "2026-11-05T19:41:48Z",
+      "match": {
+        "ticker": "MRK",
+        "domain": "merck.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:37:12Z",
+  "field_sources": {
+    "website": {
+      "name": "Merck official leadership roster",
+      "url": "https://www.merck.com/company-overview/leadership/executive-team/",
+      "observed_at": "2026-11-05T20:00:35Z"
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "ClO5BpY7fpAR9MK3c0edCQXpTDN9",
+      "observed_at": "2026-11-05T19:41:48Z",
+      "match": {
+        "ticker": "MRK",
+        "domain": "merck.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "ClO5BpY7fpAR9MK3c0edCQXpTDN9",
+      "observed_at": "2026-11-05T19:41:48Z",
+      "match": {
+        "ticker": "MRK",
+        "domain": "merck.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "ClO5BpY7fpAR9MK3c0edCQXpTDN9",
+      "observed_at": "2026-11-05T19:41:48Z",
+      "match": {
+        "ticker": "MRK",
+        "domain": "merck.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "ClO5BpY7fpAR9MK3c0edCQXpTDN9",
+      "observed_at": "2026-11-05T19:41:48Z",
+      "match": {
+        "ticker": "MRK",
+        "domain": "merck.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "ClO5BpY7fpAR9MK3c0edCQXpTDN9",
+      "observed_at": "2026-11-05T19:41:48Z",
+      "match": {
+        "ticker": "MRK",
+        "domain": "merck.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "ClO5BpY7fpAR9MK3c0edCQXpTDN9",
+      "observed_at": "2026-11-05T19:41:48Z",
+      "match": {
+        "ticker": "MRK",
+        "domain": "merck.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T20:00:35Z",
+    "leadership_scope": "Leaders listed on the current official company leadership roster; business-unit roles retain their published scope. This is not a complete board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:00:35Z",
+      "industry": "2026-11-05T19:41:48Z",
+      "headquarters": "2026-11-05T19:41:48Z",
+      "founded": "2026-11-05T19:41:48Z",
+      "professional_profile_count": "2026-11-05T19:41:48Z",
+      "employee_size_range": "2026-11-05T19:41:48Z",
+      "linkedin_url": "2026-11-05T19:41:48Z",
+      "description": "2026-11-05T19:41:48Z",
+      "leadership": "2026-11-05T20:00:35Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  },
+  "description_provider": "People Data Labs"
+}

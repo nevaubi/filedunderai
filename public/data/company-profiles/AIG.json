@@ -1,0 +1,382 @@
+{
+  "schema_version": 1,
+  "ticker": "AIG",
+  "cik": 5272,
+  "name": "AIG",
+  "description": "american international group, inc. (nyse: aig) is a leading global insurance organization. aig provides insurance solutions that help businesses and individuals in approximately 190 countries and jurisdictions protect their assets and manage risks through aig operations and network partners.\n\nadditional information about aig can be found at www.aig.com | https://www.youtube.com/aig | https://twitter.com/aiginsurance | https://www.linkedin.com/company/aig/ | https://www.facebook.com/aiginsurance | http://www.instagram.com/aiginsurance/\n\naig is the marketing name for the worldwide property-casualty and general insurance operations of american international group, inc. all products and services are written or provided by subsidiaries or affiliates of american international group, inc. products or services may not be available in all countries and jurisdictions, and coverage is subject to underwriting requirements and actual policy language. non-insurance products and services may be provided by independent third parties. certain property-casualty coverages may be provided by a surplus lines insurer. surplus lines insurers do not generally participate in state guaranty funds, and insureds are therefore not protected by such funds.\n\naig social media community guidelines:\nhttps://www.aig.com/home/about/social-media-guidelines",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "tYULXqs8ur7HdFfrCTmJaQtbcZId",
+    "observed_at": "2026-11-05T19:43:20Z",
+    "match": {
+      "ticker": "AIG",
+      "domain": "aig.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://aig.com",
+  "industry": "Insurance",
+  "headquarters": "New York, New York, United States",
+  "linkedin_url": "https://linkedin.com/company/aig",
+  "founded": 1919,
+  "employees": null,
+  "professional_profile_count": 21951,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "tYULXqs8ur7HdFfrCTmJaQtbcZId",
+    "observed_at": "2026-11-05T19:43:20Z",
+    "match": {
+      "ticker": "AIG",
+      "domain": "aig.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "tYULXqs8ur7HdFfrCTmJaQtbcZId",
+  "leadership": [
+    {
+      "name": "Eric Andersen",
+      "role": "President & Chief Executive Officer",
+      "profile_url": "https://www.aig.com/home/about/leadership-and-governance/eric-andersen",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/926fbce209dc49f7f737451a.jpg",
+      "start_date": "2026-06-01",
+      "source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "photo_credit": "AIG",
+      "start_date_source_url": "https://www.aig.com/home/about/leadership-and-governance/eric-andersen",
+      "company_start_date": "2026-02",
+      "company_start_date_source_url": "https://www.aig.com/home/about/leadership-and-governance/eric-andersen",
+      "linkedin_url": "https://linkedin.com/in/eric-andersen-aig",
+      "linkedin_source": {
+        "name": "People Data Labs",
+        "url": "https://docs.peopledatalabs.com/docs/person-search-api",
+        "observed_at": "2026-11-05T20:21:33Z",
+        "provider_verified_at": "2026-10-04"
+      },
+      "photo_original_url": "https://www.aig.com/content/aig/america-canada/us_aig/en/home/about/leadership-and-governance/_jcr_content/root/responsivegrid/responsivegrid/container_copy/tabs/item_1669762536849/teaserflex_copy_copy.coreimg.90.1944.jpeg/1780308652834/sidecard-hs-eric-andersen-4718p.jpeg",
+      "photo_sha256": "6b3b2fbe65004e753a2f783f7c52ceaca63a921d83ee74291e7289d59ec91435",
+      "photo_cached_at": "2026-11-05T20:26:42Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Nancy Bewlay",
+      "role": "EVP, Global Chief Underwriting Officer",
+      "profile_url": "https://www.aig.com/home/about/leadership-and-governance/nancy-bewlay",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/3ae7442cb7d8a1c07566e1cc.jpg",
+      "start_date": null,
+      "source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "photo_credit": "AIG",
+      "photo_original_url": "https://www.aig.com/content/aig/america-canada/us_aig/en/home/about/leadership-and-governance/_jcr_content/root/responsivegrid/responsivegrid/container_copy/tabs/item_1669762536849/teaserflex_copy_copy_2042077193.coreimg.90.1944.jpeg/1788900047757/sidecard-hs-nancy-bewlay.jpeg",
+      "photo_sha256": "0a2da054387dc6dc396f783b3c1a6b263516d4e13ec944b2e6646947b4b8ea2c",
+      "photo_cached_at": "2026-11-05T20:26:42Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Ed Dandridge",
+      "role": "EVP, Chief Marketing & Communications Officer",
+      "profile_url": "https://www.aig.com/home/about/leadership-and-governance/ed-dandridge",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/a1ac6497964b5c0e512796bd.jpg",
+      "start_date": null,
+      "source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "photo_credit": "AIG",
+      "photo_original_url": "https://www.aig.com/content/aig/america-canada/us_aig/en/home/about/leadership-and-governance/_jcr_content/root/responsivegrid/responsivegrid/container_copy/tabs/item_1669762536849/teaserflex_copy_copy_380730956.coreimg.90.1944.jpeg/1778701004956/sidecard-hs-ed-dandridge-4475p.jpeg",
+      "photo_sha256": "4a6c1919a74fe71463f8baa295a7dd1323617a0ef8818d9e222dcfcdd8079658",
+      "photo_cached_at": "2026-11-05T20:26:46Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Rose Marie Glazer",
+      "role": "EVP, General Counsel",
+      "profile_url": "https://www.aig.com/home/about/leadership-and-governance/rose-marie-glazer",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/fa08490ca0f4a61f10c52319.jpg",
+      "start_date": null,
+      "source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "photo_credit": "AIG",
+      "photo_original_url": "https://www.aig.com/content/aig/america-canada/us_aig/en/home/about/leadership-and-governance/_jcr_content/root/responsivegrid/responsivegrid/container_copy/tabs/item_1669762536849/teaserflex_copy_5066_1156911940.coreimg.90.1944.jpeg/1782918966227/sidecard-hs-rosemarie-glazer-2607.jpeg",
+      "photo_sha256": "563b0a608ee5febae02d7e6e9c5944b1bcf2ca42283136706afa766d6cd6b982",
+      "photo_cached_at": "2026-11-05T20:26:20Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Scott Hallworth",
+      "role": "EVP, Chief Digital Officer",
+      "profile_url": "https://www.aig.com/home/about/leadership-and-governance/scott-hallworth",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/ef4619eb70395720e3b39823.jpg",
+      "start_date": null,
+      "source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "photo_credit": "AIG",
+      "photo_original_url": "https://www.aig.com/content/aig/america-canada/us_aig/en/home/about/leadership-and-governance/_jcr_content/root/responsivegrid/responsivegrid/container_copy/tabs/item_1669762536849/teaserflex_copy_5066_1126852011.coreimg.90.1944.jpeg/1778701029022/sidecard-hs-scott-hallworth-4480p.jpeg",
+      "photo_sha256": "fa5d0be5b42e2c9e6a5838ef34766a2f11b742cb5337dc961fb3577ccc24b16d",
+      "photo_cached_at": "2026-11-05T20:26:16Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Jon Hancock",
+      "role": "EVP, Chief Executive Officer, General Insurance",
+      "profile_url": "https://www.aig.com/home/about/leadership-and-governance/jon-hancock",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/0444ba8996c1ab4ecf490e0e.jpg",
+      "start_date": null,
+      "source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "photo_credit": "AIG",
+      "photo_original_url": "https://www.aig.com/content/aig/america-canada/us_aig/en/home/about/leadership-and-governance/_jcr_content/root/responsivegrid/responsivegrid/container_copy/tabs/item_1669762536849/teaserflex_copy_5066_248778818.coreimg.90.1944.jpeg/1778700996021/sidecard-hs-john-hancock-4475p.jpeg",
+      "photo_sha256": "f56ceaa875d57c5955725e63e86c479643079f040549ed176130adb5435a7481",
+      "photo_cached_at": "2026-11-05T20:26:33Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Turab Hussain",
+      "role": "EVP, Chief Risk Officer",
+      "profile_url": "https://www.aig.com/home/about/leadership-and-governance/turab-hussain",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/23d00623f5e1f11a034acbeb.jpg",
+      "start_date": null,
+      "source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "photo_credit": "AIG",
+      "photo_original_url": "https://www.aig.com/content/aig/america-canada/us_aig/en/home/about/leadership-and-governance/_jcr_content/root/responsivegrid/responsivegrid/container_copy/tabs/item_1669762536849/teaserflex_copy_5066_279880856.coreimg.90.1944.jpeg/1791766704475/sidecard-hs-turab-hussain.jpeg",
+      "photo_sha256": "2fb26dd944e8ff49dfec54026238e2dd356cead3c70c2972b6e61ce325913274",
+      "photo_cached_at": "2026-11-05T20:26:42Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Kelly Lafnitzegger",
+      "role": "EVP, Chief Human Resources Officer",
+      "profile_url": "https://www.aig.com/home/about/leadership-and-governance/kelly-lafnitzegger",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/a786fb959d465bddb646a89c.jpg",
+      "start_date": null,
+      "source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "photo_credit": "AIG",
+      "photo_original_url": "https://www.aig.com/content/aig/america-canada/us_aig/en/home/about/leadership-and-governance/_jcr_content/root/responsivegrid/responsivegrid/container_copy/tabs/item_1669762536849/teaserflex_copy_5066.coreimg.90.1944.jpeg/1778704745683/sidecard-hs-kelly-lafnitzegger-3607p.jpeg",
+      "photo_sha256": "77314235020158dca3f5c0d117cf12de3d95d395a41063e841398cb2c8a97abd",
+      "photo_cached_at": "2026-11-05T20:26:11Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Roshan Navagamuwa",
+      "role": "EVP, Chief Technology and Digital Officer",
+      "profile_url": "https://www.aig.com/home/about/leadership-and-governance/roshan-navagamuwa",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/858629c83e589ddae4c62a76.jpg",
+      "start_date": null,
+      "source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "photo_credit": "AIG",
+      "photo_original_url": "https://www.aig.com/content/aig/america-canada/us_aig/en/home/about/leadership-and-governance/_jcr_content/root/responsivegrid/responsivegrid/container_copy/tabs/item_1669762536849/teaserflex_copy_5066_1313209185.coreimg.90.1944.jpeg/1791766570310/sidecard-hs-roshan-navagamuwa-4475p.jpeg",
+      "photo_sha256": "574d2d218669614f4ddba93dcd366f348673c49f12335b5215f5c138935edce4",
+      "photo_cached_at": "2026-11-05T20:26:28Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Melissa Twiningdavis",
+      "role": "EVP, Chief Operations & Administrative Officer",
+      "profile_url": "https://www.aig.com/home/about/leadership-and-governance/melissa-twiningdavis",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/b25f73555e13b6cc4fa2d938.jpg",
+      "start_date": null,
+      "source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "photo_credit": "AIG",
+      "photo_original_url": "https://www.aig.com/content/aig/america-canada/us_aig/en/home/about/leadership-and-governance/_jcr_content/root/responsivegrid/responsivegrid/container_copy/tabs/item_1669762536849/teaserflex_copy_5066_1491416286.coreimg.90.1944.jpeg/1787930967150/sidecard-hs-melissa-twiningdavis-3783p.jpeg",
+      "photo_sha256": "00d6c655cead45177e975d08cf14d36e9c5f7a821f3da096b3324ca210676881",
+      "photo_cached_at": "2026-11-05T20:26:28Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Keith Walsh",
+      "role": "EVP, Chief Financial Officer",
+      "profile_url": "https://www.aig.com/home/about/leadership-and-governance/keith-walsh",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/8580d3539f2a4a1be9999456.jpg",
+      "start_date": null,
+      "source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.aig.com/home/about/leadership-and-governance",
+      "photo_credit": "AIG",
+      "linkedin_url": "https://linkedin.com/in/keith-walsh-1a01246",
+      "linkedin_source": {
+        "name": "People Data Labs",
+        "url": "https://docs.peopledatalabs.com/docs/person-search-api",
+        "observed_at": "2026-11-05T20:21:33Z",
+        "provider_verified_at": "2026-10-04"
+      },
+      "photo_original_url": "https://www.aig.com/content/aig/america-canada/us_aig/en/home/about/leadership-and-governance/_jcr_content/root/responsivegrid/responsivegrid/container_copy/tabs/item_1669762536849/teaserflex_copy_5066_2011458552.coreimg.90.1944.jpeg/1778703144723/sidecard-hs-keith-walsh-3960p.jpeg",
+      "photo_sha256": "a27c75d2aa24333b8ed7eb08eafea79a895d2cac5e32909a340737da373f7d70",
+      "photo_cached_at": "2026-11-05T20:26:28Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "tYULXqs8ur7HdFfrCTmJaQtbcZId",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "AIG",
+        "domain": "aig.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    {
+      "name": "AIG official leadership roster",
+      "url": "https://www.aig.com/home/about/leadership-and-governance",
+      "observed_at": "2026-11-05T20:20:23Z"
+    },
+    {
+      "name": "Official executive biography",
+      "url": "https://www.aig.com/home/about/leadership-and-governance/eric-andersen",
+      "observed_at": "2026-11-05T20:20:23Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:28:47Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "tYULXqs8ur7HdFfrCTmJaQtbcZId",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "AIG",
+        "domain": "aig.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "tYULXqs8ur7HdFfrCTmJaQtbcZId",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "AIG",
+        "domain": "aig.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "tYULXqs8ur7HdFfrCTmJaQtbcZId",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "AIG",
+        "domain": "aig.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "tYULXqs8ur7HdFfrCTmJaQtbcZId",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "AIG",
+        "domain": "aig.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "tYULXqs8ur7HdFfrCTmJaQtbcZId",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "AIG",
+        "domain": "aig.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "tYULXqs8ur7HdFfrCTmJaQtbcZId",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "AIG",
+        "domain": "aig.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "tYULXqs8ur7HdFfrCTmJaQtbcZId",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "AIG",
+        "domain": "aig.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "leadership_scope": "Current official leadership roster; published regional and subsidiary role scopes are retained. Non-executive directors and memorial entries are excluded.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:20Z",
+      "industry": "2026-11-05T19:43:20Z",
+      "headquarters": "2026-11-05T19:43:20Z",
+      "founded": "2026-11-05T19:43:20Z",
+      "professional_profile_count": "2026-11-05T19:43:20Z",
+      "employee_size_range": "2026-11-05T19:43:20Z",
+      "linkedin_url": "2026-11-05T19:43:20Z",
+      "description": "2026-11-05T19:43:20Z",
+      "leadership": "2026-11-05T20:20:23Z"
+    },
+    "official_updated_at": "2026-11-05T20:20:23Z",
+    "portraits": "available_for_all_selected_leaders"
+  },
+  "description_provider": "People Data Labs"
+}

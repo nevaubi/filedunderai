@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "LDOS",
+  "cik": 1336920,
+  "name": "Leidos",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://leidos.com",
+  "industry": "defense & space",
+  "headquarters": "reston, virginia, united states",
+  "linkedin_url": "https://linkedin.com/company/leidos",
+  "founded": 1969,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "f45lmOB6Ssav4wdT3G9rFQjyXt2x",
+    "observed_at": "2026-11-05T20:03:26Z",
+    "match": {
+      "ticker": "LDOS",
+      "domain": "leidos.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.2498487970519516
+    }
+  },
+  "provider_record_id": "f45lmOB6Ssav4wdT3G9rFQjyXt2x",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "f45lmOB6Ssav4wdT3G9rFQjyXt2x",
+      "observed_at": "2026-11-05T20:03:26Z",
+      "match": {
+        "ticker": "LDOS",
+        "domain": "leidos.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2498487970519516
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:03:26Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "f45lmOB6Ssav4wdT3G9rFQjyXt2x",
+      "observed_at": "2026-11-05T20:03:26Z",
+      "match": {
+        "ticker": "LDOS",
+        "domain": "leidos.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2498487970519516
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "f45lmOB6Ssav4wdT3G9rFQjyXt2x",
+      "observed_at": "2026-11-05T20:03:26Z",
+      "match": {
+        "ticker": "LDOS",
+        "domain": "leidos.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2498487970519516
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "f45lmOB6Ssav4wdT3G9rFQjyXt2x",
+      "observed_at": "2026-11-05T20:03:26Z",
+      "match": {
+        "ticker": "LDOS",
+        "domain": "leidos.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2498487970519516
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "f45lmOB6Ssav4wdT3G9rFQjyXt2x",
+      "observed_at": "2026-11-05T20:03:26Z",
+      "match": {
+        "ticker": "LDOS",
+        "domain": "leidos.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2498487970519516
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "f45lmOB6Ssav4wdT3G9rFQjyXt2x",
+      "observed_at": "2026-11-05T20:03:26Z",
+      "match": {
+        "ticker": "LDOS",
+        "domain": "leidos.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2498487970519516
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "f45lmOB6Ssav4wdT3G9rFQjyXt2x",
+      "observed_at": "2026-11-05T20:03:26Z",
+      "match": {
+        "ticker": "LDOS",
+        "domain": "leidos.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2498487970519516
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "f45lmOB6Ssav4wdT3G9rFQjyXt2x",
+      "observed_at": "2026-11-05T20:03:26Z",
+      "match": {
+        "ticker": "LDOS",
+        "domain": "leidos.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2498487970519516
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:03:26Z",
+      "industry": "2026-11-05T20:03:26Z",
+      "headquarters": "2026-11-05T20:03:26Z",
+      "founded": "2026-11-05T20:03:26Z",
+      "employee_size_range": "2026-11-05T20:03:26Z",
+      "linkedin_url": "2026-11-05T20:03:26Z"
+    }
+  }
+}

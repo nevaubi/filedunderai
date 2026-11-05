@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "ticker": "DINO",
+  "cik": 1915657,
+  "name": "HF Sinclair Corp",
+  "description": "headquartered in dallas, texas, hf sinclair corporation is an independent, diversified energy company committed to safely producing products that power the world.  \n\nhf sinclair is the parent company to a number of subsidiaries who own or license a diverse slate of brands, including sinclair oil, petro-canada lubricants, sonneborn, red giant oil and hollyfrontier specialty products.\nestablished in march 2022 as a result of the acquisition of sinclair oil llc by hollyfrontier corporation, hf sinclair has:\n- more reach to support the everyday needs of consumers; \n- more value for our customers, employees, communities and shareholders as a result of safely operating with an environmental, social and governance mindset; and\n- more strength for the communities in which we live, work and serve.\n\ntoday, hf sinclair:\n- manufactures and sells high-value light products such as gasoline, diesel fuel, jet fuel, renewable diesel, specialty lubricant products, and specialty and modified asphalt.\n- owns and operates refineries and/or renewable diesel facilities in kansas, new mexico, oklahoma, utah, washington and wyoming.\n- markets and distributes motor fuel to consumers via more than 1,600 independent sinclair-branded stations in 30 american states.\n- produces low carbon renewable diesel from multiple feedstocks including vegetable oils and animal fats.\n- produces base oils and other specialized lubricants in the u.s., canada and the netherlands and exports such products to more than 80 countries.\n- owns a 47% limited partner interest and a non-economic general partner interest in holly energy partners, l.p. (nyse: hep), a midstream petroleum products and crude oil transportation, terminalling and storage company.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "wf2kuzNzuoUN1D3HNLFTyw9o7TeK",
+    "observed_at": "2026-11-05T19:43:57Z",
+    "match": {
+      "ticker": "DINO",
+      "domain": "hfsinclair.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://hfsinclair.com",
+  "industry": "Oil & Energy",
+  "headquarters": "Dallas, Texas, United States",
+  "linkedin_url": "https://linkedin.com/company/hf-sinclair",
+  "founded": null,
+  "employees": null,
+  "professional_profile_count": 1873,
+  "employee_size_range": "5001-10000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "wf2kuzNzuoUN1D3HNLFTyw9o7TeK",
+    "observed_at": "2026-11-05T19:43:57Z",
+    "match": {
+      "ticker": "DINO",
+      "domain": "hfsinclair.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "wf2kuzNzuoUN1D3HNLFTyw9o7TeK",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "wf2kuzNzuoUN1D3HNLFTyw9o7TeK",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "DINO",
+        "domain": "hfsinclair.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:43:57Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "wf2kuzNzuoUN1D3HNLFTyw9o7TeK",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "DINO",
+        "domain": "hfsinclair.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "wf2kuzNzuoUN1D3HNLFTyw9o7TeK",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "DINO",
+        "domain": "hfsinclair.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "wf2kuzNzuoUN1D3HNLFTyw9o7TeK",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "DINO",
+        "domain": "hfsinclair.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "wf2kuzNzuoUN1D3HNLFTyw9o7TeK",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "DINO",
+        "domain": "hfsinclair.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "wf2kuzNzuoUN1D3HNLFTyw9o7TeK",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "DINO",
+        "domain": "hfsinclair.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "wf2kuzNzuoUN1D3HNLFTyw9o7TeK",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "DINO",
+        "domain": "hfsinclair.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "wf2kuzNzuoUN1D3HNLFTyw9o7TeK",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "DINO",
+        "domain": "hfsinclair.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:57Z",
+      "industry": "2026-11-05T19:43:57Z",
+      "headquarters": "2026-11-05T19:43:57Z",
+      "professional_profile_count": "2026-11-05T19:43:57Z",
+      "employee_size_range": "2026-11-05T19:43:57Z",
+      "linkedin_url": "2026-11-05T19:43:57Z",
+      "description": "2026-11-05T19:43:57Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

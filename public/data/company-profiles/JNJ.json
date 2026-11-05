@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "ticker": "JNJ",
+  "cik": 200406,
+  "name": "Johnson & Johnson",
+  "description": "Johnson & Johnson operates across Innovative Medicine and MedTech. Its focus areas include oncology, immunology, neuroscience, cardiovascular care, surgery and vision. The company develops medical products and technologies intended to address unmet healthcare needs through a global portfolio and research pipeline.",
+  "description_source": {
+    "name": "Johnson & Johnson business context",
+    "url": "https://www.jnj.com/joaquin-duato",
+    "observed_at": "2026-11-05T19:40:50Z"
+  },
+  "source_url": "https://www.jnj.com/joaquin-duato",
+  "website": "https://www.jnj.com/",
+  "industry": null,
+  "headquarters": null,
+  "founded": null,
+  "employees": null,
+  "leadership": [
+    {
+      "name": "Joaquin Duato",
+      "role": "Chairman and Chief Executive Officer",
+      "profile_url": "https://www.jnj.com/joaquin-duato",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/849e6d2a398376288fbd3b5d.png",
+      "start_date": "2023-01",
+      "source_url": "https://www.jnj.com/joaquin-duato",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jnj.com/our-leadership-team",
+      "photo_credit": "Johnson & Johnson",
+      "linkedin_url": "https://www.linkedin.com/in/joaquinduato",
+      "linkedin_source_url": "https://www.jnj.com/joaquin-duato",
+      "start_date_source_url": "https://www.jnj.com/joaquin-duato",
+      "tenure_note": "CEO since January 2022 and Chairman since January 2023. Tenure shown begins with the combined current title.",
+      "photo_original_url": "https://jnj-content-lab2.brightspotcdn.com/dims4/default/5ecd948/2147483647/strip/true/crop/1012x1350+34+0/resize/732x976!/quality/90/?url=https%3A%2F%2Fjnj-production-jnj.s3.us-east-1.amazonaws.com%2Fbrightspot%2F95%2Fa1%2Fa47c66c34da398eae379c3dcd7ac%2Fec-vertical-4x5-joaquin-duato.png",
+      "photo_sha256": "2b9ff340da08814280597f68658ac032c942472c5d907032ad93c348120543c5",
+      "photo_cached_at": "2026-11-05T19:55:56Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Joseph J. Wolk",
+      "role": "Executive Vice President, Chief Financial Officer",
+      "profile_url": "https://www.jnj.com/joseph-j-wolk",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/fd56081e276ed685e418d777.png",
+      "start_date": "2018",
+      "source_url": "https://www.jnj.com/joseph-j-wolk",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jnj.com/our-leadership-team",
+      "photo_credit": "Johnson & Johnson",
+      "linkedin_url": "https://www.linkedin.com/in/josephwolk",
+      "linkedin_source_url": "https://www.jnj.com/joseph-j-wolk",
+      "start_date_source_url": "https://www.jnj.com/joseph-j-wolk",
+      "tenure_note": "The official biography specifies the CFO start year only.",
+      "photo_original_url": "https://jnj-content-lab2.brightspotcdn.com/dims4/default/bd352a7/2147483647/strip/true/crop/1012x1350+22+0/resize/732x976!/quality/90/?url=https%3A%2F%2Fjnj-production-jnj.s3.us-east-1.amazonaws.com%2Fbrightspot%2F5d%2F23%2Faea40f6c4e2ca00da4f1aaf37a0a%2Fec-vertical-4x5-joe-wolk.png",
+      "photo_sha256": "b9c56a193978f58b9cf39dd6d9b71bddb93e503da560f4978bd7a3fd36c3a23d",
+      "photo_cached_at": "2026-11-05T19:56:08Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Tom Cavanaugh",
+      "role": "Executive Vice President, Worldwide Chairman, Innovative Medicine",
+      "profile_url": "https://www.jnj.com/leadership/tom-cavanaugh",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/28dfeb7a2a6b475b8a201165.webp",
+      "start_date": null,
+      "source_url": "https://www.jnj.com/our-leadership-team",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jnj.com/our-leadership-team",
+      "photo_credit": "Johnson & Johnson",
+      "photo_original_url": "https://jnj-content-lab2.brightspotcdn.com/dims4/default/83bd08c/2147483647/strip/true/crop/1008x1344+0+0/resize/732x976!/quality/90/?url=https%3A%2F%2Fjnj-production-jnj.s3.us-east-1.amazonaws.com%2Fbrightspot%2F9a%2Fe8%2F66ea0a3e4fe985d00f94eadf6198%2Ftom-cavanaugh-1008x1350.webp",
+      "photo_sha256": "995bf3acb7034338c7094ef0df654b5198db476fc947afe4b04bbde607dd4e06",
+      "photo_cached_at": "2026-11-05T19:56:08Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Tim Schmid",
+      "role": "Executive Vice President, Worldwide Chairman, MedTech",
+      "profile_url": "https://www.jnj.com/leadership/tim-schmid",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/6991aeb797a67d38a912cb21.png",
+      "start_date": null,
+      "source_url": "https://www.jnj.com/our-leadership-team",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jnj.com/our-leadership-team",
+      "photo_credit": "Johnson & Johnson",
+      "photo_original_url": "https://jnj-content-lab2.brightspotcdn.com/dims4/default/358e7bf/2147483647/strip/true/crop/1012x1350+34+0/resize/732x976!/quality/90/?url=https%3A%2F%2Fjnj-production-jnj.s3.us-east-1.amazonaws.com%2Fbrightspot%2Fee%2F7a%2F4a1aad1347b69da8d2001537d660%2Fec-vertical-4x5-tim-schmid.png",
+      "photo_sha256": "20277dc6eff61b31d01a6cad37dff160012cb62b7ce0a5992ae549c11acade1e",
+      "photo_cached_at": "2026-11-05T19:55:56Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "John C. Reed, M.D., Ph.D.",
+      "role": "Executive Vice President, Innovative Medicine, R&D",
+      "profile_url": "https://www.jnj.com/leadership/john-reed",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/91b8576772f1f739cc74bdc4.png",
+      "start_date": null,
+      "source_url": "https://www.jnj.com/our-leadership-team",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jnj.com/our-leadership-team",
+      "photo_credit": "Johnson & Johnson",
+      "photo_original_url": "https://jnj-content-lab2.brightspotcdn.com/dims4/default/9403fef/2147483647/strip/true/crop/1012x1350+34+0/resize/732x976!/quality/90/?url=https%3A%2F%2Fjnj-production-jnj.s3.us-east-1.amazonaws.com%2Fbrightspot%2F2b%2F0f%2F35b5c2524045b323b86e89e853ad%2Fec-vertical-4x5-john-reed.png",
+      "photo_sha256": "81f95ea40ef183b8d63e68344c800f9bceb9be2327316b5272cef370a4bb448b",
+      "photo_cached_at": "2026-11-05T19:56:08Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Elizabeth Forminard",
+      "role": "Executive Vice President, Chief Legal Officer",
+      "profile_url": "https://www.jnj.com/elizabeth-forminard",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/d075e0506edf60f156a7c56e.png",
+      "start_date": null,
+      "source_url": "https://www.jnj.com/our-leadership-team",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jnj.com/our-leadership-team",
+      "photo_credit": "Johnson & Johnson",
+      "photo_original_url": "https://jnj-content-lab2.brightspotcdn.com/dims4/default/733e437/2147483647/strip/true/crop/1012x1350+34+0/resize/732x976!/quality/90/?url=https%3A%2F%2Fjnj-production-jnj.s3.us-east-1.amazonaws.com%2Fbrightspot%2F20%2F39%2Fea9b1ecb415d8cb9039667cf77f8%2Fec-vertical-4x5-liz-forminard.png",
+      "photo_sha256": "6579dc0cef122d0d69880e5c0b6cb3e85e3ae4708987a354a3136e5d52adb687",
+      "photo_cached_at": "2026-11-05T19:55:56Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Kristen Mulholland",
+      "role": "Executive Vice President, Chief Human Resources Officer",
+      "profile_url": "https://www.jnj.com/leadership/kristen-mulholland",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/f087497b26b86352ebd87991.png",
+      "start_date": null,
+      "source_url": "https://www.jnj.com/our-leadership-team",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jnj.com/our-leadership-team",
+      "photo_credit": "Johnson & Johnson",
+      "photo_original_url": "https://jnj-content-lab2.brightspotcdn.com/dims4/default/7983c2e/2147483647/strip/true/crop/1012x1350+34+0/resize/732x976!/quality/90/?url=https%3A%2F%2Fjnj-production-jnj.s3.us-east-1.amazonaws.com%2Fbrightspot%2F13%2Fef%2F305ac29c457e8b388b97afe676ea%2Fec-vertical-4x5-kristen-mulholland.png",
+      "photo_sha256": "341ebba1b39e4d8386f12ca2a6dec9c7a62909c6c331b73caec6f6eca4760a5f",
+      "photo_cached_at": "2026-11-05T19:55:56Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "James Swanson",
+      "role": "Executive Vice President, Chief Information Officer",
+      "profile_url": "https://www.jnj.com/james-swanson",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/5aa5b4a3c2a9db700029cea4.png",
+      "start_date": null,
+      "source_url": "https://www.jnj.com/our-leadership-team",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.jnj.com/our-leadership-team",
+      "photo_credit": "Johnson & Johnson",
+      "photo_original_url": "https://jnj-content-lab2.brightspotcdn.com/dims4/default/805aef8/2147483647/strip/true/crop/1012x1350+34+0/resize/732x976!/quality/90/?url=https%3A%2F%2Fjnj-production-jnj.s3.us-east-1.amazonaws.com%2Fbrightspot%2F15%2Fde%2Fe41cab394f0385237fb367bf27da%2Fec-vertical-4x5-jim-swanson.png",
+      "photo_sha256": "e94d1c104bb13833b99ae0ce7c1868ab683348d3d2d4e2c1e7aece1fcae3750f",
+      "photo_cached_at": "2026-11-05T19:55:56Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Johnson & Johnson official leadership roster",
+      "url": "https://www.jnj.com/our-leadership-team",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Joaquin Duato official biography",
+      "url": "https://www.jnj.com/joaquin-duato",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Joaquin Duato role start evidence",
+      "url": "https://www.jnj.com/joaquin-duato",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Joseph J. Wolk official biography",
+      "url": "https://www.jnj.com/joseph-j-wolk",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Joseph J. Wolk role start evidence",
+      "url": "https://www.jnj.com/joseph-j-wolk",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Johnson & Johnson business context",
+      "url": "https://www.jnj.com/joaquin-duato",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "Official company source",
+      "url": "https://www.jnj.com/our-leadership-team",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    "description": {
+      "name": "Johnson & Johnson business context",
+      "url": "https://www.jnj.com/joaquin-duato",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  },
+  "coverage": {
+    "status": "official_sources",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T19:40:50Z",
+    "leadership_scope": "Selected leaders from the company’s published leadership roster; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:40:50Z",
+      "description": "2026-11-05T19:40:50Z",
+      "leadership": "2026-11-05T19:40:50Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  }
+}

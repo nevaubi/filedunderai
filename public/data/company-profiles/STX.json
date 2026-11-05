@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "STX",
+  "cik": 1137789,
+  "name": "Seagate Technology",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://seagate.com",
+  "industry": "computer hardware",
+  "headquarters": "fremont, california, united states",
+  "linkedin_url": "https://linkedin.com/company/seagate-technology",
+  "founded": 1979,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "gI79HhlrCCxBsVieB9lczwc5QdTM",
+    "observed_at": "2026-11-05T20:08:16Z",
+    "match": {
+      "ticker": "STX",
+      "domain": "seagate.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.2998027535975607
+    }
+  },
+  "provider_record_id": "gI79HhlrCCxBsVieB9lczwc5QdTM",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "gI79HhlrCCxBsVieB9lczwc5QdTM",
+      "observed_at": "2026-11-05T20:08:16Z",
+      "match": {
+        "ticker": "STX",
+        "domain": "seagate.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2998027535975607
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:08:16Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "gI79HhlrCCxBsVieB9lczwc5QdTM",
+      "observed_at": "2026-11-05T20:08:16Z",
+      "match": {
+        "ticker": "STX",
+        "domain": "seagate.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2998027535975607
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "gI79HhlrCCxBsVieB9lczwc5QdTM",
+      "observed_at": "2026-11-05T20:08:16Z",
+      "match": {
+        "ticker": "STX",
+        "domain": "seagate.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2998027535975607
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "gI79HhlrCCxBsVieB9lczwc5QdTM",
+      "observed_at": "2026-11-05T20:08:16Z",
+      "match": {
+        "ticker": "STX",
+        "domain": "seagate.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2998027535975607
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "gI79HhlrCCxBsVieB9lczwc5QdTM",
+      "observed_at": "2026-11-05T20:08:16Z",
+      "match": {
+        "ticker": "STX",
+        "domain": "seagate.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2998027535975607
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "gI79HhlrCCxBsVieB9lczwc5QdTM",
+      "observed_at": "2026-11-05T20:08:16Z",
+      "match": {
+        "ticker": "STX",
+        "domain": "seagate.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2998027535975607
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "gI79HhlrCCxBsVieB9lczwc5QdTM",
+      "observed_at": "2026-11-05T20:08:16Z",
+      "match": {
+        "ticker": "STX",
+        "domain": "seagate.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2998027535975607
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "gI79HhlrCCxBsVieB9lczwc5QdTM",
+      "observed_at": "2026-11-05T20:08:16Z",
+      "match": {
+        "ticker": "STX",
+        "domain": "seagate.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2998027535975607
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:08:16Z",
+      "industry": "2026-11-05T20:08:16Z",
+      "headquarters": "2026-11-05T20:08:16Z",
+      "founded": "2026-11-05T20:08:16Z",
+      "employee_size_range": "2026-11-05T20:08:16Z",
+      "linkedin_url": "2026-11-05T20:08:16Z"
+    }
+  }
+}

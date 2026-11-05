@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "ticker": "FLS",
+  "cik": 30625,
+  "name": "FLOWSERVE CORP",
+  "description": "flowserve is one of the world's largest manufacturers of pumps, valves and seals with over 16,000 employees across 50 countries. built on more than 50 world-renowned heritage brands, the equity and customer loyalty we have earned over the past 230 years is the foundation of our leadership position across the globe. \n \nflowserve's innovations have benefited a range of industries, including oil and gas, power, chemical, water, pharmaceuticals and food processing. addressing these industries' challenges has made flowserve a leader in development and application of advanced solutions for our customers. experience, leadership and creativity are the tools we use to turn an idea into a solution.\n \ncontinuing to foster this kind of innovation is key to flowserve's long-term success. be a part of a team known for its industry-leading talent, unparalleled portfolio and unmatched commitment to customer success. we invite you to put your talents and experience in motion with flowserve.  \n \ntogether, we enable the world.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "EKfhnsHnQyUwOw9rbkNm4AvBesR1",
+    "observed_at": "2026-11-05T19:45:16Z",
+    "match": {
+      "ticker": "FLS",
+      "domain": "flowserve.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 8
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+  "website": "https://flowserve.com",
+  "industry": "Mechanical or Industrial Engineering",
+  "headquarters": "Irving, Texas, United States",
+  "linkedin_url": "https://linkedin.com/company/flowserve",
+  "founded": 1997,
+  "employees": null,
+  "professional_profile_count": 10027,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "EKfhnsHnQyUwOw9rbkNm4AvBesR1",
+    "observed_at": "2026-11-05T19:45:16Z",
+    "match": {
+      "ticker": "FLS",
+      "domain": "flowserve.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 8
+    }
+  },
+  "provider_record_id": "EKfhnsHnQyUwOw9rbkNm4AvBesR1",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "EKfhnsHnQyUwOw9rbkNm4AvBesR1",
+      "observed_at": "2026-11-05T19:45:16Z",
+      "match": {
+        "ticker": "FLS",
+        "domain": "flowserve.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:45:16Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "EKfhnsHnQyUwOw9rbkNm4AvBesR1",
+      "observed_at": "2026-11-05T19:45:16Z",
+      "match": {
+        "ticker": "FLS",
+        "domain": "flowserve.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "EKfhnsHnQyUwOw9rbkNm4AvBesR1",
+      "observed_at": "2026-11-05T19:45:16Z",
+      "match": {
+        "ticker": "FLS",
+        "domain": "flowserve.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "EKfhnsHnQyUwOw9rbkNm4AvBesR1",
+      "observed_at": "2026-11-05T19:45:16Z",
+      "match": {
+        "ticker": "FLS",
+        "domain": "flowserve.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "EKfhnsHnQyUwOw9rbkNm4AvBesR1",
+      "observed_at": "2026-11-05T19:45:16Z",
+      "match": {
+        "ticker": "FLS",
+        "domain": "flowserve.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "EKfhnsHnQyUwOw9rbkNm4AvBesR1",
+      "observed_at": "2026-11-05T19:45:16Z",
+      "match": {
+        "ticker": "FLS",
+        "domain": "flowserve.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "EKfhnsHnQyUwOw9rbkNm4AvBesR1",
+      "observed_at": "2026-11-05T19:45:16Z",
+      "match": {
+        "ticker": "FLS",
+        "domain": "flowserve.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "EKfhnsHnQyUwOw9rbkNm4AvBesR1",
+      "observed_at": "2026-11-05T19:45:16Z",
+      "match": {
+        "ticker": "FLS",
+        "domain": "flowserve.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:45:16Z",
+      "industry": "2026-11-05T19:45:16Z",
+      "headquarters": "2026-11-05T19:45:16Z",
+      "founded": "2026-11-05T19:45:16Z",
+      "professional_profile_count": "2026-11-05T19:45:16Z",
+      "employee_size_range": "2026-11-05T19:45:16Z",
+      "linkedin_url": "2026-11-05T19:45:16Z",
+      "description": "2026-11-05T19:45:16Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

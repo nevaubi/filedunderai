@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "CNP",
+  "cik": 1130310,
+  "name": "CenterPoint Energy",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://centerpointenergy.com",
+  "industry": "utilities",
+  "headquarters": "houston, texas, united states",
+  "linkedin_url": "https://linkedin.com/company/centerpoint-energy",
+  "founded": 1866,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "5001-10000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "42NHwepkxUF2zaZFjKTprQvnd5z4",
+    "observed_at": "2026-11-05T19:58:36Z",
+    "match": {
+      "ticker": "CNP",
+      "domain": "centerpointenergy.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.2877815823326018
+    }
+  },
+  "provider_record_id": "42NHwepkxUF2zaZFjKTprQvnd5z4",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "42NHwepkxUF2zaZFjKTprQvnd5z4",
+      "observed_at": "2026-11-05T19:58:36Z",
+      "match": {
+        "ticker": "CNP",
+        "domain": "centerpointenergy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2877815823326018
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:58:36Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "42NHwepkxUF2zaZFjKTprQvnd5z4",
+      "observed_at": "2026-11-05T19:58:36Z",
+      "match": {
+        "ticker": "CNP",
+        "domain": "centerpointenergy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2877815823326018
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "42NHwepkxUF2zaZFjKTprQvnd5z4",
+      "observed_at": "2026-11-05T19:58:36Z",
+      "match": {
+        "ticker": "CNP",
+        "domain": "centerpointenergy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2877815823326018
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "42NHwepkxUF2zaZFjKTprQvnd5z4",
+      "observed_at": "2026-11-05T19:58:36Z",
+      "match": {
+        "ticker": "CNP",
+        "domain": "centerpointenergy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2877815823326018
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "42NHwepkxUF2zaZFjKTprQvnd5z4",
+      "observed_at": "2026-11-05T19:58:36Z",
+      "match": {
+        "ticker": "CNP",
+        "domain": "centerpointenergy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2877815823326018
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "42NHwepkxUF2zaZFjKTprQvnd5z4",
+      "observed_at": "2026-11-05T19:58:36Z",
+      "match": {
+        "ticker": "CNP",
+        "domain": "centerpointenergy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2877815823326018
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "42NHwepkxUF2zaZFjKTprQvnd5z4",
+      "observed_at": "2026-11-05T19:58:36Z",
+      "match": {
+        "ticker": "CNP",
+        "domain": "centerpointenergy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2877815823326018
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "42NHwepkxUF2zaZFjKTprQvnd5z4",
+      "observed_at": "2026-11-05T19:58:36Z",
+      "match": {
+        "ticker": "CNP",
+        "domain": "centerpointenergy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2877815823326018
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:58:36Z",
+      "industry": "2026-11-05T19:58:36Z",
+      "headquarters": "2026-11-05T19:58:36Z",
+      "founded": "2026-11-05T19:58:36Z",
+      "employee_size_range": "2026-11-05T19:58:36Z",
+      "linkedin_url": "2026-11-05T19:58:36Z"
+    }
+  }
+}

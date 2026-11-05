@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "ticker": "KO",
+  "cik": 21344,
+  "name": "Coca-Cola",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://www.coca-colacompany.com/about-us/leadership",
+  "website": "https://www.coca-colacompany.com/",
+  "industry": null,
+  "headquarters": null,
+  "founded": null,
+  "employees": null,
+  "leadership": [
+    {
+      "name": "Henrique Braun",
+      "role": "Chief Executive Officer",
+      "profile_url": "https://www.coca-colacompany.com/about-us/leadership/henrique-braun",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/904a135a2f5d2f543088ca5d.webp",
+      "start_date": "2026-03-31",
+      "source_url": "https://www.coca-colacompany.com/about-us/leadership/henrique-braun",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.coca-colacompany.com/about-us/leadership",
+      "photo_credit": "Coca-Cola",
+      "start_date_source_url": "https://www.coca-colacompany.com/about-us/leadership/henrique-braun",
+      "photo_original_url": "https://www.coca-colacompany.com/content/dam/corporate/us/en/tccc/about-us/leadership/2026/henrique-braun.jpg",
+      "photo_sha256": "79af26485dbd2486b1a4f8df343e0035bff4138dc41eae47765bae12b51bc8c0",
+      "photo_cached_at": "2026-11-05T19:59:47Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "John Murphy",
+      "role": "President and Chief Financial Officer",
+      "profile_url": "https://www.coca-colacompany.com/about-us/leadership/john-murphy",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/b696e22244e3827815aa2aa2.webp",
+      "start_date": "2022",
+      "source_url": "https://www.coca-colacompany.com/about-us/leadership/john-murphy",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.coca-colacompany.com/about-us/leadership",
+      "photo_credit": "Coca-Cola",
+      "start_date_source_url": "https://www.coca-colacompany.com/about-us/leadership/john-murphy",
+      "tenure_note": "Chief Financial Officer since 2019 and President since 2022. Tenure shown begins with the combined current title.",
+      "photo_original_url": "https://www.coca-colacompany.com/content/dam/corporate/us/en/tccc/about-us/leadership/2026/john-murphy.jpg",
+      "photo_sha256": "8e8d18cff5f3a3b3acd72f202ed60df16f9e00eb463dddceb16df82b6d0500f9",
+      "photo_cached_at": "2026-11-05T19:59:47Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Manuel Arroyo",
+      "role": "EVP, Chief Marketing and Customer Commercial Officer",
+      "profile_url": "https://www.coca-colacompany.com/about-us/leadership/manuel-arroyo",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/dabdcd96548fac98e0a8bea3.webp",
+      "start_date": null,
+      "source_url": "https://www.coca-colacompany.com/about-us/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.coca-colacompany.com/about-us/leadership",
+      "photo_credit": "Coca-Cola",
+      "photo_original_url": "https://www.coca-colacompany.com/content/dam/corporate/us/en/tccc/about-us/leadership/2026/manuel-arroyo.jpg",
+      "photo_sha256": "45efbe3bde68327f4fa1163ed36e00421f76db01eb62befdab9e3f4dd341143d",
+      "photo_cached_at": "2026-11-05T19:59:47Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Tapaswee Chandele",
+      "role": "EVP and Global Chief People Officer",
+      "profile_url": "https://www.coca-colacompany.com/about-us/leadership/tapaswee-chandele",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/229130c917b42a09a999cd16.webp",
+      "start_date": null,
+      "source_url": "https://www.coca-colacompany.com/about-us/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.coca-colacompany.com/about-us/leadership",
+      "photo_credit": "Coca-Cola",
+      "photo_original_url": "https://www.coca-colacompany.com/content/dam/corporate/us/en/bios/Tapaswee-Chandele-513x410.jpg",
+      "photo_sha256": "1e49cc9c83f64249b86bc3701ea5f28aa0f94b49fa5f73913e54aff856470410",
+      "photo_cached_at": "2026-11-05T19:59:46Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Monica Howard Douglas",
+      "role": "EVP and Global General Counsel",
+      "profile_url": "https://www.coca-colacompany.com/about-us/leadership/monica-howard-douglas",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/2751721ccd2363daf2ba40e6.webp",
+      "start_date": null,
+      "source_url": "https://www.coca-colacompany.com/about-us/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.coca-colacompany.com/about-us/leadership",
+      "photo_credit": "Coca-Cola",
+      "photo_original_url": "https://www.coca-colacompany.com/content/dam/corporate/us/en/tccc/about-us/leadership/2026/monica-howard-douglas.jpg",
+      "photo_sha256": "aece5c7bb1494785692ee828129d6c8d8937c6c633d9d47fdfd2f56ad37bb8d3",
+      "photo_cached_at": "2026-11-05T19:59:58Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Nancy Quan",
+      "role": "EVP and Global Chief Technical & Innovation Officer",
+      "profile_url": "https://www.coca-colacompany.com/about-us/leadership/nancy-quan",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/e6d92d04a278b2d4ab78bf4b.webp",
+      "start_date": null,
+      "source_url": "https://www.coca-colacompany.com/about-us/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.coca-colacompany.com/about-us/leadership",
+      "photo_credit": "Coca-Cola",
+      "photo_original_url": "https://www.coca-colacompany.com/content/dam/corporate/us/en/tccc/about-us/leadership/2026/nancy-quan.jpg",
+      "photo_sha256": "17c01908024f8ae18b2601b0140295fc8e244f63e0c0d3b51f171b7ead1bfffb",
+      "photo_cached_at": "2026-11-05T19:59:58Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Sedef Salingan Sahin",
+      "role": "EVP and Chief Digital Officer",
+      "profile_url": "https://www.coca-colacompany.com/about-us/leadership/sedef-salingan-sahin",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/85c2ab9aa1e79aa80cf50986.webp",
+      "start_date": null,
+      "source_url": "https://www.coca-colacompany.com/about-us/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.coca-colacompany.com/about-us/leadership",
+      "photo_credit": "Coca-Cola",
+      "photo_original_url": "https://www.coca-colacompany.com/content/dam/corporate/us/en/tccc/about-us/leadership/2026/sedef-salingan-sahin.jpg",
+      "photo_sha256": "5a37753aef55342307eedb939565e517a672266d34e17e5f5b15feec8a75ecaa",
+      "photo_cached_at": "2026-11-05T19:59:58Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Beatriz \"Bea\" Perez",
+      "role": "EVP & Global Chief Communications, Sustainability and Strategic Partnerships Officer, The Coca‑Cola Company, Chair, The Coca‑Cola Foundation",
+      "profile_url": "https://www.coca-colacompany.com/about-us/leadership/bea-perez",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/52c3c9f95ea10d797f43b287.webp",
+      "start_date": null,
+      "source_url": "https://www.coca-colacompany.com/about-us/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.coca-colacompany.com/about-us/leadership",
+      "photo_credit": "Coca-Cola",
+      "photo_original_url": "https://www.coca-colacompany.com/content/dam/corporate/us/en/tccc/about-us/leadership/2026/beatriz-perez.jpg",
+      "photo_sha256": "b65e2695f89265b58cd664d7d644cdeac7cd1a3e3954a28e8864b905d5889b35",
+      "photo_cached_at": "2026-11-05T19:59:47Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Coca-Cola official leadership roster",
+      "url": "https://www.coca-colacompany.com/about-us/leadership",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Henrique Braun official biography",
+      "url": "https://www.coca-colacompany.com/about-us/leadership/henrique-braun",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Henrique Braun role start evidence",
+      "url": "https://www.coca-colacompany.com/about-us/leadership/henrique-braun",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "John Murphy official biography",
+      "url": "https://www.coca-colacompany.com/about-us/leadership/john-murphy",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "John Murphy role start evidence",
+      "url": "https://www.coca-colacompany.com/about-us/leadership/john-murphy",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "Official company source",
+      "url": "https://www.coca-colacompany.com/about-us/leadership",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  },
+  "coverage": {
+    "status": "official_sources",
+    "description": "unavailable",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T19:40:50Z",
+    "leadership_scope": "Selected leaders from the company’s published leadership roster; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:40:50Z",
+      "leadership": "2026-11-05T19:40:50Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  }
+}

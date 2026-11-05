@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "ticker": "ARW",
+  "cik": 7536,
+  "name": "ARROW ELECTRONICS, INC.",
+  "description": "arrow electronics (nyse:arw) guides innovation forward for thousands of leading technology manufacturers and service providers. with 2025 sales of $30.9 billion, arrow develops technology solutions that help improve business and daily life.\n\nour broad portfolio that spans the entire technology landscape, helps customers design, distribute and deploy forward-thinking products that make the benefits of technology accessible to as many people as possible. learn more at arrow.com.\n\nare you thinking five years out? join us at careers.arrow.com.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "TEgdRbIBxncsbpVBRWLWngtF78u0",
+    "observed_at": "2026-11-05T19:45:09Z",
+    "match": {
+      "ticker": "ARW",
+      "domain": "arrow.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 9
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+  "website": "https://arrow.com",
+  "industry": "Internet",
+  "headquarters": "Centennial, Colorado, United States",
+  "linkedin_url": "https://linkedin.com/company/arrow-electronics",
+  "founded": 1935,
+  "employees": null,
+  "professional_profile_count": 11098,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "TEgdRbIBxncsbpVBRWLWngtF78u0",
+    "observed_at": "2026-11-05T19:45:09Z",
+    "match": {
+      "ticker": "ARW",
+      "domain": "arrow.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 9
+    }
+  },
+  "provider_record_id": "TEgdRbIBxncsbpVBRWLWngtF78u0",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "TEgdRbIBxncsbpVBRWLWngtF78u0",
+      "observed_at": "2026-11-05T19:45:09Z",
+      "match": {
+        "ticker": "ARW",
+        "domain": "arrow.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:45:09Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "TEgdRbIBxncsbpVBRWLWngtF78u0",
+      "observed_at": "2026-11-05T19:45:09Z",
+      "match": {
+        "ticker": "ARW",
+        "domain": "arrow.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "TEgdRbIBxncsbpVBRWLWngtF78u0",
+      "observed_at": "2026-11-05T19:45:09Z",
+      "match": {
+        "ticker": "ARW",
+        "domain": "arrow.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "TEgdRbIBxncsbpVBRWLWngtF78u0",
+      "observed_at": "2026-11-05T19:45:09Z",
+      "match": {
+        "ticker": "ARW",
+        "domain": "arrow.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "TEgdRbIBxncsbpVBRWLWngtF78u0",
+      "observed_at": "2026-11-05T19:45:09Z",
+      "match": {
+        "ticker": "ARW",
+        "domain": "arrow.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "TEgdRbIBxncsbpVBRWLWngtF78u0",
+      "observed_at": "2026-11-05T19:45:09Z",
+      "match": {
+        "ticker": "ARW",
+        "domain": "arrow.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "TEgdRbIBxncsbpVBRWLWngtF78u0",
+      "observed_at": "2026-11-05T19:45:09Z",
+      "match": {
+        "ticker": "ARW",
+        "domain": "arrow.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "TEgdRbIBxncsbpVBRWLWngtF78u0",
+      "observed_at": "2026-11-05T19:45:09Z",
+      "match": {
+        "ticker": "ARW",
+        "domain": "arrow.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:45:09Z",
+      "industry": "2026-11-05T19:45:09Z",
+      "headquarters": "2026-11-05T19:45:09Z",
+      "founded": "2026-11-05T19:45:09Z",
+      "professional_profile_count": "2026-11-05T19:45:09Z",
+      "employee_size_range": "2026-11-05T19:45:09Z",
+      "linkedin_url": "2026-11-05T19:45:09Z",
+      "description": "2026-11-05T19:45:09Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

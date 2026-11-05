@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "ticker": "BKNG",
+  "cik": 1075531,
+  "name": "Booking Holdings",
+  "description": "booking holdings is the world’s leading provider of online travel & related services, provided to consumers and local partners in more than 220 countries and territories through six primary consumer-facing brands: booking.com, priceline, agoda, rentalcars.com, kayak and opentable. collectively, booking holdings operates in more than 40 languages across europe, north america, south america, the asia-pacific region, the middle east and africa. the mission of booking holdings is to make it easier for everyone to experience the world.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "QFHrCJ4aytCJR2xLT9JDSgihbfmm",
+    "observed_at": "2026-11-05T19:43:14Z",
+    "match": {
+      "ticker": "BKNG",
+      "domain": "bookingholdings.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://bookingholdings.com",
+  "industry": "Internet",
+  "headquarters": "Norwalk, Connecticut, United States",
+  "linkedin_url": "https://linkedin.com/company/bookingholdings",
+  "founded": 1997,
+  "employees": null,
+  "professional_profile_count": 1755,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "QFHrCJ4aytCJR2xLT9JDSgihbfmm",
+    "observed_at": "2026-11-05T19:43:14Z",
+    "match": {
+      "ticker": "BKNG",
+      "domain": "bookingholdings.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "QFHrCJ4aytCJR2xLT9JDSgihbfmm",
+  "leadership": [
+    {
+      "name": "Glenn Fogel",
+      "role": "Chief Executive Officer and President",
+      "profile_url": "https://www.bookingholdings.com/about/leadership/",
+      "photo_url": null,
+      "linkedin_url": null,
+      "start_date": "2017-01",
+      "start_date_source_url": "https://www.bookingholdings.com/about/leadership/",
+      "source_url": "https://www.bookingholdings.com/about/leadership/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Ewout Steenbergen",
+      "role": "Executive Vice President and Chief Financial Officer",
+      "profile_url": "https://www.bookingholdings.com/about/leadership/",
+      "photo_url": null,
+      "linkedin_url": null,
+      "start_date": "2024-03-15",
+      "start_date_source_url": "https://www.bookingholdings.com/about/leadership/",
+      "source_url": "https://www.bookingholdings.com/about/leadership/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Peter J. Millones Jr.",
+      "role": "General Counsel and Executive Vice President",
+      "profile_url": "https://www.bookingholdings.com/about/leadership/",
+      "photo_url": null,
+      "linkedin_url": null,
+      "start_date": "2003-04",
+      "start_date_source_url": "https://www.bookingholdings.com/about/leadership/",
+      "tenure_note": "Executive Vice President since April 2003; General Counsel since January 2001. Start date reflects the combined role.",
+      "source_url": "https://www.bookingholdings.com/about/leadership/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Paulo Pisano",
+      "role": "Chief Human Resources Officer",
+      "profile_url": "https://www.bookingholdings.com/about/leadership/",
+      "photo_url": null,
+      "linkedin_url": null,
+      "start_date": "2021-08",
+      "start_date_source_url": "https://www.bookingholdings.com/about/leadership/",
+      "source_url": "https://www.bookingholdings.com/about/leadership/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Brigit Zimmerman",
+      "role": "Chief Executive Officer of Priceline",
+      "profile_url": "https://www.bookingholdings.com/about/leadership/",
+      "photo_url": null,
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://www.bookingholdings.com/about/leadership/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Peer Bueller",
+      "role": "Chief Executive Officer of KAYAK",
+      "profile_url": "https://www.bookingholdings.com/about/leadership/",
+      "photo_url": null,
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://www.bookingholdings.com/about/leadership/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Omri Morgenshtern",
+      "role": "Chief Executive Officer of Agoda",
+      "profile_url": "https://www.bookingholdings.com/about/leadership/",
+      "photo_url": null,
+      "linkedin_url": null,
+      "start_date": "2022-07",
+      "start_date_source_url": "https://www.bookingholdings.com/about/leadership/",
+      "source_url": "https://www.bookingholdings.com/about/leadership/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Debby Soo",
+      "role": "Chief Executive Officer of OpenTable",
+      "profile_url": "https://www.bookingholdings.com/about/leadership/",
+      "photo_url": null,
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://www.bookingholdings.com/about/leadership/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "QFHrCJ4aytCJR2xLT9JDSgihbfmm",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BKNG",
+        "domain": "bookingholdings.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    {
+      "name": "Official leadership source",
+      "url": "https://www.bookingholdings.com/about/leadership/",
+      "observed_at": "2026-11-05T20:19:29Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:27:43Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "QFHrCJ4aytCJR2xLT9JDSgihbfmm",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BKNG",
+        "domain": "bookingholdings.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "QFHrCJ4aytCJR2xLT9JDSgihbfmm",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BKNG",
+        "domain": "bookingholdings.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "QFHrCJ4aytCJR2xLT9JDSgihbfmm",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BKNG",
+        "domain": "bookingholdings.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "QFHrCJ4aytCJR2xLT9JDSgihbfmm",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BKNG",
+        "domain": "bookingholdings.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "QFHrCJ4aytCJR2xLT9JDSgihbfmm",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BKNG",
+        "domain": "bookingholdings.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "QFHrCJ4aytCJR2xLT9JDSgihbfmm",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BKNG",
+        "domain": "bookingholdings.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "QFHrCJ4aytCJR2xLT9JDSgihbfmm",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "BKNG",
+        "domain": "bookingholdings.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "leadership_scope": "Selected corporate and business-unit executives verified against current official company sources; not a complete roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:14Z",
+      "industry": "2026-11-05T19:43:14Z",
+      "headquarters": "2026-11-05T19:43:14Z",
+      "founded": "2026-11-05T19:43:14Z",
+      "professional_profile_count": "2026-11-05T19:43:14Z",
+      "employee_size_range": "2026-11-05T19:43:14Z",
+      "linkedin_url": "2026-11-05T19:43:14Z",
+      "description": "2026-11-05T19:43:14Z",
+      "leadership": "2026-11-05T20:19:29Z"
+    },
+    "official_updated_at": "2026-11-05T20:19:29Z",
+    "portraits": "unavailable"
+  },
+  "description_provider": "People Data Labs"
+}

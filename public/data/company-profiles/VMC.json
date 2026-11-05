@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "VMC",
+  "cik": 1396009,
+  "name": "Vulcan Materials",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://vulcanmaterials.com",
+  "industry": "mining & metals",
+  "headquarters": "birmingham, alabama, united states",
+  "linkedin_url": "https://linkedin.com/company/vulcan-materials-company",
+  "founded": 1957,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "5001-10000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "psg8vkq7j8eh91ZgOcCfNgLyMYH9",
+    "observed_at": "2026-11-05T20:09:36Z",
+    "match": {
+      "ticker": "VMC",
+      "domain": "vulcanmaterials.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.3155919481405662
+    }
+  },
+  "provider_record_id": "psg8vkq7j8eh91ZgOcCfNgLyMYH9",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "psg8vkq7j8eh91ZgOcCfNgLyMYH9",
+      "observed_at": "2026-11-05T20:09:36Z",
+      "match": {
+        "ticker": "VMC",
+        "domain": "vulcanmaterials.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3155919481405662
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:09:36Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "psg8vkq7j8eh91ZgOcCfNgLyMYH9",
+      "observed_at": "2026-11-05T20:09:36Z",
+      "match": {
+        "ticker": "VMC",
+        "domain": "vulcanmaterials.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3155919481405662
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "psg8vkq7j8eh91ZgOcCfNgLyMYH9",
+      "observed_at": "2026-11-05T20:09:36Z",
+      "match": {
+        "ticker": "VMC",
+        "domain": "vulcanmaterials.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3155919481405662
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "psg8vkq7j8eh91ZgOcCfNgLyMYH9",
+      "observed_at": "2026-11-05T20:09:36Z",
+      "match": {
+        "ticker": "VMC",
+        "domain": "vulcanmaterials.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3155919481405662
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "psg8vkq7j8eh91ZgOcCfNgLyMYH9",
+      "observed_at": "2026-11-05T20:09:36Z",
+      "match": {
+        "ticker": "VMC",
+        "domain": "vulcanmaterials.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3155919481405662
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "psg8vkq7j8eh91ZgOcCfNgLyMYH9",
+      "observed_at": "2026-11-05T20:09:36Z",
+      "match": {
+        "ticker": "VMC",
+        "domain": "vulcanmaterials.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3155919481405662
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "psg8vkq7j8eh91ZgOcCfNgLyMYH9",
+      "observed_at": "2026-11-05T20:09:36Z",
+      "match": {
+        "ticker": "VMC",
+        "domain": "vulcanmaterials.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3155919481405662
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "psg8vkq7j8eh91ZgOcCfNgLyMYH9",
+      "observed_at": "2026-11-05T20:09:36Z",
+      "match": {
+        "ticker": "VMC",
+        "domain": "vulcanmaterials.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3155919481405662
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:09:36Z",
+      "industry": "2026-11-05T20:09:36Z",
+      "headquarters": "2026-11-05T20:09:36Z",
+      "founded": "2026-11-05T20:09:36Z",
+      "employee_size_range": "2026-11-05T20:09:36Z",
+      "linkedin_url": "2026-11-05T20:09:36Z"
+    }
+  }
+}

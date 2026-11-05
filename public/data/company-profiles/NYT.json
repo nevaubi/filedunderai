@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "NYT",
+  "cik": 71691,
+  "name": "NEW YORK TIMES CO",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://nytimes.com",
+  "industry": "newspapers",
+  "headquarters": "new york, new york, united states",
+  "linkedin_url": "https://linkedin.com/company/the-new-york-times",
+  "founded": 1851,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "1001-5000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "CF6MEK7pC88X4kiSVtTtSQXLAcSu",
+    "observed_at": "2026-11-05T20:05:37Z",
+    "match": {
+      "ticker": "NYT",
+      "domain": "nytimes.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.2807705649542176
+    }
+  },
+  "provider_record_id": "CF6MEK7pC88X4kiSVtTtSQXLAcSu",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "CF6MEK7pC88X4kiSVtTtSQXLAcSu",
+      "observed_at": "2026-11-05T20:05:37Z",
+      "match": {
+        "ticker": "NYT",
+        "domain": "nytimes.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2807705649542176
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:05:37Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "CF6MEK7pC88X4kiSVtTtSQXLAcSu",
+      "observed_at": "2026-11-05T20:05:37Z",
+      "match": {
+        "ticker": "NYT",
+        "domain": "nytimes.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2807705649542176
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "CF6MEK7pC88X4kiSVtTtSQXLAcSu",
+      "observed_at": "2026-11-05T20:05:37Z",
+      "match": {
+        "ticker": "NYT",
+        "domain": "nytimes.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2807705649542176
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "CF6MEK7pC88X4kiSVtTtSQXLAcSu",
+      "observed_at": "2026-11-05T20:05:37Z",
+      "match": {
+        "ticker": "NYT",
+        "domain": "nytimes.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2807705649542176
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "CF6MEK7pC88X4kiSVtTtSQXLAcSu",
+      "observed_at": "2026-11-05T20:05:37Z",
+      "match": {
+        "ticker": "NYT",
+        "domain": "nytimes.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2807705649542176
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "CF6MEK7pC88X4kiSVtTtSQXLAcSu",
+      "observed_at": "2026-11-05T20:05:37Z",
+      "match": {
+        "ticker": "NYT",
+        "domain": "nytimes.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2807705649542176
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "CF6MEK7pC88X4kiSVtTtSQXLAcSu",
+      "observed_at": "2026-11-05T20:05:37Z",
+      "match": {
+        "ticker": "NYT",
+        "domain": "nytimes.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2807705649542176
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "CF6MEK7pC88X4kiSVtTtSQXLAcSu",
+      "observed_at": "2026-11-05T20:05:37Z",
+      "match": {
+        "ticker": "NYT",
+        "domain": "nytimes.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2807705649542176
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:05:37Z",
+      "industry": "2026-11-05T20:05:37Z",
+      "headquarters": "2026-11-05T20:05:37Z",
+      "founded": "2026-11-05T20:05:37Z",
+      "employee_size_range": "2026-11-05T20:05:37Z",
+      "linkedin_url": "2026-11-05T20:05:37Z"
+    }
+  }
+}

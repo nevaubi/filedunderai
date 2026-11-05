@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "ticker": "FORM",
+  "cik": 1039399,
+  "name": "FORMFACTOR INC",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://formfactor.com",
+  "industry": "semiconductors",
+  "headquarters": "livermore, california, united states",
+  "linkedin_url": "https://linkedin.com/company/formfactor",
+  "founded": null,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "1001-5000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "Y6IeY6nC4TmvoB2K9Jn8jw3q7fF4",
+    "observed_at": "2026-11-05T20:00:55Z",
+    "match": {
+      "ticker": "FORM",
+      "domain": "formfactor.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.2830119107192557
+    }
+  },
+  "provider_record_id": "Y6IeY6nC4TmvoB2K9Jn8jw3q7fF4",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Y6IeY6nC4TmvoB2K9Jn8jw3q7fF4",
+      "observed_at": "2026-11-05T20:00:55Z",
+      "match": {
+        "ticker": "FORM",
+        "domain": "formfactor.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2830119107192557
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:00:55Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Y6IeY6nC4TmvoB2K9Jn8jw3q7fF4",
+      "observed_at": "2026-11-05T20:00:55Z",
+      "match": {
+        "ticker": "FORM",
+        "domain": "formfactor.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2830119107192557
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Y6IeY6nC4TmvoB2K9Jn8jw3q7fF4",
+      "observed_at": "2026-11-05T20:00:55Z",
+      "match": {
+        "ticker": "FORM",
+        "domain": "formfactor.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2830119107192557
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Y6IeY6nC4TmvoB2K9Jn8jw3q7fF4",
+      "observed_at": "2026-11-05T20:00:55Z",
+      "match": {
+        "ticker": "FORM",
+        "domain": "formfactor.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2830119107192557
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Y6IeY6nC4TmvoB2K9Jn8jw3q7fF4",
+      "observed_at": "2026-11-05T20:00:55Z",
+      "match": {
+        "ticker": "FORM",
+        "domain": "formfactor.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2830119107192557
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Y6IeY6nC4TmvoB2K9Jn8jw3q7fF4",
+      "observed_at": "2026-11-05T20:00:55Z",
+      "match": {
+        "ticker": "FORM",
+        "domain": "formfactor.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2830119107192557
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Y6IeY6nC4TmvoB2K9Jn8jw3q7fF4",
+      "observed_at": "2026-11-05T20:00:55Z",
+      "match": {
+        "ticker": "FORM",
+        "domain": "formfactor.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2830119107192557
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Y6IeY6nC4TmvoB2K9Jn8jw3q7fF4",
+      "observed_at": "2026-11-05T20:00:55Z",
+      "match": {
+        "ticker": "FORM",
+        "domain": "formfactor.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2830119107192557
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:00:55Z",
+      "industry": "2026-11-05T20:00:55Z",
+      "headquarters": "2026-11-05T20:00:55Z",
+      "employee_size_range": "2026-11-05T20:00:55Z",
+      "linkedin_url": "2026-11-05T20:00:55Z"
+    }
+  }
+}

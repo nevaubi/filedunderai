@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "ticker": "BRK-B",
+  "cik": 1067983,
+  "name": "Berkshire Hathaway",
+  "description": "berkshire hathaway is a multinational conglomerate holding company headed by its president & ceo, [warren buffet](http://www.crunchbase.com/person/warren-buffett). the company owns, manages and oversees subsidiary companies. some companies they own wholly include geico, fruit of the loom, and helzberg diamonds. berkshire hathaway also holds a significant minority in american express, the coca-cola company, wells fargo, and ibm. the company is considered to be the ninth largest public company in the world, according to forbes global 2000 list.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "OgI22H32Bg4fK5Cqkm3OqwyVbu8p",
+    "observed_at": "2026-11-05T19:43:20Z",
+    "match": {
+      "ticker": "BRK-B",
+      "domain": "berkshirehathaway.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://berkshirehathaway.com",
+  "industry": "Insurance",
+  "headquarters": "United States",
+  "linkedin_url": "https://linkedin.com/company/berkshire-hathaway",
+  "founded": null,
+  "employees": null,
+  "professional_profile_count": 2074,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "OgI22H32Bg4fK5Cqkm3OqwyVbu8p",
+    "observed_at": "2026-11-05T19:43:20Z",
+    "match": {
+      "ticker": "BRK-B",
+      "domain": "berkshirehathaway.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "OgI22H32Bg4fK5Cqkm3OqwyVbu8p",
+  "leadership": [
+    {
+      "name": "Greg Abel",
+      "role": "Chief Executive Officer",
+      "source_url": "https://berkshirehathaway.com/news/sep1826.pdf",
+      "source_name": "Official company source",
+      "profile_url": "https://berkshirehathaway.com/news/sep1826.pdf",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Executive leadership",
+      "start_date": "2026-01-01",
+      "start_date_source_url": "https://berkshirehathaway.com/news/dec0825.pdf",
+      "tenure_note": "The January 1, 2026 CEO appointment is separately corroborated by the September 18, 2026 company announcement naming Greg Abel as CEO.",
+      "source_published_at": "2026-09-18"
+    },
+    {
+      "name": "Charles C. Chang",
+      "role": "Senior Vice President and Chief Financial Officer",
+      "source_url": "https://www.berkshirehathaway.com/qtrly/2ndqtr26.pdf",
+      "source_name": "Official quarterly filing",
+      "profile_url": "https://www.berkshirehathaway.com/qtrly/2ndqtr26.pdf",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Senior leadership",
+      "start_date": "2026-06-01",
+      "start_date_source_url": "https://berkshirehathaway.com/news/dec0825.pdf",
+      "tenure_note": "CFO responsibilities transferred June 1, 2026. The predecessor’s separately announced retirement date was June 1, 2027.",
+      "source_published_at": "2026-08-08"
+    },
+    {
+      "name": "Michael J. O’Sullivan",
+      "role": "Senior Vice President and General Counsel",
+      "source_url": "https://berkshirehathaway.com/news/dec0825.pdf",
+      "source_name": "Official company source",
+      "profile_url": "https://berkshirehathaway.com/news/dec0825.pdf",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Senior leadership",
+      "start_date": "2026-01-01",
+      "start_date_source_url": "https://berkshirehathaway.com/news/dec0825.pdf",
+      "source_published_at": "2025-12-08"
+    },
+    {
+      "name": "Howard G. Buffett",
+      "role": "Chairman of the Board",
+      "source_url": "https://berkshirehathaway.com/news/sep1826.pdf",
+      "source_name": "Official company source",
+      "profile_url": "https://berkshirehathaway.com/news/sep1826.pdf",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Board of directors",
+      "start_date": "2026-09-18",
+      "start_date_source_url": "https://berkshirehathaway.com/news/sep1826.pdf",
+      "source_published_at": "2026-09-18"
+    },
+    {
+      "name": "Warren E. Buffett",
+      "role": "Chairman Emeritus and Director",
+      "source_url": "https://berkshirehathaway.com/news/sep1826.pdf",
+      "source_name": "Official company source",
+      "profile_url": "https://berkshirehathaway.com/news/sep1826.pdf",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Board of directors",
+      "start_date": "2026-09-18",
+      "start_date_source_url": "https://berkshirehathaway.com/news/sep1826.pdf",
+      "tenure_note": "The date starts the Chairman Emeritus designation. The announcement states that he remains a director.",
+      "source_published_at": "2026-09-18"
+    },
+    {
+      "name": "Susan L. Decker",
+      "role": "Lead Independent Director",
+      "source_url": "https://berkshirehathaway.com/news/sep1826.pdf",
+      "source_name": "Official company source",
+      "profile_url": "https://berkshirehathaway.com/news/sep1826.pdf",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Board of directors",
+      "start_date": null,
+      "source_published_at": "2026-09-18"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Berkshire September 2026 board leadership announcement",
+      "url": "https://berkshirehathaway.com/news/sep1826.pdf",
+      "observed_at": "2026-11-05T20:14:21Z"
+    },
+    {
+      "name": "Berkshire officer appointments effective in 2026",
+      "url": "https://berkshirehathaway.com/news/dec0825.pdf",
+      "observed_at": "2026-11-05T20:14:21Z"
+    },
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "OgI22H32Bg4fK5Cqkm3OqwyVbu8p",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "BRK-B",
+        "domain": "berkshirehathaway.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    {
+      "name": "Berkshire 2026 second-quarter filing, CFO certification",
+      "url": "https://www.berkshirehathaway.com/qtrly/2ndqtr26.pdf",
+      "observed_at": "2026-11-05T20:14:21Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:14:21Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "OgI22H32Bg4fK5Cqkm3OqwyVbu8p",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "BRK-B",
+        "domain": "berkshirehathaway.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "OgI22H32Bg4fK5Cqkm3OqwyVbu8p",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "BRK-B",
+        "domain": "berkshirehathaway.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "OgI22H32Bg4fK5Cqkm3OqwyVbu8p",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "BRK-B",
+        "domain": "berkshirehathaway.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "OgI22H32Bg4fK5Cqkm3OqwyVbu8p",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "BRK-B",
+        "domain": "berkshirehathaway.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "OgI22H32Bg4fK5Cqkm3OqwyVbu8p",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "BRK-B",
+        "domain": "berkshirehathaway.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "OgI22H32Bg4fK5Cqkm3OqwyVbu8p",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "BRK-B",
+        "domain": "berkshirehathaway.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "OgI22H32Bg4fK5Cqkm3OqwyVbu8p",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "BRK-B",
+        "domain": "berkshirehathaway.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "official_updated_at": "2026-11-05T20:14:21Z",
+    "leadership": "official_sources",
+    "leadership_scope": "Selected corporate officers and board leadership from official announcements. CEO/CFO appointments use their effective 2026 dates; the September 18, 2026 board transition supersedes older Buffett-chairman references.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:20Z",
+      "industry": "2026-11-05T19:43:20Z",
+      "headquarters": "2026-11-05T19:43:20Z",
+      "professional_profile_count": "2026-11-05T19:43:20Z",
+      "employee_size_range": "2026-11-05T19:43:20Z",
+      "linkedin_url": "2026-11-05T19:43:20Z",
+      "description": "2026-11-05T19:43:20Z",
+      "leadership": "2026-11-05T20:14:21Z"
+    },
+    "portraits": "unavailable",
+    "description": "available",
+    "images": "unavailable"
+  },
+  "description_provider": "People Data Labs"
+}

@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "ZBH",
+  "cik": 1136869,
+  "name": "Zimmer Biomet",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://zimmerbiomet.com",
+  "industry": "medical devices",
+  "headquarters": "warsaw, indiana, united states",
+  "linkedin_url": "https://linkedin.com/company/zimmerbiomet",
+  "founded": 1927,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "x5o6Gh2Djc2LBvKs4npEbA9nkpR5",
+    "observed_at": "2026-11-05T20:11:02Z",
+    "match": {
+      "ticker": "ZBH",
+      "domain": "zimmerbiomet.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.2208634318804752
+    }
+  },
+  "provider_record_id": "x5o6Gh2Djc2LBvKs4npEbA9nkpR5",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "x5o6Gh2Djc2LBvKs4npEbA9nkpR5",
+      "observed_at": "2026-11-05T20:11:02Z",
+      "match": {
+        "ticker": "ZBH",
+        "domain": "zimmerbiomet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2208634318804752
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:11:02Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "x5o6Gh2Djc2LBvKs4npEbA9nkpR5",
+      "observed_at": "2026-11-05T20:11:02Z",
+      "match": {
+        "ticker": "ZBH",
+        "domain": "zimmerbiomet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2208634318804752
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "x5o6Gh2Djc2LBvKs4npEbA9nkpR5",
+      "observed_at": "2026-11-05T20:11:02Z",
+      "match": {
+        "ticker": "ZBH",
+        "domain": "zimmerbiomet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2208634318804752
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "x5o6Gh2Djc2LBvKs4npEbA9nkpR5",
+      "observed_at": "2026-11-05T20:11:02Z",
+      "match": {
+        "ticker": "ZBH",
+        "domain": "zimmerbiomet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2208634318804752
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "x5o6Gh2Djc2LBvKs4npEbA9nkpR5",
+      "observed_at": "2026-11-05T20:11:02Z",
+      "match": {
+        "ticker": "ZBH",
+        "domain": "zimmerbiomet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2208634318804752
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "x5o6Gh2Djc2LBvKs4npEbA9nkpR5",
+      "observed_at": "2026-11-05T20:11:02Z",
+      "match": {
+        "ticker": "ZBH",
+        "domain": "zimmerbiomet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2208634318804752
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "x5o6Gh2Djc2LBvKs4npEbA9nkpR5",
+      "observed_at": "2026-11-05T20:11:02Z",
+      "match": {
+        "ticker": "ZBH",
+        "domain": "zimmerbiomet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2208634318804752
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "x5o6Gh2Djc2LBvKs4npEbA9nkpR5",
+      "observed_at": "2026-11-05T20:11:02Z",
+      "match": {
+        "ticker": "ZBH",
+        "domain": "zimmerbiomet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2208634318804752
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:11:02Z",
+      "industry": "2026-11-05T20:11:02Z",
+      "headquarters": "2026-11-05T20:11:02Z",
+      "founded": "2026-11-05T20:11:02Z",
+      "employee_size_range": "2026-11-05T20:11:02Z",
+      "linkedin_url": "2026-11-05T20:11:02Z"
+    }
+  }
+}

@@ -26,10 +26,14 @@
       "observed_at": "2026-11-05T14:47:29Z",
       "group": "Executive leadership",
       "start_date_source_url": "https://blog.google/alphabet/letter-from-larry-and-sergey/",
-      "photo_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/sundar-208x208.width-400.format-webp.webp",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/3e71fbc99555aff323d5773e.webp",
       "photo_source_url": "https://blog.google/authors/sundar-pichai/",
       "photo_credit": "Source: Google",
-      "tenure_note": "The start date refers to the Alphabet CEO role. Alphabet’s proxy states that he became Google CEO in October 2015."
+      "tenure_note": "The start date refers to the Alphabet CEO role. Alphabet’s proxy states that he became Google CEO in October 2015.",
+      "photo_original_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/sundar-208x208.width-400.format-webp.webp",
+      "photo_sha256": "bc41c1da4f52610ffac602a05c332a4bd67a3848d7940527fd97342be234035c",
+      "photo_cached_at": "2026-11-05T20:25:19Z",
+      "photo_status": "cached_and_verified"
     },
     {
       "name": "Anat Ashkenazi",
@@ -54,9 +58,13 @@
       "observed_at": "2026-11-05T14:47:29Z",
       "group": "Executive leadership",
       "start_date_source_url": "https://abc.xyz/assets/05/5c/f7c1724bc7498c0d6e95e1e5f4c1/b905fa1d665bd36ef48208dde1b90967.pdf",
-      "photo_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/Ruth_Porat_1_VDuadKa.width-400.format-webp.webp",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/00ff159a9d39c3a5274c2ade.webp",
       "photo_source_url": "https://blog.google/authors/ruth-porat/",
-      "photo_credit": "Source: Google"
+      "photo_credit": "Source: Google",
+      "photo_original_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/Ruth_Porat_1_VDuadKa.width-400.format-webp.webp",
+      "photo_sha256": "032ff15075ff84d4f1eabea4b60561b97bc6654c9651e81a3c4b74dd8c9c15b4",
+      "photo_cached_at": "2026-11-05T20:25:19Z",
+      "photo_status": "cached_and_verified"
     },
     {
       "name": "Thomas Kurian",
@@ -145,7 +153,7 @@
       "observed_at": "2026-11-05T14:47:29Z"
     }
   ],
-  "updated_at": "2026-11-05T14:47:29Z",
+  "updated_at": "2026-11-05T20:28:47Z",
   "field_sources": {
     "description": {
       "name": "Alphabet financial-statement glossary and business segments",
@@ -182,8 +190,7 @@
       "website": "2026-11-05T14:47:29Z",
       "headquarters": "2026-11-05T14:47:29Z",
       "founded": "2026-11-05T14:47:29Z",
-      "leadership": "2026-11-05T14:47:29Z",
-      "images": "2026-11-05T14:47:29Z"
+      "leadership": "2026-11-05T14:47:29Z"
     },
     "portraits": "partial; two of four selected leaders have official portrait links"
   },

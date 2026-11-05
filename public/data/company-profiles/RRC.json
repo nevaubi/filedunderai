@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "ticker": "RRC",
+  "cik": 315852,
+  "name": "RANGE RESOURCES CORP",
+  "description": "range resources corporation (nyse:rrc)  is a leading u.s. independent natural gas and ngl producer with operations focused in the appalachian basin. as a leading natural gas producer and the pioneer of the marcellus shale, we are proud of our long legacy of delivering energy solutions and value to our partners and shareholders. \n\nour core values – performance, innovation, integrity and transparency – guide us in the work we do every day as a natural gas industry leader. these values reflect how we operate as a company and are deeply rooted in our commitment to improving the communities where we work.\n\nthe company is headquartered in fort worth, texas. for more information visit www.rangeresources.com.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "fCYqSYkBiqgWJWdmBG78RgIFNMMm",
+    "observed_at": "2026-11-05T19:44:35Z",
+    "match": {
+      "ticker": "RRC",
+      "domain": "rangeresources.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 8
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+  "website": "https://rangeresources.com",
+  "industry": "Oil & Energy",
+  "headquarters": "Fort Worth, Texas, United States",
+  "linkedin_url": "https://linkedin.com/company/range-resources",
+  "founded": 1976,
+  "employees": null,
+  "professional_profile_count": 596,
+  "employee_size_range": "501-1000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "fCYqSYkBiqgWJWdmBG78RgIFNMMm",
+    "observed_at": "2026-11-05T19:44:35Z",
+    "match": {
+      "ticker": "RRC",
+      "domain": "rangeresources.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 8
+    }
+  },
+  "provider_record_id": "fCYqSYkBiqgWJWdmBG78RgIFNMMm",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "fCYqSYkBiqgWJWdmBG78RgIFNMMm",
+      "observed_at": "2026-11-05T19:44:35Z",
+      "match": {
+        "ticker": "RRC",
+        "domain": "rangeresources.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:44:35Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "fCYqSYkBiqgWJWdmBG78RgIFNMMm",
+      "observed_at": "2026-11-05T19:44:35Z",
+      "match": {
+        "ticker": "RRC",
+        "domain": "rangeresources.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "fCYqSYkBiqgWJWdmBG78RgIFNMMm",
+      "observed_at": "2026-11-05T19:44:35Z",
+      "match": {
+        "ticker": "RRC",
+        "domain": "rangeresources.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "fCYqSYkBiqgWJWdmBG78RgIFNMMm",
+      "observed_at": "2026-11-05T19:44:35Z",
+      "match": {
+        "ticker": "RRC",
+        "domain": "rangeresources.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "fCYqSYkBiqgWJWdmBG78RgIFNMMm",
+      "observed_at": "2026-11-05T19:44:35Z",
+      "match": {
+        "ticker": "RRC",
+        "domain": "rangeresources.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "fCYqSYkBiqgWJWdmBG78RgIFNMMm",
+      "observed_at": "2026-11-05T19:44:35Z",
+      "match": {
+        "ticker": "RRC",
+        "domain": "rangeresources.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "fCYqSYkBiqgWJWdmBG78RgIFNMMm",
+      "observed_at": "2026-11-05T19:44:35Z",
+      "match": {
+        "ticker": "RRC",
+        "domain": "rangeresources.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "fCYqSYkBiqgWJWdmBG78RgIFNMMm",
+      "observed_at": "2026-11-05T19:44:35Z",
+      "match": {
+        "ticker": "RRC",
+        "domain": "rangeresources.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 8
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:44:35Z",
+      "industry": "2026-11-05T19:44:35Z",
+      "headquarters": "2026-11-05T19:44:35Z",
+      "founded": "2026-11-05T19:44:35Z",
+      "professional_profile_count": "2026-11-05T19:44:35Z",
+      "employee_size_range": "2026-11-05T19:44:35Z",
+      "linkedin_url": "2026-11-05T19:44:35Z",
+      "description": "2026-11-05T19:44:35Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

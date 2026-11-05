@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "ROAD",
+  "cik": 1718227,
+  "name": "Construction Partners, Inc.",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://constructionpartners.net",
+  "industry": "construction",
+  "headquarters": "dothan, alabama, united states",
+  "linkedin_url": "https://linkedin.com/company/constructionpartners",
+  "founded": 2001,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "1001-5000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "1tCvxRijuQcdkjqG44RGYAO5rm1M",
+    "observed_at": "2026-11-05T20:07:17Z",
+    "match": {
+      "ticker": "ROAD",
+      "domain": "constructionpartners.net",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.3098225642014765
+    }
+  },
+  "provider_record_id": "1tCvxRijuQcdkjqG44RGYAO5rm1M",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "1tCvxRijuQcdkjqG44RGYAO5rm1M",
+      "observed_at": "2026-11-05T20:07:17Z",
+      "match": {
+        "ticker": "ROAD",
+        "domain": "constructionpartners.net",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3098225642014765
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:07:17Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "1tCvxRijuQcdkjqG44RGYAO5rm1M",
+      "observed_at": "2026-11-05T20:07:17Z",
+      "match": {
+        "ticker": "ROAD",
+        "domain": "constructionpartners.net",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3098225642014765
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "1tCvxRijuQcdkjqG44RGYAO5rm1M",
+      "observed_at": "2026-11-05T20:07:17Z",
+      "match": {
+        "ticker": "ROAD",
+        "domain": "constructionpartners.net",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3098225642014765
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "1tCvxRijuQcdkjqG44RGYAO5rm1M",
+      "observed_at": "2026-11-05T20:07:17Z",
+      "match": {
+        "ticker": "ROAD",
+        "domain": "constructionpartners.net",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3098225642014765
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "1tCvxRijuQcdkjqG44RGYAO5rm1M",
+      "observed_at": "2026-11-05T20:07:17Z",
+      "match": {
+        "ticker": "ROAD",
+        "domain": "constructionpartners.net",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3098225642014765
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "1tCvxRijuQcdkjqG44RGYAO5rm1M",
+      "observed_at": "2026-11-05T20:07:17Z",
+      "match": {
+        "ticker": "ROAD",
+        "domain": "constructionpartners.net",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3098225642014765
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "1tCvxRijuQcdkjqG44RGYAO5rm1M",
+      "observed_at": "2026-11-05T20:07:17Z",
+      "match": {
+        "ticker": "ROAD",
+        "domain": "constructionpartners.net",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3098225642014765
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "1tCvxRijuQcdkjqG44RGYAO5rm1M",
+      "observed_at": "2026-11-05T20:07:17Z",
+      "match": {
+        "ticker": "ROAD",
+        "domain": "constructionpartners.net",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3098225642014765
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:07:17Z",
+      "industry": "2026-11-05T20:07:17Z",
+      "headquarters": "2026-11-05T20:07:17Z",
+      "founded": "2026-11-05T20:07:17Z",
+      "employee_size_range": "2026-11-05T20:07:17Z",
+      "linkedin_url": "2026-11-05T20:07:17Z"
+    }
+  }
+}

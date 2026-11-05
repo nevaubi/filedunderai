@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "COST",
+  "cik": 909832,
+  "name": "Costco",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://www.sec.gov/Archives/edgar/data/909832/000090983226000093/cost-20260830.htm",
+  "website": "https://www.costco.com/",
+  "industry": null,
+  "headquarters": null,
+  "founded": null,
+  "employees": null,
+  "leadership": [
+    {
+      "name": "Ron M. Vachris",
+      "role": "President and Chief Executive Officer",
+      "profile_url": "https://investor.costco.com/governance/board-of-directors/person-details/default.aspx?ItemId=f0450829-b19b-4fc4-ac2e-a32ad9dc9234",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/930556a193740c628df45f9b.png",
+      "start_date": "2024-01",
+      "source_url": "https://investor.costco.com/governance/board-of-directors/person-details/default.aspx?ItemId=f0450829-b19b-4fc4-ac2e-a32ad9dc9234",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://investor.costco.com/governance/board-of-directors/person-details/default.aspx?ItemId=f0450829-b19b-4fc4-ac2e-a32ad9dc9234",
+      "tenure_note": "The official biography specifies the start month only.",
+      "photo_source_url": "https://investor.costco.com/governance/board-of-directors/person-details/default.aspx?ItemId=f0450829-b19b-4fc4-ac2e-a32ad9dc9234",
+      "photo_credit": "Costco",
+      "photo_original_url": "https://s201.q4cdn.com/287523651/files/images/board/10/31/Ron-Vachris.png",
+      "photo_sha256": "cb018ad6b14c5f300be8a0b7c7b45ca0fd0a561bd016916172f4e2cd24aaf9af",
+      "photo_cached_at": "2026-11-05T19:56:34Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Gary Millerchip",
+      "role": "Executive Vice President and Chief Financial Officer",
+      "profile_url": null,
+      "photo_url": null,
+      "start_date": "2024-03-15",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/909832/000090983226000093/cost-20260830.htm",
+      "source_name": "2026 Form 10-K executive officers",
+      "source_as_of": "2026-10-07",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://investor.costco.com/news/news-details/2024/Costco-Wholesale-Corporation-Announces-Richard-Galanti-Will-Step-Down-as-CFO-Names-Gary-Millerchip-New-CFO/default.aspx",
+      "tenure_note": "The company appointment announcement gives this effective date for Executive Vice President and Chief Financial Officer."
+    },
+    {
+      "name": "Claudine Adamo",
+      "role": "Executive Vice President, Administration",
+      "profile_url": null,
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.sec.gov/Archives/edgar/data/909832/000090983226000093/cost-20260830.htm",
+      "source_name": "2026 Form 10-K executive officers",
+      "source_as_of": "2026-10-07",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Caton Frates",
+      "role": "Senior Executive Vice President, Chief Operating Officer - Warehouse Operations, U.S. and Mexico",
+      "profile_url": null,
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.sec.gov/Archives/edgar/data/909832/000090983226000093/cost-20260830.htm",
+      "source_name": "2026 Form 10-K executive officers",
+      "source_as_of": "2026-10-07",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Sarah George",
+      "role": "Executive Vice President, Chief Operating Officer - Merchandising",
+      "profile_url": null,
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.sec.gov/Archives/edgar/data/909832/000090983226000093/cost-20260830.htm",
+      "source_name": "2026 Form 10-K executive officers",
+      "source_as_of": "2026-10-07",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Javier Polit",
+      "role": "Executive Vice President, Chief Information and Digital Officer",
+      "profile_url": null,
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.sec.gov/Archives/edgar/data/909832/000090983226000093/cost-20260830.htm",
+      "source_name": "2026 Form 10-K executive officers",
+      "source_as_of": "2026-10-07",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "John Sullivan",
+      "role": "Executive Vice President, General Counsel & Corporate Secretary",
+      "profile_url": null,
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.sec.gov/Archives/edgar/data/909832/000090983226000093/cost-20260830.htm",
+      "source_name": "2026 Form 10-K executive officers",
+      "source_as_of": "2026-10-07",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership"
+    },
+    {
+      "name": "Teresa Jones",
+      "role": "Executive Vice President, Chief Operating Officer - Global Depots and Traffic",
+      "profile_url": null,
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.sec.gov/Archives/edgar/data/909832/000090983226000093/cost-20260830.htm",
+      "source_name": "2026 Form 10-K executive officers",
+      "source_as_of": "2026-10-07",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Ron M. Vachris official biography",
+      "url": "https://investor.costco.com/governance/board-of-directors/person-details/default.aspx?ItemId=f0450829-b19b-4fc4-ac2e-a32ad9dc9234",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Ron M. Vachris role start evidence",
+      "url": "https://investor.costco.com/governance/board-of-directors/person-details/default.aspx?ItemId=f0450829-b19b-4fc4-ac2e-a32ad9dc9234",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "2026 Form 10-K executive officers",
+      "url": "https://www.sec.gov/Archives/edgar/data/909832/000090983226000093/cost-20260830.htm",
+      "source_as_of": "2026-10-07",
+      "observed_at": "2026-11-05T19:45:54Z"
+    },
+    {
+      "name": "Gary Millerchip appointment",
+      "url": "https://investor.costco.com/news/news-details/2024/Costco-Wholesale-Corporation-Announces-Richard-Galanti-Will-Step-Down-as-CFO-Names-Gary-Millerchip-New-CFO/default.aspx",
+      "observed_at": "2026-11-05T19:45:54Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "Official company source",
+      "url": "https://investor.costco.com/governance/executive-management/default.aspx",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  },
+  "coverage": {
+    "status": "official_sources",
+    "description": "unavailable",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T19:45:54Z",
+    "leadership_scope": "Selected executive officers confirmed by the October 7, 2026 Form 10-K and the current CEO biography. Dates labeled executive officer since are not treated as role start dates.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:40:50Z",
+      "leadership": "2026-11-05T19:45:54Z"
+    },
+    "portraits": "partial",
+    "leadership_source_as_of": "2026-10-07"
+  }
+}

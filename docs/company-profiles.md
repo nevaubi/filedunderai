@@ -16,6 +16,14 @@ Profiles are shipped at `public/data/company-profiles/{TICKER}.json` and publish
 
 The directory's **Company metadata** filter uses actual profile availability, and **Leadership available** requires a positive sourced leadership count. Neither filter infers enrichment from registry membership or screener eligibility. Row labels distinguish Leadership, Company details, Screener and Registered; their tooltips expose leader/portrait counts where available. A metadata-only profile is not a claim of complete management coverage.
 
+## Expanded backfill, 2026-11-05
+
+The expanded snapshot contains **728 company profiles**, including **87 companies with official leadership** and **901 sourced leadership entries**. Company metadata includes 727 websites, 686 company LinkedIn pages, 692 headquarters locations, 634 founding years, 687 provider size bands and 149 business descriptions. The leadership records contain 158 explicit role start dates and 30 separately sourced company joining dates. These are field coverage counts, not a claim that every profile is complete.
+
+The registry still contains 372 issuers without an enriched profile and 1,013 without a sourced leadership roster. Even among covered companies, some rosters are deliberately limited to the official page or selected biographies reviewed. The public profile's coverage note identifies that scope. Unknown titles, biographies, dates and photographs are left empty.
+
+The [backfill audit](audits/2026-11-05-company-metadata-backfill.json) records the final snapshot, publication/readback results, portrait outcomes, provider request accounting and validation checks. Per-field evidence remains in each public profile. The raw provider candidates and source extraction archive remain private.
+
 ## Public profile contract
 
 Each profile identifies `schema_version`, `ticker`, numeric `cik`, registry `name`, `updated_at` and `coverage`. It may include:
@@ -25,9 +33,10 @@ Each profile identifies `schema_version`, `ticker`, numeric `cik`, registry `nam
 | `description`, `description_source` | Business prose and the exact source/observation metadata. |
 | `website`, `linkedin_url`, `industry`, `headquarters`, `founded` | Available company metadata and the company's LinkedIn page; `field_sources` records provenance. Headquarters is city/region/country, without a street address. |
 | `employees` | Officially sourced workforce, when available. PDL profile counts never populate this field. |
+| `employee_size_range` | Provider-reported size band, shown with that label when an official workforce count is unavailable. It is not reported headcount. |
 | `professional_profile_count` | PDL profiles associated with the company, explicitly identified as a provider count rather than reported headcount. |
 | `professional_profile_count_basis`, `professional_profile_count_source` | Count interpretation and provider source. |
-| `leadership[]` | Names, sourced professional roles, biography and LinkedIn URLs, observation/verification dates, and sourced portraits when available. `start_date` identifies verified role tenure; `employment_start_date` identifies provider employment tenure. |
+| `leadership[]` | Names, sourced professional roles, biography and LinkedIn URLs, observation/verification dates, and sourced portraits when available. `start_date` identifies verified role tenure; `company_start_date` identifies an officially sourced joining date; `employment_start_date` identifies provider employment tenure. |
 | `images[]` | Actual, sourced official context images. Leadership portraits use each person's `photo_url` and `photo_source_url`. |
 | `sources[]` | Provider/official name, URL, observation time and, for PDL, endpoint and record identity. |
 | `coverage` | Field availability and origin; an available metadata record is not a complete management roster. |
@@ -86,7 +95,9 @@ Person pagination stores the exact request parameters and page size before trans
 
 `scripts/backfill_company_basics.py` uses the separate `company/clean` allowance for the wider directory, with a private atomic journal, bounded attempts and serialized request starts. Its output is a candidate cache, not a publication. Assembly accepts only exact ticker plus normalized issuer/legal name or an independently known official domain. The cleaner's raw `score` and `fuzzy_match` values are retained as diagnostics, never converted to enrichment likelihood. Verified paid company records take precedence over cleaner records. Use `--basics-cache` on assembly to select a different cleaner cache.
 
-`scripts/cache_profile_portraits.py` downloads source-linked portraits with bounded concurrency and byte limits, requires a real image signature, uploads a content-addressed public asset and verifies its public bytes by SHA-256. HTML/error pages are rejected. The original URL and official attribution remain available when a cached image replaces the remote URL. The cache manifest reports individual failures; it does not silently substitute a different person's photo.
+`scripts/cache_profile_portraits.py` downloads source-linked portraits with bounded concurrency and byte limits, requires a real image signature, uploads a content-addressed public asset and verifies its public bytes by SHA-256. HTML/error pages are rejected. The original URL and official attribution remain available when a cached image replaces the remote URL. The cache manifest reports individual failures; it does not silently substitute a different person's photo. Source downloads and owned storage operations have separate timeout policies. A transport-only failure can receive one bounded recovery attempt; source403 responses and non-image content are not retried. An existing cached object is reused only after its public bytes match the freshly validated source image.
+
+Offline assembly applies the portrait manifest. Verified cached images retain `photo_original_url`, `photo_source_url`, credit and a content hash. A known403 or non-image source has its displayed `photo_url` cleared while retaining the original URL and attribution for later repair. A size-limit rejection alone does not establish that the original image is broken. Portrait updates change the profile's update timestamp without refreshing the official leadership observation date.
 
 Publish the assembled profiles explicitly:
 
@@ -95,6 +106,8 @@ python scripts/publish_company_profiles.py --profiles public/data/company-profil
 ```
 
 Publication uses the existing Supabase server credentials and distributed `company-profiles` lease. It validates issuer identity, source URLs, portrait attribution and tenure dates; reconciles newer live official evidence; and backs up changed previous objects to private storage before replacing them. Changed profiles and the regenerated directory must match their readback exactly. The script updates bundled fallbacks, the profile index and a publication report. Neither a page view nor an unset cron allowlist invokes this bulk workflow.
+
+Both assembly and publication reject a populated leadership roster without an official coverage marker. This catches an official collector accidentally retaining a previous provider-only marker before any roster can disappear during the merge. The merge also retains previously verified provider company fields when an official-only collector supplies new leadership, preserving their original field dates and attribution.
 
 ## Historical pilot and verification, 2026-11-05
 
