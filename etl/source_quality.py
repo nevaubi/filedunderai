@@ -11,6 +11,42 @@ from . import sec
 CALCULATION_HISTORY_YEARS = 6.3
 
 
+SOURCE_OBSERVATION_HOLDS = ({
+    'id': 'fdxf_2026_may_debt_rounded_narrative', 'ticker': 'FDXF', 'cik': 2082247,
+    'observation': {
+        'ticker': 'FDXF', 'statement': 'balance', 'label': 'Long-term debt', 'kind': 'Q',
+        'concept': 'LongTermDebt', 'unit': 'USD', 'period_start': None, 'period_end': '2026-05-31',
+        'accession': '0001628280-26-068246', 'filed': '2026-10-29', 'form': '10-Q',
+        'value': 4300000000, 'derived': False,
+    },
+    'reason': 'The rounded narrative amount must not replace the more precise reported table amount; preserve prior publication pending source review.',
+    'evidence': [
+        {'url': 'https://www.sec.gov/Archives/edgar/data/2082247/000162828026068246/fdxf-20260930.htm',
+         'sha256': '94ebdb2cdc40153abfb32bef5e5555ca06f6884d7021040e893719244d6f74b0', 'bytes': 980584,
+         'narrative': {'inline_id': 'f-506', 'context': 'c-4', 'printed': '4.3', 'scale': 9, 'decimals': -8},
+         'table': {'inline_id': 'f-492', 'context': 'c-109', 'printed': '4,264', 'scale': 6, 'decimals': -6}},
+        {'url': 'https://www.sec.gov/Archives/edgar/data/2082247/000162828026053359/fdxf-20260531.htm',
+         'sha256': '24678beac76e786cf90113b5e062efc9799d6629032f701076c318f1ef3613f0', 'bytes': 2515813,
+         'table': {'inline_id': 'f-518', 'context': 'c-4', 'printed': '4,264', 'scale': 6, 'decimals': -6}},
+    ],
+},)
+
+
+def check_source_observation_holds(ticker, rows):
+    """Reject only exact source-reviewed observations; never choose a replacement.
+
+    CompanyFacts omits the inline precision/context evidence pinned above. No
+    numeric tolerance or general assumption about later revisions is applied.
+    """
+    from .universe import BY_TICKER
+    cik = (BY_TICKER.get(ticker) or {}).get('cik')
+    holds = [hold for hold in SOURCE_OBSERVATION_HOLDS if (hold['ticker'], hold['cik']) == (ticker, cik)]
+    for row in rows:
+        for hold in holds:
+            if all(row.get(key) == value for key, value in hold['observation'].items()):
+                raise ValueError(f"Financial source observation requires review: {hold['id']}: {hold['reason']}")
+
+
 def comparability_review(statements, as_of=None):
     """Retain source disagreements and identify those affecting current calculations."""
     today = as_of or dt.datetime.now(dt.timezone.utc).date().isoformat()

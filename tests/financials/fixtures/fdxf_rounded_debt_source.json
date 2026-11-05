@@ -1,0 +1,363 @@
+{
+  "before_facts": [
+    {
+      "accession": "0001628280-26-053359",
+      "concept": "LongTermDebtAndCapitalLeaseObligations",
+      "derived": false,
+      "filed": "2026-08-05",
+      "form": "10-K",
+      "kind": "A",
+      "label": "Long-term debt",
+      "period_end": "2025-05-31",
+      "period_start": null,
+      "statement": "balance",
+      "ticker": "FDXF",
+      "unit": "USD",
+      "value": 66000000
+    },
+    {
+      "accession": "0001628280-26-053359",
+      "concept": "LongTermDebt",
+      "derived": false,
+      "filed": "2026-08-05",
+      "form": "10-K",
+      "kind": "A",
+      "label": "Long-term debt",
+      "period_end": "2026-05-31",
+      "period_start": null,
+      "statement": "balance",
+      "ticker": "FDXF",
+      "unit": "USD",
+      "value": 4264000000
+    },
+    {
+      "accession": "0001628280-26-053359",
+      "concept": "LongTermDebtAndCapitalLeaseObligations",
+      "derived": false,
+      "filed": "2026-08-05",
+      "form": "10-K",
+      "kind": "Q",
+      "label": "Long-term debt",
+      "period_end": "2025-05-31",
+      "period_start": null,
+      "statement": "balance",
+      "ticker": "FDXF",
+      "unit": "USD",
+      "value": 66000000
+    },
+    {
+      "accession": "0001628280-26-053359",
+      "concept": "LongTermDebt",
+      "derived": false,
+      "filed": "2026-08-05",
+      "form": "10-K",
+      "kind": "Q",
+      "label": "Long-term debt",
+      "period_end": "2026-05-31",
+      "period_start": null,
+      "statement": "balance",
+      "ticker": "FDXF",
+      "unit": "USD",
+      "value": 4264000000
+    },
+    {
+      "accession": "0001628280-26-068246",
+      "concept": "LongTermDebt",
+      "derived": false,
+      "filed": "2026-10-29",
+      "form": "10-Q",
+      "kind": "Q",
+      "label": "Long-term debt",
+      "period_end": "2026-09-30",
+      "period_start": null,
+      "statement": "balance",
+      "ticker": "FDXF",
+      "unit": "USD",
+      "value": 4200000000
+    }
+  ],
+  "before_fund": {
+    "bb_ttm": null,
+    "div_ttm": null,
+    "exchange": "NYSE",
+    "fund": {
+      "buyback_yield": null,
+      "dividend_yield": null,
+      "eps_ttm": null,
+      "fcf_ttm": null,
+      "fcf_yield": null,
+      "latest_quarter": "Q1 FY27",
+      "latest_quarter_end": "2026-09-30",
+      "market_cap": null,
+      "net_income_ttm": null,
+      "net_margin_ttm": null,
+      "op_margin_lq": 0.1036036036036036,
+      "pe_ttm": null,
+      "ps_ttm": null,
+      "rev_growth_lq": 0.08100929614873831,
+      "revenue_ttm": null
+    },
+    "fye": "0531",
+    "has_release": true,
+    "has_source_tables": true,
+    "latest_accession": "0001628280-26-068246",
+    "latest_filing": "2026-10-29",
+    "legal_name": "FedEx Freight Holding Company, Inc.",
+    "material_accession": "0001628280-26-068246",
+    "name": "FedEx Freight",
+    "sector": "Industrials",
+    "shares": 149521266,
+    "sic": "Air Courier Services",
+    "ticker": "FDXF"
+  },
+  "bundle": {
+    "cik": 2082247,
+    "filings": [
+      {
+        "a": "0001628280-26-068246",
+        "d": "2026-10-29",
+        "f": "10-Q",
+        "i": "",
+        "p": "fdxf-20260930.htm",
+        "r": "2026-09-30",
+        "x": "10-Q"
+      },
+      {
+        "a": "0001628280-26-053359",
+        "d": "2026-08-05",
+        "f": "10-K",
+        "i": "",
+        "p": "fdxf-20260531.htm",
+        "r": "2026-05-31",
+        "x": "10-K"
+      }
+    ],
+    "profile": {
+      "address": {
+        "city": "MEMPHIS",
+        "stateOrCountry": "TN",
+        "street1": "8525 TOURNAMENT DRIVE",
+        "street2": null,
+        "zipCode": "38125"
+      },
+      "exchanges": [
+        "NYSE"
+      ],
+      "fiscalYearEnd": "0531",
+      "name": "FedEx Freight Holding Company, Inc.",
+      "phone": "901-818-7167",
+      "sharesOutstanding": {
+        "end": "2026-10-27",
+        "val": 149521266
+      },
+      "sic": "4513",
+      "sicDescription": "Air Courier Services",
+      "stateOfIncorporation": "DE",
+      "website": ""
+    },
+    "statements": {
+      "balance": [
+        {
+          "annual": [
+            {
+              "accn": "0001628280-26-053359",
+              "c": "LongTermDebtAndCapitalLeaseObligations",
+              "end": "2025-05-31",
+              "filed": "2026-08-05",
+              "form": "10-K",
+              "v": 66000000
+            },
+            {
+              "accn": "0001628280-26-053359",
+              "c": "LongTermDebt",
+              "end": "2026-05-31",
+              "filed": "2026-08-05",
+              "form": "10-K",
+              "v": 4264000000
+            }
+          ],
+          "concept": "LongTermDebt",
+          "label": "Long-term debt",
+          "quarterly": [
+            {
+              "accn": "0001628280-26-053359",
+              "c": "LongTermDebtAndCapitalLeaseObligations",
+              "end": "2025-05-31",
+              "filed": "2026-08-05",
+              "form": "10-K",
+              "v": 66000000
+            },
+            {
+              "accn": "0001628280-26-053359",
+              "c": "LongTermDebt",
+              "end": "2026-05-31",
+              "filed": "2026-08-05",
+              "form": "10-K",
+              "v": 4264000000
+            },
+            {
+              "accn": "0001628280-26-068246",
+              "c": "LongTermDebt",
+              "end": "2026-09-30",
+              "filed": "2026-10-29",
+              "form": "10-Q",
+              "v": 4200000000
+            }
+          ],
+          "unit": "USD"
+        }
+      ],
+      "cashflow": [],
+      "income": []
+    },
+    "ticker": "FDXF"
+  },
+  "companyfacts": {
+    "cik": "0002082247",
+    "entityName": "FedEx Freight Holding Company, Inc.",
+    "facts": {
+      "us-gaap": {
+        "LongTermDebt": {
+          "description": "Amount, after unamortized (discount) premium and debt issuance costs, of long-term debt. Includes, but not limited to, notes payable, bonds payable, debentures, mortgage loans and commercial paper. Excludes capital lease obligations.",
+          "label": "Long-term Debt",
+          "units": {
+            "USD": [
+              {
+                "accn": "0001628280-26-053359",
+                "end": "2026-05-31",
+                "filed": "2026-08-05",
+                "form": "10-K",
+                "fp": "FY",
+                "fy": 2026,
+                "val": 4264000000
+              },
+              {
+                "accn": "0001628280-26-068246",
+                "end": "2026-05-31",
+                "filed": "2026-10-29",
+                "form": "10-Q",
+                "fp": "Q3",
+                "frame": "CY2026Q2I",
+                "fy": 2026,
+                "val": 4300000000
+              },
+              {
+                "accn": "0001628280-26-068246",
+                "end": "2026-09-30",
+                "filed": "2026-10-29",
+                "form": "10-Q",
+                "fp": "Q3",
+                "frame": "CY2026Q3I",
+                "fy": 2026,
+                "val": 4200000000
+              }
+            ]
+          }
+        },
+        "LongTermDebtAndCapitalLeaseObligations": {
+          "description": "Amount of long-term debt and lease obligation, classified as noncurrent.",
+          "label": "Long-term Debt and Lease Obligation",
+          "units": {
+            "USD": [
+              {
+                "accn": "0001628280-26-053359",
+                "end": "2025-05-31",
+                "filed": "2026-08-05",
+                "form": "10-K",
+                "fp": "FY",
+                "frame": "CY2025Q2I",
+                "fy": 2026,
+                "val": 66000000
+              },
+              {
+                "accn": "0001628280-26-053359",
+                "end": "2026-05-31",
+                "filed": "2026-08-05",
+                "form": "10-K",
+                "fp": "FY",
+                "fy": 2026,
+                "val": 4484000000
+              },
+              {
+                "accn": "0001628280-26-068246",
+                "end": "2026-05-31",
+                "filed": "2026-10-29",
+                "form": "10-Q",
+                "fp": "Q3",
+                "frame": "CY2026Q2I",
+                "fy": 2026,
+                "val": 4484000000
+              },
+              {
+                "accn": "0001628280-26-068246",
+                "end": "2026-09-30",
+                "filed": "2026-10-29",
+                "form": "10-Q",
+                "fp": "Q3",
+                "frame": "CY2026Q3I",
+                "fy": 2026,
+                "val": 4376000000
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "demonstrated_replacement": {
+    "after": {
+      "accession": "0001628280-26-068246",
+      "concept": "LongTermDebt",
+      "derived": false,
+      "filed": "2026-10-29",
+      "form": "10-Q",
+      "kind": "Q",
+      "label": "Long-term debt",
+      "period_end": "2026-05-31",
+      "period_start": null,
+      "statement": "balance",
+      "ticker": "FDXF",
+      "unit": "USD",
+      "value": 4300000000
+    },
+    "before": {
+      "accession": "0001628280-26-053359",
+      "concept": "LongTermDebt",
+      "derived": false,
+      "filed": "2026-08-05",
+      "form": "10-K",
+      "kind": "Q",
+      "label": "Long-term debt",
+      "period_end": "2026-05-31",
+      "period_start": null,
+      "statement": "balance",
+      "ticker": "FDXF",
+      "unit": "USD",
+      "value": 4264000000
+    },
+    "changed_fields": [
+      "value",
+      "accession",
+      "form",
+      "filed"
+    ],
+    "key": [
+      "FDXF",
+      "balance",
+      "Long-term debt",
+      "Q",
+      "2026-05-31"
+    ]
+  },
+  "evidence_scope": "Exact extracted archived source observations; no synthetic financial values",
+  "original_before_bundle": {
+    "bytes": 142268,
+    "sha256": "4072404be4449c825d38d3f3ac2b15cdee1a1e3c53c803958f28d93ccb1d140c",
+    "url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/companies/FDXF.json"
+  },
+  "original_companyfacts": {
+    "bytes": 183511,
+    "sha256": "a854a1c4bf5bf8ce645566f69ccfaebdd2344b7a0fc73c89d73d2a88bac6f0a2",
+    "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0002082247.json"
+  }
+}

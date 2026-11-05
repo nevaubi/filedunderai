@@ -146,6 +146,9 @@ def check_reported_fact_replacements(sb, ticker, rows):
     Local additive stages have no production rows. Live reads must succeed before
     publication, and direct persistence callers receive the same protection.
     """
+    from .source_quality import check_source_observation_holds
+    rows = list(rows)
+    check_source_observation_holds(ticker, rows)
     if getattr(sb, "stage_only", False) is True:
         return
     lookup = getattr(sb, "select", None)

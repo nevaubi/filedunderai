@@ -22,7 +22,7 @@ from urllib.parse import quote, unquote
 from . import fundamentals, jobs, repair, sec
 from .common import Supabase, now_iso, request, serialized_aggregates
 from .source_provenance import validate_statement_provenance, proof_object_path
-from .source_quality import partition_supported_periods, retain_proved_filing_tables, comparability_review
+from .source_quality import partition_supported_periods, retain_proved_filing_tables, comparability_review, check_source_observation_holds
 from .universe import BY_TICKER, UNIVERSE
 
 MAX_BATCH = 25
@@ -389,6 +389,7 @@ def _candidate(bundle, raw, as_of, generated, before_facts=()):
     candidate['statements'], excluded = partition_supported_periods(candidate['statements'])
     if not any(line.get('annual') or line.get('quarterly') for lines in candidate['statements'].values() for line in lines):
         raise ValueError('No supported source facts; refusing empty replacement')
+    check_source_observation_holds(ticker, rows_for(candidate))
     sha = digest(raw)
     proof = validate_statement_provenance(raw, candidate['statements'], cik, sha)
     proof_path = proof_object_path(ticker, proof)
