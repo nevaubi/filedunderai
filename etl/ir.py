@@ -788,9 +788,9 @@ class IRClient(Supabase):
         return len(content)
 
     def get_object(self, bucket, path, public=False):
+        url, headers = self._storage_read_request(bucket, path, public)
         try:
-            # /object/authenticated/ bypasses the storage CDN copy the bare object path can return (see Supabase.get_object).
-            return self._call(f"{self.url}/storage/v1/object/{'public' if public else 'authenticated'}/{bucket}/{urllib.parse.quote(path)}", headers=self._h(), raw=True)
+            return self._call(url, headers=headers, raw=True)
         except HTTPError as error:
             if _object_missing(error):
                 return None
@@ -819,9 +819,9 @@ def _stored_object(sb, bucket, path):
     if isinstance(sb, IRClient):
         return sb.get_object(bucket, path)
     if isinstance(sb, Supabase):
+        url, headers = sb._storage_read_request(bucket, path)
         try:
-            return request(f"{sb.url}/storage/v1/object/authenticated/{bucket}/{urllib.parse.quote(path)}",
-                           headers=sb._h(), raw=True, retries=1, timeout=30)
+            return request(url, headers=headers, raw=True, retries=1, timeout=30)
         except HTTPError as error:
             if _object_missing(error):
                 return None
