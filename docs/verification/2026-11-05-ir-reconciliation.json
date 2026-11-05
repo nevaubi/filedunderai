@@ -1,0 +1,38 @@
+{
+  "completed_at": "2026-11-05T00:10:38Z",
+  "companies": 500,
+  "documents": 73420,
+  "failures": {},
+  "coverage_index": {
+    "companies": 500,
+    "coverage": {
+      "partial": 499,
+      "unverified": 1
+    },
+    "companies_with_docs": 500,
+    "documents": 73420,
+    "bytes": 38369639687,
+    "companies_with_kpis": 497,
+    "kpis": 227953,
+    "kpi_values": 3944368,
+    "companies_with_segments": 485,
+    "segment_tables": 2912
+  },
+  "kpi_counts_as_of": "2026-11-05T00:07:30.948382Z",
+  "segment_counts_as_of": "2026-11-04T09:16:53Z",
+  "source_fingerprints": {
+    "count": 73420,
+    "ids": "7b1a9997c835aeaf73ddfc9fb4178f78",
+    "metadata": "f9fd9ffb9cda835d77a41dbad6b2e65f"
+  },
+  "public_manifest_verification": {
+    "checked_at": "2026-11-05T00:00:52Z",
+    "companies": 500,
+    "documents": 73420,
+    "publication_dates": 8694,
+    "verified_extractions": 19,
+    "pending_extractions": 73401,
+    "failures": {}
+  },
+  "method": "500 exact manifest readbacks; grouped SQL KPI counts; audited document snapshot; existing segment snapshot"
+}
