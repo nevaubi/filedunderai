@@ -104,6 +104,14 @@
       "schedule": "30 15 * * *"
     },
     {
+      "path": "/api/cron/altdata?step=market",
+      "schedule": "17 1 * * 2-6"
+    },
+    {
+      "path": "/api/cron/altdata?step=refresh",
+      "schedule": "47 */3 * * *"
+    },
+    {
       "path": "/api/cron/segments",
       "schedule": "50 12 * * *"
     },

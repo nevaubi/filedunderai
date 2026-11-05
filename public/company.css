@@ -58,3 +58,52 @@
   .co-actions .btn { padding-top: 8px; padding-bottom: 8px; }
   .co-tabs { margin-top: 0; }
 }
+
+/* Insiders and Alt data tabs: summary strips span the full row like the overview strip */
+.co-stats.ins-stats, .co-stats.ad-stats { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.co-stats .d { margin-top: 1px; color: var(--faint); font: 10px/1.5 var(--f-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.co-stats .v.up { color: var(--up); } .co-stats .v.down { color: var(--down); }
+.ins-hd { display: flex; align-items: center; gap: 12px; }
+.ins-count, .ad-hd-note { color: var(--muted); font: 11px/1.5 var(--f-mono); white-space: nowrap; }
+.ins-scroll { max-height: 560px; overflow: auto; }
+.ins-table { min-width: 640px; }
+.ins-table th { position: sticky; top: 0; z-index: 1; background: var(--surface); font-size: 10px; }
+.ins-table td { white-space: nowrap; padding-top: 7px; padding-bottom: 7px; }
+.ins-table .num, .ins-date { font-family: var(--f-mono); font-size: 12px; }
+.ins-date { color: var(--ink2); }
+.ins-who { max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ins-who-sm { max-width: 230px; }
+.ins-traders { overflow-x: auto; }
+.ins-traders .ins-table { min-width: 0; }
+.ins-traders + .src { padding-top: 10px; }
+.ins-name { color: var(--ink); }
+.ins-role { margin-left: 8px; color: var(--faint); font-size: 11px; }
+.ins-role:empty { display: none; }
+.ins-type { display: flex; gap: 4px; align-items: center; }
+.ins-type .chip { height: 20px; font-size: 11px; }
+.ins-link { white-space: nowrap; font-size: 12px; }
+.ins-grid > .panel { min-width: 0; }
+.ad-tab { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.ad-table td { white-space: nowrap; }
+.ad-table .num { font-family: var(--f-mono); font-size: 12px; }
+.ad-table th { font-size: 10px; }
+.ad-awards td { vertical-align: top; }
+.ad-clip { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ad-clip.faint { font-size: 11px; }
+.ad-sub { padding: 4px 16px 0; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+.ad-key, .ad-legend { display: flex; gap: 14px; padding: 8px 16px 0; color: var(--muted); font-size: 11px; }
+.ad-legend { padding: 4px 0 0; }
+.ad-key i, .ad-legend i { display: inline-block; width: 10px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+.ad-legend i { height: 8px; width: 8px; }
+.ad-foot { padding: 0 2px; color: var(--faint); font-size: 11px; }
+@media (min-width: 1450px) {
+  .co-stats.ins-stats, .co-stats.ad-stats { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+@media (max-width: 1000px) {
+  .co-stats.ins-stats, .co-stats.ad-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .co-stats.ins-stats, .co-stats.ad-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ins-who { max-width: 160px; }
+  .ad-clip { max-width: 140px; }
+}

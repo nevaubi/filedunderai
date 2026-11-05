@@ -8,7 +8,7 @@ from .common import Supabase
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "compare", "sectors", "screener", "technicals", "mdata", "kpistd", "statements", "all"])
+    ap.add_argument("job", choices=["companies", "prices", "macro", "index", "feed", "news", "insiders", "logos", "viewer", "segments", "ir", "compare", "sectors", "screener", "technicals", "mdata", "kpistd", "statements", "altdata", "all"])
     ap.add_argument("--tickers", nargs="*")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--news", action="store_true", help="refresh news for each company")
@@ -57,6 +57,10 @@ def main():
                                    max_docs=a.max_docs, max_pages=a.max_pages, repair_existing=a.repair_existing, publish_only=a.publish_only,
                                    refresh_site=a.refresh_site, backfill=a.full_history)
         print("ir", len(done), "failed", failed)
+    if a.job == "altdata":
+        from . import altdata
+        done, failed = altdata.altdata_job(sb, a.tickers, workers=a.workers, time_budget=a.budget)
+        print("altdata", len(done), "failed", json.dumps(failed)[:2000])
     if a.job == "segments":
         done, failed = jobs.segments_job(sb, a.tickers, workers=a.workers)
         print("segments", len(done), "failed", failed)

@@ -1699,40 +1699,63 @@ function renderInsiderFilings(host, tk, c) {
   t.append(tb);
   host.append(panel("Insider filings", null, el("div", { class: "src" }, "Transaction details for this company are still being processed. The filings are listed below."), el("div", { class: "scroll" }, t)));
 }
+// Compact dollars for trade values: $823.7K, $8.2M, $1.25B.
+function insMoney(v) {
+  if (v == null || !isFinite(v) || v === 0) return "–";
+  const a = Math.abs(v), s = v < 0 ? "−" : "";
+  if (a >= 1e9) return `${s}$${(a / 1e9).toFixed(2)}B`;
+  if (a >= 1e6) return `${s}$${(a / 1e6).toFixed(a >= 1e8 ? 0 : 1)}M`;
+  if (a >= 1e3) return `${s}$${(a / 1e3).toFixed(a >= 1e5 ? 0 : 1)}K`;
+  return `${s}$${Math.round(a)}`;
+}
+// Form 4 names arrive as filed ("LEVINSON ARTHUR D"); show them in the same case as everything else.
+function insName(s) {
+  if (!s) return "";
+  return /[a-z]/.test(s) ? s : s.toLowerCase().replace(/(^|[\s'\-.])([a-z])/g, (m, p, c) => p + c.toUpperCase()).replace(/\b(Ii|Iii|Iv|Jr|Sr)\b/g, w => w === "Jr" || w === "Sr" ? w + "." : w.toUpperCase());
+}
 function renderInsiders(host, tk, ins) {
   const codes = ins.codes || {};
-  const money = v => v ? fmtMoney(v) : "–";
   const w = ins.w90 || {}, y = ins.w365 || {};
-  host.append(el("div", { class: "stats" }, ...[
-    ["Open-market buys, 90d", String(w.buys || 0), w.buys ? `${money(w.buy_value)} · ${w.buyers} insider${w.buyers === 1 ? "" : "s"}` : "none"],
-    ["Open-market sales, 90d", String(w.sells || 0), w.sells ? `${money(w.sell_value)} · ${w.sellers} insider${w.sellers === 1 ? "" : "s"}` : "none"],
-    ["Sales under 10b5-1 plans, 90d", w.sells ? `${Math.round(100 * (w.plan_sells || 0) / w.sells)}%` : "–", "pre-scheduled trading plans"],
-    ["Net open-market, 12m", money((y.buy_value || 0) - (y.sell_value || 0)), `${y.buys || 0} buys · ${y.sells || 0} sales`],
-  ].map(([l, v, d]) => el("div", {}, el("div", { class: "l" }, l), el("div", { class: "v num" }, v), el("div", { class: "faint", style: "font-size:11px" }, d)))));
+  const net90 = (w.buy_value || 0) - (w.sell_value || 0), net12 = (y.buy_value || 0) - (y.sell_value || 0);
+  const people12 = new Set((ins.rows || []).filter(r => ["P", "S"].includes(r.code) && !r.derivative).map(r => r.owner)).size;
+  const stat = (l, v, d, cls = "") => el("div", {}, el("div", { class: "l" }, l), el("div", { class: "v num " + cls }, v), el("div", { class: "d" }, d || " "));
+  host.append(el("div", { class: "stats co-stats ins-stats", role: "group", "aria-label": "Insider activity summary" },
+    stat("Open-market buys, 90d", String(w.buys || 0), w.buys ? `${insMoney(w.buy_value)} · ${w.buyers} insider${w.buyers === 1 ? "" : "s"}` : "none", w.buys ? "up" : ""),
+    stat("Open-market sales, 90d", String(w.sells || 0), w.sells ? `${insMoney(w.sell_value)} · ${w.sellers} insider${w.sellers === 1 ? "" : "s"}` : "none", w.sells ? "down" : ""),
+    stat("Net open-market, 90d", net90 ? insMoney(net90) : "–", "buys minus sales", net90 > 0 ? "up" : net90 < 0 ? "down" : ""),
+    stat("Net open-market, 12m", net12 ? insMoney(net12) : "–", `${y.buys || 0} buys · ${y.sells || 0} sales`, net12 > 0 ? "up" : net12 < 0 ? "down" : ""),
+    stat("Sales under 10b5-1, 90d", w.sells ? `${Math.round(100 * (w.plan_sells || 0) / w.sells)}%` : "–", "pre-scheduled plans"),
+    stat("Insiders trading, 12m", String(people12), "open-market trades")));
 
   const ch = el("div", { class: "bd", style: "position:relative" });
-  host.append(panel("Price with open-market insider trades", el("span", { class: "faint", style: "font-size:12px" }, "Dot size = trade value · last 12 months"), ch));
+  const grid = el("div", { class: "grid g64 ins-grid" });
+  grid.append(panel("Price with open-market insider trades", el("span", { class: "faint", style: "font-size:12px" }, "Dot size = trade value · last 12 months"), ch));
+  host.append(grid);
   requestAnimationFrame(() => insiderChart(ch, tk, ins.rows || []));
 
-  const grid = el("div", { class: "grid g64" });
   let mode = "market";
-  const tableHost = el("div", { class: "scroll", style: "max-height:560px;overflow:auto" });
+  const tableHost = el("div", { class: "ins-scroll" });
+  const count = el("span", { class: "ins-count" });
   const draw = () => {
     const rows = (ins.rows || []).filter(r => mode === "all" ? true : mode === "market" ? ["P", "S"].includes(r.code) && !r.derivative : ["A", "M", "F", "X", "C", "G"].includes(r.code));
-    const t = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Date"), el("th", {}, "Insider"), el("th", {}, "Type"), el("th", { class: "r" }, "Shares"), el("th", { class: "r" }, "Price"), el("th", { class: "r" }, "Value"), el("th", { class: "r" }, "Owned after"), el("th", {}, ""))));
+    count.textContent = `${rows.length} transaction${rows.length === 1 ? "" : "s"}`;
+    const t = el("table", { class: "t ins-table" }, el("thead", {}, el("tr", {}, el("th", {}, "Date"), el("th", {}, "Insider"), el("th", {}, "Type"), el("th", { class: "r" }, "Shares"), el("th", { class: "r" }, "Price"), el("th", { class: "r" }, "Value"), el("th", { class: "r" }, "Owned after"), el("th", { class: "r" }, "Filing"))));
     const tb = el("tbody");
-    rows.slice(0, 150).forEach(r => {
+    rows.slice(0, 200).forEach(r => {
       const val = r.shares && r.price ? r.shares * r.price : null;
       const dirCls = r.code === "P" ? "up" : r.code === "S" ? "down" : "";
+      const who = insName(r.owner);
       tb.append(el("tr", {},
-        el("td", { class: "num" }, fdate(r.tx_date)),
-        el("td", {}, el("div", {}, r.owner), el("div", { class: "faint", style: "font-size:11px" }, r.role || "")),
-        el("td", {}, el("span", { class: "chip " + dirCls, title: `Code ${r.code}${r.derivative ? " · derivative" : ""}` }, codes[r.code] || r.code || "–"), r.plan_10b5 && r.code === "S" ? el("span", { class: "chip", style: "margin-left:4px", title: "Executed under a Rule 10b5-1 trading plan" }, "10b5-1") : null, r.derivative ? el("div", { class: "faint", style: "font-size:11px" }, r.security || "Derivative") : null),
+        el("td", { class: "ins-date" }, r.tx_date ? fdate(r.tx_date) : "–"),
+        el("td", { title: `${who}${r.role ? " · " + r.role : ""}` }, el("div", { class: "ins-who" }, el("span", { class: "ins-name" }, who), el("span", { class: "ins-role" }, r.role || ""))),
+        el("td", {}, el("div", { class: "ins-type" }, el("span", { class: "chip " + dirCls, title: `Code ${r.code}${r.derivative ? " · derivative" : ""}` }, codes[r.code] || r.code || "–"),
+          r.plan_10b5 && r.code === "S" ? el("span", { class: "chip", title: "Executed under a Rule 10b5-1 trading plan" }, "10b5-1") : null,
+          r.derivative ? el("span", { class: "chip", title: r.security || "Derivative security" }, "Deriv.") : null)),
         el("td", { class: "r num" }, r.shares != null ? Math.round(r.shares).toLocaleString("en-US") : "–"),
         el("td", { class: "r num" }, r.price ? "$" + fnum(r.price) : "–"),
-        el("td", { class: "r num " + dirCls }, val ? fmtMoney(val) : "–"),
+        el("td", { class: "r num " + dirCls }, val ? insMoney(val) : "–"),
         el("td", { class: "r num muted" }, r.owned_after != null ? Math.round(r.owned_after).toLocaleString("en-US") : "–"),
-        el("td", {}, el("a", { href: `https://www.sec.gov/Archives/edgar/data/${D.companies[tk]?.cik || ""}/${r.accession.replace(/-/g, "")}/`, target: "_blank", rel: "noopener", title: "Open the Form 4 on EDGAR" }, "Form 4 ↗"))));
+        el("td", { class: "r" }, el("a", { href: `https://www.sec.gov/Archives/edgar/data/${D.companies[tk]?.cik || ""}/${r.accession.replace(/-/g, "")}/`, target: "_blank", rel: "noopener", title: "Open the Form 4 on EDGAR", class: "ins-link" }, "Form 4 ↗"))));
     });
     if (!rows.length) tb.append(el("tr", {}, el("td", { colspan: 8, class: "muted" }, "No transactions of this type in the last 12 months.")));
     t.append(tb);
@@ -1740,15 +1763,19 @@ function renderInsiders(host, tk, ins) {
     tableHost.append(t);
   };
   draw();
-  grid.append(panel("Transactions", seg([["market", "Buys & sales"], ["comp", "Grants & exercises"], ["all", "All"]], mode, v => { mode = v; draw(); }), tableHost,
-    el("div", { class: "src" }, `Parsed from ${new Set((ins.rows || []).map(r => r.accession)).size} Form 4 filings over the last 12 months. Updated ${relTime(ins.generated)}.`)));
-  const ot = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Insider"), el("th", { class: "r" }, "Bought"), el("th", { class: "r" }, "Sold"))));
+  const txPanel = panel("Transactions", el("div", { class: "ins-hd" }, count, seg([["market", "Buys & sales"], ["comp", "Grants & exercises"], ["all", "All"]], mode, v => { mode = v; draw(); })), tableHost,
+    el("div", { class: "src" }, `Parsed from ${new Set((ins.rows || []).map(r => r.accession)).size} Form 4 filings over the last 12 months. Updated ${relTime(ins.generated)}.`));
+  const ot = el("table", { class: "t ins-table" }, el("thead", {}, el("tr", {}, el("th", {}, "Insider"), el("th", { class: "r" }, "Bought"), el("th", { class: "r" }, "Sold"))));
   const ob = el("tbody");
-  (ins.owners || []).forEach(o => ob.append(el("tr", {}, el("td", {}, el("div", {}, o.owner), el("div", { class: "faint", style: "font-size:11px" }, o.role || "")), el("td", { class: "r num up" }, o.buy_value ? fmtMoney(o.buy_value) : "–"), el("td", { class: "r num down" }, o.sell_value ? fmtMoney(o.sell_value) : "–"))));
+  (ins.owners || []).slice(0, 8).forEach(o => {
+    const who = insName(o.owner);
+    ob.append(el("tr", {}, el("td", { title: `${who}${o.role ? " · " + o.role : ""}` }, el("div", { class: "ins-who ins-who-sm" }, el("span", { class: "ins-name" }, who), el("span", { class: "ins-role" }, o.role || ""))),
+      el("td", { class: "r num up" }, insMoney(o.buy_value)), el("td", { class: "r num down" }, insMoney(o.sell_value))));
+  });
   if (!(ins.owners || []).length) ob.append(el("tr", {}, el("td", { colspan: 3, class: "muted" }, "No open-market trades in the last 12 months.")));
   ot.append(ob);
-  grid.append(panel("Largest traders, 12 months", null, el("div", { class: "scroll" }, ot), el("div", { class: "src" }, "Open-market purchases (code P) and sales (code S) of common stock. Grants, option exercises and tax withholding are excluded.")));
-  host.append(grid);
+  grid.append(panel("Largest traders, 12 months", null, el("div", { class: "ins-traders" }, ot), el("div", { class: "src" }, "Open-market purchases (code P) and sales (code S) of common stock. Grants, option exercises and tax withholding are excluded.")));
+  host.append(txPanel);
 }
 function insiderChart(host, tk, rows) {
   const bars = (PX[tk]?.bars || []).filter(b => b.t >= new Date(Date.now() - 372 * 864e5));
