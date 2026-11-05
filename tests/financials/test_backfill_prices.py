@@ -149,6 +149,28 @@ class MemoryPrices:
 class BackfillPricesTests(unittest.TestCase):
     def setUp(self):
         self.assertIsNotNone(bp, "The additive price publisher is not implemented")
+        from unittest.mock import patch
+        delays = patch.object(bp, "READBACK_DELAYS", (0.001, 0.001))
+        delays.start()
+        self.addCleanup(delays.stop)
+
+    def test_readback_waits_for_an_overwrite_to_become_visible(self):
+        class Lagging:
+            """Returns the previous version for the first reads after an overwrite."""
+            def __init__(self, lag):
+                self.objects, self.lag, self.reads = {("raw", "x"): b"old"}, lag, 0
+            def put_object(self, bucket, path, body, content_type=None, cache=None):
+                self.pending, self.reads = (bucket, path, body), 0
+            def get_object(self, bucket, path):
+                self.reads += 1
+                if self.reads > self.lag:
+                    self.objects[self.pending[:2]] = self.pending[2]
+                return self.objects.get((bucket, path))
+        sb = Lagging(2)
+        bp._verified_put(sb, "raw", "x", b"new", "application/gzip")
+        self.assertEqual(sb.reads, 3)
+        with self.assertRaisesRegex(RuntimeError, "read-back SHA mismatch"):
+            bp._verified_put(Lagging(10), "raw", "x", b"new", "application/gzip")
 
     def prepared(self, root):
         company, manifest, public, screen = fixture(root)
