@@ -260,12 +260,13 @@ def _same_shared_ownership_filing(first, second, financial_accessions):
     """Preserve matching, financially unused shared notices under their first owner.
 
     SEC submissions can list the same ownership or transaction notice under
-    multiple issuers. Exact Form 144 and 425 references are eligible too, but
+    multiple issuers. Exact Form 144, 425 and DFAN14A (a third party's proxy
+    soliciting material about the issuer) references are eligible too, but
     reporting forms, document IDs and accessions used by any financial proof
     remain blocked. The secondary issuer keeps its archived filing reference.
     """
     def form(row):
-        match = re.fullmatch(r"(?:(?:SC|SCHEDULE)\s+(13[DG](?:/A)?)|([345](?:/A)?|144|425))",
+        match = re.fullmatch(r"(?:(?:SC|SCHEDULE)\s+(13[DG](?:/A)?)|([345](?:/A)?|144|425|DFAN14A))",
                              str(row.get("form", "")).strip().upper())
         return (match.group(1) or match.group(2)) if match else None
     fields = ("accession", "filed", "report_date", "primary_doc", "items")
@@ -339,7 +340,7 @@ def _publication_ownership(sb, root, receipts, workers):
                 plan["skipped"].append({
                     **{key:row[key] for key in ("accession","form","filed","report_date","primary_doc","items")},
                     "owner_ticker":owner,
-                    "reason":"shared_issuer_reference" if str(row["form"]).strip() == "425" else "shared_ownership_filing",
+                    "reason":"shared_issuer_reference" if str(row["form"]).strip().upper() in ("425", "DFAN14A") else "shared_ownership_filing",
                     "ownership_basis":"existing_row" if old else "new_batch_owner"})
     return plans
 
