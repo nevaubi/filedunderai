@@ -62,7 +62,8 @@ class ProfileTests(unittest.TestCase):
         rows=[PERSON,{**PERSON,'job_company_id':'unrelated'},{**PERSON,'job_last_verified':'2024-06-10'},{**PERSON,'job_title':'Product Manager, WW Chief Strategy Officer'},{**PERSON,'job_title':'Global Client Chief Technology Officer'},{**PERSON,'job_last_verified':None}]
         out=sanitize_leadership(rows,'company-apple',NOW,expected_domain='apple.com')
         self.assertEqual(len(out),1)
-        self.assertEqual(out[0]['start_date'],'2024-01')
+        self.assertIsNone(out[0]['start_date'])
+        self.assertEqual(out[0]['employment_start_date'],'2024-01')
         self.assertEqual(out[0]['provider_verified_at'],'2026-10-01')
         raw=json.dumps(out)
         for forbidden in ['emails','mobile_phone','street_address','secret@example','photo_url','reports_to']:
@@ -74,6 +75,74 @@ class ProfileTests(unittest.TestCase):
         self.assertEqual(partial_date('2015-03',NOW),'2015-03')
         for value in ['2027','2024-02-30','2024-13','2015-3','n/a']:
             self.assertIsNone(partial_date(value,NOW))
+
+    def test_search_uses_exact_identity_and_never_manufactures_a_likelihood_score(self):
+        from etl.company_profiles import build_search_profile
+        record={k:v for k,v in COMPANY.items() if k!='likelihood'}
+        p=build_search_profile(ISSUER,record,observed_at=NOW)
+        self.assertTrue(p['sources'][0]['endpoint'].endswith('/company/search'))
+        self.assertNotIn('likelihood',p['sources'][0]['match'])
+        self.assertEqual(p['linkedin_url'],'https://linkedin.com/company/apple')
+        for change in ({'ticker':'MSFT'},{'website':'apple.evil.example'}):
+            with self.assertRaises(ValueError):build_search_profile(ISSUER,{**record,**change},observed_at=NOW)
+
+    def test_cleaner_fuzzy_flag_never_substitutes_for_exact_issuer_identity(self):
+        from etl.company_profiles import build_clean_profile
+        record={**COMPANY,'fuzzy_match':True,'score':1.4}
+        p=build_clean_profile(ISSUER,record,observed_at=NOW)
+        self.assertTrue(p['sources'][0]['endpoint'].endswith('/company/clean'))
+        self.assertNotIn('likelihood',p['sources'][0]['match'])
+        self.assertEqual(p['sources'][0]['match']['provider_score'],1.4)
+        with self.assertRaises(ValueError):
+            build_clean_profile(BY_TICKER['AAPL'],{**record,'name':'Apple Hospitality','display_name':'Apple Hospitality'},observed_at=NOW)
+
+    def test_fresh_provider_role_claims_are_not_published_as_corporate_leadership(self):
+        from etl.company_profiles import build_profile
+        rows=[{**PERSON,'full_name':name,'job_title':'Chief Executive Officer'}
+              for name in ('Unverified First CEO','Unverified Second CEO')]
+        profile=build_profile(ISSUER,COMPANY,observed_at=NOW,people=rows)
+        self.assertEqual(profile['leadership'],[])
+        self.assertEqual(profile['coverage']['leadership'],'unavailable')
+        self.assertNotIn('Unverified',json.dumps(profile))
+
+    def test_legal_name_can_verify_a_search_but_a_similar_company_cannot(self):
+        from etl.company_profiles import build_search_profile
+        issuer={**BY_TICKER['AAPL'],'name':'Apple Technology','legal_name':'Apple Inc.'}
+        p=build_search_profile(issuer,{k:v for k,v in COMPANY.items() if k!='likelihood'},observed_at=NOW)
+        self.assertEqual(p['name'],'Apple Technology')
+        with self.assertRaises(ValueError):
+            build_search_profile(issuer,{**COMPANY,'name':'Apple Hospitality','display_name':'Apple Hospitality'},observed_at=NOW)
+
+    def test_invalid_likelihood_cannot_pass_company_identity(self):
+        from etl.company_profiles import build_profile
+        for score in (True,float('nan'),float('inf'),11):
+            with self.subTest(score=score),self.assertRaises(ValueError):
+                build_profile(ISSUER,{**COMPANY,'likelihood':score},observed_at=NOW)
+
+    def test_compound_executives_are_admitted_without_divisional_or_former_roles(self):
+        from etl.company_profiles import sanitize_leadership
+        for title in ('President & CEO','Chairman and CEO','EVP and CFO','Executive Vice President, Chief Financial Officer'):
+            with self.subTest(title=title):
+                result=sanitize_leadership([{**PERSON,'job_title':title}], 'company-apple',NOW,expected_domain='apple.com')
+                self.assertEqual(len(result),1)
+                self.assertEqual(result[0]['role'],title)
+        for title in ('Regional CFO','CEO, Consumer Division','Former CEO','CFO EMEA','Executive Vice President, Product Group'):
+            with self.subTest(title=title):
+                self.assertEqual(sanitize_leadership([{**PERSON,'job_title':title}], 'company-apple',NOW),[])
+        self.assertEqual(sanitize_leadership([{**PERSON,'job_start_date':'2027-01'}], 'company-apple',NOW),[])
+
+    def test_provider_linkedin_supplements_exact_official_identity_without_replacing_biography_or_role_date(self):
+        from etl.company_profiles import build_profile,merge_official_profile,sanitize_leadership
+        provider=build_profile(ISSUER,COMPANY,observed_at=NOW,people=[PERSON])
+        official={'ticker':'AAPL','cik':320193,'updated_at':NOW,'coverage':{'status':'official_sources'},
+                  'leadership':[{'name':'Example Executive','role':'Chief Financial Officer','start_date':'2025-01-01',
+                                 'profile_url':'https://apple.com/executive','source_url':'https://apple.com/executive','observed_at':NOW}]}
+        candidates=sanitize_leadership([PERSON],'company-apple',NOW,expected_domain='apple.com')
+        self.assertEqual(provider['leadership'],[])
+        result=merge_official_profile(provider,official,now=NOW,provider_people=candidates)['leadership'][0]
+        self.assertEqual(result['linkedin_url'],'https://linkedin.com/in/example-executive')
+        self.assertEqual(result['profile_url'],'https://apple.com/executive')
+        self.assertEqual(result['start_date'],'2025-01-01')
 
     def test_official_current_leadership_and_description_win_over_provider(self):
         from etl.company_profiles import build_profile,merge_official_profile
@@ -109,7 +178,7 @@ class ProfileTests(unittest.TestCase):
                                 {'name':'Undated Executive','role':'CFO'}]}
         merged=merge_official_profile(p,official,now=NOW)
         self.assertEqual(merged['leadership'],p['leadership'])
-        self.assertEqual(merged['coverage']['leadership'],'partial_provider_records')
+        self.assertEqual(merged['coverage']['leadership'],'unavailable')
         self.assertEqual(merged['coverage']['official_updated_at'],'2025-01-01T00:00:00Z')
 
     def test_official_freshness_is_checked_for_each_person(self):
@@ -270,9 +339,9 @@ class ProfileTests(unittest.TestCase):
         second=refresh_profiles(sb,['AAPL'],client=PDLClient('test',transport=transport),now=NOW,official_dir=Path('/nonexistent'))
         self.assertEqual(first['published'],['AAPL'])
         self.assertEqual(second['cache_hits'],1)
-        self.assertEqual(paid,['GET','POST'])
+        self.assertEqual(paid,['GET'])
         profile=sb.public['company-profiles/AAPL.json']
-        self.assertEqual(profile['leadership'][0]['role'],'Chief Financial Officer')
+        self.assertEqual(profile['leadership'],[])
         self.assertNotIn('secret@example.test',json.dumps(profile))
         self.assertNotIn('private-home',json.dumps(profile))
         self.assertIsNone(profile['employees'])
@@ -354,7 +423,10 @@ class ProfileTests(unittest.TestCase):
                     if (lose_at=='company_preflight' and 'company/enrich' in url) or (lose_at=='people_preflight' and 'person/search' in url):Lease.current.lost=True
                     return 400,{},QUOTA
                 return (200,COMPANY,QUOTA) if method=='GET' else (200,{'data':[]},QUOTA)
-            with self.subTest(lose_at=lose_at),patch('etl.company_profiles.AggregateLease',Lease),self.assertRaises(RuntimeError):
+            official={'schema_version':1,'ticker':'AAPL','cik':320193,'updated_at':NOW,
+                      'coverage':{'status':'official_sources'},'sources':[],
+                      'leadership':[{'name':'Current Executive','role':'CEO','observed_at':NOW}]}
+            with self.subTest(lose_at=lose_at),patch('etl.company_profiles.AggregateLease',Lease),patch('etl.company_profiles._read_official',return_value=official),self.assertRaises(RuntimeError):
                 refresh_profiles(Storage(),['AAPL'],client=PDLClient('test',transport=transport),now=NOW,official_dir=Path('/nonexistent'))
             self.assertFalse(any(lost for method,is_people,lost in events if method!='HEAD'))
             if lose_at.startswith('company'):self.assertFalse(any(method=='GET' for method,_,_ in events))

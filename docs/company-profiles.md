@@ -12,7 +12,9 @@ python scripts/generate_company_directory.py
 
 The generator reads `etl.universe.BY_TICKER` and `UNIVERSE`, and optionally copies known website/industry metadata from reviewed local profiles with matching ticker **and** CIK. Pass `--fundamentals /path/to/meta/fundamentals.json` to include SEC industry descriptions from an already retrieved snapshot; ticker, registry name and sector must all match. The current manifest contains SEC industry descriptions for all 1,100 issuers. The runtime also accepts the current index’s SEC classification, and related-company ranking uses that shared classification when curated industry wording differs. It cannot change screener membership. The build ships the directory as a local fallback.
 
-Reviewed profiles are shipped for AAPL, AMZN, GOOGL, MSFT and NVDA at `public/data/company-profiles/{TICKER}.json`. Their descriptions, current leadership, portraits and contextual images come from the official pages listed in each record. PDL adds separately attributed company metadata for the initial AAPL/MSFT/NVDA pilot. AMZN and GOOGL use official sources without additional paid calls. These five profiles contain 20 selected leaders, 17 sourced portrait links, and five contextual images; the lists are partial rosters, and image availability remains source-dependent. No PDL pilot person record was substituted for official leadership.
+Profiles are shipped at `public/data/company-profiles/{TICKER}.json` and published as cached objects. Official descriptions, leadership, portraits and contextual images retain their own sources; verified PDL records add separately attributed company and professional metadata. The initial five-company pilot is recorded under the historical section below. Current coverage comes from the generated directory and profile index, rather than that pilot's counts.
+
+The directory's **Company metadata** filter uses actual profile availability, and **Leadership available** requires a positive sourced leadership count. Neither filter infers enrichment from registry membership or screener eligibility. Row labels distinguish Leadership, Company details, Screener and Registered; their tooltips expose leader/portrait counts where available. A metadata-only profile is not a claim of complete management coverage.
 
 ## Public profile contract
 
@@ -21,16 +23,18 @@ Each profile identifies `schema_version`, `ticker`, numeric `cik`, registry `nam
 | Field | Meaning |
 | --- | --- |
 | `description`, `description_source` | Business prose and the exact source/observation metadata. |
-| `website`, `industry`, `headquarters`, `founded` | Available company metadata; `field_sources` records provenance. Headquarters is city/region/country, without a street address. |
+| `website`, `linkedin_url`, `industry`, `headquarters`, `founded` | Available company metadata and the company's LinkedIn page; `field_sources` records provenance. Headquarters is city/region/country, without a street address. |
 | `employees` | Officially sourced workforce, when available. PDL profile counts never populate this field. |
 | `professional_profile_count` | PDL profiles associated with the company, explicitly identified as a provider count rather than reported headcount. |
 | `professional_profile_count_basis`, `professional_profile_count_source` | Count interpretation and provider source. |
-| `leadership[]` | Names, exact professional roles, professional profile/source URLs, observation time, provider verification date when applicable, and real partial start dates. |
-| `images[]` | Only actual, sourced official context images. PDL does not supply or invent portraits. |
+| `leadership[]` | Names, sourced professional roles, biography and LinkedIn URLs, observation/verification dates, and sourced portraits when available. `start_date` identifies verified role tenure; `employment_start_date` identifies provider employment tenure. |
+| `images[]` | Actual, sourced official context images. Leadership portraits use each person's `photo_url` and `photo_source_url`. |
 | `sources[]` | Provider/official name, URL, observation time and, for PDL, endpoint and record identity. |
-| `coverage` | Field availability and origin; partial provider leadership is not a complete management roster. |
+| `coverage` | Field availability and origin; an available metadata record is not a complete management roster. |
 
-A start date remains `YYYY`, `YYYY-MM` or `YYYY-MM-DD` at its source precision. Invalid and future dates are omitted. Role groups are presentation categories and do not assert reporting relationships. Unknown values remain null or absent.
+A start date remains `YYYY`, `YYYY-MM` or `YYYY-MM-DD` at its source precision. PDL's `job_start_date` is stored as `employment_start_date`, with an explanatory `tenure_note`; it is not evidence of when the displayed role began. The UI labels this “With company since” when a role start is unavailable. A role `start_date` requires an explicit appointment source (`start_date_source_url` or `start_date_source.url`). Invalid and future dates are excluded. Role groups are presentation categories and do not assert reporting relationships. Unknown values remain null or absent.
+
+The PDL records used here do not supply profile portraits. Portraits must come from separately sourced official pages; missing photos remain missing. The UI retains the official biography as the person's main link and exposes a separate LinkedIn link when available. It displays the complete sourced roster rather than truncating it to sixteen people.
 
 The front end reads public cached objects or the bundled fallback and does not invoke enrichment. API keys, contact details, personal addresses, phones, email, raw person records and unrelated personal data are not published.
 
@@ -48,15 +52,55 @@ An operator may invoke the route after setting a reviewed allowlist. The browser
 
 Provider requests use a 15-second timeout, no automatic retry, no redirects, a response-size bound and explicit field selection. A no-credit HEAD preflight checks quota before the first paid request to each endpoint. PDL may return HTTP400 for these parameterless HEAD requests while supplying valid quota headers. The client excludes the explicit overage allowance, rejects non-finite or negative credit/rate values, and caps its local balance by every subsequent response. A missing response balance requires another preflight; malformed metadata stops further spending while retaining an already paid successful result. These checks do not change account-level overage settings or coordinate other applications using the account.
 
-Positive provider results are cached for 30 days; no-match/failed attempts for seven days. Provider stops add a one-day pause. Curated official corrections are reconciled and republished without provider calls before cache, pause and daily-budget checks; this path does not require a PDL key or reset the provider cache/reservations. Identical merges do not rewrite objects, and older bundled official evidence cannot replace newer official evidence already published. The default person query requests at most two records per company. Fresh reviewed official leadership avoids those person requests entirely. Lease and deadline checks run around reservation I/O and immediately before each provider transport, including after quota preflight. In-flight storage operations still use the shared storage client's timeout policy.
+Positive provider results are cached for 30 days; no-match/failed attempts for seven days. Provider stops add a one-day pause. Curated official corrections are reconciled and republished without provider calls before cache, pause and daily-budget checks; this path does not require a PDL key or reset the provider cache/reservations. Identical merges do not rewrite objects, and older bundled official evidence cannot replace newer official evidence already published. The default person query requests at most two records per company, only to supplement missing professional links on a current official roster. Without an official roster, it does not spend on person candidates. Lease and deadline checks run around reservation I/O and immediately before each provider transport, including after quota preflight. In-flight storage operations still use the shared storage client's timeout policy.
 
-Provider records are admitted only after exact ticker matching. A known official domain must match exactly; without one, the result needs a stronger likelihood and a normalized exact issuer name. Current person records must match the verified provider company ID, known company domain, an exact corporate title allowlist, and a full provider verification date within 180 days. Broad `cxo` classification alone is insufficient. Provider metadata is not proof that a person appears on the issuer's official leadership roster; current official sources take precedence.
+Provider company records require verified ticker identity and supporting company identity. Enrichment uses its reported likelihood together with a known domain or normalized exact issuer/legal name. Company search has no enrichment likelihood: its records need ticker identity plus an exact normalized name or verified domain, with the actual endpoint and match basis recorded. A share-class alias is acceptable only when the registry establishes the same CIK. The registry display name remains the published company name.
+
+Person candidates must match the verified provider company ID and known company domain, an approved corporate title, and a full provider verification date within 180 days. Approved title normalization handles case, whitespace, separators, abbreviations and recognized compound roles such as “Chairman and CEO” or “Executive Vice President and CFO”. Regional, divisional and former-role qualifiers are not accepted through broad title substring matching, and `cxo` classification alone is insufficient. Search queries also restrict verification dates before requesting paid results. **These checks do not establish current corporate leadership.** The bulk pass found false and outdated role claims even on fresh provider records. Provider-only people remain in the private candidate cache, and the publisher rejects them. Names and roles require corroboration from current official leadership pages or filings before appearing in the public roster.
 
 The serverless bundle includes `public/data/company-profiles/**` so the backend can preserve curated official facts when enriching. Leadership freshness is checked per person against its own observation date, with a dedicated official snapshot date as the fallback. A provider supplement's overall `updated_at` cannot renew old leadership. Future or more-than-180-day-old official observations are excluded, while source dates and date precision remain intact. A current official snapshot may be newer than the provider observation and still wins.
 
-## Pilot and verification, 2026-11-05
+Precedence follows the actual source of each field and person. Provider refreshes preserve current official descriptions, biographies, roles, appointment dates and portraits; older official evidence cannot replace newer official evidence. A fresh provider record can supplement a missing official LinkedIn URL only after an exact normalized full-name and role-family match within the same verified company. Description attribution follows `description_source`, so an official description is not labeled PDL merely because other company metadata came from PDL.
 
-The bounded live pilot made three successful company enrichments (AAPL, MSFT, NVDA), each at likelihood 10 with matching ticker/domain/name. Response headers reported one company credit for each. Six professional records were returned across three person searches, with two search credits reported per response. No additional paid calls were made for the implementation or tests.
+## Explicit bulk backfill and publication
+
+`scripts/backfill_company_profiles.py` is an operator-run workflow, separate from the cron's five-company/ten-person daily limits. Its three phases are:
+
+| Phase | Operation |
+| --- | --- |
+| `companies` | Read an explicit JSON plan with `enrich` and `search` ticker arrays; fetch bounded company records. |
+| `people` | Search only verified provider company IDs, with approved titles and the 180-day verification window; give each company group a first page before deeper pagination. |
+| `assemble` | Validate cached records, merge official corrections and write public profiles locally. Makes no provider calls and does not require the PDL key. |
+
+All phases require `--issuers` and `--cache`; company fetching also requires `--plan`. The issuer JSON is an array of records containing registry-matching `ticker` and `cik`, with `name` supplying an optional legal-name match and `website` supplying a known domain. `--output` defaults to `public/data/company-profiles`. Example invocations from the repository root:
+
+```sh
+python scripts/backfill_company_profiles.py companies --issuers /path/to/issuers.json --plan /path/to/plan.json --cache cache/company-profile-backfill
+python scripts/backfill_company_profiles.py people --issuers /path/to/issuers.json --cache cache/company-profile-backfill
+python scripts/backfill_company_profiles.py assemble --issuers /path/to/issuers.json --cache cache/company-profile-backfill
+```
+
+Set `PEOPLE_DATA_LABS_API_KEY` in the environment for fetch phases. Review the explicit `--company-enrich-limit`, `--company-search-limit` and `--people-limit` options before a run; they cap separate endpoint credit pools and must remain identical when resuming the same cache journal. The fetcher reserves credits in an atomic local journal before transport, uses a process lock and endpoint pacing, checks non-overage quota, and keeps only allowlisted response fields. Completed operations reuse cached results. Uncertain transports retain their reservation and are not automatically replayed. Only a conclusive provider credit receipt releases an unused reservation. Cached fetch data and its journal are operational files, not public profile artifacts.
+
+Person pagination stores the exact request parameters and page size before transport. Resuming uses those requests even when the remaining balance changes; it never substitutes a smaller first page and spends again on duplicate results. Legacy person plans without durable request parameters and with paid reservations require manual review instead of automatic replay.
+
+`scripts/backfill_company_basics.py` uses the separate `company/clean` allowance for the wider directory, with a private atomic journal, bounded attempts and serialized request starts. Its output is a candidate cache, not a publication. Assembly accepts only exact ticker plus normalized issuer/legal name or an independently known official domain. The cleaner's raw `score` and `fuzzy_match` values are retained as diagnostics, never converted to enrichment likelihood. Verified paid company records take precedence over cleaner records. Use `--basics-cache` on assembly to select a different cleaner cache.
+
+`scripts/cache_profile_portraits.py` downloads source-linked portraits with bounded concurrency and byte limits, requires a real image signature, uploads a content-addressed public asset and verifies its public bytes by SHA-256. HTML/error pages are rejected. The original URL and official attribution remain available when a cached image replaces the remote URL. The cache manifest reports individual failures; it does not silently substitute a different person's photo.
+
+Publish the assembled profiles explicitly:
+
+```sh
+python scripts/publish_company_profiles.py --profiles public/data/company-profiles --fundamentals /path/to/fundamentals.json --report cache/company-profile-backfill/publication-report.json
+```
+
+Publication uses the existing Supabase server credentials and distributed `company-profiles` lease. It validates issuer identity, source URLs, portrait attribution and tenure dates; reconciles newer live official evidence; and backs up changed previous objects to private storage before replacing them. Changed profiles and the regenerated directory must match their readback exactly. The script updates bundled fallbacks, the profile index and a publication report. Neither a page view nor an unset cron allowlist invokes this bulk workflow.
+
+## Historical pilot and verification, 2026-11-05
+
+The initial shipped profiles covered AAPL, AMZN, GOOGL, MSFT and NVDA: 20 selected leaders, 17 sourced portrait links and five contextual images. PDL added company metadata for AAPL/MSFT/NVDA; AMZN and GOOGL used official sources without additional paid calls. No PDL pilot person record replaced official leadership. These are historical pilot counts, not the current backfill totals.
+
+The bounded live pilot made three successful company enrichments (AAPL, MSFT, NVDA), each at likelihood 10 with matching ticker/domain/name. Response headers reported one company credit for each. Six professional records were returned across three person searches, with two search credits reported per response. No additional paid calls were made during that initial implementation or its tests; subsequent bulk work is tracked in its own journal and reports.
 
 The broad pilot person query returned divisional roles, a title-classification false positive and an old verification date. Those results motivated the stricter exact-title and freshness gates; the initial public leadership lists use official sources. PDL's company response is flat rather than wrapped in `data`; person search returns a `data` array. The implementation handles those shapes separately.
 
@@ -70,6 +114,7 @@ These documentation pages were opened and checked during implementation:
 - [Company enrichment input parameters](https://docs.peopledatalabs.com/docs/input-parameters-company-enrichment-api)
 - [Company enrichment output response](https://docs.peopledatalabs.com/docs/output-response-company-enrichment-api)
 - [Company schema](https://docs.peopledatalabs.com/docs/company-schema)
+- [Cleaner APIs](https://docs.peopledatalabs.com/docs/cleaner-apis-reference)
 - [Person Search API](https://docs.peopledatalabs.com/docs/person-search-api)
 - [Person search input parameters](https://docs.peopledatalabs.com/docs/input-parameters-person-search-api)
 - [Person schema and verification dates](https://docs.peopledatalabs.com/docs/fields)

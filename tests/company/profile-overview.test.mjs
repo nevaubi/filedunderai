@@ -21,6 +21,22 @@ test('management tenure preserves month and year precision and never invents a s
   } finally { h.close(); }
 });
 
+test('provider employment dates are visibly distinguished from current role tenure', () => {
+  const h = setup();
+  try {
+    h.api.render(h.w.document.querySelector('main'), {
+      ticker: 'AAA', company: { name: 'Alpha', filings: [] }, snapshot: {}, helpers: {},
+      enrichment: { ticker: 'AAA', updated_at: '2026-11-05', leadership: [
+        { name: 'Jane Example', role: 'Chief Executive Officer', employment_start_date: '2001-11', profile_url: 'https://alpha.example/jane', linkedin_url: 'https://www.linkedin.com/in/jane-example', source_url: 'https://alpha.example/leadership' },
+      ] },
+    });
+    const person = h.w.document.querySelector('.cp-person');
+    assert.match(person.querySelector('.cp-tenure').textContent, /^With company since Nov 2001/);
+    assert.equal(person.querySelector('h4 a').href, 'https://alpha.example/jane');
+    assert.equal(person.querySelector('.cp-person-links a[href*="linkedin.com"]').textContent, 'LinkedIn ↗');
+  } finally { h.close(); }
+});
+
 test('public profile renderer keeps exact source callbacks and handles missing enrichment without guessed leadership', () => {
   const h = setup();
   try {

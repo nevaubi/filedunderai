@@ -55,13 +55,27 @@ def build_directory(profiles=None, generated_at=None, fundamentals=None):
                     row['domain'] = host
                     row['website'] = parsed.geturl()
             row['coverage']['profile'] = 'available'
+            leaders = [person for person in profile.get('leadership', [])
+                       if isinstance(person, dict) and person.get('name') and (person.get('role') or person.get('title'))]
+            row['leadership_count'] = len(leaders)
+            row['portrait_count'] = sum(bool(person.get('photo_url')) for person in leaders)
+            row['coverage']['leadership'] = 'available' if leaders else 'unavailable'
+            row['profile_updated_at'] = profile.get('updated_at')
+            if profile.get('ir_url'):
+                row['ir_url'] = profile['ir_url']
+            if profile.get('headquarters'):
+                row['headquarters'] = profile['headquarters']
         rows.append(row)
     return {
         'schema_version': 1,
         'generated_at': generated_at or dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
         'source': 'Filed Under validated issuer registry (etl/universe.py and cohort registries)',
         'coverage_note': 'Registry discovery is independent of screener publication. Pending publication does not imply that source documents or prices are absent.',
-        'counts': {'registered':len(rows), 'screener_eligible':sum(c['screener_eligible'] for c in rows)},
+        'counts': {'registered':len(rows), 'screener_eligible':sum(c['screener_eligible'] for c in rows),
+                   'with_metadata':sum(c['coverage']['profile'] == 'available' for c in rows),
+                   'with_leadership':sum(c.get('leadership_count', 0) > 0 for c in rows),
+                   'leaders':sum(c.get('leadership_count', 0) for c in rows),
+                   'portraits':sum(c.get('portrait_count', 0) for c in rows)},
         'companies': rows,
     }
 

@@ -167,12 +167,14 @@
       const descSource = profile?.description_source?.url || profile?.description_source || profile?.description?.source_url || profile?.source_url;
       if (safeUrl(descSource)) aboutLinks.append(sourceLink(descSource, profile?.description_provider || 'Business description source'));
       if (website) aboutLinks.append(sourceLink(website, 'Company website'));
+      if (safeUrl(profile?.linkedin_url)) aboutLinks.append(sourceLink(profile.linkedin_url, 'Company LinkedIn'));
+      if (safeUrl(profile?.ir_url || summary.ir_url)) aboutLinks.append(sourceLink(profile?.ir_url || summary.ir_url, 'Investor relations'));
       description.append(aboutLinks);
       const identity = node('div', { class: 'cp-identity-note' }, node('span', {}, 'SEC registrant'), node('strong', {}, company.name || name), company.cik ? node('span', {}, 'CIK ' + String(company.cik).padStart(10, '0')) : null);
       description.append(identity);
       if (summary.screener_eligible === false) description.append(node('p', { class: 'cp-coverage-note' }, 'Company profile, price history, and filings are available. Screener coverage is still being validated.'));
 
-      const people = (profile?.leadership || []).filter(p => p && typeof p.name === 'string' && p.name.trim() && (p.role || p.title)).slice(0, 16);
+      const people = (profile?.leadership || []).filter(p => p && typeof p.name === 'string' && p.name.trim() && (p.role || p.title));
       if (!people.length) leadership.append(node('div', { class: 'cp-empty-state' }, node('div', { class: 'cp-empty-icon', 'aria-hidden': 'true' }, '◎'), node('h3', {}, 'Leadership profiles are not available yet'), node('p', {}, 'Names, roles, tenure, and portraits appear here when supported by a source.'), tenK && helpers.filingUrl ? sourceLink(helpers.filingUrl(ticker, tenK), 'View the latest annual report') : null));
       else {
         const groups = new Map();
@@ -195,15 +197,19 @@
             const profileUrl = safeUrl(person.profile_url || person.linkedin_url);
             const nameNode = profileUrl ? node('a', { href: profileUrl, target: '_blank', rel: 'noopener noreferrer' }, person.name) : node('strong', {}, person.name);
             const observedAt = person.observed_at || profile.updated_at;
-            const tenure = tenureLabel(person.start_date || person.job_start_date, observedAt || new Date().toISOString().slice(0, 10));
-            const tenureSource = safeUrl(person.start_date_source_url);
+            const roleStart = person.start_date;
+            const employmentStart = person.employment_start_date || person.company_start_date;
+            const tenure = roleStart ? tenureLabel(roleStart, observedAt || new Date().toISOString().slice(0, 10)) : employmentStart ? tenureLabel(employmentStart, observedAt || new Date().toISOString().slice(0, 10)).replace(/^Since /, 'With company since ') : 'Role start date unavailable';
+            const tenureSource = safeUrl(person.start_date_source_url || person.start_date_source?.url);
             const tenureNode = node(tenureSource ? 'a' : 'span', { class: 'cp-tenure', href: tenureSource, target: tenureSource ? '_blank' : null, rel: tenureSource ? 'noopener noreferrer' : null, title: [observedAt ? 'Role observed ' + dateLabel(observedAt) : 'Role observation date unavailable', person.tenure_note].filter(Boolean).join('. ') }, tenure);
             const credit = person.photo_credit ? node('span', { class: 'cp-photo-credit' }, 'Photo: ' + person.photo_credit, person.photo_license ? [' · ', sourceLink(person.photo_license_url, person.photo_license) || person.photo_license] : null) : null;
-            grid.append(node('article', { class: 'cp-person' }, avatar, node('div', { class: 'cp-person-info' }, node('h4', {}, nameNode), node('p', { class: 'cp-person-role' }, person.role || person.title), tenureNode, sourceLink(person.source_url, person.source_name || 'Profile source'), credit)));
+            const linkedinUrl = safeUrl(person.linkedin_url);
+            const links = node('div', { class: 'cp-person-links' }, sourceLink(person.source_url, person.source_name || 'Profile source'), linkedinUrl && linkedinUrl !== profileUrl ? sourceLink(linkedinUrl, 'LinkedIn') : null);
+            grid.append(node('article', { class: 'cp-person' }, avatar, node('div', { class: 'cp-person-info' }, node('h4', {}, nameNode), node('p', { class: 'cp-person-role' }, person.role || person.title), tenureNode, links, credit)));
           }
           leadership.append(node('div', { class: 'cp-role-group' }, node('h3', {}, group), grid));
         }
-        leadership.append(node('p', { class: 'cp-footnote' }, (profile.coverage?.leadership_scope ? profile.coverage.leadership_scope + ' ' : '') + 'Grouped by role; reporting relationships are shown only when explicitly sourced. Tenure runs from the reported role start to the source observation date.' + (profile.updated_at ? ' Profiles checked ' + dateLabel(profile.updated_at) + '.' : ' Observation dates are unavailable.')));
+        leadership.append(node('p', { class: 'cp-footnote' }, (profile.coverage?.leadership_scope ? profile.coverage.leadership_scope + ' ' : '') + 'Tenure uses the sourced role start date. “With company since” indicates employment tenure when a role start is unavailable.' + (profile.updated_at ? ' Profiles checked ' + dateLabel(profile.updated_at) + '.' : ' Observation dates are unavailable.')));
       }
       const validImages = (profile?.images || []).filter(image => safeUrl(image.url) && safeUrl(image.source_url)).slice(0, 3);
       const publicationTime = item => Date.parse(item.published_at || item.date || '') || 0;

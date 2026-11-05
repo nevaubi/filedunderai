@@ -31,10 +31,19 @@
     return records;
   }
   async function load(activeCompanies = []) {
-    if (!pending) pending = fetch('/data/company-directory.json').then(r => {
-      if (!r.ok) throw new Error('Company directory is unavailable');
-      return r.json();
-    }).catch(error => { pending = null; if (!activeCompanies.length) throw error; return { companies: [] }; });
+    if (!pending) pending = (async () => {
+      const base = root.FU_CONFIG?.dataBase;
+      const paths = [typeof base === 'string' && base ? `${base}company-directory.json` : null, '/data/company-directory.json'].filter(Boolean);
+      for (const path of paths) {
+        try {
+          const response = await fetch(path);
+          if (!response.ok) continue;
+          const directory = await response.json();
+          if (directory?.schema_version === 1 && Array.isArray(directory.companies) && directory.companies.length) return directory;
+        } catch { /* Fall back to the bundled, verified registry. */ }
+      }
+      throw new Error('Company directory is unavailable');
+    })().catch(error => { pending = null; if (!activeCompanies.length) throw error; return { companies: [] }; });
     return apply(await pending, activeCompanies);
   }
   const get = ticker => byTicker.get(String(ticker || '').toUpperCase());
@@ -42,7 +51,8 @@
   function query({ q = '', sector = '', sort = 'market_cap', coverage = '' } = {}) {
     const terms = String(q).trim().toLowerCase().split(/\s+/).filter(Boolean);
     const score = c => !terms.length ? 0 : c.ticker.toLowerCase() === terms.join(' ') ? 3 : c.ticker.toLowerCase().startsWith(terms.join(' ')) ? 2 : 1;
-    return records.filter(c => (!sector || c.sector === sector) && (!coverage || (coverage === 'screener') === c.screener_eligible) && terms.every(term => [c.ticker, c.name, c.legal_name, c.sector, c.industry, c.sic_description].filter(Boolean).join(' ').toLowerCase().includes(term))).sort((a, b) => {
+    const covered = c => !coverage || (coverage === 'screener' ? c.screener_eligible : coverage === 'leadership' ? c.leadership_count > 0 : coverage === 'profile' ? c.coverage?.profile === 'available' : false);
+    return records.filter(c => (!sector || c.sector === sector) && covered(c) && terms.every(term => [c.ticker, c.name, c.legal_name, c.sector, c.industry, c.sic_description].filter(Boolean).join(' ').toLowerCase().includes(term))).sort((a, b) => {
       const rank = score(b) - score(a); if (rank) return rank;
       if (sort === 'ticker') return a.ticker.localeCompare(b.ticker);
       if (sort === 'name') return a.name.localeCompare(b.name);
@@ -69,7 +79,7 @@
     const input = node('input', { type: 'search', placeholder: 'Search a company, ticker, or industry', 'aria-label': 'Search companies', autocomplete: 'off', value: initialQuery });
     const sector = node('select', { 'aria-label': 'Filter companies by sector' }, node('option', { value: '' }, 'All sectors'), [...new Set(records.map(c => c.sector).filter(Boolean))].sort().map(s => node('option', { value: s }, s)));
     const sorting = node('select', { 'aria-label': 'Sort companies' }, node('option', { value: 'market_cap' }, 'Market cap · largest'), node('option', { value: 'name' }, 'Company · A to Z'), node('option', { value: 'ticker' }, 'Ticker · A to Z'), node('option', { value: 'change' }, 'Daily change · highest'));
-    const coverage = node('select', { 'aria-label': 'Filter company coverage' }, node('option', { value: '' }, 'All companies'), node('option', { value: 'screener' }, 'In the screener'), node('option', { value: 'profile' }, 'Profile coverage'));
+    const coverage = node('select', { 'aria-label': 'Filter company coverage' }, node('option', { value: '' }, 'All companies'), node('option', { value: 'screener' }, 'In the screener'), node('option', { value: 'profile' }, 'Company metadata'), node('option', { value: 'leadership' }, 'Leadership available'));
     const count = node('span', { 'data-count': '', 'aria-live': 'polite' });
     const countLine = node('div', { class: 'directory-results-meta' }, count, node('span', {}, 'Closing prices · USD'));
     const tbody = node('tbody');
@@ -89,7 +99,10 @@
       for (const c of shown) {
         const identity = node('a', { href: '#company-' + c.ticker.toLowerCase(), class: 'directory-identity', onclick: () => onOpen?.(c.ticker) }, logo ? logo(c.ticker, 32) : node('span', { class: 'directory-logo', 'aria-hidden': 'true' }, c.ticker.slice(0, 2)), node('span', {}, node('strong', {}, c.name), node('span', { class: 'directory-ticker' }, c.ticker)));
         const date = c.price_date || c.price_as_of || c.as_of;
-        tbody.append(node('tr', {}, node('td', {}, identity), node('td', { class: 'directory-sector' }, node('span', {}, c.sector || 'Sector unavailable'), c.industry ? node('small', { title: [c.industry, c.industry_source].filter(Boolean).join(' · ') }, c.industry) : null), node('td', { class: 'num', title: date ? 'Close ' + date : 'Latest published close' }, price(c.price)), node('td', { class: 'num ' + (c.chg_1d > 0 ? 'up' : c.chg_1d < 0 ? 'down' : '') }, change(c.chg_1d)), node('td', { class: 'num' }, money(c.market_cap)), node('td', {}, node('span', { class: 'directory-coverage' + (c.screener_eligible ? ' complete' : ''), title: c.screener_eligible ? 'Profile and validated screener data' : 'Company profile, filings and price history; screener validation pending' }, c.screener_eligible ? 'Profile + screener' : 'Company profile'))));
+        const hasPeople = c.leadership_count > 0, hasMetadata = c.coverage?.profile === 'available';
+        const coverageLabel = hasPeople ? 'Leadership' : hasMetadata ? 'Company details' : c.screener_eligible ? 'Screener' : 'Registered';
+        const coverageTitle = [hasPeople ? `${c.leadership_count} sourced leaders · ${c.portrait_count || 0} portraits` : hasMetadata ? 'Sourced company metadata; leadership is not yet available' : 'Company registered; additional company metadata is not yet published', c.screener_eligible ? 'Screener available' : 'Screener validation pending'].join('. ');
+        tbody.append(node('tr', {}, node('td', {}, identity), node('td', { class: 'directory-sector' }, node('span', {}, c.sector || 'Sector unavailable'), c.industry ? node('small', { title: [c.industry, c.industry_source].filter(Boolean).join(' · ') }, c.industry) : null), node('td', { class: 'num', title: date ? 'Close ' + date : 'Latest published close' }, price(c.price)), node('td', { class: 'num ' + (c.chg_1d > 0 ? 'up' : c.chg_1d < 0 ? 'down' : '') }, change(c.chg_1d)), node('td', { class: 'num' }, money(c.market_cap)), node('td', {}, node('span', { class: 'directory-coverage' + (hasPeople ? ' complete' : ''), title: coverageTitle }, coverageLabel))));
       }
       if (!shown.length) tbody.append(node('tr', {}, node('td', { colspan: 6, class: 'directory-empty' }, node('strong', {}, 'No companies found'), node('p', {}, 'Try a different name, ticker, or sector.'))));
       previous.disabled = state.page === 0; next.disabled = state.page >= pages - 1; pageLabel.textContent = `${state.page + 1} / ${pages}`;
