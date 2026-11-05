@@ -370,7 +370,7 @@ details.sx-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
   async function overview() {
     const [ov, notes] = await Promise.all([loadOv(), loadNotes()]);
     page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Sectors"), el("h1", {}, "Sectors and industries"),
-      el("div", { class: "sub" }, `The S&P 500 grouped into eleven sectors and ${ov.groups.filter(g => g.kind === "industry").length} industries, aggregated from each company's own filings and prices. Click any figure for the companies and filings behind it.`)),
+      el("div", { class: "sub" }, `Tracked companies grouped into eleven sectors and ${ov.groups.filter(g => g.kind === "industry").length} industries, aggregated from each company's own filings and prices. Click any figure for the companies and filings behind it.`)),
       el("div", { class: "right" }, el("span", { class: "faint", style: "font-size:12px" }, `Built ${fdate(ov.generated.slice(0, 10))} · prices to ${fdate(ov.as_of)}`))));
     const wk = (notes.notes || []).filter(n => n.week === notes.notes[0]?.week);
     if (wk.length) page.append(panel("This week's sector notes", el("span", { class: "faint", style: "font-size:12px" }, `Week of ${fdate(wk[0].week)}`), el("div", { class: "bd", style: "display:flex;flex-direction:column;gap:8px" },
@@ -500,7 +500,7 @@ details.sx-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
     page.append(el("div", { class: "ph" }, el("div", {},
       el("div", { class: "sx-crumb" }, el("a", { href: "#sectors" }, "Sectors"), g.kind === "industry" ? ["›", el("a", { href: "#sectors-" + g.sector_slug }, g.sector)] : null, "›", el("span", {}, g.kind === "sector" ? "Sector" : "Industry")),
       el("h1", {}, g.name),
-      el("div", { class: "sub" }, `${g.members.length} S&P 500 companies · ${fmtMoney(g.val_now.mcap)} market cap${g.etf ? ` · tracked by ${g.etf}` : ""}. Built ${fdate(g.generated.slice(0, 10))}.`),
+      el("div", { class: "sub" }, `${g.members.length} tracked companies · ${fmtMoney(g.val_now.mcap)} market cap${g.etf ? ` · tracked by ${g.etf}` : ""}. Built ${fdate(g.generated.slice(0, 10))}.`),
       g.industries.length && g.kind === "sector" ? el("div", { class: "sx-chips", style: "margin-top:8px" }, ...g.industries.map(x => el("a", { class: "chip", href: "#sectors-" + x.slug }, `${x.name} · ${x.n}`))) : null,
       g.kind === "industry" ? el("div", { class: "sx-chips", style: "margin-top:8px" }, ...g.industries.filter(x => x.slug !== slug).map(x => el("a", { class: "chip", href: "#sectors-" + x.slug }, x.name))) : null)));
     const myNotes = (notes.notes || []).filter(n => n.slug === slug);

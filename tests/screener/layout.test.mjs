@@ -12,8 +12,8 @@ const row = (ticker, name, quality) => {
   const values = { ticker, name, sector: "Technology", industry: "Software", sp100: true, price: 10, ret_1y: 0.2, mcap: 1e11, pe: 20, rev_g_ttm: 0.15, om: 0.2, fcf_yield: 0.04, div_yield: 0, roic: quality ? 0.3 : 0.05, gm: 0.5, gm_chg3: 0.01, rev_cagr5: 0.1, nd_ebitda: 1, pe_p5: 0.4, beta: 1, om_chg3: 0.02 };
   return cols.map(id => values[id]);
 };
-async function setup(saved = null) {
-  const dom = new JSDOM('<main id="page"></main>', { url: "https://research.example/#screener", runScripts: "outside-only", pretendToBeVisual: true });
+async function setup(saved = null, data = null, hash = "#screener") {
+  const dom = new JSDOM('<main id="page"></main>', { url: "https://research.example/" + hash, runScripts: "outside-only", pretendToBeVisual: true });
   const w = dom.window, d = w.document;
   const errors = [];
   w.addEventListener("error", event => { errors.push(event.error?.message || event.message); event.preventDefault(); });
@@ -32,7 +32,7 @@ async function setup(saved = null) {
     for (const child of children.flat()) if (child != null) n.append(child.nodeType ? child : String(child));
     return n;
   };
-  w.getJSON = async () => ({ fields, cols, rows: [row("AAA", "Alpha", true), row("BBB", "Beta", false)], groups: [{ id: "val", n: "Valuation" }], asof: { prices: "2026-11-03" } });
+  w.getJSON = async () => data || ({ fields, cols, rows: [row("AAA", "Alpha", true), row("BBB", "Beta", false)], groups: [{ id: "val", n: "Valuation" }], asof: { prices: "2026-11-03" } });
   for (const name of ["fdate", "fnum", "fmtMoney", "fpct", "fsgn"]) w[name] = v => String(v);
   w.svgUse = () => w.el("svg");
   w.miniLogo = () => w.el("span");
@@ -60,6 +60,101 @@ async function setup(saved = null) {
   };
   return { w, d, click, change, close: () => { w.close(); assert.deepEqual(errors, [], "DOM events must not throw"); } };
 }
+
+const tracked = () => ({
+  universe: { id: "tracked", membership_version: 1 }, fields,
+  cols: [...cols, "sp500"],
+  rows: [["AAA", "Alpha", true, true, 1e11], ["BBB", "Beta", false, true, 2e11], ["CCC", "Additional", false, false, 3e11]].map(([ticker, name, sp100, sp500, mcap]) => {
+    const values = row(ticker, name, true);
+    values[cols.indexOf("sp100")] = Number(sp100);
+    values[cols.indexOf("mcap")] = mcap;
+    return [...values, Number(sp500)];
+  }),
+  groups: [{ id: "val", n: "Valuation" }], asof: { prices: "2026-11-03" },
+});
+const visibleTickers = d => [...d.querySelectorAll("table.sx tbody tr td:nth-child(2)")].map(n => n.textContent).sort();
+const fullSpec = (overrides = {}) => ({ filters: [], sectors: [], exclude_sectors: [], industries: [], exclude_industries: [], index: "sp500", tickers: [], exclude_tickers: [], similar_to: null, sort: null, columns: [], group_by: null, limit: null, explanation: "", assumptions: [], ...overrides });
+
+test("saved SP500 screens exclude additional companies before percentile filters are applied", async () => {
+  const { w, d, click, close } = await setup({ spec: fullSpec({ filters: [{ field: "mcap", op: "top", pct: 50, scope: "all" }] }) }, tracked());
+  try {
+    assert.deepEqual(visibleTickers(d), ["BBB"]);
+    assert.equal(w.store.get("scr2").spec.index, "sp500");
+    d.querySelector('.sx-chip .x').click();
+    assert.deepEqual(visibleTickers(d), ["AAA", "BBB"]);
+    click("Filters (1)");
+    click("S&P 100");
+    assert.deepEqual(visibleTickers(d), ["AAA"]);
+    click("All tracked");
+    assert.deepEqual(visibleTickers(d), ["AAA", "BBB", "CCC"]);
+    assert.equal(w.store.get("scr2").spec.index, "all");
+    assert.equal(d.querySelector(".sx-chips").hidden, true);
+    assert.ok(!d.querySelector("h1").textContent.includes("S&P"));
+    assert.match(d.querySelector(".sx-count").textContent, /All tracked/);
+    assert.ok([...d.querySelectorAll(".sx-stat")].every(n => !n.title.includes("S&P 500")));
+  } finally { close(); }
+});
+
+test("new screens include additions and persist explicit universe choices through sharing", async () => {
+  const { w, d, click, close } = await setup(null, tracked());
+  try {
+    assert.deepEqual(visibleTickers(d), ["AAA", "BBB", "CCC"]);
+    click("Filters (0)");
+    assert.equal([...d.querySelectorAll(".sx-uni .seg button")].find(n => n.classList.contains("on")).textContent, "All tracked");
+    for (const [label, index, expected] of [["S&P 500", "sp500", ["AAA", "BBB"]], ["All tracked", "all", ["AAA", "BBB", "CCC"]]]) {
+      click(label);
+      click("Actions"); click("Share screen");
+      const shared = JSON.parse(w.atob(w.copied.split("screener=")[1].replace(/-/g, "+").replace(/_/g, "/")));
+      assert.equal(shared.index, index);
+      w.location.hash = w.copied.split("#")[1];
+      w.dispatchEvent(new w.HashChangeEvent("hashchange"));
+      w.page.replaceChildren();
+      await w.FU_PAGES.screener();
+      assert.deepEqual(visibleTickers(d), expected);
+    }
+  } finally { close(); }
+});
+
+test("legacy shared and named saved screens with an omitted index retain SP500 membership", async () => {
+  const legacy = Buffer.from(JSON.stringify({ filters: [] })).toString("base64url");
+  const { w, d, click, close } = await setup(null, tracked(), "#screener=" + legacy);
+  try {
+    assert.deepEqual(visibleTickers(d), ["AAA", "BBB"]);
+    click("Actions"); click("Reset screen");
+    assert.deepEqual(visibleTickers(d), ["AAA", "BBB", "CCC"]);
+    w.store.set("scr2:saved", [{ name: "Legacy", at: 1, spec: { filters: [] }, cols: ["mcap"] }]);
+    click("Actions"); click("Saved screens");
+    d.querySelector(".sx-saved .t").click();
+    assert.deepEqual(visibleTickers(d), ["AAA", "BBB"]);
+    assert.equal(w.store.get("scr2").spec.index, "sp500");
+  } finally { close(); }
+});
+
+test("legacy bundle fallback requires declared SP500 scope and never overrides explicit false membership", async () => {
+  for (const [scope, explicit, expected] of [[undefined, false, []], ["tracked", false, []], ["sp500", false, ["AAA", "BBB"]], ["sp500", true, ["AAA", "BBB"]]]) {
+    const data = tracked();
+    data.universe = scope ? { id: scope } : undefined;
+    if (!explicit) {
+      data.cols.pop();
+      data.rows = data.rows.slice(0, 2).map(r => r.slice(0, -1));
+    }
+    const { d, close } = await setup({ spec: fullSpec() }, data);
+    try { assert.deepEqual(visibleTickers(d), expected, `${scope || "unstamped"}, explicit=${explicit}`); }
+    finally { close(); }
+  }
+});
+
+test("invalid membership values are not coerced to index membership", async () => {
+  const data = tracked();
+  data.rows[2][data.cols.indexOf("sp500")] = "false";
+  data.rows[2][data.cols.indexOf("sp100")] = "false";
+  const { d, click, close } = await setup({ spec: fullSpec() }, data);
+  try {
+    assert.deepEqual(visibleTickers(d), ["AAA", "BBB"]);
+    click("Filters (1)"); click("S&P 100");
+    assert.deepEqual(visibleTickers(d), ["AAA"]);
+  } finally { close(); }
+});
 
 test("compact primary controls retain presets, counted editable filters and collapsed statistics", async () => {
   const { w, d, click, change, close } = await setup();
@@ -145,6 +240,9 @@ test("identity sorting keeps the table and CSV intact without adding identity me
       assert.equal(w.downloaded.text.split("\n")[0].split(",").length, 12);
       assert.ok(w.downloaded.text.split("\n")[1].startsWith('"BBB","Beta"'));
       assert.ok(!w.downloaded.text.includes("undefined"));
+      w.page.replaceChildren();
+      await w.FU_PAGES.screener();
+      assert.equal(d.querySelector("table.sx tbody tr td:nth-child(2)").textContent, "BBB", "restoring the universe must preserve identity sorting");
     }
   } finally { close(); }
 });

@@ -644,11 +644,12 @@ function renderFilingTable(db, cell, c) {
   const tb = el("tbody");
   let hit = null;
   st.rows.forEach(r => {
-    const tr = el("tr", { class: r.concept === cell.concept ? "hl" : "" }, el("td", {}, r.label));
+    const matchesConcept = k => r.concepts?.[k]?.includes(cell.concept) || r.concept === cell.concept;
+    const tr = el("tr", { class: cols.some(k => matchesConcept(k) && (k === targetKey || k === lookKey)) ? "hl" : "" }, el("td", {}, r.label));
     cols.forEach(k => {
       const v = r.vals[k];
       const td = el("td", {}, v == null ? "" : r.unit === "USD/shares" ? (v < 0 ? `(${Math.abs(v).toFixed(2)})` : v.toFixed(2)) : r.unit === "shares" ? (v / 1e6).toLocaleString("en-US", { maximumFractionDigits: 0 }) : fmtM(v));
-      if (r.concept === cell.concept && (k === targetKey || k === lookKey)) { td.className = "hit"; hit = td; }
+      if (matchesConcept(k) && (k === targetKey || k === lookKey)) { td.className = "hit"; hit = td; }
       tr.append(td);
     });
     tb.append(tr);
@@ -656,7 +657,7 @@ function renderFilingTable(db, cell, c) {
   tbl.append(tb);
   doc.append(el("div", { class: "tw" }, tbl));
   db.append(el("div", { style: "display:flex;gap:8px;align-items:center" }, el("span", { class: "badge-src alt" }, "Rebuilt from XBRL"), el("span", { class: "eyebrow" }, `${rec.form} · ${STMT_DOC[cell.stmt]}`)), doc,
-    el("div", { class: "note" }, "Older filings are rebuilt from the XBRL facts in the filing. The latest 10-K and two 10-Qs per company show the original filed table."));
+    el("div", { class: "note" }, "This table is rebuilt from the filing's XBRL facts. Original filed tables are shown when available. Open the full SEC document to review the complete filing."));
   requestAnimationFrame(() => hit?.scrollIntoView({ block: "center", inline: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }));
 }
 
@@ -698,8 +699,14 @@ function baseTools(trace) {
   const wrap = (name, fn) => async (input, ctx) => { const st = trace(name, input); try { abortCheck(ctx?.signal); const r = await fn(input || {}, ctx); abortCheck(ctx?.signal); st.done(r); return r; } catch (e) { st.fail(e); throw e; } };
   const resolveLabel = (m, lab) => m.byLabel[lab] ? lab : (m.ratioDefs.find(d => d.label.toLowerCase() === String(lab).toLowerCase())?.label || Object.keys(m.byLabel).find(l => l.toLowerCase() === String(lab).toLowerCase()));
   return [
-    { name: "screen_companies", description: "Screen the covered universe (S&P 500). Returns ticker, name, sector, price, market cap, P/E, P/S, TTM revenue/net income/FCF, FCF yield, latest-quarter gross and operating margin, revenue growth YoY, dividend yield, YTD and 1Y return, beta. Optional filters: sector (exact name), sort (field name), desc (bool), limit.", inputSchema: { type: "object", properties: { sector: { type: "string" }, sort: { type: "string" }, desc: { type: "boolean" }, limit: { type: "number" } } },
-      execute: wrap("screen_companies", i => { let rows = (INDEX?.companies || []).filter(c => !i.sector || c.sector === i.sector); if (i.sort) rows = rows.filter(c => c[i.sort] != null).sort((a, b) => (i.desc === false ? 1 : -1) * (a[i.sort] - b[i.sort])); return rows.slice(0, Math.min(102, Number(i.limit) || 25)).map(c => ({ ticker: c.ticker, name: c.name, sector: c.sector, price: c.price, market_cap: c.market_cap, pe_ttm: c.pe_ttm && +c.pe_ttm.toFixed(1), ps_ttm: c.ps_ttm && +c.ps_ttm.toFixed(1), revenue_ttm: c.revenue_ttm, net_income_ttm: c.net_income_ttm, fcf_ttm: c.fcf_ttm, fcf_yield: c.fcf_yield && +(c.fcf_yield * 100).toFixed(2), gross_margin_lq: c.gross_margin_lq && +(c.gross_margin_lq * 100).toFixed(1), op_margin_lq: c.op_margin_lq && +(c.op_margin_lq * 100).toFixed(1), rev_growth_lq: c.rev_growth_lq && +(c.rev_growth_lq * 100).toFixed(1), dividend_yield: c.dividend_yield && +(c.dividend_yield * 100).toFixed(2), ret_ytd: c.ret_ytd && +(c.ret_ytd * 100).toFixed(1), ret_1y: c.ret_1y && +(c.ret_1y * 100).toFixed(1), beta_1y: c.beta_1y && +c.beta_1y.toFixed(2), latest_quarter: c.latest_quarter })); }) },
+    { name: "screen_companies", description: "Screen tracked companies. Optional index selects all (default), sp500 or sp100 using explicit membership. Returns ticker, name, sector, price, market cap, P/E, P/S, TTM revenue/net income/FCF, FCF yield, latest-quarter gross and operating margin, revenue growth YoY, dividend yield, YTD and 1Y return, beta. Optional filters: sector (exact name), sort (field name), desc (bool), limit.", inputSchema: { type: "object", properties: { index: { type: "string", enum: ["all", "sp500", "sp100"] }, sector: { type: "string" }, sort: { type: "string" }, desc: { type: "boolean" }, limit: { type: "number" } } },
+      execute: wrap("screen_companies", i => {
+        const index = i.index ?? "all";
+        if (!window.FU_SCREENSPEC.INDEXES.includes(index)) throw new Error("Unknown index; use all, sp500 or sp100");
+        let rows = (INDEX?.companies || []).filter(c => window.FU_SCREENSPEC.inIndex(c, index, INDEX?.universe) && (!i.sector || c.sector === i.sector));
+        if (i.sort) rows = rows.filter(c => c[i.sort] != null).sort((a, b) => (i.desc === false ? 1 : -1) * (a[i.sort] - b[i.sort]));
+        return rows.slice(0, Math.min(102, Number(i.limit) || 25)).map(c => ({ ticker: c.ticker, name: c.name, sector: c.sector, price: c.price, market_cap: c.market_cap, pe_ttm: c.pe_ttm && +c.pe_ttm.toFixed(1), ps_ttm: c.ps_ttm && +c.ps_ttm.toFixed(1), revenue_ttm: c.revenue_ttm, net_income_ttm: c.net_income_ttm, fcf_ttm: c.fcf_ttm, fcf_yield: c.fcf_yield && +(c.fcf_yield * 100).toFixed(2), gross_margin_lq: c.gross_margin_lq && +(c.gross_margin_lq * 100).toFixed(1), op_margin_lq: c.op_margin_lq && +(c.op_margin_lq * 100).toFixed(1), rev_growth_lq: c.rev_growth_lq && +(c.rev_growth_lq * 100).toFixed(1), dividend_yield: c.dividend_yield && +(c.dividend_yield * 100).toFixed(2), ret_ytd: c.ret_ytd && +(c.ret_ytd * 100).toFixed(1), ret_1y: c.ret_1y && +(c.ret_1y * 100).toFixed(1), beta_1y: c.beta_1y && +c.beta_1y.toFixed(2), latest_quarter: c.latest_quarter }));
+      }) },
     { name: "get_financials", description: "Return a reported or calculated metric series for one company from its SEC filings. period is 'annual' or 'quarterly'. Each point has a period label (e.g. 'FY2025', 'Q3 FY26'), value, unit and the filing it came from. Percent metrics are exact fractions (0.15 = 15%). Results are newest first, with evidence IDs and explicit pagination. Metric labels: " + METRIC_LABELS.join(", "), inputSchema: { type: "object", properties: { ticker: { type: "string" }, metric: { type: "string" }, period: { type: "string", enum: ["annual", "quarterly"] }, last: { type: "number", description: "Page size (default 8, max 20)" }, offset: { type: "integer", minimum: 0 } }, required: ["ticker", "metric"] },
       execute: wrap("get_financials", async (i, ctx) => { const tk = String(i.ticker).toUpperCase(); await ensureCompany(tk, ctx); const m = model(tk); const lab = resolveLabel(m, i.metric); if (!lab) throw new Error("Unknown metric for " + tk + ". Valid: " + Object.keys(m.byLabel).concat(m.ratioDefs.map(d => d.label)).join(", ")); return { ticker: tk, metric: lab, ...compactSeries(tk, lab, i.period === "annual" ? "A" : "Q", Math.max(1, Math.min(20, Math.floor(Number(i.last) || 8))), Math.max(0, Math.floor(Number(i.offset) || 0))), ttm: m.ttm(lab) ? evidenceForCell(m.ttm(lab)) : null, ttmPolicy: "Only four contiguous quarterly USD flows; balances, shares and per-share metrics excluded" }; }) },
     { name: "get_price_stats", description: "Price statistics for a symbol from daily bars: last close, 1D/1W/1M/3M/YTD/1Y returns, 20/60-day annualized volatility, 52-week range, beta and correlation to SPY over 1 year, max drawdown, RSI14, 50/200-day moving averages. Symbols: any covered ticker plus SPY, QQQ, IWM, DIA, SMH, sector SPDRs, ^VIX, ^TNX, DX=F, CL=F, GC=F, HG=F, BTC-USD.", inputSchema: { type: "object", properties: { symbol: { type: "string" } }, required: ["symbol"] },
@@ -1030,7 +1037,7 @@ const page = $("#page");
 const WATCH_DEFAULT = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "JPM", "LLY"];
 const watchlist = () => store.get("watch", WATCH_DEFAULT).filter(t => IDX[t]);
 function toggleWatch(t) { const w = store.get("watch", WATCH_DEFAULT); const i = w.indexOf(t); i >= 0 ? w.splice(i, 1) : w.push(t); store.set("watch", w); renderRail(); toast(i >= 0 ? `Removed ${t} from watchlist` : `Added ${t} to watchlist`); return i < 0; }
-const STATE = { coTab: store.get("coTab", "overview"), finStmt: "income", finKind: "A", finView: "values", finRange: "all", finDense: store.get("dense", false), taSym: "NVDA", taRange: "1Y", taInd: { sma: true, bb: false, vol: true }, cmp: ["AAPL", "MSFT", "NVDA", "GOOGL"], cmpMetric: "Revenue", cmpKind: "Q", scr: store.get("scr", { sector: "", sort: "market_cap", desc: true, q: "" }) };
+const STATE = { coTab: store.get("coTab", "overview"), finStmt: "income", finKind: "A", finView: "values", finRange: "all", finDense: store.get("dense", false), taSym: "NVDA", taRange: "1Y", taInd: { sma: true, bb: false, vol: true }, cmp: ["AAPL", "MSFT", "NVDA", "GOOGL"], cmpMetric: "Revenue", cmpKind: "Q", scr: (() => { const saved = store.get("scr", null); return saved ? { ...saved, uni: saved.uni || "sp500" } : { sector: "", sort: "market_cap", desc: true, q: "", uni: "all" }; })() };
 function renderRail() {
   const wl = $("#wl"); wl.innerHTML = "";
   const current = location.hash.startsWith("#company-") ? location.hash.slice(9).toUpperCase() : null;
@@ -1211,7 +1218,7 @@ function newsList(items, lines, n = 10) {
   return box;
 }
 function pMarkets() {
-  page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Markets · " + d3.utcFormat("%A, %B %d")(last("SPY").t)), el("h1", {}, "Today across the tape"), el("div", { class: "sub" }, "Indexes, rates, commodities, the S&P 500 and your watchlist. Every tile opens its chart.")), el("div", { class: "right" }, el("button", { class: "btn", onclick: () => openPalette() }, svgUse("i-search"), "Search", el("span", { class: "kbd" }, "⌘K")))));
+  page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Markets · " + d3.utcFormat("%A, %B %d")(last("SPY").t)), el("h1", {}, "Today across the tape"), el("div", { class: "sub" }, "Indexes, rates, commodities, tracked companies and your watchlist. Every tile opens its chart.")), el("div", { class: "right" }, el("button", { class: "btn", onclick: () => openPalette() }, svgUse("i-search"), "Search", el("span", { class: "kbd" }, "⌘K")))));
   const syms = ["SPY", "QQQ", "IWM", "DIA", "SMH", "^VIX", "^TNX", "UUP", "CL=F", "GC=F", "HG=F", "BTC-USD"];
   page.append(el("div", { class: "tiles" }, syms.filter(s => PX[s]).map(s => {
     const ch = s === "^TNX" ? (last(s).c - prev(s).c) / 100 : dayChg(s);
@@ -1229,7 +1236,7 @@ function pMarkets() {
   const capChg = U.reduce((a, c) => a + (c.market_cap || 0) * c.chg_1d, 0) / (capw || 1);
   const above = U.filter(c => c.high_52w && c.price >= c.high_52w * 0.97).length;
   page.append(el("div", { class: "stats" }, ...[
-    ["S&P 500 advancers", `${adv} / ${U.length}`, `${dec} decliners`],
+    ["Tracked advancers", `${adv} / ${U.length}`, `${dec} decliners`],
     ["Cap-weighted move", fsgn(capChg, 2), "today"],
     ["Near 52-week high", String(above), "within 3%"],
     ["Median P/E (TTM)", (() => { const p = U.map(c => c.pe_ttm).filter(Boolean).sort((a, b) => a - b); return p.length ? p[Math.floor(p.length / 2)].toFixed(1) : "–"; })(), "covered companies"],
@@ -1348,12 +1355,12 @@ const SCR_PRESETS = [
 ];
 function pScreener() {
   const st = STATE.scr; st.min = st.min || {}; st.max = st.max || {};
-  page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Screener"), el("h1", {}, "S&P 500"), el("div", { class: "sub" }, `${INDEX.companies.length} companies with fundamentals from their SEC filings and prices as of ${fdate(INDEX.companies.find(c => c.as_of)?.as_of)}. Sort any column, filter, star to your watchlist, or open a company.`))));
+  page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Screener"), el("h1", {}, "Tracked companies"), el("div", { class: "sub" }, `${INDEX.companies.length} companies with fundamentals from their SEC filings and prices as of ${fdate(INDEX.companies.find(c => c.as_of)?.as_of)}. Sort any column, filter, star to your watchlist, or open a company.`))));
   const q = el("input", { type: "search", id: "scr-q", placeholder: "Filter by ticker or name", value: st.q || "" });
   const sectors = [...new Set(INDEX.companies.map(c => c.sector))].sort();
   const sec = el("select", { class: "btn", id: "scr-sector" }, el("option", { value: "" }, "All sectors"), ...sectors.map(s => { const o = el("option", { value: s }, s); if (s === st.sector) o.selected = true; return o; }));
-  const uni = el("select", { class: "btn", id: "scr-uni", title: "Index" }, el("option", { value: "" }, "S&P 500"), el("option", { value: "sp100" }, "S&P 100 only"));
-  uni.value = st.uni || "";
+  const uni = el("select", { class: "btn", id: "scr-uni", title: "Universe", "aria-label": "Universe" }, window.FU_SCREENSPEC.INDEXES.map(id => el("option", { value: id }, window.FU_SCREENSPEC.INDEX_LABELS[id])));
+  uni.value = st.uni || "all";
   const presets = el("div", { class: "picker" }, SCR_PRESETS.map(([n, p]) => el("button", { class: (st.preset || "All") === n ? "on" : "", onclick: () => { st.preset = n; st.min = { ...(p.min || {}) }; st.max = { ...(p.max || {}) }; if (p.sort) { st.sort = p.sort; st.desc = p.desc !== false; } save(); route(); } }, n)));
   const count = el("span", { class: "muted", style: "font-size:12.5px;margin-left:auto" });
   const csvBtn = el("button", { class: "btn", title: "Download the filtered table as CSV" }, svgUse("i-dl"), "CSV");
@@ -1367,7 +1374,7 @@ function pScreener() {
   csvBtn.onclick = () => { const head = SCR_COLS.map(c => c.n); const lines = [head.join(",")].concat(rowsNow.map(r => SCR_COLS.map(c => { const v = r[c.k]; return typeof v === "string" ? `"${v.replace(/"/g, '""')}"` : v ?? ""; }).join(","))); downloadText("filedunder_screener.csv", lines.join("\n"), "text/csv"); };
   function draw() {
     const qq = (st.q || "").toLowerCase();
-    let rows = INDEX.companies.filter(c => (!st.sector || c.sector === st.sector) && (st.uni !== "sp100" || c.sp100) && (!qq || c.ticker.toLowerCase().includes(qq) || c.name.toLowerCase().includes(qq)));
+    let rows = INDEX.companies.filter(c => (!st.sector || c.sector === st.sector) && window.FU_SCREENSPEC.inIndex(c, st.uni || "all", INDEX.universe) && (!qq || c.ticker.toLowerCase().includes(qq) || c.name.toLowerCase().includes(qq)));
     for (const [k, v] of Object.entries(st.min)) rows = rows.filter(c => c[k] != null && c[k] >= v);
     for (const [k, v] of Object.entries(st.max)) rows = rows.filter(c => c[k] != null && c[k] <= v && (k !== "pe_ttm" || c[k] > 0));
     const dir = st.desc ? -1 : 1;
@@ -1409,7 +1416,7 @@ function sectorConstituents() {
       el("div", { class: "faint", style: "font-size:11.5px" }, `${list.length} companies · ${fmtMoney(cap)}${etf ? " · " + etf : ""}`),
       ...list.sort((a, b) => (b.market_cap || 0) - (a.market_cap || 0)).slice(0, 6).map(c => el("div", { class: "row", onclick: () => location.hash = "company-" + c.ticker.toLowerCase() }, el("span", {}, el("b", { class: "mono" }, c.ticker), " ", el("span", { class: "muted" }, c.name)), el("span", { class: "num " + cls(c.chg_1d) }, fsgn(c.chg_1d, 2))))));
   });
-  return panel("S&P 500 by sector", el("a", { href: "#screener" }, "Screener"), grid, el("div", { class: "src" }, "Sector move is weighted by market cap. Largest six companies shown per sector."));
+  return panel("Tracked companies by sector", el("a", { href: "#screener" }, "Screener"), grid, el("div", { class: "src" }, "Sector move is weighted by market cap. Largest six companies shown per sector."));
 }
 const logoUrl = t => IDX[t]?.logo ? `${PUB}logos/${encodeURIComponent(t)}.png` : null;
 function logoTile(t, size = 56) {
@@ -1432,7 +1439,7 @@ function miniLogo(t, size = 18) {
 
 pCompany.prep = null;
 async function pCompany(tk) {
-  if (!IDX[tk]) { page.append(el("div", { class: "empty" }, el("h2", {}, `${tk} isn't covered yet`), el("p", { class: "muted" }, "Coverage is the S&P 500 today."), el("a", { class: "btn", href: "#screener" }, "Open the screener"))); return; }
+  if (!IDX[tk]) { page.append(el("div", { class: "empty" }, el("h2", {}, `${tk} isn't covered yet`), el("p", { class: "muted" }, "Find available companies in the screener."), el("a", { class: "btn", href: "#screener" }, "Open the screener"))); return; }
   await ensureCompany(tk);
   page.innerHTML = "";
   const s = snapshot(tk), c = s.c, a = c.address || {};
@@ -2633,14 +2640,14 @@ async function pResearch() {
   const g = el("div", { class: "grid", style: "grid-template-columns:minmax(0,1fr) 300px" });
   const chat = el("section", { class: "panel", style: "display:flex;flex-direction:column;min-height:68vh" });
   const side = el("div", { style: "display:flex;flex-direction:column;gap:16px" },
-    panel("What it can look up", null, el("div", { class: "bd", style: "display:flex;flex-direction:column;gap:8px;font-size:12.5px" }, ...[["Screen", "Rank the S&P 500 on valuation, margins, growth, returns"], ["Financials", "Filed and calculated series with sources"], ["Prices", "Returns, volatility, beta, RSI"], ["Earnings reactions", "Moves after each 8-K Item 2.02"], ["Macro", "CPI, jobs, rates, the curve"], ["Filings", "SEC filings by form"], ["Analysis", "Bounded source-based programs, formulas and assumptions"], ["Web", "Recent news and any public page"]].map(([n, d]) => el("div", {}, el("b", {}, n), el("div", { class: "muted" }, d))))),
+    panel("What it can look up", null, el("div", { class: "bd", style: "display:flex;flex-direction:column;gap:8px;font-size:12.5px" }, ...[["Screen", "Rank tracked companies on valuation, margins, growth, returns"], ["Financials", "Filed and calculated series with sources"], ["Prices", "Returns, volatility, beta, RSI"], ["Earnings reactions", "Moves after each 8-K Item 2.02"], ["Macro", "CPI, jobs, rates, the curve"], ["Filings", "SEC filings by form"], ["Analysis", "Bounded source-based programs, formulas and assumptions"], ["Web", "Recent news and any public page"]].map(([n, d]) => el("div", {}, el("b", {}, n), el("div", { class: "muted" }, d))))),
     el("div", { class: "note" }, "Citations like ", el("span", { class: "cite" }, "NVDA Revenue Q2 FY27"), " open the filing behind the number. Answers can be wrong; check the sources."));
   g.append(chat, side); page.append(g);
   if (innerWidth < 860) g.style.gridTemplateColumns = "minmax(0,1fr)";
   RESEARCH = chatPanel(chat, {
     id: "rs", tier: "default", profile: "detailed", placeholder: "e.g. Compare free cash flow conversion across all four companies over the last eight quarters. Ctrl/⌘+Enter to send.",
     suggestions: ["Top 10 by FCF yield, and what explains the leaders?", "Which megacaps grew revenue fastest last quarter?", "Compare JPM, BAC and WFC net income over eight quarters", "How did NVDA react to its last four earnings?", "Is the yield curve still inverted, and since when?"],
-    rules: "Today is " + new Date().toISOString().slice(0, 10) + ". You are Filed Under's research assistant for US equities (coverage: S&P 500). Work like a careful analyst: call tools to get facts (never guess financial figures), use screen_companies for cross-sectional questions, calculate for multi-series math, web_search only for events the data does not cover. Follow the selected research depth. Synthesize comparisons, calculations, drivers, risks, conflicting sources and missing evidence with useful headings and tables. Note when a quarter is derived from cumulative figures. Do not give investment advice.",
+    rules: "Today is " + new Date().toISOString().slice(0, 10) + ". You are Filed Under's research assistant for tracked US equities. Coverage includes companies outside the S&P 500; use screen_companies with index sp500 or sp100 for those specific memberships, or all for the tracked universe. Work like a careful analyst: call tools to get facts (never guess financial figures), use screen_companies for cross-sectional questions, calculate for multi-series math, web_search only for events the data does not cover. Follow the selected research depth. Synthesize comparisons, calculations, drivers, risks, conflicting sources and missing evidence with useful headings and tables. Note when a quarter is derived from cumulative figures. Do not give investment advice.",
   });
 }
 

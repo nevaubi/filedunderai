@@ -1,4 +1,7 @@
-"""Covered universe: S&P 500 constituents (the S&P 100 first). CIKs from SEC company_tickers.json."""
+"""Covered issuers and explicit index membership, with staged additions."""
+import json
+import re
+from pathlib import Path
 
 # ticker, cik, display name, sector (GICS-style)
 SP100_LIST = [
@@ -508,7 +511,8 @@ SP500_REST = [
     ("ZTS", 1555280, "Zoetis", "Health Care"),
 ]
 
-UNIVERSE = SP100_LIST + SP500_REST
+SP500_LIST = SP100_LIST + SP500_REST
+SP500 = {t for t, *_ in SP500_LIST}
 SP100 = {t for t, *_ in SP100_LIST}
 
 MARKET_SYMBOLS = ["SPY", "QQQ", "IWM", "DIA", "SMH", "^VIX", "^TNX", "^IRX", "^TYX", "UUP", "CL=F", "GC=F", "HG=F", "BTC-USD",
@@ -517,7 +521,44 @@ MARKET_SYMBOLS = ["SPY", "QQQ", "IWM", "DIA", "SMH", "^VIX", "^TNX", "^IRX", "^T
 SECTOR_ETF = {"Information Technology": "XLK", "Financials": "XLF", "Energy": "XLE", "Health Care": "XLV", "Consumer Discretionary": "XLY",
               "Consumer Staples": "XLP", "Industrials": "XLI", "Utilities": "XLU", "Materials": "XLB", "Real Estate": "XLRE", "Communication Services": "XLC"}
 
-BY_TICKER = {t: {"ticker": t, "cik": c, "name": n, "sector": s} for t, c, n, s in UNIVERSE}
+def load_additional_registry(document, base):
+    """Validate identities; approval for explicit imports is separate from scheduling."""
+    if not isinstance(document, dict) or document.get("schema_version") != 1:
+        raise ValueError("Unsupported additional-company registry")
+    companies, active_tickers = document.get("companies"), document.get("active_tickers")
+    if not isinstance(companies, list) or not isinstance(active_tickers, list):
+        raise ValueError("Registry companies and active_tickers must be lists")
+    tickers, ciks = {t for t, *_ in base}, {c for _, c, *_ in base}
+    approved = []
+    for company in companies:
+        if not isinstance(company, dict):
+            raise ValueError("Invalid company registry record")
+        t, c, n, s = (company.get(k) for k in ("ticker", "cik", "name", "sector"))
+        if not isinstance(t, str) or not re.fullmatch(r"[A-Z][A-Z0-9.-]{0,9}", t) or t in tickers:
+            raise ValueError("Invalid or duplicate company ticker")
+        if type(c) is not int or not 0 < c < 10**10 or c in ciks:
+            raise ValueError("Invalid or duplicate company CIK")
+        if not isinstance(n, str) or not n.strip() or s not in SECTOR_ETF:
+            raise ValueError("Invalid company name or sector")
+        tickers.add(t)
+        ciks.add(c)
+        approved.append((t, c, n, s))
+    approved_tickers = {t for t, *_ in approved}
+    if (any(not isinstance(t, str) for t in active_tickers)
+            or len(active_tickers) != len(set(active_tickers))
+            or not set(active_tickers) <= approved_tickers):
+        raise ValueError("Unknown or duplicate active company")
+    return approved, [row for row in approved if row[0] in active_tickers]
+
+
+ADDITIONAL_REGISTRY = json.loads(Path(__file__).with_name("additional_companies.json").read_text())
+ADDITIONAL_LIST, ACTIVE_ADDITIONAL_LIST = load_additional_registry(ADDITIONAL_REGISTRY, SP500_LIST)
+UNIVERSE = SP500_LIST + ACTIVE_ADDITIONAL_LIST
+UNIVERSE_METADATA = {"id": "tracked", "membership_version": 1}
+# Pending issuers are addressable by an explicit batch, but ordinary scheduled jobs
+# continue using UNIVERSE until publication and source read-back have succeeded.
+BY_TICKER = {t: {"ticker": t, "cik": c, "name": n, "sector": s}
+             for t, c, n, s in SP500_LIST + ADDITIONAL_LIST}
 
 # Companies whose earlier filings sit under another EDGAR registrant after a holding-company reorganisation or
 # re-domiciling. Filings of the predecessor CIK up to the cut-off date belong to the same reporting history.

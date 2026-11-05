@@ -14,12 +14,13 @@ def main():
     ap.add_argument("--news", action="store_true", help="refresh news for each company")
     ap.add_argument("--summary", action="store_true", help="regenerate summaries")
     ap.add_argument("--no-docs", action="store_true")
+    ap.add_argument("--facts-only", action="store_true", help="companies: validate archived SEC values, disable news, summaries and unarchived gap fill")
     ap.add_argument("--full-history", action="store_true")
     ap.add_argument("--part", type=int)
     ap.add_argument("--parts", type=int, default=1)
     ap.add_argument("--changed", action="store_true", help="only companies with new 10-K/10-Q/8-K filings")
     ap.add_argument("--sec-only", action="store_true", help="IR job: EDGAR exhibits only, skip the IR website")
-    ap.add_argument("--budget", type=float, help="time budget in seconds (IR, compare, sectors)")
+    ap.add_argument("--budget", type=float, help="time budget in seconds (companies, IR, compare, sectors)")
     ap.add_argument("--repair-existing", action="store_true", help="IR: repair extraction/dates using stored originals only")
     ap.add_argument("--publish-only", action="store_true", help="IR: reconcile manifests from existing rows without providers")
     ap.add_argument("--max-docs", type=int, default=90, help="IR: per-company new/repair document work cap")
@@ -46,7 +47,7 @@ def main():
         jobs.macro_job(sb)
         print("macro ok")
     if a.job in ("companies", "all"):
-        print(json.dumps(jobs.companies_job(sb, a.tickers, workers=a.workers, refresh_news=a.news, refresh_summary=a.summary, fetch_docs=not a.no_docs, only_changed=a.changed), default=str)[:2000])
+        print(json.dumps(jobs.companies_job(sb, a.tickers, workers=a.workers, refresh_news=a.news, refresh_summary=a.summary, fetch_docs=not a.no_docs, only_changed=a.changed, time_budget=a.budget, facts_only=True if a.facts_only else None), default=str)[:2000])
     if a.job == "news":
         print(jobs.news_rotation_job(sb))
     if a.job in ("insiders", "all"):

@@ -7,8 +7,8 @@ from urllib.parse import quote
 from concurrent.futures import ThreadPoolExecutor
 
 from . import docs, fundamentals, insiders, macro, news, prices, sec, summaries
-from .common import Run, Supabase, now_iso, serialized_aggregates
-from .universe import BY_TICKER, MARKET_SYMBOLS, SECTOR_ETF, SP100, UNIVERSE
+from .common import Run, Supabase, now_iso, sec_get_raw, serialized_aggregates
+from .universe import ADDITIONAL_LIST, BY_TICKER, MARKET_SYMBOLS, SECTOR_ETF, SP100, SP500, UNIVERSE, UNIVERSE_METADATA
 
 PIPELINE_VERSION = 2
 
@@ -39,6 +39,53 @@ def _cache(sb, path, default, strict=False):
         if strict:
             raise
         return default
+
+
+def preserve_filing_owners(sb, rows):
+    """Hold additional-issuer aliases of globally owned filing accessions.
+
+    Local StageStore writes are checked independently by the backfill publisher.
+    Live stores must provide a successful owner lookup; never treat its failure
+    as an empty table. Existing-universe rows retain their original write path.
+    """
+    rows = list(rows)
+    additional = {t for t, *_ in ADDITIONAL_LIST}
+    guarded = [r for r in rows if r["ticker"] in additional]
+    if not guarded or getattr(sb, "stage_only", False) is True:
+        return rows, []
+    lookup = getattr(sb, "select", None)
+    if not callable(lookup):
+        raise RuntimeError("Live filing ownership lookup is unavailable")
+    accessions = list(dict.fromkeys(r["accession"] for r in guarded))
+    owners = {}
+    for offset in range(0, len(accessions), 250):
+        batch = accessions[offset:offset + 250]
+        existing = lookup("filings", "select=accession,ticker&accession=in.(" + quote(",".join(batch), safe=",") + ")")
+        if not isinstance(existing, list):
+            raise RuntimeError("Invalid live filing ownership lookup result")
+        for row in existing:
+            if (not isinstance(row, dict) or row.get("accession") not in batch or not row.get("ticker")
+                    or (row["accession"] in owners and owners[row["accession"]] != row["ticker"])):
+                raise RuntimeError("Incomplete or conflicting live filing ownership lookup")
+            owners[row["accession"]] = row["ticker"]
+    kept, held = [], []
+    for row in rows:
+        owner = owners.get(row["accession"])
+        if row["ticker"] in additional and owner is not None and owner != row["ticker"]:
+            held.append({"accession": row["accession"], "ticker": row["ticker"], "owner_ticker": owner})
+        else:
+            kept.append(row)
+    return kept, held
+
+
+def _held_filing_message(row):
+    return f"Held filing alias {row['accession']} for {row['ticker']}; existing owner {row['owner_ticker']} preserved."
+
+
+def _filing_owner_stats(stats, held):
+    if stats is not None and held:
+        stats.setdefault("held_filing_aliases", []).extend(held)
+        stats["held_filing_alias_count"] = len(stats["held_filing_aliases"])
 
 
 FACT_KEY = ("ticker", "statement", "label", "kind", "period_end")
@@ -88,34 +135,86 @@ def persist_normalized_facts(sb, ticker, rows):
 
 
 # ---------------------------------------------------------------- companies
-def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_docs=True, store_raw=True, log=print):
+def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_docs=True, store_raw=True, log=print,
+                    facts_only=None, source_inputs=None, source_retrieved_at=None):
     u = BY_TICKER[tk]
     cik = u["cik"]
+    # Newly onboarded issuers retain strict provenance on subsequent scheduled runs.
+    facts_only = tk in {t for t, *_ in ADDITIONAL_LIST} if facts_only is None else facts_only
+    if facts_only and not store_raw:
+        raise ValueError("Facts-only imports require immutable source archiving")
+    if facts_only and (refresh_news or refresh_summary):
+        raise ValueError("Facts-only imports cannot request provider enrichment")
     warnings = []
     def warn(message):
         warnings.append(message.strip())
         log(message)
     prev = _cache(sb, f"companies/{tk}.json", {}, strict=True)
-    sub = sec.submissions(cik)
-    cf = sec.companyfacts(cik)
+    source_urls = {"submissions": f"https://data.sec.gov/submissions/CIK{cik:010d}.json",
+                   "companyfacts": f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json"}
+    if facts_only or source_inputs is not None:
+        source_inputs = source_inputs if source_inputs is not None else {k: sec_get_raw(url) for k, url in source_urls.items()}
+        if set(source_inputs) != set(source_urls) or any(not isinstance(v, bytes) for v in source_inputs.values()):
+            raise ValueError("Source inputs must contain exact submissions and companyfacts bytes")
+        sub, cf = (json.loads(source_inputs[k]) for k in ("submissions", "companyfacts"))
+        if any(str(x.get("cik", "")).lstrip("0") != str(cik) for x in (sub, cf)):
+            raise ValueError("SEC source issuer CIK identity mismatch")
+        original = source_inputs["companyfacts"]
+    else:
+        sub, cf = sec.submissions(cik), sec.companyfacts(cik)
+        original = json.dumps(cf).encode()
     facts = cf["facts"]
     source_archive = None
-    if store_raw:
-        original = json.dumps(cf)
-        digest = hashlib.sha256(original.encode()).hexdigest()
-        source_archive = f"sec/companyfacts/archives/CIK{cik:010d}/{digest}.json"
-        sb.put_raw(source_archive, original, ticker=tk, kind="companyfacts_snapshot", source_url=f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json")
-        sb.put_raw(f"sec/companyfacts/CIK{cik:010d}.json", json.dumps(cf), ticker=tk, kind="companyfacts", source_url=f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json")
     filings = sec.filing_list(sub)
-    try:
-        sec.fill_gaps(cik, facts, sub, log=log)
-    except Exception as e:
-        warn(f"  {tk} gap filler failed: {str(e)[:200]}")
+    if not facts_only:
+        try:
+            sec.fill_gaps(cik, facts, sub, log=log)
+        except Exception as e:
+            warn(f"  {tk} gap filler failed: {str(e)[:200]}")
     statements = {k: sec.build_series(facts, k) for k in sec.CONCEPTS}
+    quarantined = []
+    if facts_only:
+        from .source_quality import partition_supported_periods
+        statements, quarantined = partition_supported_periods(statements)
+        if quarantined:
+            warn(f"{len(quarantined)} selected/history statement candidates have unsupported reporting periods; "
+                 "retained in quarantined_statement_points and excluded from published financial values.")
     if not any(statements.values()):
         raise ValueError("No usable statement facts; preserving prior company bundle")
+    digest = hashlib.sha256(original).hexdigest()
+    provenance = None
+    if facts_only:
+        from .source_provenance import validate_statement_provenance
+        proof = validate_statement_provenance(original, statements, cik, digest)
+        proof_path = f"sources/companies/{tk}/{digest}.json"
+        provenance = {k: proof[k] for k in ("version", "status", "cik", "source_url", "snapshot_sha256", "counts")}
+        provenance.update(proof_path=proof_path, retrieved_at=(source_retrieved_at or {}).get("companyfacts") or now_iso(),
+                          gap_fill="disabled_unarchived_sources")
+    filing_plan, held_aliases = preserve_filing_owners(sb, [
+        {"accession": f["a"], "ticker": tk} for f in filings[:250]])
+    allowed_filings = {row["accession"] for row in filing_plan}
+    for alias in held_aliases:
+        warn(_held_filing_message(alias))
+    # Validation precedes all mutations, including source object publication.
+    if store_raw:
+        source_archive = f"sec/companyfacts/archives/CIK{cik:010d}/{digest}.json"
+        sb.put_raw(source_archive, original, ticker=tk, kind="companyfacts_snapshot", source_url=source_urls["companyfacts"])
+        sb.put_raw(f"sec/companyfacts/CIK{cik:010d}.json", original, ticker=tk, kind="companyfacts", source_url=source_urls["companyfacts"])
+        if source_inputs:
+            sub_digest = hashlib.sha256(source_inputs["submissions"]).hexdigest()
+            sub_archive = f"sec/submissions/archives/CIK{cik:010d}/{sub_digest}.json"
+            sb.put_raw(sub_archive, source_inputs["submissions"], ticker=tk, kind="submissions_snapshot", source_url=source_urls["submissions"])
+            if provenance:
+                provenance["submissions"] = {"source_archive": sub_archive, "sha256": sub_digest,
+                    "url": source_urls["submissions"], "retrieved_at": (source_retrieved_at or {}).get("submissions") or now_iso()}
+    if provenance:
+        sb.put_json(proof_path, proof, cache="max-age=31536000,immutable")
     prof = sec.profile(sub, facts)
     ftables = sec.filing_tables(facts, statements, filings, cik)
+    if facts_only:
+        from .source_quality import retain_proved_filing_tables
+        ftables, unproved_table_cells = retain_proved_filing_tables(ftables, proof)
+        provenance["reconstructed_tables"] = {"scope":"verified_source_records_only", "omitted_cells":unproved_table_cells}
     earn = [{"filed": f["d"], "accn": f["a"], "url": sec.filing_url(cik, f["a"], f["p"])} for f in filings if f["f"] == "8-K" and "2.02" in (f["i"] or "")][:12]
 
     # original statement tables for the latest 10-K and 10-Q
@@ -158,7 +257,7 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
             warn(f"  {tk} release failed: {str(e)[:160]}")
 
     coverage = prev.get("news") or {}
-    if refresh_news or not coverage.get("items"):
+    if not facts_only and (refresh_news or not coverage.get("items")):
         try:
             coverage = {"items": news.company_news(u["name"], tk), "fetched_at": now_iso()}
         except Exception as e:
@@ -166,7 +265,7 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
 
     summary = prev.get("summary")
     release_changed = (release or {}).get("accn") != ((prev.get("release") or {}).get("accn"))
-    if refresh_summary or not summary or release_changed or refresh_news:
+    if not facts_only and (refresh_summary or not summary or release_changed or refresh_news):
         try:
             summary = summaries.company(u["name"], tk, statements, prof["fiscalYearEnd"], (release or {}).get("markdown"), coverage.get("items", []))
         except Exception as e:
@@ -183,6 +282,9 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
         "profile": prof, "statements": statements, "source_archive": source_archive, "normalization": {"version": 2, "vintage": "latest", "availability_resolution": "filing_date"}, "warnings": warnings, "filings": [f for f in filings][:250], "filingTables": ftables,
         "earnings8k": earn, "ix": ix, "release": release, "news": coverage, "summary": summary,
     }
+    if provenance:
+        bundle["provenance"] = provenance
+        bundle["quarantined_statement_points"] = quarantined
     sb.put_json(f"companies/{tk}.json", bundle)
 
     # relational copies
@@ -193,7 +295,7 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
         "shares_as_of": (prof["sharesOutstanding"] or {}).get("end"), "latest_accession": filings[0]["a"] if filings else None, "updated_at": now_iso()}], "ticker")
     sb.upsert("filings", [{
         "accession": f["a"], "ticker": tk, "form": f["f"], "filed": f["d"], "report_date": f["r"] or None, "primary_doc": f["p"], "items": f["i"],
-        "description": describe(f), "url": sec.filing_url(cik, f["a"], f["p"]), "has_source_tables": f["a"] in ix, "updated_at": now_iso()} for f in filings[:250]], "accession")
+        "description": describe(f), "url": sec.filing_url(cik, f["a"], f["p"]), "has_source_tables": f["a"] in ix, "updated_at": now_iso()} for f in filings[:250] if f["a"] in allowed_filings], "accession")
     rows = {}
     for stmt, lst in statements.items():
         for r in lst:
@@ -202,7 +304,11 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
                     rows[(stmt, r["label"], kind, p["end"])] = {
                         "ticker": tk, "statement": stmt, "label": r["label"], "kind": kind, "period_end": p["end"], "period_start": p.get("start"),
                         "concept": p.get("c") or r["concept"], "unit": r["unit"], "value": p["v"], "accession": p["accn"], "form": p["form"], "filed": p["filed"], "derived": bool(p.get("derived"))}
-    fact_cleanup = persist_normalized_facts(sb, tk, rows.values())
+    if facts_only:
+        sb.upsert("facts", rows.values(), "ticker,statement,label,kind,period_end", batch=1000)
+        fact_cleanup = {"deleted": 0, "backup": None, "mode": "additive"}
+    else:
+        fact_cleanup = persist_normalized_facts(sb, tk, rows.values())
     if coverage.get("items"):
         lines = (summary or {}).get("news_lines") or {}
         sb.upsert("news_items", [{"url": x["url"], "ticker": tk, "title": x["title"][:500], "source": x["source"], "published_at": _ts(x.get("date")),
@@ -210,6 +316,15 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
     if summary:
         sb.upsert("summaries", [{"id": f"company:{tk}", "kind": "company", "ticker": tk, "content": summary, "generated_at": summary.get("generated_at") or now_iso()}], "id")
 
+    result = company_fundamental(tk, statements, prof, filings, warnings, fact_cleanup, ix, release)
+    if held_aliases:
+        result["held_filing_aliases"] = held_aliases
+    return result
+
+
+def company_fundamental(tk, statements, prof, filings, warnings, fact_cleanup, ix=None, release=None):
+    """Deterministic public-index inputs, also reconstructed at backfill promotion."""
+    u = BY_TICKER[tk]
     fund = fundamentals.compute(statements, prof, None)
     return {"pipeline_version": PIPELINE_VERSION, "ticker": tk, "warnings": warnings, "fact_cleanup": fact_cleanup, "name": u["name"], "legal_name": prof["name"], "sector": u["sector"], "sic": prof["sicDescription"], "exchange": (prof["exchanges"] or [None])[0],
             "fye": prof["fiscalYearEnd"], "shares": (prof["sharesOutstanding"] or {}).get("val"), "shares_metadata": prof["sharesOutstanding"], "latest_filing": filings[0]["d"] if filings else None,
@@ -234,14 +349,14 @@ def material_accession(filings):
     return next((f["a"] for f in filings if f["f"] in MATERIAL), None)
 
 
-def detect_changes(sb, tickers, fund, deadline):
+def detect_changes(sb, tickers, fund, deadline, ownership_stats=None):
     """Checks SEC submissions for each ticker. New material filings (10-K, 10-Q, 8-K) mark the company for
     reprocessing, as do legacy normalization versions even without a new filing. The caller
     applies its ordinary max_companies/time budget. Other new filings sync to the filings table."""
     state = _cache(sb, "meta/check_cursor.json", {"cursor": 0})
     start = state.get("cursor", 0) % max(len(tickers), 1)
     order = tickers[start:] + tickers[:start]
-    changed, checked, light = [], 0, []
+    changed, checked, light, latest_updates = [], 0, [], []
 
     def check(tk):
         if time.time() > deadline:
@@ -272,10 +387,20 @@ def detect_changes(sb, tickers, fund, deadline):
                         break
                     light.append({"accession": f["a"], "ticker": tk, "form": f["f"], "filed": f["d"], "report_date": f["r"] or None, "primary_doc": f["p"],
                                   "items": f["i"], "description": describe(f), "url": sec.filing_url(cik, f["a"], f["p"]), "updated_at": now_iso()})
-                prev["latest_accession"] = fl[0]["a"]
-                prev["latest_filing"] = fl[0]["d"]
+                latest_updates.append((tk, fl[0]["a"], fl[0]["d"]))
+    light, held_aliases = preserve_filing_owners(sb, light)
+    for alias in held_aliases:
+        message = _held_filing_message(alias)
+        print(message)
+        warnings = fund[alias["ticker"]].setdefault("warnings", [])
+        if message not in warnings:
+            warnings.append(message)
+    _filing_owner_stats(ownership_stats, held_aliases)
     if light:
         sb.upsert("filings", light, "accession")
+    for tk, accession, filed in latest_updates:
+        fund[tk]["latest_accession"] = accession
+        fund[tk]["latest_filing"] = filed
     state["cursor"] = (start + checked) % max(len(tickers), 1)
     state["updated_at"] = now_iso()
     sb.put_json("meta/check_cursor.json", state, cache="no-store")
@@ -284,13 +409,13 @@ def detect_changes(sb, tickers, fund, deadline):
 
 
 @serialized_aggregates
-def companies_job(sb, tickers=None, workers=4, refresh_news=False, refresh_summary=False, fetch_docs=True, time_budget=None, only_changed=False, max_companies=None):
+def companies_job(sb, tickers=None, workers=4, refresh_news=False, refresh_summary=False, fetch_docs=True, time_budget=None, only_changed=False, max_companies=None, facts_only=None):
     with Run(sb, "companies") as run:
         t0 = time.time()
         fund = _cache(sb, "meta/fundamentals.json", {}, strict=True)
         tickers = tickers or [t for t, *_ in UNIVERSE]
         if only_changed:
-            tickers = detect_changes(sb, tickers, fund, deadline=t0 + (time_budget or 600) * 0.4)
+            tickers = detect_changes(sb, tickers, fund, deadline=t0 + (time_budget or 600) * 0.4, ownership_stats=run.stats)
         if max_companies:
             tickers = tickers[:max_companies]
         done, failed, skipped, enrichment_errors = [], {}, {}, {}
@@ -299,7 +424,7 @@ def companies_job(sb, tickers=None, workers=4, refresh_news=False, refresh_summa
             if time_budget and time.time() - t0 > time_budget:
                 return tk, None, "skipped: time budget"
             try:
-                return tk, process_company(sb, tk, refresh_news=refresh_news, refresh_summary=refresh_summary, fetch_docs=fetch_docs), None
+                return tk, process_company(sb, tk, refresh_news=refresh_news, refresh_summary=refresh_summary, fetch_docs=fetch_docs, facts_only=facts_only), None
             except Exception as e:
                 return tk, None, str(e)[:300]
 
@@ -307,6 +432,7 @@ def companies_job(sb, tickers=None, workers=4, refresh_news=False, refresh_summa
             for tk, res, err in ex.map(one, tickers):
                 if res:
                     fund[tk] = res
+                    _filing_owner_stats(run.stats, res.get("held_filing_aliases") or [])
                     if res.get("warnings"):
                         enrichment_errors[tk] = res["warnings"]
                     done.append(tk)
@@ -462,10 +588,10 @@ def build_index(sb, pstats=None):
             m["buyback_yield"] = f["bb_ttm"] / mcap
         metrics.append({k: (None if isinstance(v, float) and v != v else v) for k, v in m.items()})
         rows.append({**{k: v for k, v in m.items() if k not in ("updated_at",)}, "name": f["name"], "legal_name": f.get("legal_name"), "sector": f["sector"], "sic": f.get("sic"),
-                     "exchange": f.get("exchange"), "fye": f.get("fye"), "latest_filing": f.get("latest_filing"), "has_source_tables": f.get("has_source_tables"), "sp100": tk in SP100, "logo": tk in logos, "insider_net_90d": _ins_net(ins.get(tk)), "spark": ps.get("spark", []), "shares_metadata": f.get("shares_metadata")})
+                     "exchange": f.get("exchange"), "fye": f.get("fye"), "latest_filing": f.get("latest_filing"), "has_source_tables": f.get("has_source_tables"), "sp100": tk in SP100, "sp500": tk in SP500, "logo": tk in logos, "insider_net_90d": _ins_net(ins.get(tk)), "spark": ps.get("spark", []), "shares_metadata": f.get("shares_metadata")})
     if metrics:
         sb.upsert("company_metrics", metrics, "ticker")
-    sb.put_json("index.json", {"generated": now_iso(), "sectors": SECTOR_ETF, "companies": rows}, cache="max-age=120")
+    sb.put_json("index.json", {"generated": now_iso(), "universe": UNIVERSE_METADATA, "sectors": SECTOR_ETF, "companies": rows}, cache="max-age=120")
     return len(rows)
 
 

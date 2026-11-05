@@ -136,10 +136,12 @@ class PipelineRegressions(unittest.TestCase):
             inp={key:None for key in ('eps','oi','rev','fcf','eq','ta','tl','tca','tcl','re','debt','cash')}
             inp.update(fin=True,ni=5,div=div,bb=bb,recs={key:[] for key in ('eps','oi','rev','fcf','eq','div','bb','debt','cash')})
             data={'T':{'q':{},'shares':{'v':100,'end':'2026-10-20','basis':'reported_outstanding'}}}
-            scope=dict(screener.__dict__,out=out,prov=prov,inp=inp,fundc=data,tk='T',dates=['2026-11-03'],c=[10],fx=None,valuation_history=lambda *a:{})
+            scope=dict(screener.__dict__,out=out,prov=prov,inp=inp,fundc=data,tk='T',dates=['2026-11-04'],c=[10],fx=None,
+                       pp={'price':{'p':[['2026-11-03',10]]}},valuation_history=lambda *a:{})
             exec(compile(code,'production_valuation_branch','exec'),scope)
             self.assertEqual(out.get('sh_yield'),expected)
             self.assertEqual(out.get('div_yield'),None if div is None else div/1000)
+            self.assertEqual(prov.f['mcap']['p'],[['2026-11-03',10]])
 
     def test_unchanged_legacy_companies_migrate_in_bounded_rotation(self):
         sb=MemoryStore()

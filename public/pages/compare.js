@@ -127,19 +127,23 @@ table.cmpx td.c.der::after{content:"";position:absolute;right:3px;top:5px;width:
   const HIST = {};
   async function ensureUniverse() {
     if (UNI) return UNI;
-    let rows = INDEX.companies, src = "index.json", gen = INDEX.generated;
+    const members = new Set(INDEX.companies.filter(c => window.FU_SCREENSPEC.inIndex(c, "sp500", INDEX.universe)).map(c => c.ticker));
+    let rows = INDEX.companies, src = "index.json", gen = INDEX.generated, fields = {};
     try {
       const s = await getJSON("screener.json");
       let arr = Array.isArray(s) ? s : (s.companies || s.rows || s.data || []);
-      const cols = s.columns || s.fields;
+      const cols = s.cols || s.columns || s.fields;
       if (Array.isArray(arr) && arr.length) {
         if (Array.isArray(arr[0]) && Array.isArray(cols)) arr = arr.map(r => Object.fromEntries(cols.map((c, i) => [typeof c === "string" ? c : c.key || c.k || c.id, r[i]])));
         const by = Object.fromEntries(arr.filter(r => r && r.ticker).map(r => [r.ticker, r]));
         rows = INDEX.companies.map(c => ({ ...c, ...(by[c.ticker] || {}) }));
+        fields = Object.fromEntries((Array.isArray(s.fields) ? s.fields : []).filter(f => f && typeof f === "object" && f.id).map(f => [f.id, f]));
         src = "screener.json and index.json"; gen = s.generated || gen;
       }
     } catch { /* screener.json not published yet: index.json fields only */ }
-    UNI = { rows, src, gen, by: Object.fromEntries(rows.map(r => [r.ticker, r])) };
+    // Index membership defines the benchmark pool; every tracked company keeps
+    // its loaded fields for selection, comparison highlights and source drawers.
+    UNI = { rows: rows.filter(r => members.has(r.ticker)), src, gen, fields, by: Object.fromEntries(rows.map(r => [r.ticker, r])) };
     return UNI;
   }
   async function ensureHistory(sym) {
@@ -1215,12 +1219,22 @@ table.cmpx td.c.der::after{content:"";position:absolute;right:3px;top:5px;width:
     const extra = [];
     if (UNI && UNI.src.startsWith("screener")) {
       const sample = UNI.rows.slice(0, 50);
-      Object.keys(UNI.rows[0] || {}).forEach(k => { if (known.has(k) || ["spark", "price", "chg_1d", "high_52w", "low_52w", "insider_net_90d", "eps_ttm"].includes(k)) return; if (sample.filter(r => typeof r[k] === "number").length >= 25) { const row = Object.values(ROW).find(r => r.spx.includes(k)); extra.push([k, row ? row.label : k.replace(/_/g, " "), row ? row.unit : /margin|yield|growth|ret|vol|pct|ro[aei]/.test(k) ? "pct" : "num", row ? row.key : null]); } });
+      Object.keys(UNI.rows[0] || {}).forEach(k => {
+        if (known.has(k) || ["sp500", "sp100", "cik", "spark", "price", "chg_1d", "high_52w", "low_52w", "insider_net_90d", "eps_ttm"].includes(k)) return;
+        if (sample.filter(r => typeof r[k] === "number").length < 25) return;
+        const row = Object.values(ROW).find(r => r.spx.includes(k)), field = UNI.fields[k];
+        const unit = row?.unit || (field?.u ? ({ usd: "USD", pct: "pct", pctl: "pct", x: "x" }[field.u] || "num") : /margin|yield|growth|ret|vol|pct|ro[aei]/.test(k) ? "pct" : "num");
+        extra.push([k, row?.label || field?.n || k.replace(/_/g, " "), unit, row?.key || null]);
+      });
     }
     return SC_FIELDS.concat(extra).filter(f => UNI?.rows.some(r => r[f[0]] != null));
   }
   function scatterPanel(body) {
     const fields = scFields();
+    if (!fields.length) {
+      body.append(panel("Scatter against the S&P 500", null, el("div", { class: "note" }, "S&P 500 benchmark data is not available for this snapshot.")));
+      return;
+    }
     if (!fields.find(f => f[0] === CS.sx)) CS.sx = "pe_ttm";
     if (!fields.find(f => f[0] === CS.sy)) CS.sy = "rev_growth_lq";
     const mk = (cur, on) => el("select", { class: "btn", onchange: e => on(e.target.value) }, fields.map(f => { const o = el("option", { value: f[0] }, f[1]); if (f[0] === cur) o.selected = true; return o; }));
