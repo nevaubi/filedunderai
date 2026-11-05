@@ -6,6 +6,35 @@ from decimal import Decimal
 from . import sec
 
 
+# The screener retains this much financial history for its current growth and
+# return calculations. Source conflicts inside it require a comparability decision.
+CALCULATION_HISTORY_YEARS = 6.3
+
+
+def comparability_review(statements, as_of=None):
+    """Retain source disagreements and identify those affecting current calculations."""
+    today = as_of or dt.datetime.now(dt.timezone.utc).date().isoformat()
+    from .fundamentals import current_period_end
+    latest = current_period_end(statements)
+    anchor = min(today, latest) if latest else today
+    cutoff = (dt.date.fromisoformat(anchor) - dt.timedelta(days=int(365.25 * CALCULATION_HISTORY_YEARS))).isoformat()
+    conflicts = []
+    for statement, rows in statements.items():
+        for row in rows:
+            for bucket in ('annual', 'quarterly'):
+                for point in row.get(bucket, []):
+                    conflict = point.get('selection_conflict')
+                    if conflict:
+                        entry = {'statement': statement, 'label': row['label'], 'unit': row['unit'],
+                                 'bucket': bucket, 'point': copy.deepcopy(point), 'reason': conflict['reason']}
+                        for key in ('alternative', 'reported_observations'):
+                            if key in conflict:
+                                entry[key] = copy.deepcopy(conflict[key])
+                        conflicts.append(entry)
+    return {'calculation_anchor': anchor, 'calculation_cutoff': cutoff, 'conflicts': conflicts,
+            'current_conflicts': [r for r in conflicts if r['point']['end'] >= cutoff]}
+
+
 def partition_supported_periods(statements):
     """Partition two known period defects; every other error still fails the gate.
 

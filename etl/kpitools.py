@@ -344,7 +344,7 @@ def validate(sb, data, fix=False):
     kunit = {k["id"]: (k.get("unit") or "").strip().lower() for k in data.get("kpis", [])}
     for dv in data.get("derived", []):
         # ratios, percentages and per-unit figures are not additive: a quarter cannot be derived by subtraction
-        if kunit.get(dv["kpi"]) in ("%", "pct", "percent", "ratio", "x", "bp", "usd_per_unit", "$/unit", "per_share", "usd_per_share", "usd_per_barrel"):
+        if kunit.get(dv["kpi"]) in ("%", "pct", "percent", "ratio", "x", "bp", "usd_per_unit", "$/unit", "per_share", "usd_per_share", "usd_per_barrel", "packages_per_day"):
             report["derived_bad"].append({**dv, "error": f"unit {kunit.get(dv['kpi'])} is not additive"})
             continue
         ins = []

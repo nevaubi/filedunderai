@@ -34,7 +34,8 @@ STRICT_SOURCE_TICKERS = {t for t, *_ in ADDITIONAL_LIST}
 FACTOR_SYMS = ["SPY", "QQQ", "^TNX", "CL=F", "GC=F", "DX-Y.NYB", "BTC-USD"]
 EXTRA_SYMS = ["DX-Y.NYB"]  # not carried by the prices job
 HIST_SYMS = list(dict.fromkeys(MARKET_SYMBOLS + EXTRA_SYMS + TICKERS))
-HIST_YEARS = 6.3
+from .source_quality import CALCULATION_HISTORY_YEARS
+HIST_YEARS = CALCULATION_HISTORY_YEARS
 CLOSES_PATH, FUND_PATH, KPI_PATH = "screener/closes.json.gz", "screener/fund.json.gz", "screener/kpi.json.gz"
 FUND_VERSION = 6
 YAHOO = "https://query2.finance.yahoo.com/v8/finance/chart/"
@@ -412,7 +413,7 @@ def _rec(r, concept):
     c = r.get("c") or concept
     rec.append(c)
     rec.append(1 if r.get("derived") else 0)
-    rec.append({k:r[k] for k in ("accessions", "available_at", "vintage", "validation_status", "derived", "selection_reason", "superseded_at") if k in r})
+    rec.append({k:r[k] for k in ("accessions", "available_at", "vintage", "validation_status", "derived", "selection_reason", "selection_conflict", "superseded_at") if k in r})
     return rec
 
 
@@ -466,12 +467,12 @@ def extract_company(sb, tk, since):
                  for stmt,concepts,instant in (("income",EXTRA_FLOW,False),("balance",EXTRA_BAL,True))}
         if strict:
             from .source_quality import partition_supported_periods
-            from .source_provenance import validate_statement_provenance
+            from .source_provenance import validate_statement_provenance, proof_object_path
             extra, excluded = partition_supported_periods(extra)
             sha = b["provenance"]["snapshot_sha256"]
             proof = validate_statement_provenance(cf_raw,extra,cik,sha,
                                                   taxonomy={"income":EXTRA_FLOW,"balance":EXTRA_BAL})
-            proof_path = f"sources/screener/{tk}/{sha}.json"
+            proof_path = proof_object_path(tk, proof, scope='screener')
             sb.put_json(proof_path,proof,cache="max-age=31536000,immutable")
             out["source_provenance"] = {"status":"verified","snapshot_sha256":sha,"proof_path":proof_path,
                                          "counts":proof["counts"],"quarantined_points":excluded}
@@ -563,8 +564,9 @@ class Facts:
         self.valuation_basis = fundamentals.valuation_hold(data.get("ticker"), data.get("valuation_basis"), as_of)
         source = data.get("filing_history") if as_of else data.get("q")
         self.q = {}
+        self.comparability_holds = []
         for lab, records in (source or {}).items():
-            picked = {}
+            picked, visible = {}, {}
             for r in records:
                 if (lab in SHARE_COUNT or lab in PER_SHARE) and r[7]:
                     continue
@@ -574,9 +576,25 @@ class Facts:
                     continue
                 if as_of and (not available or available > as_of):
                     continue
+                visible.setdefault(r[0], []).append(r)
                 prev = picked.get(r[0])
                 if not prev or (available, not bool(r[7])) > (((prev[8].get("available_at") if len(prev)>8 else None) or prev[4]), not bool(prev[7])):
                     picked[r[0]] = r
+            for end, record in list(picked.items()):
+                def point(r):
+                    metadata = r[8] if len(r) > 8 else {}
+                    p = dict(metadata, end=r[0], start=r[1] or None, v=r[2], accn=r[3],
+                             filed=r[4], form=r[5], c=r[6])
+                    if r[7] and not p.get('derived'):
+                        p['derived'] = True
+                    return p
+                selected = sec.prefer_reported_observation(point(record), [point(r) for r in visible[end]])
+                if selected.get('selection_conflict'):
+                    self.comparability_holds.append({'label': lab, 'point': selected,
+                                                     **selected['selection_conflict']})
+                    del picked[end]
+                elif selected != point(record):
+                    picked[end] = _rec(selected, selected['c'])
             self.q[lab] = sorted(picked.values(), key=lambda r:r[0])
         self.splits = splits or []
         self.ends = sorted({r[0] for label in ("Net income", "Revenue") for r in self.q.get(label, [])})

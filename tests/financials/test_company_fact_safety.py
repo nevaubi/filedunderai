@@ -137,7 +137,7 @@ class ScheduledFactSafety(unittest.TestCase):
         store = CompanyStore([reported_row()])
         previous = {"ticker": "AAPL", "generated": "previous"}
         store.data["companies/AAPL.json"] = copy.deepcopy(previous)
-        with self.assertRaisesRegex(ValueError, "reported_to_derived"):
+        with self.assertRaisesRegex(ValueError, "comparability review"):
             self.process(store, cumulative_sources(total=260))
         self.assertEqual(store.data["companies/AAPL.json"], previous)
         self.assertEqual(store.facts, [reported_row()])
@@ -203,12 +203,13 @@ class DirectPersistenceSafety(unittest.TestCase):
         facts = json.loads(sources(observations)["companyfacts"])["facts"]
         point = sec.build_series(facts, "income")[0]["quarterly"][-1]
         self.assertEqual((point["v"], point["accn"], point["filed"]),
-                         (150, Q3, "2026-11-01"))
-        self.assertTrue(point.get("derived"))
+                         (160, "0000320193-26-000004", "2026-09-01"))
+        self.assertFalse(point.get("derived"))
+        self.assertEqual(point['selection_conflict']['alternative']['v'], 150)
         before = reported_row(value=160, accession="0000320193-26-000004",
                               filed="2026-09-01")
         store = CompanyStore([before])
-        with self.assertRaisesRegex(ValueError, "reported_to_derived"):
+        with self.assertRaisesRegex(ValueError, "comparability review"):
             ScheduledFactSafety().process(store, observations)
         self.assertEqual(store.facts, [before])
         self.assertEqual((store.writes, store.db), ([], []))

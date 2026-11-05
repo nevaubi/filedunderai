@@ -115,6 +115,40 @@ def _revenue_rank(facts, r, names):
     return names.index(c), "reported concept priority within accounting scope"
 
 
+def prefer_reported_observation(selected, options):
+    """Preserve the latest direct observation for one already unit-matched series.
+
+    A later cumulative comparative can be restated while the older subtraction
+    leg is not. Keep the complete disagreement for review, never a synthesized
+    revision. Conflicting starts or same-date direct values remain explicit
+    ambiguities even when an issuer has no previous database observation.
+    """
+    if selected.get('selection_conflict'):
+        return selected
+    reported = [r for r in options if not r.get("derived") and r["c"] == selected["c"]
+                and r["end"] == selected["end"] and r["end"] <= r["filed"]]
+    if not reported:
+        return selected
+    latest_date = max(r.get("available_at") or r["filed"] for r in reported)
+    latest = [r for r in reported if (r.get("available_at") or r["filed"]) == latest_date]
+    if (any(r.get("start") != selected.get("start") for r in latest)
+            or len({r["v"] for r in latest}) != 1):
+        return dict(selected, selection_conflict={
+            'reason': 'reported_period_or_value_ambiguity',
+            'reported_observations': [{k: v for k, v in r.items() if not k.startswith('_')}
+                                      for r in sorted(latest, key=lambda r: (r['accn'], r.get('start') or '', r['v']))]})
+    if not selected.get('derived'):
+        return selected
+    preferred = dict(max(latest, key=lambda r: r["accn"]),
+                     selection_reason="Preserved exact reported observation over an equal later derived value")
+    if preferred["v"] != selected["v"]:
+        preferred["selection_reason"] = "Preserved latest reported observation; conflicting later derivation requires comparability review"
+        preferred["selection_conflict"] = {
+            "reason": "later_derived_value_differs_from_reported",
+            "alternative": {k: v for k, v in selected.items() if not k.startswith("_")}}
+    return preferred
+
+
 def build_series(facts, stmt, vintage="latest", as_of=None, concepts=None, instant=None):
     """Normalize reported observations and retain filing histories for point-in-time use.
 
@@ -191,20 +225,8 @@ def build_series(facts, stmt, vintage="latest", as_of=None, concepts=None, insta
                 date = (max if vintage == "latest" else min)(r["available_at"] for r in options)
                 pool = [r for r in options if r["available_at"] == date]
                 selected = min(pool, key=lambda r: (r["_rank"], bool(r.get("derived")), r["accn"]))
-                if vintage == "latest" and selected.get("derived"):
-                    # A later cumulative filing does not turn an identical,
-                    # directly reported quarter into a synthetic observation.
-                    # Require the newest reported value and its full period
-                    # context; an older equal value cannot hide a revision.
-                    reported = [r for r in options if not r.get("derived")
-                                and r["c"] == selected["c"]]
-                    if reported:
-                        latest_reported = max(r["available_at"] for r in reported)
-                        latest = [r for r in reported if r["available_at"] == latest_reported]
-                        if all((r.get("start"), r["v"]) ==
-                               (selected.get("start"), selected["v"]) for r in latest):
-                            selected = dict(max(latest, key=lambda r: r["accn"]),
-                                            selection_reason="Preserved exact reported observation over an equal later derived value")
+                if vintage == "latest":
+                    selected = prefer_reported_observation(selected, options)
                 chosen.append(selected)
             return sorted(chosen, key=lambda r:r["end"])
         def clean(records):
