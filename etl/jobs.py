@@ -94,6 +94,58 @@ NONADDITIVE_FACT_CONCEPTS = {"EarningsPerShareBasic", "EarningsPerShareDiluted",
                             "WeightedAverageNumberOfDilutedSharesOutstanding", "WeightedAverageNumberOfSharesOutstandingBasic"}
 
 
+def statement_fact_rows(ticker, statements):
+    rows = {}
+    for statement, lines in statements.items():
+        for line in lines:
+            for kind, bucket in (("A", "annual"), ("Q", "quarterly")):
+                for point in line[bucket]:
+                    rows[(statement, line["label"], kind, point["end"])] = {
+                        "ticker": ticker, "statement": statement, "label": line["label"], "kind": kind,
+                        "period_end": point["end"], "period_start": point.get("start"),
+                        "concept": point.get("c") or line["concept"], "unit": line["unit"], "value": point["v"],
+                        "accession": point["accn"], "form": point["form"], "filed": point["filed"],
+                        "derived": bool(point.get("derived"))}
+    return list(rows.values())
+
+
+def check_reported_fact_replacements(sb, ticker, rows):
+    """Reject unsafe overwrites; absent historical rows are never deleted here.
+
+    Local additive stages have no production rows. Live reads must succeed before
+    publication, and direct persistence callers receive the same protection.
+    """
+    if getattr(sb, "stage_only", False) is True:
+        return
+    lookup = getattr(sb, "select", None)
+    if not callable(lookup):
+        raise RuntimeError("Live fact replacement lookup unavailable")
+    existing = lookup("facts", f"select=*&ticker=eq.{quote(ticker, safe='')}&derived=is.false"
+                      "&order=statement.asc,label.asc,kind.asc,period_end.asc")
+    if not isinstance(existing, list):
+        raise RuntimeError("Invalid live fact replacement lookup result")
+    before = {tuple(row[key] for key in FACT_KEY): row for row in existing if row.get("derived") is False}
+    for candidate in rows:
+        prior = before.get(tuple(candidate[key] for key in FACT_KEY))
+        if prior is None:
+            continue
+        reason = None
+        if candidate.get("derived"):
+            reason = "reported_to_derived"
+        else:
+            old_date, new_date = prior.get("filed"), candidate.get("filed")
+            changed = any(prior.get(key) != candidate.get(key) for key in ("value", "unit", "period_start", "concept"))
+            if old_date and (not new_date or new_date < old_date):
+                reason = "older_reported_filing"
+            elif changed and (not old_date or not new_date):
+                reason = "changed_reported_value_unknown_date"
+            elif changed and old_date == new_date:
+                reason = "changed_reported_value_same_date"
+        if reason:
+            key = "/".join(str(candidate[field]) for field in FACT_KEY)
+            raise ValueError(f"Financial replacement requires review: {reason}: {key}; prior reported fact preserved")
+
+
 def persist_normalized_facts(sb, ticker, rows, delete_batch_size=1):
     """Upsert valid replacements, then remove only unsupported legacy nonadditive quarters.
 
@@ -105,6 +157,8 @@ def persist_normalized_facts(sb, ticker, rows, delete_batch_size=1):
         raise ValueError("Fact deletion batches must contain 1–20 rows")
     if delete_batch_size > 1 and not callable(getattr(sb, "delete_nonadditive_fact_batches", None)):
         raise TypeError("Batched fact deletion requires the reviewed repair client")
+    rows = list(rows)
+    check_reported_fact_replacements(sb, ticker, rows)
     sb.upsert("facts", rows, "ticker,statement,label,kind,period_end", batch=1000)
     existing = sb.select("facts", f"select=*&ticker=eq.{quote(ticker, safe='')}&kind=eq.Q&derived=is.true"
                          "&order=statement.asc,label.asc,kind.asc,period_end.asc")
@@ -180,14 +234,12 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
         except Exception as e:
             warn(f"  {tk} gap filler failed: {str(e)[:200]}")
     statements = {k: sec.build_series(facts, k) for k in sec.CONCEPTS}
-    quarantined = []
-    if facts_only:
-        from .source_quality import partition_supported_periods
-        statements, quarantined = partition_supported_periods(statements)
-        if quarantined:
-            warn(f"{len(quarantined)} selected/history statement candidates have unsupported reporting periods; "
-                 "retained in quarantined_statement_points and excluded from published financial values.")
-    if not any(statements.values()):
+    from .source_quality import partition_supported_periods
+    statements, quarantined = partition_supported_periods(statements)
+    if quarantined:
+        warn(f"{len(quarantined)} selected/history statement candidates have unsupported reporting periods; "
+             "retained in quarantined_statement_points and excluded from published financial values.")
+    if not any(line["annual"] or line["quarterly"] for lines in statements.values() for line in lines):
         raise ValueError("No usable statement facts; preserving prior company bundle")
     digest = hashlib.sha256(original).hexdigest()
     provenance = None
@@ -203,6 +255,8 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
     allowed_filings = {row["accession"] for row in filing_plan}
     for alias in held_aliases:
         warn(_held_filing_message(alias))
+    rows = statement_fact_rows(tk, statements)
+    check_reported_fact_replacements(sb, tk, rows)
     # Validation precedes all mutations, including source object publication.
     if store_raw:
         source_archive = f"sec/companyfacts/archives/CIK{cik:010d}/{digest}.json"
@@ -289,11 +343,10 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
         "pipeline_version": PIPELINE_VERSION, "ticker": tk, "cik": cik, "displayName": u["name"], "sector": u["sector"], "irUrl": IR_URLS.get(tk), "generated": now_iso(),
         "profile": prof, "statements": statements, "source_archive": source_archive, "normalization": {"version": 2, "vintage": "latest", "availability_resolution": "filing_date"}, "warnings": warnings, "filings": [f for f in filings][:250], "filingTables": ftables,
         "earnings8k": earn, "ix": ix, "release": release, "news": coverage, "summary": summary,
+        "quarantined_statement_points": quarantined,
     }
     if provenance:
         bundle["provenance"] = provenance
-        bundle["quarantined_statement_points"] = quarantined
-    sb.put_json(f"companies/{tk}.json", bundle)
 
     # relational copies
     sb.upsert("companies", [{
@@ -304,19 +357,13 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
     sb.upsert("filings", [{
         "accession": f["a"], "ticker": tk, "form": f["f"], "filed": f["d"], "report_date": f["r"] or None, "primary_doc": f["p"], "items": f["i"],
         "description": describe(f), "url": sec.filing_url(cik, f["a"], f["p"]), "has_source_tables": f["a"] in ix, "updated_at": now_iso()} for f in filings[:250] if f["a"] in allowed_filings], "accession")
-    rows = {}
-    for stmt, lst in statements.items():
-        for r in lst:
-            for kind, key in (("A", "annual"), ("Q", "quarterly")):
-                for p in r[key]:
-                    rows[(stmt, r["label"], kind, p["end"])] = {
-                        "ticker": tk, "statement": stmt, "label": r["label"], "kind": kind, "period_end": p["end"], "period_start": p.get("start"),
-                        "concept": p.get("c") or r["concept"], "unit": r["unit"], "value": p["v"], "accession": p["accn"], "form": p["form"], "filed": p["filed"], "derived": bool(p.get("derived"))}
     if facts_only:
-        sb.upsert("facts", rows.values(), "ticker,statement,label,kind,period_end", batch=1000)
+        sb.upsert("facts", rows, "ticker,statement,label,kind,period_end", batch=1000)
         fact_cleanup = {"deleted": 0, "backup": None, "mode": "additive"}
     else:
-        fact_cleanup = persist_normalized_facts(sb, tk, rows.values())
+        fact_cleanup = persist_normalized_facts(sb, tk, rows)
+    # A failed fact write must not advertise a new public financial bundle.
+    sb.put_json(f"companies/{tk}.json", bundle)
     if coverage.get("items"):
         lines = (summary or {}).get("news_lines") or {}
         sb.upsert("news_items", [{"url": x["url"], "ticker": tk, "title": x["title"][:500], "source": x["source"], "published_at": _ts(x.get("date")),

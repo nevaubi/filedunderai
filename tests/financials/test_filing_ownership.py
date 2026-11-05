@@ -127,7 +127,11 @@ class FilingOwnershipTests(unittest.TestCase):
 
     def test_legacy_company_refresh_does_not_require_a_filing_lookup(self):
         sb = FilingStore()
-        sb.select = None
+        def lookup(table, query):
+            if table == 'filings':
+                raise AssertionError('Legacy filing publication must not require an ownership lookup')
+            return []  # Financial replacement safety performs its own fact lookup.
+        sb.select = lookup
         jobs.process_company(sb, "AAPL", facts_only=True, fetch_docs=False,
                              source_inputs=source_inputs("AAPL", with_shared=False), log=lambda *_: None)
         self.assertEqual(sb.filings[OWN]["ticker"], "AAPL")

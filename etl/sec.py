@@ -190,7 +190,22 @@ def build_series(facts, stmt, vintage="latest", as_of=None, concepts=None, insta
             for end, options in grouped.items():
                 date = (max if vintage == "latest" else min)(r["available_at"] for r in options)
                 pool = [r for r in options if r["available_at"] == date]
-                chosen.append(min(pool, key=lambda r: (r["_rank"], bool(r.get("derived")), r["accn"])))
+                selected = min(pool, key=lambda r: (r["_rank"], bool(r.get("derived")), r["accn"]))
+                if vintage == "latest" and selected.get("derived"):
+                    # A later cumulative filing does not turn an identical,
+                    # directly reported quarter into a synthetic observation.
+                    # Require the newest reported value and its full period
+                    # context; an older equal value cannot hide a revision.
+                    reported = [r for r in options if not r.get("derived")
+                                and r["c"] == selected["c"]]
+                    if reported:
+                        latest_reported = max(r["available_at"] for r in reported)
+                        latest = [r for r in reported if r["available_at"] == latest_reported]
+                        if all((r.get("start"), r["v"]) ==
+                               (selected.get("start"), selected["v"]) for r in latest):
+                            selected = dict(max(latest, key=lambda r: r["accn"]),
+                                            selection_reason="Preserved exact reported observation over an equal later derived value")
+                chosen.append(selected)
             return sorted(chosen, key=lambda r:r["end"])
         def clean(records):
             return [{k:v for k,v in r.items() if not k.startswith("_")} for r in records]

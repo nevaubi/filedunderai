@@ -117,8 +117,8 @@ details.ks-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
   }
   function openPoint(S, tk, s, p, K) {
     const d = (S.docs || {})[p[3]] || [];
-    openKpiSource(tk, { name: s.name, unit: s.unit }, K, p[0], { v: p[9], printed: printedIn(p[5], p[9]), doc: p[3], page: p[4], quote: p[5], sheet: p[6], cell: p[7], derived: p[8] ? { formula: p[8] } : null,
-      doc_title: d[0], path: d[1], ext: d[2], url: d[3], label: p[2] });
+    return openKpiSource(tk, { name: s.name, unit: s.unit }, K, p[0], { v: p[9], printed: printedIn(p[5], p[9]), doc: p[3], page: p[4], quote: p[5], sheet: p[6], cell: p[7], derived: p[8] ? { formula: p[8] } : null,
+      doc_title: d[0], path: d[1], ext: d[2], url: d[3], text_path: d[6], label: p[2] });
   }
   const numBtn = (text, onclick, title) => el("button", { class: "ks-n", title: title || "Open the source document at this value", onclick: e => { e.stopPropagation(); onclick(); } }, text);
 

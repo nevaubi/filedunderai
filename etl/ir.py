@@ -11,6 +11,7 @@ import os
 import re
 import time
 import urllib.parse
+import xml.etree.ElementTree as ET
 import zipfile
 
 from .common import AggregateLease, HTTPError, SEC_UA, Supabase, now_iso, request, sec_throttle
@@ -239,9 +240,11 @@ def _text_result(kind, content, limits=None, errors=None):
 
 
 WORKBOOK_MAX_SHEETS = 256
+WORKBOOK_EXTRACTION_VERSION = 2
 WORKBOOK_MAX_CELLS = 1_000_000
 WORKBOOK_ZIP_MAX_BYTES = 128 * 1024 * 1024
 WORKBOOK_ZIP_MAX_MEMBER_BYTES = 32 * 1024 * 1024
+WORKBOOK_ZIP_MAX_DRAWING_BYTES = 64 * 1024 * 1024
 WORKBOOK_ZIP_MAX_MEMBERS = 10000
 
 
@@ -271,7 +274,9 @@ def _workbook_zip(body, deadline=None):
             if entry.flag_bits & 1 or (entry.external_attr >> 16) & 0o170000 == 0o120000:
                 raise ValueError("Encrypted or symbolic-link workbook ZIP member")
             total += entry.file_size
-            if entry.file_size > WORKBOOK_ZIP_MAX_MEMBER_BYTES or total > WORKBOOK_ZIP_MAX_BYTES:
+            member_limit = (WORKBOOK_ZIP_MAX_DRAWING_BYTES if re.fullmatch(r"xl/drawings/drawing\d+\.xml", name)
+                            else WORKBOOK_ZIP_MAX_MEMBER_BYTES)
+            if entry.file_size > member_limit or total > WORKBOOK_ZIP_MAX_BYTES:
                 raise ValueError("Workbook ZIP exceeds expanded size limit")
             names.append(name)
             changed = changed or name != entry.filename
@@ -281,19 +286,65 @@ def _workbook_zip(body, deadline=None):
         with zipfile.ZipFile(repaired, "w", compression=zipfile.ZIP_DEFLATED) as target:
             for entry, name in zip(entries, names):
                 _timeout(deadline)
+                member_limit = (WORKBOOK_ZIP_MAX_DRAWING_BYTES if re.fullmatch(r"xl/drawings/drawing\d+\.xml", name)
+                                else WORKBOOK_ZIP_MAX_MEMBER_BYTES)
                 with source.open(entry) as member:
-                    data = member.read(WORKBOOK_ZIP_MAX_MEMBER_BYTES + 1)
-                if len(data) > WORKBOOK_ZIP_MAX_MEMBER_BYTES or len(data) != entry.file_size:
+                    data = member.read(member_limit + 1)
+                if len(data) > member_limit or len(data) != entry.file_size:
                     raise ValueError("Workbook ZIP member size mismatch")
                 target.writestr(name, data)
         return repaired.getvalue()
+
+
+def _worksheet_data_bounds(archive, worksheet, deadline=None):
+    """Bound actual OOXML values/formulas, excluding formatting-only trailing ranges.
+
+    The pinned openpyxl read-only worksheet supplies the resolved archive member
+    and shared strings; no original package member or cell is rewritten.
+    """
+    namespace = '{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'
+    last_row, last_column, seen = 0, 0, 0
+    with archive.open(worksheet._worksheet_path) as source:
+        for _, element in ET.iterparse(source, events=('end',)):
+            if element.tag == namespace + 'row':
+                element.clear()
+                continue
+            if element.tag != namespace + 'c':
+                continue
+            if seen % 1024 == 0:
+                _timeout(deadline)
+            seen += 1
+            formula = element.find(namespace + 'f')
+            value_node = element.find(namespace + 'v')
+            value = value_node.text if value_node is not None else None
+            if element.get('t') == 's' and value is not None:
+                try:
+                    value = worksheet._shared_strings[int(value)]
+                except (ValueError, IndexError) as exc:
+                    raise ValueError('Invalid workbook shared-string index') from exc
+            elif element.get('t') == 'inlineStr':
+                value = ''.join(n.text or '' for n in element.iter(namespace + 't'))
+            if formula is not None or (value is not None and str(value).strip()):
+                match = re.fullmatch(r'([A-Z]+)([1-9]\d*)', element.get('r', ''))
+                if not match:
+                    raise ValueError('Invalid workbook cell coordinate')
+                column = 0
+                for letter in match.group(1):
+                    column = column * 26 + ord(letter) - 64
+                row = int(match.group(2))
+                if row > 1048576 or column > 16384:
+                    raise ValueError('Workbook cell coordinate exceeds Excel bounds')
+                last_row, last_column = max(last_row, row), max(last_column, column)
+            element.clear()
+    return last_row, last_column
 
 
 def extract_text(body, ext, deadline=None):
     """Extract a bounded, coordinate-preserving representation; limits never imply complete text.
 
     'verified' checks machine-readable nonempty content, not OCR accuracy or financial correctness.
-    Empty interior/trailing rows and columns are retained so evidence coordinates never shift.
+    Interior empty rows/columns retain their coordinates. Formatting-only trailing
+    XLSX ranges are described in sheet metadata, without consuming the cell budget.
     """
     _timeout(deadline)
     limits, errors = [], []
@@ -323,6 +374,8 @@ def extract_text(body, ext, deadline=None):
         return _text_result("pages", pages, limits, errors)
     if ext in (".xlsx", ".xlsm", ".xls"):
         sheets, cell_budget, budget_exhausted = {}, WORKBOOK_MAX_CELLS, False
+        cell_metadata, sheet_metadata = {}, {}
+        missing_formula_caches, source_cell_errors = 0, 0
         def bounded_rows(source):
             nonlocal cell_budget, budget_exhausted
             rows = []
@@ -340,7 +393,7 @@ def extract_text(body, ext, deadline=None):
             return rows
         if ext == ".xls":
             import xlrd
-            book = xlrd.open_workbook(file_contents=body, on_demand=True, logfile=io.StringIO())
+            book = xlrd.open_workbook(file_contents=body, on_demand=True, formatting_info=True, logfile=io.StringIO())
             try:
                 if book.nsheets > WORKBOOK_MAX_SHEETS:
                     limits.append(f"sheets:{WORKBOOK_MAX_SHEETS}")
@@ -351,8 +404,9 @@ def extract_text(body, ext, deadline=None):
                     if _expired(deadline):
                         limits.append("deadline")
                         break
-                    if ws.nrows > 601 or ws.ncols > 60:
-                        limits.append(f"sheet:{ws.name}:rows:601,columns:60")
+                    cell_metadata[ws.name] = {}
+                    sheet_metadata[ws.name] = {"rows": ws.nrows, "columns": ws.ncols,
+                        "state": {0: "visible", 1: "hidden", 2: "veryHidden"}.get(ws.visibility, "unknown")}
                     def value(cell):
                         if cell.ctype == xlrd.XL_CELL_ERROR:
                             return xlrd.error_text_from_code.get(cell.value, "#ERROR!")
@@ -361,13 +415,37 @@ def extract_text(body, ext, deadline=None):
                         if cell.ctype == xlrd.XL_CELL_BOOLEAN:
                             return bool(cell.value)
                         return cell.value
-                    sheets[ws.name] = bounded_rows([value(ws.cell(i, j)) for j in range(min(ws.ncols, 60))] for i in range(min(ws.nrows, 601)))
+                    def source_rows():
+                        nonlocal source_cell_errors
+                        for i in range(ws.nrows):
+                            row = []
+                            for j in range(ws.ncols):
+                                cell = ws.cell(i, j)
+                                row.append(value(cell))
+                                if cell.ctype not in (xlrd.XL_CELL_EMPTY, xlrd.XL_CELL_BLANK):
+                                    fmt = book.format_map.get(book.xf_list[cell.xf_index].format_key)
+                                    ref = xlrd.cellname(i, j)
+                                    meta = {
+                                        "data_type": cell.ctype, "number_format": fmt.format_str if fmt else "General"}
+                                    if cell.ctype == xlrd.XL_CELL_ERROR:
+                                        meta["source_error"] = row[-1]
+                                        source_cell_errors += 1
+                                        if len(errors) < 100:
+                                            errors.append(f"{ws.name}!{ref}:source cell error {row[-1]}")
+                                    cell_metadata[ws.name][ref] = meta
+                            yield row
+                    sheets[ws.name] = bounded_rows(source_rows())
             finally:
                 book.release_resources()
         else:
             import openpyxl
-            book = openpyxl.load_workbook(io.BytesIO(_workbook_zip(body, deadline)), data_only=True, read_only=True)
+            package = _workbook_zip(body, deadline)
+            book = openpyxl.load_workbook(io.BytesIO(package), data_only=True, read_only=True)
+            formulas = None
+            content_archive = None
             try:
+                formulas = openpyxl.load_workbook(io.BytesIO(package), data_only=False, read_only=True)
+                content_archive = zipfile.ZipFile(io.BytesIO(package))
                 if len(book.worksheets) > WORKBOOK_MAX_SHEETS:
                     limits.append(f"sheets:{WORKBOOK_MAX_SHEETS}")
                 for ws in book.worksheets[:WORKBOOK_MAX_SHEETS]:
@@ -376,15 +454,59 @@ def extract_text(body, ext, deadline=None):
                     if _expired(deadline):
                         limits.append("deadline")
                         break
-                    if (ws.max_row or 0) > 601 or (ws.max_column or 0) > 60:
-                        limits.append(f"sheet:{ws.title}:rows:601,columns:60")
-                    rows = ws.iter_rows(max_row=min(ws.max_row or 601, 601), max_col=min(ws.max_column or 60, 60), values_only=True)
-                    sheets[ws.title] = bounded_rows(["" if v is None else v for v in row] for row in rows)
+                    cell_metadata[ws.title] = {}
+                    sheet_metadata[ws.title] = {"rows": ws.max_row, "columns": ws.max_column, "state": ws.sheet_state}
+                    data_rows, data_columns = _worksheet_data_bounds(content_archive, formulas[ws.title], deadline)
+                    sheet_metadata[ws.title].update(data_rows=data_rows, data_columns=data_columns)
+                    if not data_rows or not data_columns:
+                        sheets[ws.title] = []
+                        continue
+                    bounds = {"max_row": data_rows, "max_col": data_columns}
+                    def source_rows():
+                        nonlocal missing_formula_caches, source_cell_errors
+                        for cached, source in zip(ws.iter_rows(**bounds), formulas[ws.title].iter_rows(**bounds), strict=True):
+                            values = []
+                            for cell, original in zip(cached, source, strict=True):
+                                values.append("" if cell.value is None else cell.value)
+                                if original.value is None:
+                                    continue
+                                meta = {"data_type": original.data_type, "number_format": original.number_format}
+                                if cell.data_type == "e":
+                                    meta["source_error"] = cell.value
+                                    source_cell_errors += 1
+                                    if len(errors) < 100:
+                                        errors.append(f"{ws.title}!{original.coordinate}:source cell error {cell.value}")
+                                if original.data_type == "f":
+                                    meta["formula"] = original.value if isinstance(original.value, str) else getattr(original.value, "text", None)
+                                    meta["cached"] = cell.value is not None
+                                    if not meta["cached"]:
+                                        missing_formula_caches += 1
+                                        if len(errors) < 100:
+                                            errors.append(f"{ws.title}!{original.coordinate}:formula cache missing")
+                                cell_metadata[ws.title][original.coordinate] = meta
+                            yield values
+                    sheets[ws.title] = bounded_rows(source_rows())
             finally:
                 book.close()
+                if formulas is not None:
+                    formulas.close()
+                if content_archive is not None:
+                    content_archive.close()
+        for name, rows in sheets.items():
+            sheet_metadata[name].update(extracted_rows=len(rows), extracted_columns=max(map(len, rows), default=0))
+            # A row prepared just as a deadline/cell budget expired is not extracted evidence.
+            cell_metadata[name] = {ref: meta for ref, meta in cell_metadata[name].items()
+                                   if int(re.search(r"\d+$", ref).group()) <= len(rows)}
+        if missing_formula_caches + source_cell_errors > len(errors):
+            limits.append(f"cell errors:{missing_formula_caches + source_cell_errors}; first {len(errors)} listed")
         # Workbooks expose cached formula results only; no formula evaluation is attempted.
         result = _text_result("sheets", sheets, limits, errors)
+        result["cell_metadata"], result["sheet_metadata"] = cell_metadata, sheet_metadata
         result["extraction"]["formula_values"] = "cached_only"
+        result["extraction"]["workbook_version"] = WORKBOOK_EXTRACTION_VERSION
+        result["extraction"]["formula_inspection"] = "unavailable_for_xls" if ext == ".xls" else "formula_and_cache"
+        result["extraction"]["missing_formula_caches"] = missing_formula_caches if ext != ".xls" else None
+        result["extraction"]["source_cell_errors"] = source_cell_errors
         return result
     if ext == ".pptx":
         from pptx import Presentation
@@ -1112,8 +1234,13 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
     # Missing text and previously failed extraction repairs are independent of discovery cooldown.
     for row in sorted(existing, key=lambda r: bool(r.get("text_path"))):
         outcome = state["outcomes"].get(row["id"], {})
-        if not row.get("text_path") or (repair_existing and outcome.get("status") != "verified"):
-            _enqueue(state, "extractions", row["id"], id=row["id"])
+        stale_workbook = (repair_existing and row.get("ext") in (".xls", ".xlsx", ".xlsm")
+                          and outcome.get("workbook_version") != WORKBOOK_EXTRACTION_VERSION)
+        if not row.get("text_path") or (repair_existing and (outcome.get("status") != "verified" or stale_workbook)):
+            task = _enqueue(state, "extractions", row["id"], id=row["id"])
+            if stale_workbook and task is not None and task.get("workbook_version") != WORKBOOK_EXTRACTION_VERSION:
+                task.update(status="pending", attempts=0, workbook_version=WORKBOOK_EXTRACTION_VERSION)
+                task.pop("error", None)
     if repair_existing:
         stats["dates_repaired"] = _repair_dates(sb, ticker, existing)
     elif not publish_only:
@@ -1180,6 +1307,8 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
         except Exception as e:
             if quality is None:
                 state["outcomes"][did] = {"status": "failed", "nonempty": False, "limits": [], "errors": [str(e)[:200]], "attempted_at": now_iso()}
+                if row.get("ext") in (".xls", ".xlsx", ".xlsm"):
+                    state["outcomes"][did]["workbook_version"] = WORKBOOK_EXTRACTION_VERSION
             _failure(item, e, stats, "extraction")
         _save_checkpoint(sb, state)
     # Completed/known document candidates do not spend the work cap.

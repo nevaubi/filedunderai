@@ -12,7 +12,7 @@ from urllib.parse import urlsplit
 from . import ir, sec
 from .backfill import atomic_write, digest, encoded
 from .common import AggregateLease, Supabase, now_iso
-from .universe import ADDITIONAL_REGISTRY, BY_TICKER, SP500
+from .universe import ADDITIONAL_REGISTRY, BY_TICKER, SP500, cohort_registry, registry_for
 
 
 def prepare_documents(root, ticker):
@@ -21,7 +21,7 @@ def prepare_documents(root, ticker):
         raise ValueError("IR backfill requires an approved additional issuer")
     manifest = json.loads((root / "ir-discovery" / "companies" / f"{ticker}.json").read_bytes())
     if (manifest["ticker"] != ticker or manifest["cik"] != BY_TICKER[ticker]["cik"]
-            or manifest["cohort_id"] != ADDITIONAL_REGISTRY["cohort_id"]):
+            or manifest["cohort_id"] != registry_for(ticker)["cohort_id"]):
         raise ValueError("IR discovery manifest identity mismatch")
     cik = manifest["cik"]
     source = root / "raw" / "sec" / "submissions" / f"CIK{cik:010d}.json.gz"
@@ -199,6 +199,7 @@ def main(argv=None):
     parser.add_argument("--workers",type=int,default=4)
     args=parser.parse_args(argv)
     tickers=args.tickers or [r["ticker"] for r in ADDITIONAL_REGISTRY["companies"]]
+    registry=cohort_registry(tickers)
     def one(ticker):
         try:
             return publish_company(args.root,ticker)
@@ -209,7 +210,7 @@ def main(argv=None):
         for result in pool.map(one,tickers):
             results.append(result)
             print(json.dumps({k:v for k,v in result.items() if k!="coverage"}),flush=True)
-    report={"cohort_id":ADDITIONAL_REGISTRY["cohort_id"],"at":now_iso(),"companies":len(results),
+    report={"cohort_id":registry["cohort_id"],"at":now_iso(),"companies":len(results),
             "published":sum(r["status"]=="published" for r in results),"results":results}
     atomic_write(args.root/"ir-publication-report.json",encoded(report))
     if report["published"]!=len(results):

@@ -114,14 +114,19 @@ Items:
 Return JSON: {{"items": [{{"i": <item number>, "id": <option id or null>, "scope": "total"|"segment"|"variant", "member": <segment/region/variant text or null>, "reason": <at most 18 words>}}]}}"""
 
 
-def _llm(prompt, max_tokens=12000):
+def _llm(prompt, max_tokens=12000, deadline=None):
     last = None
     for model, effort in MODELS:
+        remaining = deadline - time.time() if deadline is not None else None
+        if remaining is not None and remaining <= 0:
+            raise TimeoutError("KPI model proposal budget exhausted") from last
         try:
             d = json.loads(request("https://api.fireworks.ai/inference/v1/chat/completions", method="POST", data={
                 "model": f"accounts/fireworks/models/{model}", "messages": [{"role": "user", "content": prompt}], "reasoning_effort": effort,
                 "max_tokens": max_tokens, "temperature": 0, "response_format": {"type": "json_object"}},
-                headers={"Authorization": f"Bearer {os.environ['FIREWORKS_API_KEY']}"}, timeout=180, retries=2))
+                headers={"Authorization": f"Bearer {os.environ['FIREWORKS_API_KEY']}"},
+                timeout=min(180, remaining) if remaining is not None else 180,
+                retries=1 if deadline is not None else 2))
             txt = re.sub(r"(?s)<think>.*?</think>", "", d["choices"][0]["message"]["content"] or "").strip()
             m = re.search(r"(?s)\{.*\}", txt)
             return json.loads(m.group(0) if m else txt), model
@@ -143,7 +148,7 @@ def propose(items, cache, deadline=None, workers=4):
     batches = [todo[i:i + 30] for i in range(0, len(todo), 30)]
 
     def one(batch):
-        if deadline and time.time() > deadline:
+        if deadline is not None and time.time() >= deadline:
             return []
         ids = sorted({t["id"] for *_, opts in batch for t in opts})
         tax = "\n".join(f"- {i}: {K.BY_ID[i]['name']} ({K.BY_ID[i]['unit']}). {K.BY_ID[i]['definition']}" for i in ids)
@@ -153,7 +158,7 @@ def propose(items, cache, deadline=None, workers=4):
                                      "parent": p.get("name") if p else None, "component_of_parent": bool(d.get("sums_to_parent")),
                                      "company": d["ticker"], "options": [t["id"] for t in opts]}, ensure_ascii=False))
         try:
-            out, model = _llm(PROMPT.format(tax=tax, items="\n".join(lines)))
+            out, model = _llm(PROMPT.format(tax=tax, items="\n".join(lines)), deadline=deadline)
         except Exception as e:
             log_("  proposal batch failed:", str(e)[:200])
             return []
@@ -282,8 +287,8 @@ def fetch_docs(sb, ids):
     out = {}
     ids = sorted(i for i in ids if i and i != "derived")
     for i in range(0, len(ids), 80):
-        for d in sb.select("ir_documents", f"select=id,title,storage_path,ext,url,doc_type,fiscal_label,published&id=in.({_q(ids[i:i + 80])})"):
-            out[d["id"]] = [(d.get("title") or "").split("||")[0][:140], d.get("storage_path"), d.get("ext"), d.get("url"), d.get("doc_type"), d.get("fiscal_label")]
+        for d in sb.select("ir_documents", f"select=id,title,storage_path,ext,url,doc_type,fiscal_label,published,text_path&id=in.({_q(ids[i:i + 80])})"):
+            out[d["id"]] = [(d.get("title") or "").split("||")[0][:140], d.get("storage_path"), d.get("ext"), d.get("url"), d.get("doc_type"), d.get("fiscal_label"), d.get("text_path")]
     return out
 
 
@@ -475,6 +480,7 @@ def map_job(sb, tickers=None, full=False, use_llm=True, time_budget=None, log=lo
     _raw_put(sb, STATE_PATH, state)
     stats = publish(sb, uni, old_map, tfiles, touched, gone, run_ts, log=log)
     stats.update({"companies_mapped": len(done), "companies_left": len(todo) - len(done), "open_ids": len(pending), "unanswered_companies": len(unanswered),
+                  "skipped": len((set(todo) - set(done)) | unanswered),
                   "seconds": round(time.time() - t0, 1)})
     log("kpistd", stats)
     return stats
@@ -499,6 +505,10 @@ def _last_yoy(pts, uclass):
 def publish(sb, uni, old_map, tfiles, touched, gone, run_ts, log=log_):
     """map.json, taxonomy.json and the series files of every canonical id whose members changed."""
     prim = dict(old_map.get("primary") or {})
+    if not tfiles and not touched and not gone:
+        # No underlying company changed: keep the last real publication timestamps.
+        return {"series_files": 0, "companies_with_series": len(prim),
+                "canonical_ids_covered": len({cid for cs in prim.values() for cid in cs})}
     alts = dict(old_map.get("alts") or {})
     for tk in gone:
         prim.pop(tk, None)
