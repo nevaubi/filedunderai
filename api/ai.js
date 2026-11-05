@@ -9,8 +9,8 @@ export function validCompletion(d) {
   if (!m) return false;
   if (d.choices[0].finish_reason === "length" && m.tool_calls?.length) return false;
   if (m.tool_calls != null && !Array.isArray(m.tool_calls)) return false;
-  if (m.tool_calls?.length) return m.tool_calls.length <= 12 && new Set(m.tool_calls.map(t => t.id)).size === m.tool_calls.length && m.tool_calls.every(t => {
-    if (typeof t.id !== "string" || !t.id || t.type !== "function" || typeof t.function?.name !== "string" || typeof t.function.arguments !== "string") return false;
+  if (m.tool_calls?.length) return m.tool_calls.length <= 12 && new Set(m.tool_calls.map(t => t?.id)).size === m.tool_calls.length && m.tool_calls.every(t => {
+    if (!t || typeof t.id !== "string" || !t.id || t.type !== "function" || typeof t.function?.name !== "string" || typeof t.function.arguments !== "string") return false;
     try { const a = JSON.parse(t.function.arguments); return a && typeof a === "object" && !Array.isArray(a); } catch { return false; }
   });
   return typeof m.content === "string" && m.content.trim().length > 0;
@@ -35,7 +35,7 @@ export async function completeWithFallback(body, signal) {
   try { return await complete(PRIMARY, body, signal, budget); }
   catch (e) {
     const remaining = budget.remainingTokens - budget.maxTokens, timeoutMs = budget.timeoutMs - (Date.now() - started);
-    if (signal?.aborted || remaining < 1 || timeoutMs < 1000 || (e.status && e.status < 500 && ![404, 408, 429].includes(e.status))) throw e;
+    if (signal?.aborted || budget.remainingCalls < 2 || remaining < 1 || timeoutMs < 1000 || (e.status && e.status < 500 && ![404, 408, 429].includes(e.status))) throw e;
     const data = await complete(FALLBACK, body, signal, { ...budget, remainingTokens: remaining, maxTokens: Math.min(budget.maxTokens, remaining), timeoutMs });
     data.research.chargedTokens += budget.maxTokens; data.research.providerCalls = 2; return data;
   }
