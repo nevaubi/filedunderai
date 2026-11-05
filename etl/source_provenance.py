@@ -18,6 +18,18 @@ class ProvenanceError(ValueError):
     """A statement cannot be fully substantiated by the supplied source bytes."""
 
 
+def proof_object_path(ticker, proof, scope='companies'):
+    """Content-address the proof separately from its immutable source snapshot.
+
+    Multiple reviewed selections can share one original snapshot. Their distinct
+    proofs must not overwrite an earlier source-only-named immutable object.
+    """
+    if scope not in ('companies', 'screener') or not re.fullmatch(r'[A-Z0-9.\-]+', ticker):
+        raise ValueError('Invalid source proof scope or ticker')
+    body = json.dumps(proof, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()
+    return f'sources/{scope}/{ticker}/{hashlib.sha256(body).hexdigest()}.json'
+
+
 def _fail(path, reason):
     raise ProvenanceError(f"{path}: {reason}")
 
@@ -292,6 +304,43 @@ def validate_statement_provenance(snapshot, statements, expected_cik, snapshot_s
             _fail(path, 'source was unavailable at the requested filing-date cutoff')
         if 'vintage' in point and point['vintage'] != row.get('vintage', point['vintage']):
             _fail(path, 'point vintage contradicts its statement series')
+        if 'selection_conflict' in point:
+            conflict = point['selection_conflict']
+            if not isinstance(conflict, dict):
+                _fail(path, 'invalid source selection conflict')
+            if conflict.get('reason') == 'later_derived_value_differs_from_reported':
+                if derived is not None or set(conflict) != {'reason', 'alternative'}:
+                    _fail(path, 'invalid reported selection conflict')
+                alternative = conflict['alternative']
+                if (not isinstance(alternative, dict) or not alternative.get('derived')
+                        or 'selection_conflict' in alternative):
+                    _fail(path, 'selection conflict requires one complete derived alternative')
+                checked = validate_point(alternative, row, statement, namespace, allowed,
+                                         path + '/selection_conflict/alternative', active, bucket)
+                if ((checked['concept'], checked['start'], checked['end']) != (concept, start, end)
+                        or checked['value'] == value or checked['available'] <= available):
+                    _fail(path, 'selection conflict differs in scope or is not a later conflicting derivation')
+                proof['selection_conflict'] = {'reason': conflict['reason'], 'alternative': checked['proof'],
+                                               'reported_value': str(value), 'alternative_value': str(checked['value'])}
+            elif conflict.get('reason') == 'reported_period_or_value_ambiguity':
+                observations = conflict.get('reported_observations')
+                if set(conflict) != {'reason', 'reported_observations'} or not isinstance(observations, list) or not observations:
+                    _fail(path, 'source ambiguity requires complete reported alternatives')
+                checked = []
+                for i, observation in enumerate(observations):
+                    if (not isinstance(observation, dict) or observation.get('derived')
+                            or 'selection_conflict' in observation):
+                        _fail(path, 'source ambiguity alternative must be directly reported')
+                    checked.append(validate_point(observation, row, statement, namespace, allowed,
+                                                   path + f'/selection_conflict/reported_observations/{i}', active, bucket))
+                if (any(r['concept'] != concept or r['end'] != end or r['available'] > available for r in checked)
+                        or len({r['available'] for r in checked}) != 1
+                        or not (any(r['start'] != start for r in checked) or len({r['value'] for r in checked}) > 1)):
+                    _fail(path, 'reported alternatives do not establish the declared period/value ambiguity')
+                proof['selection_conflict'] = {'reason': conflict['reason'],
+                                               'reported_observations': [r['proof'] for r in checked]}
+            else:
+                _fail(path, 'unsupported source selection conflict')
         return {'proof': proof, 'value': value, 'concept': concept, 'start': start, 'end': end,
                 'accn': accession, 'filed': filed, 'form': form, 'available': available, 'accessions': accessions}
 

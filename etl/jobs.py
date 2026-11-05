@@ -234,19 +234,22 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
         except Exception as e:
             warn(f"  {tk} gap filler failed: {str(e)[:200]}")
     statements = {k: sec.build_series(facts, k) for k in sec.CONCEPTS}
-    from .source_quality import partition_supported_periods
+    from .source_quality import partition_supported_periods, comparability_review
     statements, quarantined = partition_supported_periods(statements)
     if quarantined:
         warn(f"{len(quarantined)} selected/history statement candidates have unsupported reporting periods; "
              "retained in quarantined_statement_points and excluded from published financial values.")
     if not any(line["annual"] or line["quarterly"] for lines in statements.values() for line in lines):
         raise ValueError("No usable statement facts; preserving prior company bundle")
+    comparability = comparability_review(statements)
+    if comparability['current_conflicts']:
+        raise ValueError(f"{len(comparability['current_conflicts'])} reported/derived source conflicts require comparability review; preserving prior financial publication")
     digest = hashlib.sha256(original).hexdigest()
     provenance = None
     if facts_only:
-        from .source_provenance import validate_statement_provenance
+        from .source_provenance import validate_statement_provenance, proof_object_path
         proof = validate_statement_provenance(original, statements, cik, digest)
-        proof_path = f"sources/companies/{tk}/{digest}.json"
+        proof_path = proof_object_path(tk, proof)
         provenance = {k: proof[k] for k in ("version", "status", "cik", "source_url", "snapshot_sha256", "counts")}
         provenance.update(proof_path=proof_path, retrieved_at=(source_retrieved_at or {}).get("companyfacts") or now_iso(),
                           gap_fill="disabled_unarchived_sources")
@@ -344,6 +347,7 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
         "profile": prof, "statements": statements, "source_archive": source_archive, "normalization": {"version": 2, "vintage": "latest", "availability_resolution": "filing_date"}, "warnings": warnings, "filings": [f for f in filings][:250], "filingTables": ftables,
         "earnings8k": earn, "ix": ix, "release": release, "news": coverage, "summary": summary,
         "quarantined_statement_points": quarantined,
+        "comparability_review": comparability,
     }
     if provenance:
         bundle["provenance"] = provenance

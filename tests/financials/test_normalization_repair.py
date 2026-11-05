@@ -220,6 +220,32 @@ class NormalizationRepairTests(unittest.TestCase):
         unchanged = dict(before, filed='2026-10-30')
         self.assertEqual(self.repair.review_database_replacements([before], [unchanged]), {'blockers': [], 'review_required': []})
 
+    def test_later_reported_equity_scope_cannot_silently_replace_prior_scope(self):
+        before = dict(self.obsolete, statement='balance', label="Shareholders' equity", unit='USD',
+                      concept='StockholdersEquity', period_start=None, derived=False, filed='2026-08-01', value=100)
+        for value in (100, 125):
+            after = dict(before, concept='StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest',
+                         filed='2026-11-01', value=value)
+            with self.subTest(value=value):
+                review = self.repair.review_database_replacements([before], [after])
+                self.assertEqual(review['blockers'], [])
+                self.assertEqual(review['review_required'][0]['reason'], 'reported_accounting_scope_changed')
+
+    def test_later_reported_unit_or_duration_change_requires_scope_review(self):
+        before = dict(self.obsolete, label='Revenue', unit='USD', concept='Revenues',
+                      period_start='2026-04-01', period_end='2026-06-30', derived=False, filed='2026-08-01')
+        for fields in ({'unit': 'USD_millions'}, {'period_start': '2026-04-02'}):
+            after = dict(before, filed='2026-11-01', **fields)
+            with self.subTest(fields=fields):
+                review = self.repair.review_database_replacements([before], [after])
+                self.assertEqual(review['review_required'][0]['reason'], 'reported_accounting_scope_changed')
+
+    def test_same_scope_later_reported_revision_remains_eligible(self):
+        before = dict(self.obsolete, label='Revenue', unit='USD', concept='Revenues',
+                      period_start='2026-04-01', period_end='2026-06-30', derived=False, filed='2026-08-01', value=100)
+        after = dict(before, filed='2026-11-01', value=110)
+        self.assertEqual(self.repair.review_database_replacements([before], [after]), {'blockers': [], 'review_required': []})
+
     def test_exact_archived_reported_observation_is_preserved_over_equal_derived_value(self):
         def source(value, start, end, accession, filed):
             return {'val': value, 'start': start, 'end': end, 'accn': accession, 'filed': filed, 'form': '10-Q'}

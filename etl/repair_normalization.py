@@ -21,8 +21,8 @@ from urllib.parse import quote, unquote
 
 from . import fundamentals, jobs, repair, sec
 from .common import Supabase, now_iso, request, serialized_aggregates
-from .source_provenance import validate_statement_provenance
-from .source_quality import partition_supported_periods, retain_proved_filing_tables
+from .source_provenance import validate_statement_provenance, proof_object_path
+from .source_quality import partition_supported_periods, retain_proved_filing_tables, comparability_review
 from .universe import BY_TICKER, UNIVERSE
 
 MAX_BATCH = 25
@@ -288,6 +288,10 @@ def review_database_replacements(before, replacements):
             changed = any(prior.get(k) != candidate.get(k) for k in ('value', 'unit', 'period_start'))
             if old_date and (not new_date or new_date < old_date):
                 reason, bucket = 'older_reported_filing', 'blockers'
+            elif any(prior.get(k) != candidate.get(k) for k in ('concept', 'unit', 'period_start')):
+                # A later filing does not establish equivalent accounting scope.
+                # Keep concept, scale and duration changes available for explicit review.
+                reason = 'reported_accounting_scope_changed'
             elif changed and (not old_date or not new_date):
                 reason = 'changed_reported_value_unknown_date'
             elif old_date == new_date and changed:
@@ -385,12 +389,14 @@ def _candidate(bundle, raw, as_of, generated, before_facts=()):
         raise ValueError('No supported source facts; refusing empty replacement')
     sha = digest(raw)
     proof = validate_statement_provenance(raw, candidate['statements'], cik, sha)
-    proof_path = f'sources/companies/{ticker}/{sha}.json'
+    proof_path = proof_object_path(ticker, proof)
     candidate['source_archive'] = f'sec/companyfacts/archives/CIK{cik:010d}/{sha}.json'
     candidate['provenance'] = {k: proof[k] for k in ('version', 'status', 'cik', 'source_url', 'snapshot_sha256', 'counts')}
     candidate['provenance'].update(proof_path=proof_path, gap_fill='disabled_unarchived_sources')
     candidate['quarantined_statement_points'] = excluded
-    candidate['normalization'].update(review_required=False, repair='archived_source_proved')
+    comparability = comparability_review(candidate['statements'], as_of=as_of)
+    candidate['comparability_review'] = comparability
+    candidate['normalization'].update(review_required=bool(comparability['current_conflicts']), repair='archived_source_proved')
     tables = sec.filing_tables(cf['facts'], candidate['statements'], candidate.get('filings') or [], cik)
     candidate['filingTables'], omitted = retain_proved_filing_tables(tables, proof)
     candidate['provenance']['reconstructed_tables'] = {'scope': 'verified_source_records_only', 'omitted_cells': omitted}
@@ -399,7 +405,8 @@ def _candidate(bundle, raw, as_of, generated, before_facts=()):
     prior_reported = {key for key, row in fact_map(rows_for(bundle)).items() if not row['derived']}
     lost_reported = sorted(prior_reported - set(fact_map(rows_for(candidate))))
     review.update(source_sha256=sha, quarantined_points=len(excluded), lost_reported_periods=[list(k) for k in lost_reported],
-                  fundamentals=candidate['fundamentals'], source_proof=proof['counts'], preserved_reported_observations=preserved)
+                  fundamentals=candidate['fundamentals'], source_proof=proof['counts'], preserved_reported_observations=preserved,
+                  comparability=comparability)
     return candidate, proof, review
 
 
@@ -517,7 +524,7 @@ def plan_repair(sb, tickers, output, as_of=None, workers=4):
                       'candidate_bundle': ('candidate-company.json', candidate, False), 'candidate_facts': ('candidate-facts.json', replacements, False),
                       'candidate_fund': ('candidate-fundamental.json', metadata, False), 'proof': ('source-proof.json', proof, False)}
             status = ('blocked' if database_review['blockers'] else 'review_required'
-                      if review['lost_reported_periods'] or database_review['review_required'] else 'ready')
+                      if review['lost_reported_periods'] or database_review['review_required'] or review['comparability']['current_conflicts'] else 'ready')
             entry.update(artifacts={k: _artifact(output, ticker, name, value, raw=is_raw) for k, (name, value, is_raw) in assets.items()},
                          source_path='raw/' + source + '.gz', review=review,
                          status=status)
@@ -558,6 +565,8 @@ def _load_plan(path):
         candidate, proof, regenerated_review = _candidate(data['before_bundle'], data['source'], plan['as_of'], plan['created_at'], data['before_facts'])
         if regenerated_review['lost_reported_periods']:
             raise ValueError('Candidate omits reported bundle periods; review is required')
+        if regenerated_review['comparability']['current_conflicts']:
+            raise ValueError('Candidate has unresolved current source conflicts; comparability review is required')
         if candidate != data['candidate_bundle'] or proof != data['proof'] or rows_for(candidate) != data['candidate_facts']:
             raise ValueError('Candidate no longer matches the source-proved normalization')
         database_review = review_database_replacements(data['before_facts'], data['candidate_facts'])
