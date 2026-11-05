@@ -1,8 +1,9 @@
 """Build the public registry manifest independently of screener publication.
 
 Run from the repository root: python scripts/generate_company_directory.py
-Optional reviewed profiles supply known website/industry only; their issuer identity
-must match both ticker and CIK before any metadata can be copied.
+Optional reviewed profiles supply website/industry context; their issuer identity
+must match both ticker and CIK. A stored fundamentals snapshot may also supply
+the SEC industry description when ticker, registry name and sector agree.
 """
 import argparse
 import datetime as dt
@@ -17,9 +18,10 @@ if str(ROOT) not in sys.path:
 from etl.universe import BY_TICKER, UNIVERSE, COHORT_OF
 
 
-def build_directory(profiles=None, generated_at=None):
+def build_directory(profiles=None, generated_at=None, fundamentals=None):
     active = {t for t, *_ in UNIVERSE}
     profiles = profiles or {}
+    fundamentals = fundamentals or {}
     rows = []
     for ticker, issuer in sorted(BY_TICKER.items()):
         row = dict(issuer)
@@ -32,10 +34,19 @@ def build_directory(profiles=None, generated_at=None):
         cohort = COHORT_OF.get(ticker)
         if cohort:
             row['cohort_id'] = cohort['cohort_id']
+        filed = fundamentals.get(ticker) or {}
+        sic = filed.get('sic')
+        if (filed.get('ticker') == ticker and filed.get('name') == issuer['name']
+                and filed.get('sector') == issuer['sector']
+                and isinstance(sic, str) and sic.strip() and not sic.strip().isdigit()):
+            row['sic_description'] = sic.strip()
+            row['industry'] = sic.strip()
+            row['industry_source'] = 'SEC Standard Industrial Classification'
         profile = profiles.get(ticker) or {}
         if profile.get('ticker') == ticker and profile.get('cik') == issuer['cik']:
             if isinstance(profile.get('industry'), str) and profile['industry'].strip():
                 row['industry'] = profile['industry'].strip()
+                row['industry_source'] = 'Sourced company profile'
             website = profile.get('website')
             if isinstance(website, str):
                 parsed = urlparse(website if '://' in website else 'https://' + website)
@@ -59,6 +70,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,default=ROOT/'public/data/company-directory.json')
     parser.add_argument('--profiles',type=Path,default=ROOT/'public/data/company-profiles')
+    parser.add_argument('--fundamentals',type=Path,help='Previously retrieved meta/fundamentals.json; no network requests are made')
     args=parser.parse_args()
     profiles={}
     if args.profiles.exists():
@@ -66,7 +78,8 @@ def main():
             if path.name!='index.json':
                 data=json.loads(path.read_text())
                 profiles[path.stem]=data
-    manifest=build_directory(profiles=profiles)
+    fundamentals=json.loads(args.fundamentals.read_text()) if args.fundamentals else {}
+    manifest=build_directory(profiles=profiles, fundamentals=fundamentals)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(manifest,separators=(',',':'),ensure_ascii=False)+'\n')
     print(json.dumps({'output':str(args.output.relative_to(ROOT)) if args.output.is_relative_to(ROOT) else str(args.output),**manifest['counts']}))

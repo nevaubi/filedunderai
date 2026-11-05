@@ -22,7 +22,11 @@
       if (!/^[A-Z0-9][A-Z0-9.-]{0,14}$/.test(ticker)) continue;
       merged.set(ticker, { ...merged.get(ticker), ...c, ...active.get(ticker), ticker, screener_eligible: active.has(ticker) });
     }
-    records = [...merged.values()].map(c => Object.freeze({ ...c, name: c.name || c.display_name || c.ticker }));
+    records = [...merged.values()].map(c => {
+      const sic = typeof c.sic === 'string' && c.sic.trim() && !/^\d+$/.test(c.sic.trim()) ? c.sic : c.sic_description;
+      const industry = c.industry_source === 'SEC Standard Industrial Classification' ? sic : c.industry || sic;
+      return Object.freeze({ ...c, name: c.name || c.display_name || c.ticker, sic_description: sic, industry, industry_source: c.industry_source || (!c.industry && sic ? 'SEC Standard Industrial Classification' : null) });
+    });
     byTicker = new Map(records.map(c => [c.ticker, c]));
     return records;
   }
@@ -38,7 +42,7 @@
   function query({ q = '', sector = '', sort = 'market_cap', coverage = '' } = {}) {
     const terms = String(q).trim().toLowerCase().split(/\s+/).filter(Boolean);
     const score = c => !terms.length ? 0 : c.ticker.toLowerCase() === terms.join(' ') ? 3 : c.ticker.toLowerCase().startsWith(terms.join(' ')) ? 2 : 1;
-    return records.filter(c => (!sector || c.sector === sector) && (!coverage || (coverage === 'screener') === c.screener_eligible) && terms.every(term => [c.ticker, c.name, c.legal_name, c.sector, c.industry].filter(Boolean).join(' ').toLowerCase().includes(term))).sort((a, b) => {
+    return records.filter(c => (!sector || c.sector === sector) && (!coverage || (coverage === 'screener') === c.screener_eligible) && terms.every(term => [c.ticker, c.name, c.legal_name, c.sector, c.industry, c.sic_description].filter(Boolean).join(' ').toLowerCase().includes(term))).sort((a, b) => {
       const rank = score(b) - score(a); if (rank) return rank;
       if (sort === 'ticker') return a.ticker.localeCompare(b.ticker);
       if (sort === 'name') return a.name.localeCompare(b.name);
@@ -50,7 +54,7 @@
   function related(ticker, limit = 5) {
     const company = get(ticker); if (!company) return [];
     return records.filter(c => c.ticker !== company.ticker && c.cik !== company.cik && company.sector && c.sector === company.sector).sort((a, b) => {
-      const exact = c => company.industry && c.industry === company.industry ? 1 : 0;
+      const exact = c => company.industry && c.industry === company.industry ? 2 : company.sic_description && c.sic_description === company.sic_description ? 1 : 0;
       return exact(b) - exact(a) || Number(b.screener_eligible) - Number(a.screener_eligible) || (b.market_cap || 0) - (a.market_cap || 0) || a.name.localeCompare(b.name);
     }).slice(0, limit);
   }
@@ -85,7 +89,7 @@
       for (const c of shown) {
         const identity = node('a', { href: '#company-' + c.ticker.toLowerCase(), class: 'directory-identity', onclick: () => onOpen?.(c.ticker) }, logo ? logo(c.ticker, 32) : node('span', { class: 'directory-logo', 'aria-hidden': 'true' }, c.ticker.slice(0, 2)), node('span', {}, node('strong', {}, c.name), node('span', { class: 'directory-ticker' }, c.ticker)));
         const date = c.price_date || c.price_as_of || c.as_of;
-        tbody.append(node('tr', {}, node('td', {}, identity), node('td', { class: 'directory-sector' }, node('span', {}, c.sector || 'Sector unavailable'), c.industry ? node('small', {}, c.industry) : null), node('td', { class: 'num', title: date ? 'Close ' + date : 'Latest published close' }, price(c.price)), node('td', { class: 'num ' + (c.chg_1d > 0 ? 'up' : c.chg_1d < 0 ? 'down' : '') }, change(c.chg_1d)), node('td', { class: 'num' }, money(c.market_cap)), node('td', {}, node('span', { class: 'directory-coverage' + (c.screener_eligible ? ' complete' : ''), title: c.screener_eligible ? 'Profile and validated screener data' : 'Company profile, filings and price history; screener validation pending' }, c.screener_eligible ? 'Profile + screener' : 'Company profile'))));
+        tbody.append(node('tr', {}, node('td', {}, identity), node('td', { class: 'directory-sector' }, node('span', {}, c.sector || 'Sector unavailable'), c.industry ? node('small', { title: [c.industry, c.industry_source].filter(Boolean).join(' · ') }, c.industry) : null), node('td', { class: 'num', title: date ? 'Close ' + date : 'Latest published close' }, price(c.price)), node('td', { class: 'num ' + (c.chg_1d > 0 ? 'up' : c.chg_1d < 0 ? 'down' : '') }, change(c.chg_1d)), node('td', { class: 'num' }, money(c.market_cap)), node('td', {}, node('span', { class: 'directory-coverage' + (c.screener_eligible ? ' complete' : ''), title: c.screener_eligible ? 'Profile and validated screener data' : 'Company profile, filings and price history; screener validation pending' }, c.screener_eligible ? 'Profile + screener' : 'Company profile'))));
       }
       if (!shown.length) tbody.append(node('tr', {}, node('td', { colspan: 6, class: 'directory-empty' }, node('strong', {}, 'No companies found'), node('p', {}, 'Try a different name, ticker, or sector.'))));
       previous.disabled = state.page === 0; next.disabled = state.page >= pages - 1; pageLabel.textContent = `${state.page + 1} / ${pages}`;

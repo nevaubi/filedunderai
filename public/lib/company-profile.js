@@ -97,7 +97,7 @@
     const leadership = card('Leadership', null, 'cp-leadership');
     const related = card('Related companies', node('a', { href: '#companies', class: 'cp-text-button' }, 'Explore all →'), 'cp-related');
     rootNode.append(node('div', { class: 'cp-leadership-grid' }, leadership, related));
-    const recent = card('Recent context', button('All coverage', 'news'), 'cp-recent'); rootNode.append(recent);
+    const recent = card('Company context', button('All coverage', 'news'), 'cp-recent'); rootNode.append(recent);
 
     function financialTable() {
       const lq = model?.latestQ?.(), annual = model?.latestA?.();
@@ -135,7 +135,11 @@
       const website = safeUrl(profile?.website) || safeUrl(company.website) || safeUrl(summary.website) || (profile?.website ? safeUrl('https://' + profile.website) : null);
       const location = locationLabel(profile?.headquarters) || locationLabel(company.address);
       const employees = profile?.employees?.count ?? profile?.employees;
-      const items = [['Sector', summary.sector || company.sector], ['Industry', profile?.industry || company.sicDescription], ['Headquarters', location], ['Exchange', (company.exchanges || []).join(', ')], ['Founded', profile?.founded], ['Employees', finite(employees) ? employees.toLocaleString('en-US') : null], ['Fiscal year end', /^\d{4}$/.test(company.fiscalYearEnd || '') ? new Date('2000-' + company.fiscalYearEnd.slice(0, 2) + '-' + company.fiscalYearEnd.slice(2) + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' }) : null]];
+      const workforceScope = { full_time_equivalent: 'Full-time equivalent', full_time: 'Full-time', employees: 'Reported workforce' }[profile?.employees?.scope];
+      const workforce = finite(employees) ? node('span', {}, (profile?.employees?.approximate ? '≈ ' : '') + employees.toLocaleString('en-US'), profile?.employees?.as_of ? node('small', { class: 'cp-fact-detail' }, [workforceScope, dateLabel(profile.employees.as_of)].filter(Boolean).join(' · ')) : null) : null;
+      const exchanges = [...new Set((company.exchanges || []).filter(Boolean))].join(', ');
+      const founded = profile?.founded ? node('span', { title: profile.founded_note }, profile.founded) : null;
+      const items = [['Sector', summary.sector || company.sector], ['Industry', profile?.industry || company.sicDescription || summary.industry], ['Headquarters', location], ['Exchange', exchanges || summary.exchange], ['Founded', founded], ['Employees', workforce], ['Fiscal year end', /^\d{4}$/.test(company.fiscalYearEnd || '') ? new Date('2000-' + company.fiscalYearEnd.slice(0, 2) + '-' + company.fiscalYearEnd.slice(2) + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' }) : null]];
       const dl = node('dl', { class: 'cp-fact-list' });
       for (const [label, value] of items) dl.append(node('div', {}, node('dt', {}, label), node('dd', {}, value || 'Not available')));
       if (website) dl.append(node('div', {}, node('dt', {}, 'Website'), node('dd', {}, sourceLink(website, new URL(website).hostname.replace(/^www\./, '')))));
@@ -185,22 +189,25 @@
             const nameNode = profileUrl ? node('a', { href: profileUrl, target: '_blank', rel: 'noopener noreferrer' }, person.name) : node('strong', {}, person.name);
             const observedAt = person.observed_at || profile.updated_at;
             const tenure = tenureLabel(person.start_date || person.job_start_date, observedAt || new Date().toISOString().slice(0, 10));
+            const tenureSource = safeUrl(person.start_date_source_url);
+            const tenureNode = node(tenureSource ? 'a' : 'span', { class: 'cp-tenure', href: tenureSource, target: tenureSource ? '_blank' : null, rel: tenureSource ? 'noopener noreferrer' : null, title: [observedAt ? 'Role observed ' + dateLabel(observedAt) : 'Role observation date unavailable', person.tenure_note].filter(Boolean).join('. ') }, tenure);
             const credit = person.photo_credit ? node('span', { class: 'cp-photo-credit' }, 'Photo: ' + person.photo_credit, person.photo_license ? [' · ', sourceLink(person.photo_license_url, person.photo_license) || person.photo_license] : null) : null;
-            grid.append(node('article', { class: 'cp-person' }, avatar, node('div', { class: 'cp-person-info' }, node('h4', {}, nameNode), node('p', { class: 'cp-person-role' }, person.role || person.title), node('span', { class: 'cp-tenure', title: observedAt ? 'Role observed ' + dateLabel(observedAt) : 'Role observation date unavailable' }, tenure), sourceLink(person.source_url, person.source_name || 'Profile source'), credit)));
+            grid.append(node('article', { class: 'cp-person' }, avatar, node('div', { class: 'cp-person-info' }, node('h4', {}, nameNode), node('p', { class: 'cp-person-role' }, person.role || person.title), tenureNode, sourceLink(person.source_url, person.source_name || 'Profile source'), credit)));
           }
           leadership.append(node('div', { class: 'cp-role-group' }, node('h3', {}, group), grid));
         }
         leadership.append(node('p', { class: 'cp-footnote' }, (profile.coverage?.leadership_scope ? profile.coverage.leadership_scope + ' ' : '') + 'Grouped by role; reporting relationships are shown only when explicitly sourced. Tenure runs from the reported role start to the source observation date.' + (profile.updated_at ? ' Profiles checked ' + dateLabel(profile.updated_at) + '.' : ' Observation dates are unavailable.')));
       }
       const validImages = (profile?.images || []).filter(image => safeUrl(image.url) && safeUrl(image.source_url)).slice(0, 3);
-      const news = (options.news || []).filter(item => safeUrl(item.url) && item.title).slice(0, 4);
+      const publicationTime = item => Date.parse(item.published_at || item.date || '') || 0;
+      const news = (options.news || []).filter(item => safeUrl(item.url) && item.title).sort((a, b) => publicationTime(b) - publicationTime(a)).slice(0, 4);
       const context = node('div', { class: 'cp-context-grid' });
       validImages.forEach(image => {
         const picture = node('img', { src: safeUrl(image.url), alt: image.caption || image.title || name, loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer' });
         picture.addEventListener('error', () => picture.parentElement.classList.add('cp-image-unavailable'), { once: true });
         context.append(node('a', { class: 'cp-context-card cp-with-image', href: safeUrl(image.source_url), target: '_blank', rel: 'noopener noreferrer' }, node('div', { class: 'cp-context-image' }, picture), node('div', { class: 'cp-context-copy' }, node('span', { class: 'cp-context-category' }, image.kind || 'Company context'), node('h3', {}, image.title || image.caption || name), node('span', { class: 'cp-context-meta' }, [new URL(safeUrl(image.source_url)).hostname.replace(/^www\./, ''), image.published_at ? dateLabel(image.published_at) : null].filter(Boolean).join(' · ')), image.credit ? node('span', { class: 'cp-photo-credit' }, 'Image: ' + image.credit) : null)));
       });
-      news.slice(0, validImages.length ? 3 : 4).forEach(item => {
+      news.slice(0, Math.max(0, 3 - validImages.length)).forEach(item => {
         const published = item.published_at || item.date;
         context.append(node('a', { class: 'cp-context-card', href: safeUrl(item.url), target: '_blank', rel: 'noopener noreferrer' }, node('div', { class: 'cp-context-copy' }, node('span', { class: 'cp-context-category' }, item.source || new URL(safeUrl(item.url)).hostname.replace(/^www\./, '')), node('h3', {}, item.title), node('span', { class: 'cp-context-meta' }, published ? dateLabel(published) : 'Publication date unavailable'), node('span', { class: 'cp-context-arrow', 'aria-hidden': 'true' }, '↗'))));
       });
