@@ -201,7 +201,10 @@ class Supabase:
         return len(content)
 
     def get_object(self, bucket, path, public=False):
-        base = f"{self.url}/storage/v1/object/{'public/' if public else ''}{bucket}/{urllib.parse.quote(path)}"
+        # The bare /object/{bucket}/{path} download can be served from the storage CDN for the object's
+        # cache-control lifetime, so a read-modify-write or a post-write read-back could see the previous
+        # version. /object/authenticated/ is the same authorized download without that cache.
+        base = f"{self.url}/storage/v1/object/{'public' if public else 'authenticated'}/{bucket}/{urllib.parse.quote(path)}"
         try:
             return request(base, headers=self._h(), raw=True, retries=2)
         except HTTPError as e:
