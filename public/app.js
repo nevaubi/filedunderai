@@ -2653,6 +2653,10 @@ async function pCoverage() {
   page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Data status"), el("h1", {}, "What's loaded and how fresh it is"), el("div", { class: "sub" }, "Every dataset on the site, where it comes from, and when it last refreshed. Jobs run on a schedule after the market close and through the day."))));
   const age = s => s ? relTime(s) : "–";
   const dot = s => { if (!s) return css("--faint"); const h = (Date.now() - new Date(s)) / 36e5; return h < 30 ? css("--up") : h < 80 ? css("--warn") : css("--down"); };
+  const countsAsOf = key => {
+    const stamp = Object.prototype.hasOwnProperty.call(irc, key) ? irc[key] : irc.generated;
+    return typeof stamp === "string" && Number.isFinite(Date.parse(stamp)) ? stamp : null;
+  };
   const rows = [
     ["Company index and metrics", "index.json", INDEX?.generated, `${INDEX?.companies.length || 0} companies`],
     ["Prices", "market.json + prices/*", MARKET?.generated, `${Object.keys(MARKET?.symbols || {}).length} market symbols, ${INDEX?.companies.length || 0} stocks`],
@@ -2660,9 +2664,9 @@ async function pCoverage() {
     ["Market brief", "macro.json", MACRO?.brief?.generated_at, MACRO?.brief ? "available" : "pending"],
     ["Filings feed", "feed.json", FEED?.generated, `${FEED?.filings?.length || 0} recent filings`],
     ...(irc ? [
-      ["Segment breakdowns (XBRL)", "segments/*", irc.generated, `${irc.summary.segment_tables} tables across ${irc.summary.companies_with_segments} companies`],
+      ["Segment breakdowns (XBRL)", "segments/*", countsAsOf("segment_counts_as_of"), `${irc.summary.segment_tables} tables across ${irc.summary.companies_with_segments} companies`],
       ["Investor relations documents", "ir bucket", irc.generated, `${irc.summary.documents.toLocaleString("en-US")} files for ${irc.summary.companies_with_docs} companies, ${(irc.summary.bytes / 1e9).toFixed(2)} GB stored`],
-      ["KPIs from investor materials", "kpis/*", irc.generated, `${irc.summary.kpis.toLocaleString("en-US")} KPIs, ${irc.summary.kpi_values.toLocaleString("en-US")} values for ${irc.summary.companies_with_kpis} companies`],
+      ["KPIs from investor materials", "kpis/*", countsAsOf("kpi_counts_as_of"), `${irc.summary.kpis.toLocaleString("en-US")} KPIs, ${irc.summary.kpi_values.toLocaleString("en-US")} values for ${irc.summary.companies_with_kpis} companies`],
     ] : []),
   ];
   const t = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Dataset"), el("th", {}, "Updated"), el("th", {}, "Detail"))));
