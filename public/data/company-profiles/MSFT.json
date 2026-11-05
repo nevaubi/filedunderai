@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "ticker": "MSFT",
+  "cik": 789019,
+  "name": "Microsoft",
+  "description": "Microsoft builds software, cloud infrastructure and AI tools for businesses and consumers. Its products include Azure, Microsoft 365, Copilot, Windows, Dynamics and security services. LinkedIn provides professional networking and business services, while Xbox spans gaming content, subscriptions and devices. Microsoft reports through three business segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing.",
+  "description_source": {
+    "name": "Microsoft 2026 Annual Report",
+    "url": "https://www.microsoft.com/investor/reports/ar26/index.html",
+    "observed_at": "2026-11-05T14:15:13Z"
+  },
+  "source_url": "https://www.microsoft.com/investor/reports/ar26/index.html",
+  "website": "https://www.microsoft.com/",
+  "industry": "Computer Software",
+  "headquarters": "Redmond, Washington, United States",
+  "founded": 1975,
+  "employees": null,
+  "professional_profile_count": 301371,
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "RZOFiRjw26VpLObnwmYXGgRyn3aW",
+    "observed_at": "2026-11-05T14:09:51Z",
+    "match": {
+      "ticker": "MSFT",
+      "domain": "microsoft.com",
+      "likelihood": 10
+    }
+  },
+  "provider_record_id": "RZOFiRjw26VpLObnwmYXGgRyn3aW",
+  "leadership": [
+    {
+      "name": "Satya Nadella",
+      "role": "Chief Executive Officer",
+      "start_date": "2014-02-04",
+      "profile_url": "https://news.microsoft.com/source/exec/satya-nadella/",
+      "source_url": "https://news.microsoft.com/source/exec/satya-nadella/",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:15:13Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://news.microsoft.com/facts-about-microsoft/",
+      "photo_url": "https://news.microsoft.com/source/wp-content/uploads/2024/10/MS-Exec-Nadella-Satya.jpg",
+      "photo_source_url": "https://news.microsoft.com/source/exec/satya-nadella/",
+      "photo_credit": "Brian Smale and Microsoft",
+      "photo_license": "CC BY-SA 4.0",
+      "photo_license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "additional_roles": [
+        "Chairman"
+      ],
+      "tenure_note": "The start date refers to the chief executive officer role. The current official biography also identifies Nadella as chairman."
+    },
+    {
+      "name": "Amy Hood",
+      "role": "Executive Vice President and Chief Financial Officer",
+      "start_date": "2013",
+      "profile_url": "https://news.microsoft.com/source/exec/amy-hood/",
+      "source_url": "https://news.microsoft.com/source/exec/amy-hood/",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:15:13Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://news.microsoft.com/source/exec/amy-hood/",
+      "photo_url": "https://news.microsoft.com/source/wp-content/uploads/2024/07/amy-hood.jpg",
+      "photo_source_url": "https://news.microsoft.com/source/exec/amy-hood/",
+      "photo_credit": "Microsoft"
+    },
+    {
+      "name": "Brad Smith",
+      "role": "Vice Chair and President",
+      "start_date": "2021-09-14",
+      "profile_url": "https://news.microsoft.com/source/exec/brad-smith/",
+      "source_url": "https://news.microsoft.com/source/exec/brad-smith/",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:15:13Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://news.microsoft.com/source/2021/09/14/microsoft-announces-quarterly-dividend-increase-and-new-share-repurchase-program-2/",
+      "photo_url": "https://news.microsoft.com/source/wp-content/uploads/2024/07/brad.jpg",
+      "photo_source_url": "https://news.microsoft.com/source/exec/brad-smith/",
+      "photo_credit": "Brian Smale and Microsoft",
+      "photo_license": "CC BY-SA 4.0",
+      "photo_license_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+    },
+    {
+      "name": "Judson Althoff",
+      "role": "Chief Executive Officer, Microsoft Commercial Business",
+      "start_date": "2025-10-01",
+      "profile_url": "https://news.microsoft.com/source/exec/judson-althoff/",
+      "source_url": "https://news.microsoft.com/source/exec/judson-althoff/",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:15:13Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://blogs.microsoft.com/blog/2025/10/01/accelerating-our-commercial-growth/",
+      "photo_status": "unavailable",
+      "photo_note": "The portrait linked from the official biography could not be retrieved when this profile was checked."
+    }
+  ],
+  "images": [
+    {
+      "url": "https://msftstories.thesourcemediaassets.com/sites/759/2026/10/Hero-Surface-Laptop-Ultra-and-Surface-RTX-Spark-Dev-Box.png",
+      "source_url": "https://news.microsoft.com/windows-surface-october-2026-news/",
+      "title": "Surface hardware in Microsoft’s October 2026 announcements",
+      "caption": "Surface Laptop Ultra at left and Surface RTX Spark Dev Box at right, as identified in Microsoft’s official media gallery.",
+      "kind": "Product announcement",
+      "credit": "Microsoft",
+      "observed_at": "2026-11-05T14:15:13Z"
+    }
+  ],
+  "sources": [
+    {
+      "name": "Microsoft 2026 Annual Report",
+      "url": "https://www.microsoft.com/investor/reports/ar26/index.html",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Facts About Microsoft",
+      "url": "https://news.microsoft.com/facts-about-microsoft/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Microsoft official executive biographies",
+      "url": "https://news.microsoft.com/source/exec/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Brad Smith role appointment",
+      "url": "https://news.microsoft.com/source/2021/09/14/microsoft-announces-quarterly-dividend-increase-and-new-share-repurchase-program-2/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Judson Althoff role appointment",
+      "url": "https://blogs.microsoft.com/blog/2025/10/01/accelerating-our-commercial-growth/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Microsoft Windows and Surface media gallery, October 2026",
+      "url": "https://news.microsoft.com/windows-surface-october-2026-news/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Satya Nadella official biography",
+      "url": "https://news.microsoft.com/source/exec/satya-nadella/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Amy Hood official biography",
+      "url": "https://news.microsoft.com/source/exec/amy-hood/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Brad Smith official biography",
+      "url": "https://news.microsoft.com/source/exec/brad-smith/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Judson Althoff official biography",
+      "url": "https://news.microsoft.com/source/exec/judson-althoff/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "RZOFiRjw26VpLObnwmYXGgRyn3aW",
+      "observed_at": "2026-11-05T14:09:51Z",
+      "match": {
+        "ticker": "MSFT",
+        "domain": "microsoft.com",
+        "likelihood": 10
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T14:15:13Z",
+  "field_sources": {
+    "website": {
+      "name": "Microsoft 2026 Annual Report",
+      "url": "https://www.microsoft.com/investor/reports/ar26/index.html",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "RZOFiRjw26VpLObnwmYXGgRyn3aW",
+      "observed_at": "2026-11-05T14:09:51Z",
+      "match": {
+        "ticker": "MSFT",
+        "domain": "microsoft.com",
+        "likelihood": 10
+      }
+    },
+    "headquarters": {
+      "name": "Facts About Microsoft",
+      "url": "https://news.microsoft.com/facts-about-microsoft/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    "founded": {
+      "name": "Facts About Microsoft",
+      "url": "https://news.microsoft.com/facts-about-microsoft/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "RZOFiRjw26VpLObnwmYXGgRyn3aW",
+      "observed_at": "2026-11-05T14:09:51Z",
+      "match": {
+        "ticker": "MSFT",
+        "domain": "microsoft.com",
+        "likelihood": 10
+      }
+    },
+    "description": {
+      "name": "Microsoft 2026 Annual Report",
+      "url": "https://www.microsoft.com/investor/reports/ar26/index.html",
+      "observed_at": "2026-11-05T14:15:13Z"
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "available",
+    "official_updated_at": "2026-11-05T14:15:13Z",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T14:15:13Z",
+      "industry": "2026-11-05T14:09:51Z",
+      "headquarters": "2026-11-05T14:15:13Z",
+      "founded": "2026-11-05T14:15:13Z",
+      "professional_profile_count": "2026-11-05T14:09:51Z",
+      "description": "2026-11-05T14:15:13Z",
+      "leadership": "2026-11-05T14:15:13Z"
+    }
+  }
+}

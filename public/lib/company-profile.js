@@ -61,12 +61,15 @@
   }
   function history(ticker, fallback) {
     const cached = historyCache.get(ticker); if (!cached) return fallback;
-    const rawDate = cached.d.at(-1), end = Array.isArray(rawDate) ? new Date(rawDate[0] * 1000).toISOString().slice(0, 10) : String(rawDate).slice(0, 10);
+    const rawDate = cached.d.at(-1), cachedDate = new Date(Array.isArray(rawDate) ? rawDate[0] * 1000 : rawDate);
     const latest = fallback?.bars?.at(-1)?.t;
+    const latestDate = new Date(latest);
+    if (!Number.isFinite(+cachedDate) || !latest || !Number.isFinite(+latestDate)) return fallback;
+    const end = cachedDate.toISOString().slice(0, 10);
     // Require the same latest session and price basis; no unsafe split-history merge.
     const cachedClose = Array.isArray(cached.c) ? cached.c.at(-1) : Array.isArray(rawDate) ? rawDate[4] : null;
     const currentClose = fallback?.bars?.at(-1)?.c;
-    if (latest && (end !== new Date(latest).toISOString().slice(0, 10) || !finite(cachedClose) || !finite(currentClose) || Math.abs(cachedClose - currentClose) > Math.max(0.000001, Math.abs(currentClose) * 0.000001))) return fallback;
+    if (end !== latestDate.toISOString().slice(0, 10) || !finite(cachedClose) || !finite(currentClose) || Math.abs(cachedClose - currentClose) > Math.max(0.000001, Math.abs(currentClose) * 0.000001)) return fallback;
     return cached;
   }
   const money = value => !finite(value) ? '—' : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 2 }).format(value);
@@ -112,7 +115,7 @@
         const periodLabel = end ? (period === 'TTM' ? 'TTM · ' : '') + dateLabel(end) : period;
         const unit = cell?.unit;
         let value = '—';
-        if (valid && /^[A-Z]{3}$/.test(unit || '')) value = new Intl.NumberFormat('en-US', { style: 'currency', currency: unit, notation: 'compact', maximumFractionDigits: 2 }).format(cell.v);
+        if (valid && /^[A-Z]{3}$/.test(unit || '')) value = new Intl.NumberFormat('en-US', { style: 'currency', currency: unit, notation: 'compact', minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(cell.v);
         else if (valid) value = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 }).format(cell.v) + ' ' + (unit || '(unit unavailable)');
         tbody.append(node('tr', {}, node('th', { scope: 'row' }, label), node('td', { class: 'num' }, valid ? node('button', { class: 'cp-fin-value', 'data-metric': label, onclick: () => helpers.openSource?.(cell), title: 'Open the source for ' + label + ' (' + (unit || 'unit unavailable') + ')', 'aria-label': label + ': ' + value + '. Open source.' }, value, node('span', { 'aria-hidden': 'true' }, ' ↗')) : node('span', { title: 'A supported value is not available for this period' }, '—')), node('td', {}, periodLabel)));
       }
@@ -136,7 +139,8 @@
       const dl = node('dl', { class: 'cp-fact-list' });
       for (const [label, value] of items) dl.append(node('div', {}, node('dt', {}, label), node('dd', {}, value || 'Not available')));
       if (website) dl.append(node('div', {}, node('dt', {}, 'Website'), node('dd', {}, sourceLink(website, new URL(website).hostname.replace(/^www\./, '')))));
-      facts.append(dl, node('p', { class: 'cp-footnote' }, profile?.updated_at ? 'Company context updated ' + dateLabel(profile.updated_at) + '. Employee counts are provider estimates.' : 'Company identity from SEC filings. Additional context appears when sourced.'));
+      const workforceNote = finite(employees) ? (profile?.employees?.basis === 'reported' ? ' Employee count is company-reported.' : ' Employee count follows its attributed source.') : '';
+      facts.append(dl, node('p', { class: 'cp-footnote' }, profile?.updated_at ? 'Company context updated ' + dateLabel(profile.updated_at) + '.' + workforceNote : 'Company identity from SEC filings. Additional context appears when sourced.', finite(employees) ? sourceLink(profile?.employees?.source_url, 'Workforce source') : null));
       const text = typeof profile?.description === 'string' ? profile.description.trim() : profile?.description?.text;
       if (text) {
         const paragraphs = text.split(/\n\s*\n|\n/).map(x => x.trim()).filter(Boolean);
@@ -181,11 +185,12 @@
             const nameNode = profileUrl ? node('a', { href: profileUrl, target: '_blank', rel: 'noopener noreferrer' }, person.name) : node('strong', {}, person.name);
             const observedAt = person.observed_at || profile.updated_at;
             const tenure = tenureLabel(person.start_date || person.job_start_date, observedAt || new Date().toISOString().slice(0, 10));
-            grid.append(node('article', { class: 'cp-person' }, avatar, node('div', { class: 'cp-person-info' }, node('h4', {}, nameNode), node('p', { class: 'cp-person-role' }, person.role || person.title), node('span', { class: 'cp-tenure', title: observedAt ? 'Role observed ' + dateLabel(observedAt) : 'Role observation date unavailable' }, tenure), sourceLink(person.source_url, person.source_name || 'Profile source'))));
+            const credit = person.photo_credit ? node('span', { class: 'cp-photo-credit' }, 'Photo: ' + person.photo_credit, person.photo_license ? [' · ', sourceLink(person.photo_license_url, person.photo_license) || person.photo_license] : null) : null;
+            grid.append(node('article', { class: 'cp-person' }, avatar, node('div', { class: 'cp-person-info' }, node('h4', {}, nameNode), node('p', { class: 'cp-person-role' }, person.role || person.title), node('span', { class: 'cp-tenure', title: observedAt ? 'Role observed ' + dateLabel(observedAt) : 'Role observation date unavailable' }, tenure), sourceLink(person.source_url, person.source_name || 'Profile source'), credit)));
           }
           leadership.append(node('div', { class: 'cp-role-group' }, node('h3', {}, group), grid));
         }
-        leadership.append(node('p', { class: 'cp-footnote' }, 'Grouped by role; reporting relationships are shown only when explicitly sourced. Tenure runs from the reported role start to the source observation date.' + (profile.updated_at ? ' Profiles checked ' + dateLabel(profile.updated_at) + '.' : ' Observation dates are unavailable.')));
+        leadership.append(node('p', { class: 'cp-footnote' }, (profile.coverage?.leadership_scope ? profile.coverage.leadership_scope + ' ' : '') + 'Grouped by role; reporting relationships are shown only when explicitly sourced. Tenure runs from the reported role start to the source observation date.' + (profile.updated_at ? ' Profiles checked ' + dateLabel(profile.updated_at) + '.' : ' Observation dates are unavailable.')));
       }
       const validImages = (profile?.images || []).filter(image => safeUrl(image.url) && safeUrl(image.source_url)).slice(0, 3);
       const news = (options.news || []).filter(item => safeUrl(item.url) && item.title).slice(0, 4);
@@ -193,7 +198,7 @@
       validImages.forEach(image => {
         const picture = node('img', { src: safeUrl(image.url), alt: image.caption || image.title || name, loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer' });
         picture.addEventListener('error', () => picture.parentElement.classList.add('cp-image-unavailable'), { once: true });
-        context.append(node('a', { class: 'cp-context-card cp-with-image', href: safeUrl(image.source_url), target: '_blank', rel: 'noopener noreferrer' }, node('div', { class: 'cp-context-image' }, picture), node('div', { class: 'cp-context-copy' }, node('span', { class: 'cp-context-category' }, image.kind || 'Company context'), node('h3', {}, image.title || image.caption || name), node('span', { class: 'cp-context-meta' }, [new URL(safeUrl(image.source_url)).hostname.replace(/^www\./, ''), image.published_at ? dateLabel(image.published_at) : null].filter(Boolean).join(' · ')))));
+        context.append(node('a', { class: 'cp-context-card cp-with-image', href: safeUrl(image.source_url), target: '_blank', rel: 'noopener noreferrer' }, node('div', { class: 'cp-context-image' }, picture), node('div', { class: 'cp-context-copy' }, node('span', { class: 'cp-context-category' }, image.kind || 'Company context'), node('h3', {}, image.title || image.caption || name), node('span', { class: 'cp-context-meta' }, [new URL(safeUrl(image.source_url)).hostname.replace(/^www\./, ''), image.published_at ? dateLabel(image.published_at) : null].filter(Boolean).join(' · ')), image.credit ? node('span', { class: 'cp-photo-credit' }, 'Image: ' + image.credit) : null)));
       });
       news.slice(0, validImages.length ? 3 : 4).forEach(item => {
         const published = item.published_at || item.date;

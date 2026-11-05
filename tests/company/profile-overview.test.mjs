@@ -71,3 +71,42 @@ test('reported currency and protocol-relative source links survive overview rend
     assert.ok(!h.w.document.querySelector('.cp-leadership').textContent.includes('Board of directors'));
   } finally { h.close(); }
 });
+
+test('invalid or incompatible long-history dates fall back to current price bars', async () => {
+  const h = setup();
+  try {
+    const current = { bars: [{ t: '2026-11-04', c: 100 }] };
+    const cases = [
+      ['BAD', { d: [[1e30, 100, 100, 100, 100, 1]] }, current],
+      ['MISMATCH', { d: ['2026-11-03'], c: [100] }, current],
+      ['BASIS', { d: ['2026-11-04'], c: [10] }, current],
+      ['FALLBACK', { d: ['2026-11-04'], c: [100] }, { bars: [{ t: 'invalid-date', c: 100 }] }],
+      ['VALID', { d: ['2026-11-04'], c: [100] }, current],
+    ];
+    for (const [ticker, data, fallback] of cases) {
+      h.w.fetch = async () => ({ ok: true, json: async () => data });
+      await h.api.loadHistory(ticker, { dataBase: 'https://data.example/' });
+      assert.equal(h.api.history(ticker, fallback), ticker === 'VALID' ? data : fallback);
+    }
+  } finally { h.close(); }
+});
+
+test('official portraits retain attribution while professional-profile counts stay separate from workforce', () => {
+  const h = setup();
+  try {
+    h.api.render(h.w.document.querySelector('main'), {
+      ticker: 'AAA', company: { name: 'Alpha', filings: [] }, snapshot: {},
+      enrichment: { ticker: 'AAA', updated_at: '2026-11-05', employees: null, professional_profile_count: 12345,
+        coverage: { leadership_scope: 'Selected leaders; not a complete roster.' },
+        leadership: [{ name: 'Jane Example', role: 'CEO', photo_url: 'https://alpha.example/photo.jpg', photo_credit: 'Example Photographer', photo_license: 'CC BY-SA 4.0', photo_license_url: 'https://creativecommons.org/licenses/by-sa/4.0/' }],
+        images: [{ url: 'https://alpha.example/event.jpg', source_url: 'https://alpha.example/event', title: 'Company event', credit: 'Alpha' }],
+      }, helpers: {},
+    });
+    assert.match(h.w.document.querySelector('.cp-leadership').textContent, /Photo: Example Photographer/);
+    assert.equal(h.w.document.querySelector('.cp-photo-credit a').href, 'https://creativecommons.org/licenses/by-sa/4.0/');
+    assert.match(h.w.document.querySelector('.cp-leadership').textContent, /not a complete roster/);
+    assert.match(h.w.document.querySelector('.cp-recent').textContent, /Image: Alpha/);
+    assert.ok(!h.w.document.querySelector('.cp-facts').textContent.includes('12,345'));
+    assert.ok(!h.w.document.querySelector('.cp-facts').textContent.includes('provider estimates'));
+  } finally { h.close(); }
+});
