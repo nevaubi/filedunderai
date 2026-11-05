@@ -94,15 +94,20 @@ NONADDITIVE_FACT_CONCEPTS = {"EarningsPerShareBasic", "EarningsPerShareDiluted",
                             "WeightedAverageNumberOfDilutedSharesOutstanding", "WeightedAverageNumberOfSharesOutstandingBasic"}
 
 
-def persist_normalized_facts(sb, ticker, rows):
+def persist_normalized_facts(sb, ticker, rows, delete_batch_size=1):
     """Upsert valid replacements, then remove only unsupported legacy nonadditive quarters.
 
     Every deletion uses the exact primary key plus the backed-up derived flag,
     accession, concept and value. A direct reported replacement at that key survives.
     No other absent historical facts are reconciled here: those need a reviewed repair.
     """
+    if type(delete_batch_size) is not int or not 1 <= delete_batch_size <= 20:
+        raise ValueError("Fact deletion batches must contain 1–20 rows")
+    if delete_batch_size > 1 and not callable(getattr(sb, "delete_nonadditive_fact_batches", None)):
+        raise TypeError("Batched fact deletion requires the reviewed repair client")
     sb.upsert("facts", rows, "ticker,statement,label,kind,period_end", batch=1000)
-    existing = sb.select("facts", f"select=*&ticker=eq.{quote(ticker, safe='')}&kind=eq.Q&derived=is.true")
+    existing = sb.select("facts", f"select=*&ticker=eq.{quote(ticker, safe='')}&kind=eq.Q&derived=is.true"
+                         "&order=statement.asc,label.asc,kind.asc,period_end.asc")
     obsolete = [r for r in existing if r.get("ticker") == ticker and r.get("kind") == "Q" and r.get("derived") is True
                 and (r.get("label") in NONADDITIVE_FACT_LABELS or r.get("concept") in NONADDITIVE_FACT_CONCEPTS)]
     if not obsolete:
@@ -116,6 +121,9 @@ def persist_normalized_facts(sb, ticker, rows):
     sb.put_object("raw", backup, body, cache="no-store")
     if hashlib.sha256(sb.get_object("raw", backup) or b"").hexdigest() != digest:
         raise RuntimeError(f"Nonadditive fact backup verification failed: raw/{backup}; no facts deleted")
+    if delete_batch_size > 1:
+        result = sb.delete_nonadditive_fact_batches(obsolete, "raw/" + backup, batch_size=delete_batch_size)
+        return {**result, "backup": "raw/" + backup}
     deleted, protected = 0, 0
     for row in obsolete:
         key_query = "&".join(f"{k}=eq.{quote(str(row[k]), safe='')}" for k in FACT_KEY)
@@ -559,7 +567,7 @@ def _ins_net(entry):
 
 
 @serialized_aggregates
-def build_index(sb, pstats=None, fundamentals_snapshot=None):
+def build_index(sb, pstats=None, fundamentals_snapshot=None, return_snapshot=False):
     fund = (_cache(sb, "meta/fundamentals.json", {}, strict=True)
             if fundamentals_snapshot is None else fundamentals_snapshot)
     if not isinstance(fund, dict) or not fund:
@@ -598,8 +606,9 @@ def build_index(sb, pstats=None, fundamentals_snapshot=None):
                      "pipeline_version": f.get("pipeline_version"), "financial_status": "normalized" if is_normalized else "normalization_pending"})
     if metrics:
         sb.upsert("company_metrics", metrics, "ticker")
-    sb.put_json("index.json", {"generated": now_iso(), "universe": UNIVERSE_METADATA, "sectors": SECTOR_ETF, "companies": rows}, cache="max-age=120")
-    return len(rows)
+    snapshot = {"generated": now_iso(), "universe": UNIVERSE_METADATA, "sectors": SECTOR_ETF, "companies": rows}
+    sb.put_json("index.json", snapshot, cache="max-age=120")
+    return snapshot if return_snapshot else len(rows)
 
 
 def build_feed(sb, limit=400):
