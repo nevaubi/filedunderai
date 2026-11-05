@@ -73,7 +73,7 @@ def main():
         print("viewer copies", jobs.publish_filings_job(sb, a.tickers, workers=a.workers))
     if a.job == "logos":
         from .logos import logos_job
-        print("logos", logos_job(sb, a.tickers))
+        print("logos", json.dumps(logos_job(sb, a.tickers, force=a.force, workers=a.workers)))
     if a.job == "compare":
         from .compare import compare_job
         done, errors = compare_job(sb, a.tickers, time_budget=a.budget, full=a.full_history, workers=min(a.workers, 4))

@@ -6,6 +6,7 @@ const D = { companies: {}, filings: {}, macro: {}, generated: "" };
 const E = { ix: {}, releases: {}, news: {}, narratives: {}, macro_brief: null, macro_news: [] };
 let TICKERS = [];
 const IDX = {};
+let LOGOS = {};
 let INDEX = null, FEED = null, MACRO = null, MARKET = null;
 const _inflight = {};
 function companySummary(ticker) {
@@ -27,6 +28,15 @@ function applyIndex(ix) {
   INDEX = ix; D.generated = ix.generated;
   TICKERS = ix.companies.map(c => c.ticker);
   ix.companies.forEach(c => { IDX[c.ticker] = c; NAME[c.ticker] = c.legal_name || c.name; SHORT[c.ticker] = c.name; });
+}
+function applyLogos(registry) {
+  if (!registry?.tickers || typeof registry.tickers !== "object" || Array.isArray(registry.tickers)) return;
+  LOGOS = registry.tickers;
+  // A late registry updates only logo placeholders, preserving route and filter state.
+  document.querySelectorAll("[data-logo-ticker]").forEach(node => {
+    const t = node.dataset.logoTicker;
+    if (logoUrl(t)) node.replaceWith(node.classList.contains("mlogo") ? miniLogo(t, +node.dataset.logoSize) : logoTile(t, +node.dataset.logoSize));
+  });
 }
 function applyMarket(m) {
   MARKET = m;
@@ -1438,9 +1448,9 @@ function sectorConstituents() {
   });
   return panel("Tracked companies by sector", el("a", { href: "#screener" }, "Screener"), grid, el("div", { class: "src" }, "Sector move is weighted by market cap. Largest six companies shown per sector."));
 }
-const logoUrl = t => IDX[t]?.logo ? `${PUB}logos/${encodeURIComponent(t)}.png` : null;
+const logoUrl = t => Object.hasOwn(LOGOS, t) || IDX[t]?.logo ? `${PUB}logos/${encodeURIComponent(t)}.png` : null;
 function logoTile(t, size = 56) {
-  const mono = () => el("div", { class: "logo", style: `background:${logoColor(t)};width:${size}px;height:${size}px;font-size:${size * (t.length > 3 ? .26 : .32)}px`, "aria-hidden": "true" }, t.replace("-", "."));
+  const mono = () => el("div", { class: "logo", style: `background:${logoColor(t)};width:${size}px;height:${size}px;font-size:${size * (t.length > 3 ? .26 : .32)}px`, "aria-hidden": "true", "data-logo-ticker": t, "data-logo-size": size }, t.replace("-", "."));
   const u = logoUrl(t);
   if (!u) return mono();
   const box = el("div", { class: "logo img", style: `width:${size}px;height:${size}px`, "aria-hidden": "true" });
@@ -1450,10 +1460,11 @@ function logoTile(t, size = 56) {
   return box;
 }
 function miniLogo(t, size = 18) {
+  const mono = () => el("span", { class: "mlogo mono", style: `width:${size}px;height:${size}px;background:${logoColor(t)};font-size:${Math.round(size * .42)}px`, "aria-hidden": "true", "data-logo-ticker": t, "data-logo-size": size }, t[0]);
   const u = logoUrl(t);
-  if (!u) return el("span", { class: "mlogo mono", style: `width:${size}px;height:${size}px;background:${logoColor(t)};font-size:${Math.round(size * .42)}px`, "aria-hidden": "true" }, t[0]);
+  if (!u) return mono();
   const im = el("img", { class: "mlogo", src: u, alt: "", width: size, height: size, loading: "lazy", decoding: "async" });
-  im.onerror = () => im.replaceWith(el("span", { class: "mlogo mono", style: `width:${size}px;height:${size}px;background:${logoColor(t)};font-size:${Math.round(size * .42)}px` }, t[0]));
+  im.onerror = () => im.replaceWith(mono());
   return im;
 }
 
@@ -2817,7 +2828,7 @@ async function pCoverage() {
 async function boot() {
   try {
     const soft = p => Promise.race([p.catch(() => null), new Promise(r => setTimeout(() => r(null), 4000))]);
-    const [ix, mk, mc, fd] = await Promise.all([getJSON("index.json"), getJSON("market.json"), soft(getJSON("macro.json")), soft(getJSON("feed.json"))]);
+    const [ix, mk, mc, fd] = await Promise.all([getJSON("index.json"), getJSON("market.json"), soft(getJSON("macro.json")), soft(getJSON("feed.json")), soft(getJSON("meta/logos.json").then(applyLogos))]);
     applyIndex(ix); applyMarket(mk);
     if (window.FU_COMPANIES) {
       await window.FU_COMPANIES.load(ix.companies).catch(() => window.FU_COMPANIES.apply({ companies: [] }, ix.companies));
