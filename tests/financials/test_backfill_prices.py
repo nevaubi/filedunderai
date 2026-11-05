@@ -169,6 +169,19 @@ class BackfillPricesTests(unittest.TestCase):
             self.assertEqual(merged["splits"]["AAPL"], [["2020-08-31", 4]])
             self.assertEqual(merged["extra"], "keep")
 
+    def test_dry_run_report_names_the_items_cohort(self):
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as tmp:
+            item, _, _ = self.prepared(Path(tmp))
+            report_path = Path(tmp) / "validation.json"
+            with patch.object(bp, "validate_bundle", return_value=([item], "cohort-hash")), patch("builtins.print"):
+                bp.main(["--cohort", str(Path(tmp) / "cohort.json"), "--prices-dir", tmp,
+                         "--dry-run", "--report", str(report_path)])
+            report = json.loads(report_path.read_text())
+            self.assertTrue(report["all_checks_passed"])
+            self.assertEqual(report["cohort_id"], "additional-300-mdy-2026-11-03-r1")
+            self.assertEqual(report["tickers"], ["OKTA"])
+
     def test_rehashed_derived_values_cannot_disagree_with_source(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

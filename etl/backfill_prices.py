@@ -523,8 +523,13 @@ def main(argv=None):
     report_path = args.report or args.prices_dir / ("publication-report.json" if args.publish else "publisher-validation.json")
     try:
         items, cohort_hash = validate_bundle(args.cohort, args.prices_dir, args.tickers, log)
+        if not items:
+            raise ValueError("No validated price items")
+        cohort_ids = {registry_for(i["ticker"])["cohort_id"] for i in items}
+        if len(cohort_ids) != 1:
+            raise ValueError("Validated price items span more than one cohort")
         report = {"schema_version": 1, "mode": "offline_validation", "validated_at": now(),
-                  "cohort_id": registry_for(ticker)["cohort_id"], "cohort_sha256": cohort_hash,
+                  "cohort_id": cohort_ids.pop(), "cohort_sha256": cohort_hash,
                   "companies": len(items), "daily_bars": sum(len(i["rows"]) for i in items),
                   "source": "Yahoo Finance", "attribution": ATTRIBUTION,
                   "latest_date_counts": dict(Counter(i["rows"][-1]["d"] for i in items)),
