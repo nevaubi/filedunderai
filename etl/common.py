@@ -200,13 +200,22 @@ class Supabase:
                 headers=self._h({"Content-Type": content_type, "x-upsert": "true", "cache-control": cache}), timeout=180)
         return len(content)
 
-    def get_object(self, bucket, path, public=False):
-        # The bare /object/{bucket}/{path} download can be served from the storage CDN for the object's
-        # cache-control lifetime, so a read-modify-write or a post-write read-back could see the previous
-        # version. /object/authenticated/ is the same authorized download without that cache.
+    def _storage_read_request(self, bucket, path, public=False):
+        """Share freshness options without changing each caller's error or timeout rules."""
         base = f"{self.url}/storage/v1/object/{'public' if public else 'authenticated'}/{bucket}/{urllib.parse.quote(path)}"
+        headers = {}
+        if not public:
+            # Authenticated downloads can also be CDN-cached. Request freshness with
+            # Supabase's documented cacheNonce and cache directives; exact readback
+            # comparisons remain authoritative if an intermediary still serves stale data.
+            base += f"?cacheNonce={uuid.uuid4().hex}"
+            headers = {"Cache-Control": "no-cache, no-store", "Pragma": "no-cache"}
+        return base, self._h(headers)
+
+    def get_object(self, bucket, path, public=False):
+        base, headers = self._storage_read_request(bucket, path, public)
         try:
-            return request(base, headers=self._h(), raw=True, retries=2)
+            return request(base, headers=headers, raw=True, retries=2)
         except HTTPError as e:
             if e.code in (400, 404):
                 return None
