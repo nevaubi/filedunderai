@@ -38,9 +38,10 @@ class AdditionalCompanyRegistryTests(unittest.TestCase):
         self.assertEqual(len(universe.SP500_LIST), 500)
         self.assertEqual(universe.SP500, {t for t, *_ in universe.SP500_LIST})
         self.assertTrue(universe.SP100 <= universe.SP500)
-        self.assertEqual(len(universe.ADDITIONAL_LIST), 300)
+        self.assertEqual(len(universe.ADDITIONAL_REGISTRY["companies"]), 300)  # the first cohort is unchanged
+        self.assertEqual(len(universe.ADDITIONAL_LIST), sum(len(r["companies"]) for r in universe.ADDITIONAL_REGISTRIES))
         self.assertFalse(universe.SP500 & {t for t, *_ in universe.ADDITIONAL_LIST})
-        self.assertEqual(len({c for _, c, *_ in universe.SP500_LIST + universe.ADDITIONAL_LIST}), 800)
+        self.assertEqual(len({c for _, c, *_ in universe.SP500_LIST + universe.ADDITIONAL_LIST}), 500 + len(universe.ADDITIONAL_LIST))
         self.assertTrue(all(t in universe.BY_TICKER for t, *_ in universe.ADDITIONAL_LIST))
 
     def test_public_index_excludes_additions_from_sp500_membership(self):
