@@ -565,6 +565,7 @@ class Facts:
         source = data.get("filing_history") if as_of else data.get("q")
         self.q = {}
         self.comparability_holds = []
+        visible_ends = set()
         for lab, records in (source or {}).items():
             picked, visible = {}, {}
             for r in records:
@@ -580,6 +581,11 @@ class Facts:
                 prev = picked.get(r[0])
                 if not prev or (available, not bool(r[7])) > (((prev[8].get("available_at") if len(prev)>8 else None) or prev[4]), not bool(prev[7])):
                     picked[r[0]] = r
+            # A held value is still evidence of the reporting period. Removing
+            # that date would silently recalculate current metrics one quarter
+            # earlier. Availability and supersession were checked above.
+            if lab in ("Net income", "Revenue"):
+                visible_ends.update(visible)
             for end, record in list(picked.items()):
                 def point(r):
                     metadata = r[8] if len(r) > 8 else {}
@@ -597,7 +603,7 @@ class Facts:
                     picked[end] = _rec(selected, selected['c'])
             self.q[lab] = sorted(picked.values(), key=lambda r:r[0])
         self.splits = splits or []
-        self.ends = sorted({r[0] for label in ("Net income", "Revenue") for r in self.q.get(label, [])})
+        self.ends = sorted(visible_ends)
 
     def adj(self, label, rec):
         """Split-adjusted value: per-share figures and share counts filed before a split are restated to today's basis."""
@@ -915,6 +921,29 @@ def fundamentals_for(tk, data, splits, price, sector):
         prov.put("pio_f", "Count of the nine Piotroski tests passed (see each pio_ field)", [x for _ok, recs in tests.values() for x in recs][:40])
     for key, label in (("rev", "Revenue"), ("eps", "EPS diluted"), ("fcf", None), ("oi", "Operating income")):
         growth_block(fx, out, prov, key, label or "Free cash flow", end)
+
+    # Explain missing fields caused by an anchor-period hold. The source
+    # references retain the reported value and conflicting alternative; they
+    # are evidence of the hold, not inputs to a substitute calculation.
+    # Current P/E and earnings yield use independently reported diluted EPS.
+    held_fields = {}
+    dependents = {
+        "Revenue": ("gm om nm fcfm gm_chg3 om_chg3 nm_chg3 fcfm_chg3 sbc_pct capex_int rnd_int "
+                    "ps ev_sales altman_z ps_p5 ev_sales_p5 pio_f_dmargin pio_f_dturn pio_f "
+                    "rev_g_q rev_g_ttm rev_cagr3 rev_cagr5 rev_accel rev_streak"),
+        "Net income": ("nm nm_chg3 roe roa accruals cash_conv pio_f_roa pio_f_droa pio_f_accrual "
+                       "pio_f pe_p5 earn_yield_p5"),
+    }
+    for hold in fx.comparability_holds:
+        if hold['point']['end'] != end:
+            continue
+        for field in dependents.get(hold['label'], '').split():
+            held_fields.setdefault(field, []).append((hold['label'], _rec(hold['point'], hold['point']['c'])))
+    for field, records in held_fields.items():
+        if out.get(field) is None:
+            labels = ', '.join(dict.fromkeys(label for label, _ in records))
+            prov.put(field, f"Conflicting {labels} observations for {end}; metric withheld pending review",
+                     records, status="held", period_end=end)
 
     inputs = {"end": end, "rev": rev, "ni": ni, "oi": oi, "eps": eps, "fcf": fcf, "eq": eq, "ta": ta, "tl": tl, "tca": tca, "tcl": tcl, "re": re_,
               "debt": debt, "cash": cashall, "div": div, "bb": bb, "fin": fin,
