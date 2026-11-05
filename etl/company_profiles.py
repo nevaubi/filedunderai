@@ -16,6 +16,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import unicodedata
 from pathlib import Path
 
 from .common import AggregateLease
@@ -23,6 +24,8 @@ from .universe import BY_TICKER
 
 API_ROOT = 'https://api.peopledatalabs.com/v5/'
 COMPANY_DOCS = 'https://docs.peopledatalabs.com/docs/company-enrichment-api'
+COMPANY_SEARCH_DOCS = 'https://docs.peopledatalabs.com/docs/company-search-api'
+COMPANY_CLEAN_DOCS = 'https://docs.peopledatalabs.com/docs/cleaner-apis-reference'
 PEOPLE_DOCS = 'https://docs.peopledatalabs.com/docs/person-search-api'
 STATE_PATH = 'company-profiles/state.json'
 MAX_COMPANIES = 5
@@ -41,6 +44,17 @@ CORPORATE_TITLES = {
     'co-founder and chief executive officer', 'cofounder and chief executive officer',
     'executive vice president and chief financial officer',
 }
+# Include common corporate title combinations without admitting division or region
+# qualifiers. Exact query terms reduce paid records that would fail validation.
+for _prefix in ('executive vice president', 'senior vice president', 'evp', 'svp', 'president'):
+    for _role in ('chief financial officer', 'chief operating officer', 'chief technology officer',
+                  'chief information officer', 'chief legal officer', 'general counsel', 'cfo', 'coo', 'cto'):
+        for _separator in (' and ', ', ', ' & '):
+            CORPORATE_TITLES.add(_prefix + _separator + _role)
+for _prefix in ('chairman', 'chair', 'president', 'founder', 'co-founder', 'cofounder'):
+    for _role in ('chief executive officer', 'ceo'):
+        for _separator in (' and ', ', ', ' & '):
+            CORPORATE_TITLES.add(_prefix + _separator + _role)
 QUOTA_HEADERS = ('x-call-credits-spent','x-call-credits-type','x-totallimit-remaining',
                  'x-totallimit-purchased-remaining','x-totallimit-overages-remaining',
                  'x-ratelimit-remaining','x-ratelimit-reset')
@@ -90,9 +104,54 @@ def _domain(value):
 
 
 def _name(value):
-    words=re.findall(r'[a-z0-9]+',str(value or '').lower())
-    suffixes={'inc','incorporated','corp','corporation','co','company','limited','ltd','plc','the'}
+    value=''.join(c for c in unicodedata.normalize('NFKD',str(value or '')) if not unicodedata.combining(c))
+    value=re.sub(r'\s*(?:/+[a-z]{2}/*|\([a-z]{2}\))\s*$','',value,flags=re.I)
+    value=re.sub(r'\((?:nasdaq|nyse)\s*:[^)]*\)','',value,flags=re.I)
+    value=value.replace("'",'').replace('’','')
+    words=re.findall(r'[a-z0-9]+',value.lower())
+    suffixes={'inc','incorporated','corp','corporation','co','company','companies','limited','ltd','plc','the','and'}
     return ' '.join(w for w in words if w not in suffixes)
+
+
+def _title(value):
+    value=re.sub(r'\s+',' ',str(value or '').casefold()).strip()
+    value=re.sub(r'\s*(?:,|&)\s*',' and ',value)
+    aliases={'ceo':'chief executive officer','cfo':'chief financial officer','coo':'chief operating officer',
+             'cto':'chief technology officer','cio':'chief information officer','evp':'executive vice president',
+             'svp':'senior vice president'}
+    for short,full in aliases.items(): value=re.sub(r'\b'+short+r'\b',full,value)
+    return re.sub(r'\s+',' ',value).strip()
+
+
+def _corporate_title(value):
+    return _title(value) in {_title(title) for title in CORPORATE_TITLES}
+
+
+def _person_name(value):
+    value=''.join(c for c in unicodedata.normalize('NFKD',str(value or '')) if not unicodedata.combining(c))
+    return ' '.join(re.findall(r'[a-z0-9]+',value.casefold()))
+
+
+def _leader_rank(person):
+    role=_title(person.get('job_title') or person.get('role'))
+    return next((i for i,title in enumerate(('chief executive officer','chief financial officer','chief operating officer',
+                                             'chief technology officer','chief legal officer')) if title in role),10)
+
+
+def _role_family(person):
+    role=_title(person.get('job_title') or person.get('role'))
+    titles=('chief executive officer','chief financial officer','chief operating officer',
+            'chief technology officer','chief information officer','chief legal officer',
+            'chief people officer','chief accounting officer','chief marketing officer',
+            'chief compliance officer','chief human resources officer','general counsel')
+    return next((title for title in titles if title in role),role)
+
+
+def _linkedin_url(value,kind):
+    url=safe_url(value)
+    if not url: return None
+    parsed=urllib.parse.urlsplit(url)
+    return url if re.fullmatch(r'(?:www\.)?linkedin\.com',parsed.hostname or '') and parsed.path.startswith('/'+kind+'/') else None
 
 
 def partial_date(value, observed_at=None):
@@ -110,33 +169,46 @@ def _matches(issuer,record):
     ticker=lambda v: str(v or '').strip().upper().replace('.','-')
     if ticker(record.get('ticker'))!=ticker(issuer['ticker']): return False
     likelihood=record.get('likelihood')
-    if not isinstance(likelihood,(int,float)) or likelihood<6: return False
+    if type(likelihood) not in (int,float) or not math.isfinite(likelihood) or not 6<=likelihood<=10: return False
     expected=_domain(issuer.get('website') or issuer.get('domain'))
     if expected: return _domain(record.get('website'))==expected
     # Without a verified domain, require both a stronger match and the issuer name.
-    return likelihood>=8 and _name(issuer['name']) in {_name(record.get('name')),_name(record.get('display_name'))}
+    expected_names={_name(issuer.get(key)) for key in ('name','display_name','legal_name')} - {''}
+    return likelihood>=8 and bool(expected_names & {_name(record.get('name')),_name(record.get('display_name'))})
+
+
+def _search_matches(issuer,record):
+    if not isinstance(record,dict) or record.get('status',200)!=200 or not record.get('id'): return False
+    ticker=lambda v: str(v or '').strip().upper().replace('.','-')
+    if ticker(record.get('ticker'))!=ticker(issuer['ticker']): return False
+    expected=_domain(issuer.get('website') or issuer.get('domain'))
+    if expected: return _domain(record.get('website'))==expected
+    expected_names={_name(issuer.get(key)) for key in ('name','display_name','legal_name')} - {''}
+    return bool(expected_names & {_name(record.get('name')),_name(record.get('display_name'))})
 
 
 def sanitize_leadership(records, company_id, observed_at, expected_domain=None, limit=MAX_PEOPLE):
     out=[]; seen=set(); today=_utc(observed_at).date()
     if limit<=0 or not company_id: return out
-    for person in records if isinstance(records,list) else []:
+    rows=sorted([p for p in records if isinstance(p,dict)],key=_leader_rank) if isinstance(records,list) else []
+    for person in rows:
         if not isinstance(person,dict) or person.get('job_company_id')!=company_id: continue
         if expected_domain and _domain(person.get('job_company_website'))!=_domain(expected_domain): continue
         name=_text(person.get('full_name'),160); role=_text(person.get('job_title'),200)
-        if not name or not role or role.casefold() not in CORPORATE_TITLES: continue
+        if not name or not role or not _corporate_title(role): continue
         verified=partial_date(person.get('job_last_verified'),observed_at)
         if not verified or len(verified)!=10 or (today-dt.date.fromisoformat(verified)).days>180: continue
-        url=safe_url(person.get('linkedin_url'))
-        if url and not re.fullmatch(r'(?:www\.)?linkedin\.com',urllib.parse.urlsplit(url).hostname or ''): url=None
-        if url and not urllib.parse.urlsplit(url).path.startswith('/in/'): url=None
+        employment_start=partial_date(person.get('job_start_date'),observed_at)
+        if person.get('job_start_date') and not employment_start: continue
+        url=_linkedin_url(person.get('linkedin_url'),'in')
         identity=(name.casefold(),role.casefold())
         if identity in seen: continue
         seen.add(identity)
-        out.append({'name':name,'role':role,'start_date':partial_date(person.get('job_start_date'),observed_at),
-                    'profile_url':url,'source_url':PEOPLE_DOCS,'source_name':'People Data Labs',
+        out.append({'name':name,'role':role,'start_date':None,'employment_start_date':employment_start,
+                    'tenure_note':'Provider employment start; the appointment date for this specific role is not verified.' if employment_start else None,
+                    'profile_url':url,'linkedin_url':url,'source_url':PEOPLE_DOCS,'source_name':'People Data Labs',
                     'observed_at':_iso(observed_at),'provider_verified_at':verified,
-                    'group':'Executive leadership' if role.casefold() in {'ceo','chief executive officer','president and chief executive officer'} else 'Senior leadership'})
+                    'group':'Executive leadership' if 'chief executive officer' in _title(role) else 'Senior leadership'})
         if len(out)>=max(0,min(MAX_PEOPLE,limit)): break
     return out
 
@@ -209,13 +281,22 @@ def _unique_sources(sources):
     return out
 
 
-def build_profile(issuer,record,observed_at=None,people=None):
+def build_profile(issuer,record,observed_at=None,people=None,_endpoint='company/enrich'):
     """Convert only allowed public business/professional fields from the flat API response."""
-    if not _matches(issuer,record): raise ValueError('Company identity was not verified')
+    matcher=_matches if _endpoint=='company/enrich' else _search_matches
+    if _endpoint not in ('company/search','company/enrich','company/clean') or not matcher(issuer,record): raise ValueError('Company identity was not verified')
     observed_at=_iso(observed_at)
-    source={'name':'People Data Labs','url':COMPANY_DOCS,'endpoint':API_ROOT+'company/enrich',
+    docs={'company/search':COMPANY_SEARCH_DOCS,'company/enrich':COMPANY_DOCS,'company/clean':COMPANY_CLEAN_DOCS}[_endpoint]
+    match={'ticker':issuer['ticker'],'domain':_domain(record.get('website')),
+           'basis':'ticker_and_verified_domain' if _domain(issuer.get('website') or issuer.get('domain')) else 'ticker_and_exact_issuer_name'}
+    if _endpoint=='company/enrich': match['likelihood']=record.get('likelihood')
+    if _endpoint=='company/clean':
+        # Cleaner scores/fuzzy flags are provider diagnostics, not probabilities.
+        match['provider_fuzzy_match']=record.get('fuzzy_match')
+        match['provider_score']=record.get('score')
+    source={'name':'People Data Labs','url':docs,'endpoint':API_ROOT+_endpoint,
             'record_id':_text(record.get('id'),120),'observed_at':observed_at,
-            'match':{'ticker':issuer['ticker'],'domain':_domain(record.get('website')),'likelihood':record.get('likelihood')}}
+            'match':match}
     description=_text(record.get('summary')) or _text(record.get('headline'))
     loc=record.get('location') if isinstance(record.get('location'),dict) else {}
     hq=', '.join(str(loc[k]).strip() for k in ['locality','region','country'] if isinstance(loc.get(k),str) and loc[k].strip()) or None
@@ -223,16 +304,20 @@ def build_profile(issuer,record,observed_at=None,people=None):
     founded=founded if type(founded) is int and 1800<=founded<=_utc(observed_at).year else None
     count=record.get('employee_count')
     count=count if type(count) is int and count>=0 else None
-    leadership=sanitize_leadership(people or [],record.get('id'),observed_at,record.get('website'))
+    # Even fresh provider employment records can misidentify a division's chief
+    # or an outdated role as corporate leadership. Only an official roster may
+    # establish a name and role; provider candidates can supplement its links.
+    leadership=[]
     profile={
         'schema_version':1,'ticker':issuer['ticker'],'cik':issuer['cik'],'name':issuer['name'],
-        'description':description,'description_source':source if description else None,'source_url':COMPANY_DOCS,
+        'description':description,'description_source':source if description else None,'source_url':docs,
         'website':safe_url(record.get('website')),'industry':_text(record.get('industry'),150),'headquarters':hq,
+        'linkedin_url':_linkedin_url(record.get('linkedin_url'),'company'),
         'founded':founded,'employees':None,'professional_profile_count':count,
         'professional_profile_count_basis':'People Data Labs profiles associated with the company; not company-reported headcount',
         'professional_profile_count_source':source,'provider_record_id':source['record_id'],
         'leadership':leadership,'images':[],'sources':[source],'updated_at':observed_at,
-        'field_sources':{k:source for k in ['website','industry','headquarters','founded','professional_profile_count']},
+        'field_sources':{k:source for k in ['website','industry','headquarters','founded','professional_profile_count','linkedin_url']},
         'coverage':{'status':'provider_enriched','description':'available' if description else 'unavailable',
                     'leadership':'partial_provider_records' if leadership else 'unavailable','images':'unavailable',
                     'leadership_scope':'Selected leadership profiles; this is not a complete executive or board roster.'},
@@ -242,7 +327,17 @@ def build_profile(issuer,record,observed_at=None,people=None):
     return profile
 
 
-def merge_official_profile(profile,official,now=None):
+def build_search_profile(issuer,record,observed_at=None,people=None):
+    """Search has no likelihood score; verify its ticker plus name/domain explicitly."""
+    return build_profile(issuer,record,observed_at=observed_at,people=people,_endpoint='company/search')
+
+
+def build_clean_profile(issuer,record,observed_at=None):
+    """Cleaner identity needs the same exact issuer evidence as company search."""
+    return build_profile(issuer,record,observed_at=observed_at,_endpoint='company/clean')
+
+
+def merge_official_profile(profile,official,now=None,provider_people=None):
     """Curated official data wins; provider facts remain separately attributed."""
     if not isinstance(official,dict) or official.get('ticker')!=profile.get('ticker') or official.get('cik')!=profile.get('cik'):
         return profile
@@ -281,12 +376,25 @@ def merge_official_profile(profile,official,now=None):
     if incoming_leaders and (not previous_leaders or max(p['observed_at'] for p in incoming_leaders)>=max(p['observed_at'] for p in previous_leaders)):
         leaders=incoming_leaders; using_incoming=True
     if leaders:
+        for leader in leaders:
+            candidates=[person for person in list(provider_people or [])+profile.get('leadership',[]) if
+                        _provider_source({'name':person.get('source_name'),'url':person.get('source_url')})
+                        and _person_name(person.get('name'))==_person_name(leader.get('name'))
+                        and _role_family(person)==_role_family(leader)]
+            if not leader.get('linkedin_url') and len(candidates)==1:
+                person=candidates[0]
+                verified=partial_date(person.get('provider_verified_at'),now)
+                url=_linkedin_url(person.get('linkedin_url') or person.get('profile_url'),'in')
+                if url and verified and len(verified)==10 and (now.date()-dt.date.fromisoformat(verified)).days<=180:
+                    leader['linkedin_url']=url
+                    leader['linkedin_source']={'name':'People Data Labs','url':PEOPLE_DOCS,
+                                               'observed_at':person.get('observed_at'),'provider_verified_at':verified}
         merged['leadership']=leaders
         evidence_dates.extend(_timestamp(p['observed_at']) for p in leaders)
-    elif (profile.get('coverage') or {}).get('status') in ('official_sources','official_with_provider_metadata'):
-        # Do not keep expired official people merely because the cached object
-        # also contains provider metadata. Provider rows retain their own basis.
-        merged['leadership']=[p for p in merged.get('leadership',[]) if _provider_source({'name':p.get('source_name'),'url':p.get('source_url')})]
+    else:
+        # Provider-only rows and expired official rosters never become current
+        # corporate leadership simply because metadata was refreshed.
+        merged['leadership']=[]
     previous_update=_timestamp(profile.get('updated_at'))
     if previous_update and previous_update<=now: evidence_dates.append(previous_update)
     if evidence_dates: merged['updated_at']=_iso(max(evidence_dates))
@@ -299,7 +407,7 @@ def merge_official_profile(profile,official,now=None):
                         'status':'official_with_provider_metadata' if has_provider else 'official_sources',
                         'official_updated_at':_iso(max(official_dates)) if official_dates else None,
                         'description':'available' if merged.get('description') else 'unavailable',
-                        'leadership':'official_sources' if leaders else 'partial_provider_records' if merged.get('leadership') else 'unavailable',
+                        'leadership':'official_sources' if leaders else 'unavailable',
                         'images':'available' if merged.get('images') else 'unavailable',
                         'leadership_scope':(scope_profile.get('coverage') or {}).get('leadership_scope') or 'Selected leadership profiles; this is not a complete executive or board roster.'}
     merged['coverage']['field_observed_at']=_field_observed_at(merged)
@@ -433,8 +541,11 @@ class PDLClient:
         if not company.get('id'): return []
         self._reserve_credits('person/search',allowed)
         self.people_reserved+=allowed
+        today=_utc().date(); titles=sorted(CORPORATE_TITLES)
+        roles=[{'terms':{'job_title':titles[i:i+100]}} for i in range(0,len(titles),100)]
         query={'query':{'bool':{'filter':[{'term':{'job_company_id':company['id']}},
-                                         {'terms':{'job_title':sorted(CORPORATE_TITLES)}}]}}}
+                                         {'bool':{'should':roles}},
+                                         {'range':{'job_last_verified':{'gte':(today-dt.timedelta(days=180)).isoformat(),'lte':today.isoformat()}}}]}}}
         data=self._call('person/search',{'query':query,'size':allowed,'dataset':'resume','titlecase':True,'data_include':PERSON_FIELDS},method='POST')
         return (data.get('data') or [])[:allowed] if data else []
 
@@ -563,14 +674,16 @@ def refresh_profiles(sb,tickers,client=None,now=None,official_dir=None,time_budg
                             people=[]
                             official_leadership=bool(_current_official_leadership(official,now))
                             capacity=min(2,MAX_PEOPLE-budget['people_reserved'])
-                            if capacity>0 and not official_leadership and not client.stopped:
+                            needs_links=official_leadership and any(not person.get('linkedin_url') for person in _current_official_leadership(official,now))
+                            if capacity>0 and needs_links and not client.stopped:
                                 guard(); budget['people_reserved']+=capacity; _save_state(sb,state,guard)
                                 try:
                                     people=client.people(record,size=capacity)
                                 except PDLError as exc:
                                     summary['failures'].append({'ticker':ticker,'stage':'professional_records','status':exc.status})
                             profile=build_profile(issuer,record,observed_at=stamp,people=people)
-                            profile=merge_official_profile(profile,official,now=now)
+                            candidates=sanitize_leadership(people,record.get('id'),stamp,record.get('website'))
+                            profile=merge_official_profile(profile,official,now=now,provider_people=candidates)
                             guard(); sb.put_json('company-profiles/'+ticker+'.json',profile,cache='max-age=3600')
                             state['companies'][ticker]={'status':'matched','attempted_at':stamp,'provider_record_id':record.get('id')}
                             if ticker not in summary['published']: summary['published'].append(ticker)

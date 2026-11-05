@@ -74,3 +74,35 @@ test('SEC industry descriptions remain searchable and prioritize actual industry
     assert.equal(h.api.get('AAA').screener_eligible, false);
   } finally { h.close(); }
 });
+
+test('metadata and leadership filters use actual enrichment independently of screener membership', () => {
+  const h = setup();
+  try {
+    h.api.apply({ companies: [
+      { ticker: 'AAA', name: 'Alpha', cik: 1, coverage: { profile: 'unavailable' } },
+      { ticker: 'BBB', name: 'Beta', cik: 2, coverage: { profile: 'available' }, leadership_count: 3, portrait_count: 2 },
+      { ticker: 'CCC', name: 'Gamma', cik: 3, coverage: { profile: 'available' }, leadership_count: 0 },
+    ] }, [{ ticker: 'AAA', name: 'Alpha' }]);
+    assert.deepEqual(Array.from(h.api.query({ coverage: 'screener' }), c => c.ticker), ['AAA']);
+    assert.deepEqual(Array.from(h.api.query({ coverage: 'profile', sort: 'ticker' }), c => c.ticker), ['BBB', 'CCC']);
+    assert.deepEqual(Array.from(h.api.query({ coverage: 'leadership' }), c => c.ticker), ['BBB']);
+    h.api.render(h.w.document.querySelector('main'));
+    assert.equal(h.w.document.querySelector('a[href="#company-aaa"]').closest('tr').querySelector('.directory-coverage').textContent, 'Screener');
+    assert.equal(h.w.document.querySelector('a[href="#company-bbb"]').closest('tr').querySelector('.directory-coverage').textContent, 'Leadership');
+  } finally { h.close(); }
+});
+
+test('newly published metadata loads before the bundled fallback', async () => {
+  const h = setup();
+  try {
+    h.w.FU_CONFIG = { dataBase: 'https://data.example/' };
+    const calls = [];
+    h.w.fetch = async url => {
+      calls.push(url);
+      return { ok: true, json: async () => ({ schema_version: 1, companies: [{ ticker: 'BBB', name: 'Beta', coverage: { profile: 'available' }, leadership_count: 4 }] }) };
+    };
+    await h.api.load([]);
+    assert.deepEqual(calls, ['https://data.example/company-directory.json']);
+    assert.equal(h.api.get('BBB').leadership_count, 4);
+  } finally { h.close(); }
+});
