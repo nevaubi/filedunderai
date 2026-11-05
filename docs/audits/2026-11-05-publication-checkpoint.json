@@ -1,0 +1,211 @@
+{
+  "checkpoint_at": "2026-11-05T19:31:49Z",
+  "kpi_publication": {
+    "verified_at": "2026-11-05T19:31:49Z",
+    "plan_sha256": "0790df4db2459bc5f85f094c659ccba7d1c2ac48918d58bae0c7ed8e192d57e9",
+    "archive_prefix": "repairs/kpistd/0790df4db2459bc5f85f094c659ccba7d1c2ac48918d58bae0c7ed8e192d57e9/resume-35352473-a970-4a4b-a5b3-aa5c0c7d9be2",
+    "removed_incorrect_dis_mappings": 22,
+    "preserved_dis_mappings": 115,
+    "preserved_dis_numeric_points": 88,
+    "added_ida_mappings": 1,
+    "source_verified_ida_points": 16,
+    "source_fact_mutations": 0,
+    "original_document_mutations": 0,
+    "unrelated_db_mappings_unchanged": 11184,
+    "authenticated_objects_verified": 9,
+    "public_objects_verified": [
+      {
+        "path": "kpistd/t/DIS.json",
+        "sha256": "09b193a75ad169faffcaa0fb91775b9ba1331a187042bd83fc4c1434ee25cf0e"
+      },
+      {
+        "path": "kpistd/t/IDA.json",
+        "sha256": "4aedc7fc9a03ddf3e8158c9ddc364cd4b864623dada232c4aac644b112e470c9"
+      },
+      {
+        "path": "kpistd/series/fcf.json",
+        "sha256": "c72391b53a40033286f32cfadbf4d7f4679451d6d49a67f45dca838df41aa9bd"
+      },
+      {
+        "path": "kpistd/series/occupancy.json",
+        "sha256": "90cd5e1315e461b2228388e135367dab4a3db15ca99b36397948e8c9b6eed85f"
+      },
+      {
+        "path": "kpistd/series/total_revenue.json",
+        "sha256": "91f693471f4297a678fb96d962e0df4b67a40180938da7136ddc7e911ed2e0a6"
+      },
+      {
+        "path": "kpistd/latest.json",
+        "sha256": "810378c8f2ad6b8751acb45b76028f5c2dc2f89798cf2eb38fe80e2566d188d9"
+      },
+      {
+        "path": "kpistd/taxonomy.json",
+        "sha256": "50e338c6d9cbe82baaf5985c6c3ae447b8c726011b97c40dcd26c343d090a76a"
+      },
+      {
+        "path": "kpistd/map.json",
+        "sha256": "b40b6c9d56dbc63adcd95c993267825cd5d57c6333397e1c9b76896be6189337"
+      }
+    ],
+    "overall_outcome": "partial; IDA ordinary EPS options remain unanswered"
+  },
+  "ipo_review": {
+    "reviewed_at": "2026-11-05T19:29:07.126831+00:00",
+    "reviewer": "/root/backfill_handoff",
+    "status": "pass_offline_source_and_preservation",
+    "production_writes": 0,
+    "manifest_expected_sha256": "115abfe701e171ee77c4a1c8b3bab5a5244eb6518773c867128da5d68f2c717e",
+    "checks": [
+      {
+        "check": "All sealed hashes and byte lengths",
+        "result": "pass",
+        "artifacts": 108,
+        "code_files": 3,
+        "inputs": 3,
+        "outputs": 98,
+        "manifest_sha256": "115abfe701e171ee77c4a1c8b3bab5a5244eb6518773c867128da5d68f2c717e"
+      },
+      {
+        "check": "Original workbook",
+        "result": "pass",
+        "sha256": "8499e48223bb72d93cd5919a4f3b2f84776d020b120e3133d992841da5ba5450",
+        "bytes": 42234,
+        "fixture_byte_equality": true
+      },
+      {
+        "check": "Archived official source-page publication citation",
+        "result": "pass",
+        "date": "2026-09-22",
+        "source_page_sha256": "2556ecb89cc425a1b88acda0fe5a6da09762558a1bbf60217243a23a2c3df4af",
+        "workbook_link_found": true
+      },
+      {
+        "check": "Independent source-to-output comparison",
+        "result": "pass",
+        "source_cells": 3168,
+        "numeric_observations": 3080,
+        "states": {
+          "reported": 3080,
+          "missing_marker": 87,
+          "blank": 1
+        },
+        "annual_periods": 26,
+        "quarterly_periods": 106,
+        "annual_last": "2025-12-31",
+        "quarterly_last": "2026-06-30",
+        "published_and_vintage": "2026-09-22",
+        "values_rounded_to_source_display_precision": 221,
+        "leading_missing_snapshot_rows_trimmed": [
+          {
+            "series_id": "SEC_IPO:AVERAGE_PROCEEDS_SPAC:A",
+            "leading_missing_rows": 3,
+            "all_cell_evidence_retained": true
+          },
+          {
+            "series_id": "SEC_IPO:AVERAGE_PROCEEDS_SPAC:Q",
+            "leading_missing_rows": 14,
+            "all_cell_evidence_retained": true
+          },
+          {
+            "series_id": "SEC_IPO:MEDIAN_PROCEEDS_SPAC:A",
+            "leading_missing_rows": 3,
+            "all_cell_evidence_retained": true
+          },
+          {
+            "series_id": "SEC_IPO:MEDIAN_PROCEEDS_SPAC:Q",
+            "leading_missing_rows": 14,
+            "all_cell_evidence_retained": true
+          }
+        ]
+      },
+      {
+        "check": "All prior catalog and registry entries preserved",
+        "result": "pass",
+        "registry_entries": 330,
+        "catalog_entries": 330,
+        "calendar_entries": 63,
+        "change_entries": 12,
+        "sections": 7,
+        "only_added_series": 48,
+        "only_public_outputs": 98,
+        "release_file_mutated": false
+      }
+    ],
+    "current_apply_wrapper_sha256": "49499244a1c4b429a85a9bbf7d38278f1403541183b8562e6472cd3899a70450",
+    "apply_wrapper_review": {
+      "status": "pass_code_review_and_verify_only",
+      "transport": "Current plain-function common.request wrapper checks lease and sets retries=1 for every non-GET; no apply invoked.",
+      "scope": "New 48 macro-series IDs, their 3080 observations, 96 new bundles/snapshots, registry and catalog, and immutable private evidence prefix only.",
+      "preservation": "Under lease preflight compares all 330 prior DB rows, all release rows, three public baseline objects; requires IPO rows and new object paths absent. Postwrite checks all rows and public/authenticated object bytes.",
+      "caveat": "DB and storage publication remains nontransactional. Cooperative lease, private intent/archive, journal and exact readbacks require read-only reconciliation after any failure."
+    },
+    "known_external_hold": "Parent reports Vercel provisioning failure. Production application remains held."
+  },
+  "pdf_summary": {
+    "completed_at": "2026-11-05T19:29:27.340570+00:00",
+    "scope": "Fixed manifest of 34 ir_documents rows with text_path IS NULL and ext='.pdf'; no production mutations.",
+    "documents": 34,
+    "exact_integrity_verified": 34,
+    "bytes_verified": 155074245,
+    "pages_checked_by_both_parsers": 447,
+    "image_based_documents_without_native_text": 34,
+    "native_recoveries_feasible": 0,
+    "text_payloads_staged": 0,
+    "opening_password_required": 0,
+    "encrypted_owner_permissions": 1,
+    "parser_repaired_documents": 0,
+    "parser_errors": 0,
+    "ocr_attempted": false,
+    "rendering_attempted": false,
+    "production_mutations": false,
+    "by_ticker": [
+      {
+        "ticker": "ATI",
+        "documents": 23,
+        "pages": 342,
+        "bytes": 37953195,
+        "native_recoveries": 0
+      },
+      {
+        "ticker": "ROKU",
+        "documents": 1,
+        "pages": 1,
+        "bytes": 115247,
+        "native_recoveries": 0
+      },
+      {
+        "ticker": "SNX",
+        "documents": 1,
+        "pages": 15,
+        "bytes": 4985429,
+        "native_recoveries": 0
+      },
+      {
+        "ticker": "UTHR",
+        "documents": 9,
+        "pages": 89,
+        "bytes": 112020374,
+        "native_recoveries": 0
+      }
+    ],
+    "extractor_inspection": {
+      "repository_commit": "e877cf8d5bf4cbe807e2c1196cf53c8e534ed35b",
+      "file": "etl/ir.py",
+      "file_sha256": "d992fdac44e1d171c3ce76404b26ecbb53b86bb2128da19ca46c81de3eee7370",
+      "native_pdf_branch": "pdfplumber; up to 400 pages; no OCR fallback",
+      "repo_extractor_executed_for_native_candidates": 0,
+      "reason": "No source contains native text according to either independent parser."
+    },
+    "parsers": {
+      "pymupdf": "PyMuPDF 1.26.6",
+      "poppler": "pdftotext version 24.02.0"
+    }
+  },
+  "verification": {
+    "node": "22.22.0",
+    "javascript_tests": 251,
+    "python_financial_tests": 517,
+    "fingerprinted_assets": 35
+  },
+  "source_commit": "e877cf8d5bf4cbe807e2c1196cf53c8e534ed35b"
+}
