@@ -230,10 +230,19 @@ def sync_ftd(sb, deadline=None, today=None):
 
 # ---------- lobbying ----------
 
-def _lda_get(url, params=None):
+def _lda_get(url, params=None, attempts=8):
+    """GET from lda.gov, waiting out its throttle ('Expected available in N seconds') instead of failing."""
     if params:
         url = url + "?" + urllib.parse.urlencode(params)
-    return json.loads(request(url, headers=UA, timeout=60, retries=3))
+    for attempt in range(attempts):
+        try:
+            return json.loads(request(url, headers=UA, timeout=60, retries=1))
+        except Exception as e:
+            msg = str(e)
+            if "429" not in msg or attempt == attempts - 1:
+                raise
+            m = re.search(r"available in (\d+) second", msg)
+            time.sleep(min(60, (int(m.group(1)) if m else 5) + 1))
 
 
 def lobbying(names, years, log=print):
