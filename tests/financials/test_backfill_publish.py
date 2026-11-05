@@ -104,18 +104,18 @@ class BackfillPublishTests(unittest.TestCase):
                 self.assertEqual(sb.db,[])
                 self.assertEqual(sb.rows["filings"],[old])
 
-    def test_matching_unused_144_and_425_references_preserve_the_existing_owner(self):
-        for form in ("144", "425"):
+    def test_matching_unused_144_425_and_dfan14a_references_preserve_the_existing_owner(self):
+        for form in ("144", "425", "DFAN14A"):
             with self.subTest(form=form),tempfile.TemporaryDirectory() as root:
                 filing = self.ownership_filing(form)
                 self.stage(root,filing=filing)
-                old = self.existing_filing(filing,ticker="DASH" if form == "425" else "AIG")
+                old = self.existing_filing(filing,ticker="AIG" if form == "144" else "DASH")
                 sb = PublishStore();sb.rows["filings"] = [copy.deepcopy(old)]
                 result = backfill.publish_staged(sb,root,["OKTA"],workers=1)
                 self.assertEqual(result["published"],1)
                 self.assertEqual(sb.rows["filings"],[old])
                 skipped = result["results"]["OKTA"]["skipped_shared_ownership_filings"][0]
-                self.assertEqual(skipped["reason"],"shared_issuer_reference" if form == "425" else "shared_ownership_filing")
+                self.assertEqual(skipped["reason"],"shared_ownership_filing" if form == "144" else "shared_issuer_reference")
                 self.assertEqual(skipped["owner_ticker"],old["ticker"])
                 self.assertEqual(result["results"]["OKTA"]["filings_upserted"],0)
                 # The secondary issuer retains its original SEC reference in its
@@ -123,8 +123,8 @@ class BackfillPublishTests(unittest.TestCase):
                 bundle = json.loads(sb.objects[("public-data","companies/OKTA.json")])
                 self.assertEqual(bundle["filings"][0]["a"],filing["accession"])
 
-    def test_144_and_425_reference_metadata_must_match_exactly(self):
-        for form in ("144", "425"):
+    def test_144_425_and_dfan14a_reference_metadata_must_match_exactly(self):
+        for form in ("144", "425", "DFAN14A"):
             for field,value in (("form","8-K"),("filed","2026-10-28"),
                                 ("report_date","2026-09-30"),("primary_doc","other.html"),("items","2.02")):
                 with self.subTest(form=form,field=field),tempfile.TemporaryDirectory() as root:
@@ -138,7 +138,7 @@ class BackfillPublishTests(unittest.TestCase):
 
     def test_reporting_and_other_filing_ownership_conflicts_still_block(self):
         for form in ("10-K","10-Q","8-K","13F-HR","SCHEDULE 13G EXTRA","3 EXTRA","4/A/A","5A",
-                     "144 EXTRA","144/A","425/A","425 EXTRA"):
+                     "144 EXTRA","144/A","425/A","425 EXTRA","DEFA14A","DEF 14A","DFAN14A EXTRA","PREC14A"):
             with self.subTest(form=form),tempfile.TemporaryDirectory() as root:
                 filing = self.ownership_filing(form);self.stage(root,filing=filing)
                 old = self.existing_filing(filing)
@@ -149,7 +149,7 @@ class BackfillPublishTests(unittest.TestCase):
                 self.assertEqual(sb.rows["filings"],[old])
 
     def test_shared_ownership_accession_used_by_financial_facts_is_not_skipped(self):
-        for form in ("SCHEDULE 13G/A","3","3/A","4","4/A","5","5/A","144","425"):
+        for form in ("SCHEDULE 13G/A","3","3/A","4","4/A","5","5/A","144","425","DFAN14A"):
             with self.subTest(form=form),tempfile.TemporaryDirectory() as root:
                 filing = self.ownership_filing(form)
                 self.stage(root,filing=filing,financial_accession=filing["accession"])
