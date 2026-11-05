@@ -805,3 +805,60 @@ class DeadlineIOTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class SiteDiscoveryTests(unittest.TestCase):
+    def test_investor_sites_rank_ahead_of_the_marketing_site(self):
+        # Many www.okta.com hits must not outrank a single investor.okta.com hit.
+        results = [{"url": "https://www.okta.com/products/"}, {"url": "https://www.okta.com/pricing/"},
+                   {"url": "https://okta.com/"}, {"url": "https://www.okta.com/blog/"},
+                   {"url": "https://investor.okta.com/news-releases"}]
+        with patch.object(ir, "tavily", side_effect=[results, []]):
+            self.assertEqual(ir.ir_candidates("Okta, Inc.", "OKTA")[0], "https://investor.okta.com")
+
+    def test_asset_hosts_are_never_sites_and_main_site_is_last_resort(self):
+        with patch.object(ir, "tavily", side_effect=[[{"url": "https://image.roku.com/x/4Q25-Shareholder-Letter.pdf"}], []]):
+            self.assertEqual(ir.ir_candidates("Roku, Inc.", "ROKU"), [])
+        with patch.object(ir, "tavily", side_effect=[[{"url": "https://www.cintas.com/about/"}], []]):
+            self.assertEqual(ir.ir_candidates("Cintas Corporation", "CTAS"), ["https://www.cintas.com"])
+        with patch.object(ir, "tavily", side_effect=[[{"url": "https://www.mgic.com/about"}, {"url": "https://mtg.mgic.com/financial-information"}], []]):
+            self.assertEqual(ir.ir_candidates("MGIC Investment Corp", "MTG"), ["https://mtg.mgic.com", "https://www.mgic.com"])
+        with patch.object(ir, "tavily", side_effect=[[{"url": "https://www.pginvestor.com/financial"}, {"url": "https://www.pg.com/"}], []]):
+            self.assertEqual(ir.ir_candidates("Procter & Gamble Co", "PG")[0], "https://www.pginvestor.com")
+        with patch.object(ir, "tavily", side_effect=[[{"url": "https://www.technipfmc.com/en/investors/reports"}], []]):
+            self.assertEqual(ir.ir_candidates("TechnipFMC plc", "FTI"), ["https://www.technipfmc.com/en/investors/"])
+        with patch.object(ir, "tavily", side_effect=[[{"url": "https://fiscal.ai/company/NYSE_STE/investor-relations"},
+                                                      {"url": "https://steris.org.in/"}, {"url": "https://sterisplc.gcs-web.com/financial"}], []]):
+            self.assertEqual(ir.ir_candidates("STERIS plc", "STE"), ["https://sterisplc.gcs-web.com", "https://steris.org.in"])
+        with patch.object(ir, "tavily", side_effect=[[{"url": "https://newsroom.intel.com/a"}, {"url": "https://www.intel.com/"},
+                                                      {"url": "https://www.intc.com/news-events"}], []]):
+            self.assertEqual(ir.ir_candidates("Intel Corporation", "INTC")[0], "https://www.intc.com")
+
+    def test_site_tier(self):
+        for host, path, level in (("investor.okta.com", "/", 0), ("www.abbottinvestor.com", "/", 0), ("www.x.com", "/investors/a", 0),
+                                  ("mtg.mgic.com", "/", 1), ("www.okta.com", "/", 2), ("okta.com", "/", 2),
+                                  ("www.example.co.uk", "/", 2), ("example.co.uk", "/", 2),
+                                  ("image.roku.com", "/", None), ("cdn.example.com", "/", None), ("shop.example.com", "/", None)):
+            with self.subTest(host=host):
+                self.assertEqual(ir._site_tier(host, path), level)
+        self.assertEqual(ir._site_tier("www.intc.com", "/", "INTC", ["intel", "corporation"]), 0)
+        self.assertEqual(ir._site_tier("www.intel.com", "/", "INTC", ["intel", "corporation"]), 2)
+        self.assertEqual(ir._site_tier("www.okta.com", "/", "OKTA", ["okta"]), 2)  # ticker is the name: not evidence
+        self.assertIsNone(ir._site_tier("image.roku.com", "/", "ROKU", ["roku"]))
+        self.assertEqual(ir._site_tier("www.o.com", "/", "O"), 2)  # one- and two-letter tickers are not domain evidence
+    def test_site_change_drops_unfinished_work_from_the_old_site(self):
+        state = {"queues": {q: {} for q in ("submissions", "filings", "maps", "pages", "documents", "extractions")}}
+        q = state["queues"]
+        q["pages"]["https://www.okta.com/blog"] = {"url": "https://www.okta.com/blog", "status": "pending"}
+        q["pages"]["https://www.okta.com/done"] = {"url": "https://www.okta.com/done", "status": "done"}
+        q["pages"]["https://investor.okta.com/"] = {"url": "https://investor.okta.com/", "status": "pending"}
+        q["maps"]["https://www.okta.com quarterly"] = {"url": "https://www.okta.com", "search": "quarterly", "status": "retry"}
+        q["maps"]["site-search"] = {"url": "", "search": "site-search", "status": "pending"}
+        q["documents"]["https://www.okta.com/a.pdf"] = {"url": "https://www.okta.com/a.pdf", "source": "web",
+                                                         "source_page": "https://www.okta.com/blog", "status": "pending"}
+        q["documents"]["https://www.sec.gov/x.htm"] = {"url": "https://www.sec.gov/x.htm", "source": "sec",
+                                                        "source_page": "https://www.sec.gov/", "status": "pending"}
+        self.assertEqual(ir._drop_other_site_work(state, "https://investor.okta.com"), 3)
+        self.assertEqual(set(q["pages"]), {"https://www.okta.com/done", "https://investor.okta.com/"})
+        self.assertEqual(set(q["maps"]), {"site-search"})
+        self.assertEqual(set(q["documents"]), {"https://www.sec.gov/x.htm"})

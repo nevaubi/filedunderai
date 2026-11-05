@@ -42,33 +42,61 @@ def firecrawl_map(url, search=None, limit=400, deadline=None):
     return [l if isinstance(l, dict) else {"url": l} for l in links]
 
 
+NON_IR_LABELS = {"image", "images", "img", "cdn", "static", "assets", "media", "files", "content", "s3", "shop",
+                 "store", "support", "help", "docs", "developer", "developers", "blog", "careers", "jobs", "community",
+                 "status", "login", "app", "go", "events", "learn", "academy", "partners"}
+
+
+def _site_tier(host, path, ticker="", brand=()):
+    """0: an investor site (ir./investor. host, "investor" in the domain, an /investors path or a ticker domain);
+    1: a company's own subdomain (mtg.mgic.com); 2: the www/apex marketing site, used only when nothing better
+    turned up; None: asset, store, support and app hosts, never an investor site."""
+    labels = host.split(":")[0].split(".")
+    symbol = re.sub(r"[^a-z0-9]", "", ticker.lower())
+    # A www/apex domain named after a ticker that is not the company's name (intc.com, cmcsa.com) is the IR site.
+    ticker_domain = (len(symbol) >= 3 and len(labels) in (2, 3) and labels[-2] == symbol and labels[0] in ("www", symbol)
+                     and not any(w.startswith(symbol) for w in brand))
+    if (re.search(r"(^|\.)(investors?|ir|investor-relations)\.", host) or "investor" in host
+            or re.search(r"/(investors?|investor-relations|ir)(/|$)", path, re.I) or ticker_domain):
+        return 0
+    if labels[0] in NON_IR_LABELS:
+        return None
+    apex = len(labels) <= 2 or (len(labels) == 3 and len(labels[-1]) == 2 and len(labels[-2]) <= 3)
+    return 2 if apex or labels[0] == "www" else 1
+
+
 def ir_candidates(name, ticker, deadline=None):
-    """Searches for the company's investor relations site. Returns ranked root URLs whose host matches the company."""
+    """Searches for the company's investor relations site. Returns root URLs whose host names the company or ticker,
+    investor sites first, then company subdomains, then the main site; within a tier by search evidence."""
     res = tavily(f"{name} ({ticker}) investor relations quarterly results", max_results=10, deadline=deadline)
     res += tavily(f"{name} investor relations website", max_results=8, deadline=deadline)
-    score = {}
+    score, tier = {}, {}
     for i, r in enumerate(res):
         u = urllib.parse.urlparse(r["url"])
         host = u.netloc.lower()
         if any(x in host for x in ("quartr", "daloopa", "stocktitan", "tavily", "q4cdn", "annualreports", "last10k", "craft.co", "companiesmarketcap", "ycharts",
                                    "digrin", "dividend", "theglobeandmail", "investorplace", "benzinga", "gurufocus", "wallstreetzen", "koyfin", "alphaspread", "sec.gov", "nasdaq.com", "nyse.com", "yahoo", "seekingalpha", "marketwatch", "reuters", "bloomberg", "wsj", "cnbc",
                                    "fool.com", "zacks", "macrotrends", "stockanalysis", "wikipedia", "linkedin", "businesswire", "prnewswire", "globenewswire",
-                                   "morningstar", "investing.com", "barrons", "tipranks", "marketbeat", "simplywall", "gurufocus", "finviz")):
+                                   "morningstar", "investing.com", "barrons", "tipranks", "marketbeat", "simplywall", "gurufocus", "finviz", "signals.ai")):
+            continue
+        brand = [w for w in re.findall(r"[a-z0-9]+", name.lower()) if len(w) >= 3 and w not in ("inc", "corp", "the", "and", "company", "group", "holdings", "international")]
+        level = _site_tier(host, u.path, ticker, brand)
+        if level is None:
             continue
         s = 10 - i
-        brand = [w for w in re.findall(r"[a-z0-9]+", name.lower()) if len(w) >= 3 and w not in ("inc", "corp", "the", "and", "company", "group", "holdings", "international")]
         if ticker.lower().replace("-", "") in host.replace("-", "") or any(w in host.replace("-", "") for w in brand[:2]):
             s += 25
         else:
-            s -= 15
-        if re.search(r"(^|\.)(investors?|ir|investor-relations)\.", host) or re.search(r"/(investors?|investor-relations|ir)(/|$)", u.path, re.I):
+            continue  # a host that names neither the company nor its ticker is a third party (aggregator, data vendor)
+        if level == 0:
             s += 15
         root = f"{u.scheme}://{host}"
         m = re.search(r"^(.*?/(?:investors?|investor-relations|ir))(?:/|$)", u.path, re.I)
         if m and not re.search(r"(^|\.)(investors?|ir)\.", host):
             root += m.group(1) + ("/" if u.path[len(m.group(1)):].startswith("/") else "")
         score[root] = score.get(root, 0) + s
-    ranked = sorted(score, key=lambda k: -score[k])
+        tier[root] = min(tier.get(root, level), level)
+    ranked = sorted(score, key=lambda k: (tier[k], -score[k]))
     return [r for r in ranked if score[r] > 0]
 
 
@@ -885,8 +913,32 @@ def _exhibit_names(page, filing):
     return names
 
 
+def _drop_other_site_work(state, root):
+    """Forget unfinished discovery from a previously recorded site after the IR site changes.
+
+    Pages and maps are only ever queued for the current root's host, so pending work under another host
+    came from an earlier (wrong) site. Unstarted web documents found on those pages go too; stored
+    documents and SEC work are untouched. Returns the number of entries removed.
+    """
+    host = urllib.parse.urlparse(root).netloc.lower()
+    def other(url):
+        return bool(url) and urllib.parse.urlparse(url).netloc.lower() != host
+    removed = 0
+    for queue, field in (("pages", "url"), ("maps", "url"), ("documents", "source_page")):
+        for key, item in list(state["queues"][queue].items()):
+            if item.get("search") == "site-search" or item["status"] not in ACTIVE:
+                continue
+            if queue == "documents" and item.get("source") != "web":
+                continue
+            if other(item.get(field)):
+                del state["queues"][queue][key]
+                removed += 1
+    return removed
+
+
 def _enumerate_web(state, site, deadline, stats, sb, page_budget):
     root = site["ir_url"]
+    _drop_other_site_work(state, root)
     _enqueue(state, "pages", root, url=root)
     for search in ("quarterly results earnings", "financial information presentation supplement"):
         _enqueue(state, "maps", root + " " + search, url=root, search=search)
