@@ -830,7 +830,7 @@ async function agentLoop({ system, turns, tools = [], signal, onText, profile = 
   const p = FU_RESEARCH_RUNTIME.profile(profile), t0 = performance.now();
   const msgs = [{ role: "system", content: system + "\n\nResearch depth: " + p.instruction + ` Maximum ${p.maxClaims} checked claims; prioritize material claims.` }, ...conversationWindow(turns)];
   const spec = tools.map(t => ({ type: "function", function: { name: t.name, description: t.description, parameters: t.inputSchema || { type: "object", properties: {} } } }));
-  let calls = 0, tokens = 0, raw = "", forceFinal = false, answerStart = null;
+  let calls = 0, tokens = 0, providerCalls = 0, raw = "", forceFinal = false, answerStart = null;
   const progress = [];
   const finish = (report, assembled = null) => {
     if (answerStart != null) msgs.splice(answerStart);
@@ -840,29 +840,34 @@ async function agentLoop({ system, turns, tools = [], signal, onText, profile = 
   };
   const partial = reason => finish(researchPartial(raw, reason, progress));
   try {
-    for (let round = 0; round < p.maxCalls; round++) {
+    while (providerCalls < p.maxCalls) {
       abortCheck(signal);
       const remainingMs = Math.floor(p.maxMs - (performance.now() - t0)), remainingTokens = p.totalTokens - tokens;
       if (remainingMs < 1000) return partial("time_limit");
       if (remainingTokens < 1 || raw.length >= p.maxChars) return partial("output_limit");
-      const final = forceFinal || !!raw || !spec.length || round >= p.maxCalls - 2 || remainingTokens <= p.finalTokens * 2 || remainingMs <= p.requestMs + 3000;
+      const final = forceFinal || !!raw || !spec.length || providerCalls >= p.maxCalls - 2 || remainingTokens <= p.finalTokens * 2 || remainingMs <= p.requestMs + 3000;
       const maxTokens = Math.min(p.maxTokens, final ? remainingTokens : remainingTokens - p.finalTokens);
+      const remainingCalls = p.maxCalls - providerCalls - (final ? 0 : 1);
       if (final && !raw) msgs.push({ role: "system", content: "Synthesize your final answer now using the evidence collected. No more tool calls. State missing evidence and unresolved scope. Return one complete report JSON object; do not claim exhaustive research." });
       const requestSignal = typeof AbortSignal !== "undefined" && AbortSignal.timeout ? AbortSignal.any([...(signal ? [signal] : []), AbortSignal.timeout(remainingMs)]) : signal;
-      const r = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: msgs, tools: final ? undefined : spec, profile: p.id, round, maxTokens, remainingTokens: final ? remainingTokens : remainingTokens - p.finalTokens, timeoutMs: Math.min(p.requestMs, remainingMs) }), signal: requestSignal });
+      const r = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: msgs, tools: final ? undefined : spec, profile: p.id, round: providerCalls, remainingCalls, maxTokens, remainingTokens: final ? remainingTokens : remainingTokens - p.finalTokens, timeoutMs: Math.min(p.requestMs, remainingMs) }), signal: requestSignal });
       abortCheck(signal);
       if (!r.ok) { const body = await r.json().catch(() => ({})); if (!raw && !progress.length) throw { code: r.status === 429 ? "rate_limited" : r.status === 413 ? "too_large" : r.status === 403 ? "forbidden" : "upstream_error", message: body.error || r.statusText }; return partial("upstream_error"); }
       const d = await r.json(), choice = d.choices?.[0], m = choice?.message;
       abortCheck(signal);
+      // The server can try a primary and a fallback. Missing usage consumes both
+      // possible attempts, bounded by the allowance sent with this request.
+      const attempts = d.research?.providerCalls, attemptCap = Math.min(2, remainingCalls);
+      providerCalls += Number.isInteger(attempts) && attempts >= 1 && attempts <= attemptCap ? attempts : attemptCap;
       const charged = d.research?.chargedTokens ?? d.usage?.completion_tokens;
       tokens += Number.isInteger(charged) && charged > 0 ? charged : maxTokens;
       if (!m || (typeof m.content !== "string" && !m.tool_calls?.length)) return partial("upstream_error");
       if (m.tool_calls != null && !Array.isArray(m.tool_calls)) return partial("invalid_tool");
       if (m.tool_calls?.length) {
         // Validate every argument before any action. Even syntactically valid length-limited tool calls are inert.
-        if (choice.finish_reason === "length" || final || m.tool_calls.length > 12 || new Set(m.tool_calls.map(t => t.id)).size !== m.tool_calls.length) return partial("invalid_tool");
+        if (choice.finish_reason === "length" || final || m.tool_calls.length > 12 || new Set(m.tool_calls.map(t => t?.id)).size !== m.tool_calls.length) return partial("invalid_tool");
         const parsed = [];
-        try { for (const tc of m.tool_calls) { if (typeof tc.id !== "string" || !tc.id || (tc.type && tc.type !== "function") || typeof tc.function?.name !== "string" || typeof tc.function.arguments !== "string") throw new Error("Invalid tool call"); const args = JSON.parse(tc.function.arguments); if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Invalid arguments"); parsed.push(args); } } catch { return partial("invalid_tool"); }
+        try { for (const tc of m.tool_calls) { if (!tc || typeof tc.id !== "string" || !tc.id || (tc.type && tc.type !== "function") || typeof tc.function?.name !== "string" || typeof tc.function.arguments !== "string") throw new Error("Invalid tool call"); const args = JSON.parse(tc.function.arguments); if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Invalid arguments"); parsed.push(args); } } catch { return partial("invalid_tool"); }
         msgs.push({ role: "assistant", content: m.content || "", tool_calls: m.tool_calls });
         for (let i = 0; i < m.tool_calls.length; i++) {
           const tc = m.tool_calls[i], tool = tools.find(t => t.name === tc.function.name); let out;
@@ -1628,6 +1633,20 @@ function coFilings(body, tk) {
   draw();
 }
 function coEarnings(body, tk) {
+  const documents = el("div", { class: "co-ir-documents" });
+  body.append(documents);
+  const loadDocuments = async () => {
+    documents.replaceChildren(el("div", { class: "note", role: "status" }, "Loading investor relations documents…"));
+    try {
+      const ir = await getJSON(`ir/${tk}.json`);
+      documents.replaceChildren();
+      renderIrDocs(documents, tk, ir);
+    } catch {
+      documents.replaceChildren(el("div", { class: "note", role: "alert" }, "Could not load investor relations documents. ",
+        el("button", { class: "btn", onclick: loadDocuments }, "Retry")));
+    }
+  };
+  loadDocuments();
   const ers = earningsReactions(tk);
   const R = E?.releases?.[tk], N = E?.narratives?.[tk];
   if (R) {
@@ -1650,7 +1669,6 @@ function coEarnings(body, tk) {
   g.append(panel("Release log", null, el("div", { class: "scroll" }, t)));
   const ir = el("div", { class: "bd cover" },
     srcCard("Earnings press releases", "8-K Exhibit 99.1", "live", "Latest release text pulled from EDGAR when the 8-K lands, with highlights."),
-    srcCard("Investor relations site", (IR[tk] || "IR site").replace("https://", ""), "planned", "Decks, shareholder letters and event pages."),
     srcCard("Earnings call transcripts", "IR event pages", "planned", "Speaker-tagged transcripts, searchable and citable."),
     srcCard("News coverage", "News search", "live", "Recent articles, refreshed on a rolling schedule and summarized on the News tab."));
   g.append(panel("Sources for this company", IR[tk] ? el("a", { href: IR[tk], target: "_blank", rel: "noopener" }, "Open IR site ↗") : null, ir));
