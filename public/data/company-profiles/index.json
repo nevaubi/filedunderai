@@ -2,6 +2,8 @@
   "schema_version": 1,
   "tickers": [
     "AAPL",
+    "AMZN",
+    "GOOGL",
     "MSFT",
     "NVDA"
   ]

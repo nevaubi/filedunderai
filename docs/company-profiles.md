@@ -10,9 +10,9 @@ Regenerate it from the repository root:
 python scripts/generate_company_directory.py
 ```
 
-The generator reads `etl.universe.BY_TICKER` and `UNIVERSE`, and optionally copies known website/industry metadata from reviewed local profiles with matching ticker **and** CIK. It cannot change screener membership. The build ships the directory as a local fallback.
+The generator reads `etl.universe.BY_TICKER` and `UNIVERSE`, and optionally copies known website/industry metadata from reviewed local profiles with matching ticker **and** CIK. Pass `--fundamentals /path/to/meta/fundamentals.json` to include SEC industry descriptions from an already retrieved snapshot; ticker, registry name and sector must all match. The current manifest contains SEC industry descriptions for all 1,100 issuers. The runtime also accepts the current index’s SEC classification, and related-company ranking uses that shared classification when curated industry wording differs. It cannot change screener membership. The build ships the directory as a local fallback.
 
-Initial reviewed profiles are shipped for AAPL, MSFT and NVDA at `public/data/company-profiles/{TICKER}.json`. Their descriptions, current leadership, portraits and contextual images come from the official pages listed in each record. PDL adds separately attributed company metadata. No PDL pilot person record was substituted for official leadership.
+Reviewed profiles are shipped for AAPL, AMZN, GOOGL, MSFT and NVDA at `public/data/company-profiles/{TICKER}.json`. Their descriptions, current leadership, portraits and contextual images come from the official pages listed in each record. PDL adds separately attributed company metadata for the initial AAPL/MSFT/NVDA pilot. AMZN and GOOGL use official sources without additional paid calls. These five profiles contain 20 selected leaders, 17 sourced portrait links, and five contextual images; the lists are partial rosters, and image availability remains source-dependent. No PDL pilot person record was substituted for official leadership.
 
 ## Public profile contract
 

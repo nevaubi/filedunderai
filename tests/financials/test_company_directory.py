@@ -32,5 +32,18 @@ class CompanyDirectoryTests(unittest.TestCase):
         self.assertEqual(row['domain'],'apple.com')
         self.assertEqual(row['industry'],'Consumer electronics')
 
+    def test_stored_industry_requires_registry_identity_and_preserves_profile_precedence(self):
+        from scripts.generate_company_directory import build_directory
+        issuer = universe.BY_TICKER['AAPL']
+        filed = {'ticker':'AAPL', 'name':issuer['name'], 'sector':issuer['sector'], 'sic':'Electronic Computers'}
+        profile = {'ticker':'AAPL', 'cik':320193, 'industry':'Consumer electronics'}
+        row = next(c for c in build_directory(profiles={'AAPL':profile}, fundamentals={'AAPL':filed})['companies'] if c['ticker']=='AAPL')
+        self.assertEqual(row['sic_description'],'Electronic Computers')
+        self.assertEqual(row['industry'],'Consumer electronics')
+        self.assertEqual(row['coverage']['profile'],'available')
+        for change in ({'ticker':'OTHER'}, {'name':'Unrelated'}, {'sector':'Energy'}, {'sic':'3571'}):
+            row = next(c for c in build_directory(fundamentals={'AAPL':{**filed, **change}})['companies'] if c['ticker']=='AAPL')
+            self.assertNotIn('industry',row)
+
 if __name__ == '__main__':
     unittest.main()

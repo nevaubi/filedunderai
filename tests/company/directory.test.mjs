@@ -58,3 +58,19 @@ test('directory renders real links, filters results and resets pagination on sea
     assert.match(host.querySelector('[data-count]').textContent, /1–1/);
   } finally { h.close(); }
 });
+
+test('SEC industry descriptions remain searchable and prioritize actual industry peers without changing coverage', () => {
+  const h = setup();
+  try {
+    h.api.apply({ companies: [
+      { ticker: 'AAA', name: 'Alpha', cik: 1, sector: 'Information Technology', industry: 'Enterprise platforms', sic_description: 'Services-Prepackaged Software' },
+      { ticker: 'BBB', name: 'Beta', cik: 2, sector: 'Information Technology' },
+      { ticker: 'ZZZ', name: 'Zeta', cik: 3, sector: 'Information Technology', sic_description: 'Semiconductors' },
+    ] }, [{ ticker: 'BBB', sic: 'Services-Prepackaged Software', market_cap: 10 }, { ticker: 'ZZZ', market_cap: 1000 }]);
+    assert.equal(h.api.get('AAA').industry, 'Enterprise platforms');
+    assert.equal(h.api.get('BBB').industry, 'Services-Prepackaged Software');
+    assert.deepEqual(Array.from(h.api.query({ q: 'prepackaged' }), x => x.ticker), ['BBB', 'AAA']);
+    assert.deepEqual(Array.from(h.api.related('AAA'), x => x.ticker), ['BBB', 'ZZZ']);
+    assert.equal(h.api.get('AAA').screener_eligible, false);
+  } finally { h.close(); }
+});

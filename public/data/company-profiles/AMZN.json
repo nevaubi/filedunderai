@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "ticker": "AMZN",
+  "cik": 1018724,
+  "name": "Amazon",
+  "description": "Amazon operates businesses in shopping, cloud computing, AI, devices, entertainment, healthcare, and logistics. Its stores connect customers with products, while its operations network supports fulfillment and delivery. Amazon Web Services provides cloud infrastructure and services, including AI tools and custom chips. Consumer products include Alexa-enabled devices, Prime Video, Amazon MGM Studios, Amazon Music, Audible, and Twitch. Amazon also offers healthcare services through One Medical and Amazon Pharmacy. The company describes practical applications of AI across its shopping experiences, cloud services, and fulfillment network.",
+  "description_source": {
+    "name": "Amazon business overview",
+    "url": "https://www.aboutamazon.com/what-we-do",
+    "observed_at": "2026-11-05T14:47:29Z"
+  },
+  "source_url": "https://www.aboutamazon.com/what-we-do",
+  "website": "https://www.amazon.com/",
+  "industry": null,
+  "headquarters": "Puget Sound, Washington, and Arlington, Virginia, United States",
+  "founded": 1994,
+  "employees": null,
+  "leadership": [
+    {
+      "name": "Andy Jassy",
+      "role": "President and Chief Executive Officer",
+      "start_date": "2021-07",
+      "profile_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=be0a9875-4456-4f84-b4d9-ec2e4b97d1d8",
+      "source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=be0a9875-4456-4f84-b4d9-ec2e4b97d1d8",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:47:29Z",
+      "group": "Executive leadership",
+      "photo_url": "https://s2.q4cdn.com/299287126/files/images/new-headshots/Andy-Jassy.jpg",
+      "photo_source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=be0a9875-4456-4f84-b4d9-ec2e4b97d1d8",
+      "photo_credit": "Amazon",
+      "start_date_source_url": "https://www.sec.gov/Archives/edgar/data/1018724/000110465926041026/tm261382-1_def14a.htm",
+      "tenure_note": "The official source specifies the start month; no exact start day is recorded."
+    },
+    {
+      "name": "Brian T. Olsavsky",
+      "role": "Senior Vice President and Chief Financial Officer",
+      "start_date": "2015-06",
+      "profile_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=759d328e-1f4c-489c-8fc8-ceb5122b9ffa",
+      "source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=759d328e-1f4c-489c-8fc8-ceb5122b9ffa",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:47:29Z",
+      "group": "Executive leadership",
+      "photo_url": "https://s2.q4cdn.com/299287126/files/images/board/brianolsavsky-67_240x240.jpg",
+      "photo_source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=759d328e-1f4c-489c-8fc8-ceb5122b9ffa",
+      "photo_credit": "Amazon",
+      "start_date_source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=759d328e-1f4c-489c-8fc8-ceb5122b9ffa",
+      "tenure_note": "The official source specifies the start month; no exact start day is recorded."
+    },
+    {
+      "name": "Matt Garman",
+      "role": "Chief Executive Officer, Amazon Web Services",
+      "start_date": "2024-06",
+      "profile_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=80f6622c-efcb-4cce-94a7-591fb3d9a335",
+      "source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=80f6622c-efcb-4cce-94a7-591fb3d9a335",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:47:29Z",
+      "group": "Executive leadership",
+      "photo_url": "https://s2.q4cdn.com/299287126/files/images/officers/2024/matt-garman-9255_new-1.jpg",
+      "photo_source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=80f6622c-efcb-4cce-94a7-591fb3d9a335",
+      "photo_credit": "Amazon",
+      "start_date_source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=80f6622c-efcb-4cce-94a7-591fb3d9a335",
+      "tenure_note": "The official source specifies the start month; no exact start day is recorded."
+    },
+    {
+      "name": "Douglas J. Herrington",
+      "role": "Chief Executive Officer, Worldwide Amazon Stores",
+      "start_date": "2022-07",
+      "profile_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=4d8fda8f-d06c-433d-8693-5b7dba137ffa",
+      "source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=4d8fda8f-d06c-433d-8693-5b7dba137ffa",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:47:29Z",
+      "group": "Executive leadership",
+      "photo_url": "https://s2.q4cdn.com/299287126/files/images/officers/Doug-Herrington.jpg",
+      "photo_source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=4d8fda8f-d06c-433d-8693-5b7dba137ffa",
+      "photo_credit": "Amazon",
+      "start_date_source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=4d8fda8f-d06c-433d-8693-5b7dba137ffa",
+      "tenure_note": "The official source specifies the start month; no exact start day is recorded."
+    }
+  ],
+  "images": [
+    {
+      "url": "https://assets.aboutamazon.com/dims4/default/544c9e8/2147483647/strip/true/crop/3000x1689%2B0%2B3/resize/2640x1486%21/quality/90/?url=https%3A%2F%2Fassets.aboutamazon.com%2F1f%2F0a%2F689055f34393a1ee357aedb7d9c3%2Fhq1-hero-2550px.jpg",
+      "source_url": "https://www.aboutamazon.com/news/amazon-offices/amazon-headquarters-seattle-photo-tour",
+      "title": "The Spheres at Amazon’s Puget Sound headquarters",
+      "caption": "The Spheres illuminated at night with Seattle buildings behind them, from Amazon’s official headquarters photo tour.",
+      "kind": "Company campus",
+      "credit": "Amazon / About Amazon",
+      "published_at": "2023-07-25",
+      "observed_at": "2026-11-05T14:47:29Z"
+    }
+  ],
+  "sources": [
+    {
+      "name": "Amazon business overview",
+      "url": "https://www.aboutamazon.com/what-we-do",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    {
+      "name": "Amazon corporate offices",
+      "url": "https://www.aboutamazon.com/workplace/corporate-offices",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    {
+      "name": "Amazon Puget Sound headquarters photo tour",
+      "url": "https://www.aboutamazon.com/news/amazon-offices/amazon-headquarters-seattle-photo-tour",
+      "observed_at": "2026-11-05T14:47:29Z",
+      "published_at": "2023-07-25"
+    },
+    {
+      "name": "Amazon 2026 proxy statement",
+      "url": "https://www.sec.gov/Archives/edgar/data/1018724/000110465926041026/tm261382-1_def14a.htm",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    {
+      "name": "Andy Jassy official biography",
+      "url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=be0a9875-4456-4f84-b4d9-ec2e4b97d1d8",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    {
+      "name": "Brian T. Olsavsky official biography",
+      "url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=759d328e-1f4c-489c-8fc8-ceb5122b9ffa",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    {
+      "name": "Matt Garman official biography",
+      "url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=80f6622c-efcb-4cce-94a7-591fb3d9a335",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    {
+      "name": "Douglas J. Herrington official biography",
+      "url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=4d8fda8f-d06c-433d-8693-5b7dba137ffa",
+      "observed_at": "2026-11-05T14:47:29Z"
+    }
+  ],
+  "updated_at": "2026-11-05T14:47:29Z",
+  "field_sources": {
+    "description": {
+      "name": "Amazon business overview",
+      "url": "https://www.aboutamazon.com/what-we-do",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    "website": {
+      "name": "Amazon business overview",
+      "url": "https://www.aboutamazon.com/what-we-do",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    "headquarters": {
+      "name": "Amazon corporate offices",
+      "url": "https://www.aboutamazon.com/workplace/corporate-offices",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    "founded": {
+      "name": "Amazon Puget Sound headquarters photo tour",
+      "url": "https://www.aboutamazon.com/news/amazon-offices/amazon-headquarters-seattle-photo-tour",
+      "observed_at": "2026-11-05T14:47:29Z",
+      "published_at": "2023-07-25"
+    }
+  },
+  "coverage": {
+    "status": "official_sources",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "available",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T14:47:29Z",
+    "leadership_scope": "Selected current leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "description": "2026-11-05T14:47:29Z",
+      "website": "2026-11-05T14:47:29Z",
+      "headquarters": "2026-11-05T14:47:29Z",
+      "founded": "2026-11-05T14:47:29Z",
+      "leadership": "2026-11-05T14:47:29Z",
+      "images": "2026-11-05T14:47:29Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  }
+}

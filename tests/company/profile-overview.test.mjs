@@ -110,3 +110,17 @@ test('official portraits retain attribution while professional-profile counts st
     assert.ok(!h.w.document.querySelector('.cp-facts').textContent.includes('provider estimates'));
   } finally { h.close(); }
 });
+
+test('recent company context selects the newest published articles without reordering the source data', () => {
+  const h = setup();
+  try {
+    const news = [
+      { title: 'Older report', url: 'https://alpha.example/older', date: '2026-10-01' },
+      { title: 'Undated report', url: 'https://alpha.example/undated', date: 'invalid' },
+      { title: 'Latest report', url: 'https://alpha.example/latest', published_at: '2026-11-04T12:00:00Z' },
+    ];
+    h.api.render(h.w.document.querySelector('main'), { ticker: 'AAA', company: { name: 'Alpha', filings: [] }, snapshot: {}, enrichment: null, news, helpers: {} });
+    assert.deepEqual(Array.from(h.w.document.querySelectorAll('.cp-context-card h3'), e => e.textContent), ['Latest report', 'Older report', 'Undated report']);
+    assert.equal(news[0].title, 'Older report');
+  } finally { h.close(); }
+});

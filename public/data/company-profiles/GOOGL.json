@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "ticker": "GOOGL",
+  "cik": 1652044,
+  "name": "Alphabet",
+  "description": "Alphabet is the parent company of Google and businesses such as Waymo, Verily, and Wing. Google Services includes Search, YouTube, Android, Chrome, Maps, Photos, Google Play, and Pixel devices, with revenue from advertising, subscriptions, apps, and hardware. Google Cloud provides computing infrastructure, AI tools, security, data services, and Workspace collaboration products for organizations. Other Bets spans activities including autonomous transportation, healthcare technology, internet access, and investment businesses. Alphabet also funds shared AI research and development.",
+  "description_source": {
+    "name": "Alphabet financial-statement glossary and business segments",
+    "url": "https://abc.xyz/investor/faqs-and-general-information/default.aspx",
+    "observed_at": "2026-11-05T14:47:29Z"
+  },
+  "source_url": "https://abc.xyz/investor/faqs-and-general-information/default.aspx",
+  "website": "https://abc.xyz/",
+  "industry": null,
+  "headquarters": "Mountain View, California, United States",
+  "founded": 2015,
+  "employees": null,
+  "leadership": [
+    {
+      "name": "Sundar Pichai",
+      "role": "Chief Executive Officer, Alphabet and Google",
+      "start_date": "2019-12-03",
+      "profile_url": "https://blog.google/authors/sundar-pichai/",
+      "source_url": "https://blog.google/authors/sundar-pichai/",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:47:29Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://blog.google/alphabet/letter-from-larry-and-sergey/",
+      "photo_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/sundar-208x208.width-400.format-webp.webp",
+      "photo_source_url": "https://blog.google/authors/sundar-pichai/",
+      "photo_credit": "Source: Google",
+      "tenure_note": "The start date refers to the Alphabet CEO role. Alphabet’s proxy states that he became Google CEO in October 2015."
+    },
+    {
+      "name": "Anat Ashkenazi",
+      "role": "Senior Vice President and Chief Financial Officer, Alphabet and Google",
+      "start_date": "2024-07-31",
+      "profile_url": "https://s206.q4cdn.com/479360582/files/doc_events/2026/Oct/28/2026_Q3_Earnings_Transcript.pdf",
+      "source_url": "https://s206.q4cdn.com/479360582/files/doc_events/2026/Oct/28/2026_Q3_Earnings_Transcript.pdf",
+      "source_name": "Alphabet third-quarter 2026 earnings-call transcript",
+      "observed_at": "2026-11-05T14:47:29Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://abc.xyz/assets/7b/19/1cfce14d4a09a8aa9ad8580219b1/pro012701-1-alphabet-courtesy-edgar.pdf",
+      "photo_status": "unavailable",
+      "photo_note": "The current role was verified from an official source; no portrait URL was verified in this snapshot."
+    },
+    {
+      "name": "Ruth Porat",
+      "role": "President and Chief Investment Officer, Alphabet and Google",
+      "start_date": "2023-09-01",
+      "profile_url": "https://blog.google/authors/ruth-porat/",
+      "source_url": "https://blog.google/authors/ruth-porat/",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:47:29Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://abc.xyz/assets/05/5c/f7c1724bc7498c0d6e95e1e5f4c1/b905fa1d665bd36ef48208dde1b90967.pdf",
+      "photo_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/Ruth_Porat_1_VDuadKa.width-400.format-webp.webp",
+      "photo_source_url": "https://blog.google/authors/ruth-porat/",
+      "photo_credit": "Source: Google"
+    },
+    {
+      "name": "Thomas Kurian",
+      "role": "Senior Vice President and Chief Executive Officer, Google Cloud",
+      "start_date": "2019",
+      "profile_url": "https://s206.q4cdn.com/479360582/files/doc_events/2026/Oct/28/2026_Q3_Earnings_Transcript.pdf",
+      "source_url": "https://s206.q4cdn.com/479360582/files/doc_events/2026/Oct/28/2026_Q3_Earnings_Transcript.pdf",
+      "source_name": "Alphabet third-quarter 2026 earnings-call transcript",
+      "observed_at": "2026-11-05T14:47:29Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://cloud.google.com/blog/topics/inside-google-cloud/transitioning-google-cloud-after-three-great-years",
+      "photo_status": "unavailable",
+      "photo_note": "The current role was verified from an official source; no portrait URL was verified in this snapshot.",
+      "tenure_note": "The year refers to the Google Cloud CEO role. The official transition announcement specifies early 2019; no exact start day is recorded."
+    }
+  ],
+  "images": [
+    {
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/da/a1/5aaa5aa246418a48046bc16adeff/us-mtv-43.jpg%3Ds543-fcrop64%3D1%2C00003811ffffc7ef-rw",
+      "source_url": "https://about.google/company-info/locations/",
+      "title": "Googleplex in Mountain View",
+      "caption": "Google’s Mountain View Googleplex campus, as identified on its official office-locations page.",
+      "kind": "Company campus",
+      "credit": "Source: Google",
+      "observed_at": "2026-11-05T14:47:29Z"
+    }
+  ],
+  "sources": [
+    {
+      "name": "Alphabet financial-statement glossary and business segments",
+      "url": "https://abc.xyz/investor/faqs-and-general-information/default.aspx",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    {
+      "name": "Alphabet certificate of incorporation",
+      "url": "https://abc.xyz/investor/board-and-governance/certificate-of-incorporation/default.aspx",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    {
+      "name": "Alphabet Form SD, principal executive offices",
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000055/googformsd-2025.htm",
+      "observed_at": "2026-11-05T14:47:29Z",
+      "published_at": "2026-05-29"
+    },
+    {
+      "name": "Alphabet 2025 proxy statement, executive biographies and appointment dates",
+      "url": "https://abc.xyz/assets/7b/19/1cfce14d4a09a8aa9ad8580219b1/pro012701-1-alphabet-courtesy-edgar.pdf",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    {
+      "name": "Alphabet third-quarter 2026 earnings-call transcript",
+      "url": "https://s206.q4cdn.com/479360582/files/doc_events/2026/Oct/28/2026_Q3_Earnings_Transcript.pdf",
+      "observed_at": "2026-11-05T14:47:29Z",
+      "published_at": "2026-10-28"
+    },
+    {
+      "name": "Alphabet and Google CEO transition",
+      "url": "https://blog.google/alphabet/letter-from-larry-and-sergey/",
+      "observed_at": "2026-11-05T14:47:29Z",
+      "published_at": "2019-12-03"
+    },
+    {
+      "name": "Alphabet president and chief investment officer appointment",
+      "url": "https://abc.xyz/assets/05/5c/f7c1724bc7498c0d6e95e1e5f4c1/b905fa1d665bd36ef48208dde1b90967.pdf",
+      "observed_at": "2026-11-05T14:47:29Z",
+      "published_at": "2023-07-25"
+    },
+    {
+      "name": "Google Cloud leadership transition",
+      "url": "https://cloud.google.com/blog/topics/inside-google-cloud/transitioning-google-cloud-after-three-great-years",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    {
+      "name": "Google official office locations",
+      "url": "https://about.google/company-info/locations/",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    {
+      "name": "Sundar Pichai official biography",
+      "url": "https://blog.google/authors/sundar-pichai/",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    {
+      "name": "Ruth Porat official biography",
+      "url": "https://blog.google/authors/ruth-porat/",
+      "observed_at": "2026-11-05T14:47:29Z"
+    }
+  ],
+  "updated_at": "2026-11-05T14:47:29Z",
+  "field_sources": {
+    "description": {
+      "name": "Alphabet financial-statement glossary and business segments",
+      "url": "https://abc.xyz/investor/faqs-and-general-information/default.aspx",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    "website": {
+      "name": "Alphabet financial-statement glossary and business segments",
+      "url": "https://abc.xyz/investor/faqs-and-general-information/default.aspx",
+      "observed_at": "2026-11-05T14:47:29Z"
+    },
+    "headquarters": {
+      "name": "Alphabet Form SD, principal executive offices",
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000055/googformsd-2025.htm",
+      "observed_at": "2026-11-05T14:47:29Z",
+      "published_at": "2026-05-29"
+    },
+    "founded": {
+      "name": "Alphabet certificate of incorporation",
+      "url": "https://abc.xyz/investor/board-and-governance/certificate-of-incorporation/default.aspx",
+      "observed_at": "2026-11-05T14:47:29Z"
+    }
+  },
+  "coverage": {
+    "status": "official_sources",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "available",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T14:47:29Z",
+    "leadership_scope": "Selected current leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "description": "2026-11-05T14:47:29Z",
+      "website": "2026-11-05T14:47:29Z",
+      "headquarters": "2026-11-05T14:47:29Z",
+      "founded": "2026-11-05T14:47:29Z",
+      "leadership": "2026-11-05T14:47:29Z",
+      "images": "2026-11-05T14:47:29Z"
+    },
+    "portraits": "partial; two of four selected leaders have official portrait links"
+  },
+  "founded_note": "2015 refers to Alphabet Inc.; Google’s operating business predates the holding company."
+}

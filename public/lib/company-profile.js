@@ -97,7 +97,7 @@
     const leadership = card('Leadership', null, 'cp-leadership');
     const related = card('Related companies', node('a', { href: '#companies', class: 'cp-text-button' }, 'Explore all →'), 'cp-related');
     rootNode.append(node('div', { class: 'cp-leadership-grid' }, leadership, related));
-    const recent = card('Recent context', button('All coverage', 'news'), 'cp-recent'); rootNode.append(recent);
+    const recent = card('Company context', button('All coverage', 'news'), 'cp-recent'); rootNode.append(recent);
 
     function financialTable() {
       const lq = model?.latestQ?.(), annual = model?.latestA?.();
@@ -195,7 +195,8 @@
         leadership.append(node('p', { class: 'cp-footnote' }, (profile.coverage?.leadership_scope ? profile.coverage.leadership_scope + ' ' : '') + 'Grouped by role; reporting relationships are shown only when explicitly sourced. Tenure runs from the reported role start to the source observation date.' + (profile.updated_at ? ' Profiles checked ' + dateLabel(profile.updated_at) + '.' : ' Observation dates are unavailable.')));
       }
       const validImages = (profile?.images || []).filter(image => safeUrl(image.url) && safeUrl(image.source_url)).slice(0, 3);
-      const news = (options.news || []).filter(item => safeUrl(item.url) && item.title).slice(0, 4);
+      const publicationTime = item => Date.parse(item.published_at || item.date || '') || 0;
+      const news = (options.news || []).filter(item => safeUrl(item.url) && item.title).sort((a, b) => publicationTime(b) - publicationTime(a)).slice(0, 4);
       const context = node('div', { class: 'cp-context-grid' });
       validImages.forEach(image => {
         const picture = node('img', { src: safeUrl(image.url), alt: image.caption || image.title || name, loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer' });
