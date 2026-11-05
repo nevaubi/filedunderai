@@ -286,6 +286,12 @@ def extract_text(body, ext, deadline=None):
                 except Exception as e:
                     pages.append("")
                     errors.append(f"page:{i + 1}:{str(e)[:120]}")
+        # Some publisher PDF endpoints render a password screen as a valid PDF.
+        # Match the whole known template so an article quoting its notice stays valid.
+        document_text = " ".join(" ".join(pages).split())
+        if re.fullmatch(r"(?:News Release Archive )?This site is not available for public viewing\. "
+                        r"Password:? Submit(?: https?://\S+)?", document_text, re.I):
+            raise ValueError("PDF is an access-restricted placeholder")
         return _text_result("pages", pages, limits, errors)
     if ext in (".xlsx", ".xlsm", ".xls"):
         sheets, cell_budget, budget_exhausted = {}, WORKBOOK_MAX_CELLS, False
@@ -966,7 +972,19 @@ def _repair_dates(sb, ticker, rows):
     for row in rows:
         if row.get("published"):
             continue
-        match = re.search(r"sec\.gov/Archives/edgar/data/\d+/(\d{18})/", row.get("url") or "", re.I)
+        try:
+            source = urllib.parse.urlsplit(row.get("url") or "")
+            if (source.scheme not in ("http", "https") or source.hostname not in ("sec.gov", "www.sec.gov")
+                    or source.username is not None or source.password is not None):
+                continue
+            if source.port not in (None, 443 if source.scheme == "https" else 80):
+                continue
+            path = urllib.parse.unquote(source.path)
+        except (TypeError, ValueError):
+            continue
+        if "\\" in path or any(part in (".", "..") for part in path.split("/")):
+            continue
+        match = re.match(r"^/Archives/edgar/data/[0-9]+/([0-9]{18})/[^/]", path)
         published = dates.get(match.group(1)) if match else None
         if published:
             dt.date.fromisoformat(published)

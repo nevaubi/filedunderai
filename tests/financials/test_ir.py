@@ -98,7 +98,54 @@ def existing(sb, url, text=True):
     return did
 
 
+def pdf_document(lines):
+    """A tiny real PDF, keeping parser regressions independent of PDF writer libraries."""
+    stream = b'BT /F1 12 Tf 50 750 Td 16 TL\n'
+    for line in lines:
+        escaped = line.replace('\\', '\\\\').replace('(', '\\(').replace(')', '\\)')
+        stream += b'(' + escaped.encode('ascii') + b') Tj T*\n'
+    stream += b'ET\n'
+    objects = [
+        b'<< /Type /Catalog /Pages 2 0 R >>',
+        b'<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+        b'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>',
+        b'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+        f'<< /Length {len(stream)} >>\nstream\n'.encode() + stream + b'endstream',
+    ]
+    body, offsets = b'%PDF-1.4\n', [0]
+    for number, obj in enumerate(objects, 1):
+        offsets.append(len(body))
+        body += f'{number} 0 obj\n'.encode() + obj + b'\nendobj\n'
+    start = len(body)
+    body += f'xref\n0 {len(offsets)}\n0000000000 65535 f \n'.encode()
+    body += b''.join(f'{offset:010} 00000 n \n'.encode() for offset in offsets[1:])
+    return body + f'trailer\n<< /Size {len(offsets)} /Root 1 0 R >>\nstartxref\n{start}\n%%EOF\n'.encode()
+
+
 class ExtractionTests(unittest.TestCase):
+    def test_password_placeholder_pdf_is_not_verified_or_published_as_text(self):
+        raw = pdf_document(['News Release Archive', 'This site is not available for public viewing.',
+                            'Password Submit', 'https://vylor.mediaroom.com/index.php?s=2469&item=122500'])
+        with self.assertRaisesRegex(ValueError, 'access-restricted placeholder'):
+            ir.extract_text(raw, '.pdf')
+        sb, outcomes = Store(), {}
+        url = 'https://ir.example.test/earnings.pdf'
+        ir.store_document(sb, 'TEST', url, raw, '.pdf', 'Earnings', '', set(), outcomes=outcomes, log=lambda _: None)
+        row = sb.rows[ir.doc_id(url)]
+        self.assertIsNone(row['text_path'])
+        self.assertIsNone(row['extracted_at'])
+        self.assertEqual(outcomes[row['id']]['status'], 'failed')
+        self.assertFalse(outcomes[row['id']]['nonempty'])
+        self.assertEqual(sb.objects['ir', row['storage_path']], raw)
+
+    def test_pdf_article_quoting_access_notice_remains_valid(self):
+        raw = pdf_document(['Quarterly results: Revenue was $42 million.',
+                            'This site is not available for public viewing.', 'Password Submit',
+                            'The old archive displayed the notice above before launch.'])
+        result = ir.extract_text(raw, '.pdf')
+        self.assertEqual(result['extraction']['status'], 'verified')
+        self.assertIn('Revenue was $42 million.', result['pages'][0])
+
     def test_csv_quoted_multiline_coordinates_and_precision(self):
         result = ir.extract_text(b'Name,Value,Note\n"Revenue, net",1.234567890123,"line one\nline two"\n,,\n', '.csv')
         self.assertEqual(result['sheets']['csv'][1], ['Revenue, net', '1.234567890123', 'line one\nline two'])
@@ -352,6 +399,51 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(sb.rows[yes]['published'], '2026-10-02')
         self.assertIsNone(sb.rows[no].get('published'))
 
+    def test_repair_dates_accepts_only_parsed_sec_archive_urls(self):
+        archive = '/Archives/edgar/data/1/000000000126000001/ex99.htm'
+        for url in ('https://www.sec.gov' + archive, 'http://sec.gov' + archive + '?download=1',
+                    'https://www.sec.gov:443' + archive, 'http://sec.gov:80' + archive,
+                    'https://WWW.SEC.GOV' + archive + '#results'):
+            with self.subTest(url=url):
+                sb = Store()
+                row = {'id': 'document', 'ticker': 'TEST', 'url': url, 'title': 'Earnings'}
+                with patch.object(sb, 'select', return_value=[{'accession': '0000000001-26-000001', 'filed': '2026-10-02'}]):
+                    self.assertEqual(ir._repair_dates(sb, 'TEST', [row]), 1)
+                self.assertEqual(sb.rows['document']['published'], '2026-10-02')
+                self.assertEqual(sb.rows['document']['url'], url)
+
+    def test_repair_dates_rejects_lookalikes_embedded_urls_and_invalid_paths(self):
+        archive = '/Archives/edgar/data/1/000000000126000001/ex99.htm'
+        urls = ('https://notsec.gov' + archive,
+                'https://sec.gov.evil.example' + archive,
+                'https://evil.example/?x=sec.gov' + archive,
+                'https://evil.example/#https://sec.gov' + archive,
+                'https://sec.gov@evil.example' + archive,
+                'https://evil.example/sec.gov' + archive,
+                'https://www.sec.gov/other' + archive,
+                'https://www.sec.gov' + archive.replace('/Archives/', '/archives/'),
+                'https://www.sec.gov' + archive.replace('/ex99.htm', '/../other.htm'),
+                'https://www.sec.gov' + archive.replace('/ex99.htm', '/%2e%2e/other.htm'),
+                'https://www.sec.gov' + archive.replace('/ex99.htm', '/' + chr(92) + '..' + chr(92) + 'other.htm'),
+                'https://www.sec.gov' + archive.replace('/ex99.htm', '/%5c..%5cother.htm'),
+                'https://www.sec.gov:bad' + archive,
+                'https://www.sec.gov:8443' + archive,
+                'https://www.sec.gov:65536' + archive,
+                'https://www.sec.gov:80' + archive,
+                'http://www.sec.gov:443' + archive,
+                'https://user@www.sec.gov' + archive,
+                'ftp://www.sec.gov' + archive,
+                '//www.sec.gov' + archive,
+                'https://[invalid', '', None)
+        for url in urls:
+            with self.subTest(url=url):
+                sb = Store()
+                row = {'id': 'document', 'ticker': 'TEST', 'url': url}
+                with patch.object(sb, 'select', return_value=[{'accession': '0000000001-26-000001', 'filed': '2026-10-02'}]):
+                    self.assertEqual(ir._repair_dates(sb, 'TEST', [row]), 0)
+                self.assertIsNone(row.get('published'))
+                self.assertEqual(sb.writes, [])
+
     def test_shared_client_is_not_mutated_with_worker_lease(self):
         sb = Store()
         with self.providers():
@@ -462,18 +554,106 @@ class PipelineTests(unittest.TestCase):
             ir.process_company(sb, 'TEST', 'Test', 1)
         self.assertEqual(sb.writes, [])
 
-    def test_incremental_coverage_reuses_prior_status_without_500_manifest_reads(self):
-        sb = Store(); existing(sb, 'https://ir.example.test/q1.csv')
-        sb.json['meta/coverage_ir.json'] = {'companies':{'EMPTY':{'coverage':{'status':'complete','total_documents':0}}}}
+    def coverage_snapshot(self):
+        return {
+            'generated':'2026-11-01T10:00:00Z',
+            'kpi_counts_as_of':'2026-10-31T09:00:00Z',
+            'segment_counts_as_of':'2026-10-30T08:00:00Z',
+            'summary':{'companies':2, 'documents':1, 'bytes':100, 'kpis':227953, 'kpi_values':3944368,
+                       'companies_with_docs':1, 'companies_with_kpis':2, 'companies_with_segments':1, 'segment_tables':1},
+            'companies':{
+                'TEST':{'docs':1, 'bytes':100, 'types':{'release':1}, 'kpis':2, 'kpi_values':3,
+                        'segment_tables':1, 'segment_ties':1, 'coverage':{'status':'unverified','total_documents':1}},
+                'EMPTY':{'docs':0, 'bytes':0, 'types':{}, 'kpis':227951, 'kpi_values':3944365,
+                         'segment_tables':0, 'segment_ties':0, 'coverage':{'status':'complete','total_documents':0},
+                         'documents_as_of':'2026-11-01T10:00:00Z', 'custom_note':'preserve this'}
+            }
+        }
+
+    def test_incremental_coverage_is_independent_of_millions_of_kpi_rows(self):
+        sb = Store(); sb.json['meta/coverage_ir.json'] = self.coverage_snapshot()
+        before = copy.deepcopy(sb.json['meta/coverage_ir.json']); queries = []
+        def select(table, query=''):
+            queries.append((table, query))
+            if table != 'ir_documents' or 'ticker=eq.TEST' not in query:
+                raise AssertionError('No KPI or unfiltered document scan is permitted')
+            return [{'ticker':'TEST','doc_type':'release','bytes':200}, {'ticker':'TEST','doc_type':'supplement','bytes':300}]
         def get_json(path):
-            if path.startswith('ir/'):
-                raise AssertionError('rotation must not read per-company manifests')
+            if path != 'meta/coverage_ir.json':
+                raise AssertionError('No manifest or segment refresh belongs in an incremental IR update')
             return copy.deepcopy(sb.json.get(path))
-        sb.get_json = get_json
+        sb.select, sb.get_json = select, get_json
         with patch('etl.universe.UNIVERSE', [('TEST',), ('EMPTY',)]):
-            kpitools.build_index(sb, coverage_updates={'TEST':{'status':'partial','total_documents':1}})
-        self.assertEqual(sb.json['meta/coverage_ir.json']['companies']['TEST']['coverage']['status'], 'partial')
-        self.assertEqual(sb.json['meta/coverage_ir.json']['companies']['EMPTY']['coverage']['status'], 'complete')
+            summary = kpitools.build_index(sb, coverage_updates={'TEST':{'status':'partial','total_documents':2}})
+        result = sb.json['meta/coverage_ir.json']
+        self.assertEqual(queries, [('ir_documents','select=ticker,doc_type,bytes&ticker=eq.TEST')])
+        self.assertEqual(result['companies']['TEST']['types'], {'release':1,'supplement':1})
+        self.assertEqual(result['companies']['TEST']['docs'], 2)
+        self.assertEqual(result['companies']['TEST']['bytes'], 500)
+        self.assertEqual(result['companies']['TEST']['kpis'], 2)
+        self.assertEqual(result['companies']['TEST']['kpi_values'], 3)
+        self.assertEqual(result['companies']['TEST']['segment_tables'], 1)
+        self.assertEqual(result['companies']['EMPTY'], before['companies']['EMPTY'])
+        self.assertEqual(result['kpi_counts_as_of'], '2026-10-31T09:00:00Z')
+        self.assertEqual(result['segment_counts_as_of'], '2026-10-30T08:00:00Z')
+        self.assertEqual(summary['kpis'], 227953)
+        self.assertEqual(summary['kpi_values'], 3944368)
+        self.assertEqual(summary['documents'], 2)
+        self.assertEqual(summary['bytes'], 500)
+
+    def test_incremental_coverage_missing_or_incomplete_prior_fails_before_any_scan(self):
+        valid = self.coverage_snapshot()
+        missing_company = copy.deepcopy(valid); del missing_company['companies']['EMPTY']
+        missing_count = copy.deepcopy(valid); del missing_count['companies']['TEST']['kpi_values']
+        inconsistent = copy.deepcopy(valid); inconsistent['summary']['kpi_values'] = 0
+        for prior in (None, {}, missing_company, missing_count, inconsistent):
+            with self.subTest(prior=prior):
+                sb = Store(); sb.json['meta/coverage_ir.json'] = prior
+                sb.select = lambda *args: (_ for _ in ()).throw(AssertionError('Do not scan to repair an incomplete snapshot'))
+                with patch('etl.universe.UNIVERSE', [('TEST',), ('EMPTY',)]), self.assertRaisesRegex(ValueError, 'prior|snapshot'):
+                    kpitools.build_index(sb, coverage_updates={'TEST':{'status':'partial','total_documents':1}})
+                self.assertEqual(sb.writes, [])
+                self.assertEqual(sb.json['meta/coverage_ir.json'], prior)
+
+    def test_incremental_legacy_asof_fallback_does_not_advance_on_later_runs(self):
+        sb = Store(); prior = self.coverage_snapshot()
+        del prior['kpi_counts_as_of']; del prior['segment_counts_as_of']
+        sb.json['meta/coverage_ir.json'] = prior
+        sb.select = lambda *args: (_ for _ in ()).throw(AssertionError('Empty update must issue no relational query'))
+        with patch('etl.universe.UNIVERSE', [('TEST',), ('EMPTY',)]):
+            kpitools.build_index(sb, coverage_updates={})
+            kpitools.build_index(sb, coverage_updates={})
+        result = sb.json['meta/coverage_ir.json']
+        self.assertEqual(result['kpi_counts_as_of'], '2026-11-01T10:00:00Z')
+        self.assertEqual(result['segment_counts_as_of'], '2026-11-01T10:00:00Z')
+        self.assertEqual(result['summary']['kpi_values'], 3944368)
+
+    def test_incremental_coverage_marks_document_count_mismatch_unverified(self):
+        sb = Store(); sb.json['meta/coverage_ir.json'] = self.coverage_snapshot()
+        sb.select = lambda table, query: []
+        with patch('etl.universe.UNIVERSE', [('TEST',), ('EMPTY',)]):
+            kpitools.build_index(sb, coverage_updates={'TEST':{'status':'complete','total_documents':99}})
+        company = sb.json['meta/coverage_ir.json']['companies']['TEST']
+        self.assertEqual(company['docs'], 0)
+        self.assertEqual(company['coverage']['status'], 'unverified')
+        self.assertIn('manifest row count differs from stored documents', company['coverage']['limits'])
+
+    def test_explicit_full_coverage_rebuild_still_counts_source_rows(self):
+        sb = Store()
+        sb.json['meta/segments.json'] = {'generated':'2026-10-30T08:00:00Z','companies':{'TEST':{'tables':2,'recon_ok':1}}}
+        rows = {'ir_documents':[{'ticker':'TEST','doc_type':'release','bytes':100}],
+                'kpi_definitions':[{'ticker':'TEST','kpi_id':'revenue'}],
+                'kpi_values':[{'ticker':'TEST'},{'ticker':'TEST'}]}
+        sb.select = lambda table, query='':copy.deepcopy(rows.get(table, []))
+        with patch('etl.universe.UNIVERSE', [('TEST',), ('EMPTY',)]):
+            summary = kpitools.build_index(sb)
+        self.assertEqual(summary['documents'], 1)
+        self.assertEqual(summary['kpis'], 1)
+        self.assertEqual(summary['kpi_values'], 2)
+        self.assertEqual(summary['segment_tables'], 2)
+        self.assertEqual(summary['companies'], 2)
+        self.assertEqual(sb.json['meta/coverage_ir.json']['segment_counts_as_of'], '2026-10-30T08:00:00Z')
+        self.assertTrue(sb.json['meta/coverage_ir.json']['kpi_counts_as_of'])
 
     def test_rotation_skips_aggregate_work_after_deadline(self):
         sb = Store()
@@ -490,21 +670,23 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(after['coverage']['scope'], before['coverage']['scope'])
 
     def test_new_sec_filings_are_polled_while_historical_index_is_blocked(self):
-        sb = Store()
-        today = dt.date.today()
-        old = {'a':'0000000001-26-000001','f':'8-K','d':today.isoformat(),'p':'report.htm','i':'7.01'}
-        with self.providers(secdata=sub([old])), patch.object(ir, '_sec_request', side_effect=RuntimeError('historical index down')):
-            for _ in range(3):
-                ir.process_company(sb, 'TEST', 'Test', 1, web=False)
-        actual_date = dt.date
-        class Tomorrow(actual_date):
+        sb = Store(); actual_date = dt.date
+        day = [actual_date(2026, 11, 4)]
+        class ClockDate(actual_date):
             @classmethod
             def today(cls):
-                return today + dt.timedelta(days=1)
-        new = dict(old, a='0000000001-26-000002', d=Tomorrow.today().isoformat())
-        index = '<table><tr><td>1</td><td>Slides</td><td><a href="ex99.htm">Slides</a></td><td>EX-99.1</td></tr></table>'
-        with self.providers(secdata=sub([new, old])), patch.object(ir.dt, 'date', Tomorrow), patch.object(ir, '_sec_request', side_effect=lambda url, **kw: b'<html>Revenue 42</html>' if kw.get('raw') else index):
-            result = ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+                return day[0]
+        stamp = lambda: day[0].isoformat() + 'T12:00:00Z'
+        old = {'a':'0000000001-26-000001','f':'8-K','d':day[0].isoformat(),'p':'report.htm','i':'7.01'}
+        with patch.object(ir.dt, 'date', ClockDate), patch.object(ir, 'now_iso', side_effect=stamp):
+            with self.providers(secdata=sub([old])), patch.object(ir, '_sec_request', side_effect=RuntimeError('historical index down')):
+                for _ in range(3):
+                    ir.process_company(sb, 'TEST', 'Test', 1, web=False)
+            day[0] += dt.timedelta(days=1)
+            new = dict(old, a='0000000001-26-000002', d=day[0].isoformat())
+            index = '<table><tr><td>1</td><td>Slides</td><td><a href="ex99.htm">Slides</a></td><td>EX-99.1</td></tr></table>'
+            with self.providers(secdata=sub([new, old])), patch.object(ir, '_sec_request', side_effect=lambda url, **kw: b'<html>Revenue 42</html>' if kw.get('raw') else index):
+                result = ir.process_company(sb, 'TEST', 'Test', 1, web=False)
         self.assertEqual(result['sec'], 1)
         self.assertEqual(next(iter(sb.rows.values()))['published'], new['d'])
         self.assertEqual(result['coverage']['enumeration']['sec'], 'failed')

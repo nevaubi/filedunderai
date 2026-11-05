@@ -583,56 +583,125 @@ def main():
 
 @serialized_aggregates
 def build_index(sb, coverage_updates=None):
-    """meta/coverage_ir.json: IR documents, KPI and segment coverage per company, for the Data status page."""
+    """Publish IR coverage. Updates reuse a validated count snapshot; None requests a full rebuild."""
     import collections
+    import copy
+    import datetime as dt
     from concurrent.futures import ThreadPoolExecutor
+    from urllib.parse import quote
     from .universe import UNIVERSE
+
+    def summarize(companies):
+        return {"companies": len(companies),
+                "coverage": dict(collections.Counter((v.get("coverage") or {}).get("status", "unverified") for v in companies.values())),
+                "companies_with_docs": sum(bool(v["docs"]) for v in companies.values()),
+                "documents": sum(v["docs"] for v in companies.values()),
+                "bytes": sum(v["bytes"] for v in companies.values()),
+                "companies_with_kpis": sum(bool(v["kpis"]) for v in companies.values()),
+                "kpis": sum(v["kpis"] for v in companies.values()),
+                "kpi_values": sum(v["kpi_values"] for v in companies.values()),
+                "companies_with_segments": sum(bool(v.get("segment_tables")) for v in companies.values()),
+                "segment_tables": sum(v.get("segment_tables") or 0 for v in companies.values())}
+
+    def checked_coverage(value, count):
+        value = copy.deepcopy(value) if value else {"version": 1, "status": "unverified", "limits": ["legacy coverage not verified"]}
+        if not isinstance(value, dict) or value.get("status") not in ("complete", "partial", "unverified"):
+            raise ValueError("Invalid IR coverage update")
+        if value.get("total_documents") is not None and value["total_documents"] != count:
+            value = {**value, "status": "unverified", "limits": list(value.get("limits", [])) + ["manifest row count differs from stored documents"]}
+        return value
+
+    if coverage_updates is not None:
+        # Cron must never scan the multi-million-row KPI tables to refresh a few IR companies.
+        prior = sb.get_json("meta/coverage_ir.json")
+        if (not isinstance(coverage_updates, dict) or not isinstance(prior, dict)
+                or not isinstance(prior.get("companies"), dict) or not isinstance(prior.get("summary"), dict)):
+            raise ValueError("Missing or incomplete prior coverage snapshot; explicit full rebuild required")
+        out = copy.deepcopy(prior["companies"])
+        required = {ticker for ticker, *_ in UNIVERSE} | set(coverage_updates)
+        if not required.issubset(out):
+            raise ValueError("Incomplete prior coverage snapshot: missing company counts; explicit full rebuild required")
+        def count(value):
+            return type(value) is int and value >= 0
+        for ticker, company in out.items():
+            if (not isinstance(ticker, str) or not isinstance(company, dict)
+                    or any(not count(company.get(key)) for key in ("docs", "bytes", "kpis", "kpi_values"))
+                    or not isinstance(company.get("types"), dict)
+                    or any(not count(value) for value in company["types"].values())
+                    or sum(company["types"].values()) != company["docs"]
+                    or ("segment_tables" in company and not count(company["segment_tables"]))
+                    or (company.get("segment_ties") is not None and not count(company["segment_ties"]))):
+                raise ValueError(f"Incomplete prior coverage snapshot counts for {ticker}; explicit full rebuild required")
+        expected = summarize(out)
+        for key in ("documents", "bytes", "kpis", "kpi_values", "companies_with_docs", "companies_with_kpis", "companies_with_segments", "segment_tables"):
+            if not count(prior["summary"].get(key)) or prior["summary"][key] != expected[key]:
+                raise ValueError(f"Inconsistent prior coverage snapshot: {key}; explicit full rebuild required")
+        if "companies" in prior["summary"] and prior["summary"]["companies"] != len(out):
+            raise ValueError("Inconsistent prior coverage snapshot: company count")
+        as_of = {}
+        for key in ("kpi_counts_as_of", "segment_counts_as_of"):
+            # Legacy generated is accepted only after all per-company/summary counts agree.
+            stamp = prior[key] if key in prior else prior.get("generated")
+            try:
+                if not isinstance(stamp, str) or not stamp:
+                    raise ValueError("missing timestamp")
+                dt.datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+            except (TypeError, ValueError) as error:
+                raise ValueError(f"Incomplete prior coverage snapshot: {key}") from error
+            as_of[key] = stamp
+        for ticker, value in coverage_updates.items():
+            if not isinstance(ticker, str) or not ticker:
+                raise ValueError("Invalid IR coverage ticker")
+            checked_coverage(value, out[ticker]["docs"])
+
+        def refresh(ticker):
+            docs = sb.select("ir_documents", f"select=ticker,doc_type,bytes&ticker=eq.{quote(ticker, safe='')}")
+            if any(row.get("ticker") != ticker for row in docs):
+                raise ValueError("IR document query returned a different ticker")
+            company = out[ticker]
+            company.update(docs=len(docs), bytes=sum(row.get("bytes") or 0 for row in docs),
+                           types=dict(collections.Counter(row.get("doc_type") or "other" for row in docs)), documents_as_of=now_iso())
+            company["coverage"] = checked_coverage(coverage_updates[ticker], company["docs"])
+        with ThreadPoolExecutor(8) as pool:
+            list(pool.map(refresh, coverage_updates))
+        summary = {**prior["summary"], **summarize(out)}
+        sb.put_json("meta/coverage_ir.json", {**prior, "generated": now_iso(), **as_of, "summary": summary, "companies": out}, cache="max-age=300")
+        return summary
+
+    # Explicit operator rebuild: source scans are intentionally kept out of the incremental branch.
     docs = sb.select("ir_documents", "select=ticker,doc_type,bytes")
     defs = sb.select("kpi_definitions", "select=ticker,kpi_id")
     vals = sb.select("kpi_values", "select=ticker&source_kind=eq.ir")
-    seg = (sb.get_json("meta/segments.json") or {}).get("companies", {})
+    kpi_counts_as_of = now_iso()
+    segments = sb.get_json("meta/segments.json") or {}
+    seg = segments.get("companies", {})
     by = collections.defaultdict(lambda: {"docs": 0, "bytes": 0, "kpis": 0, "kpi_values": 0, "types": collections.Counter()})
-    for d in docs:
-        b = by[d["ticker"]]
-        b["docs"] += 1
-        b["bytes"] += d.get("bytes") or 0
-        b["types"][d.get("doc_type") or "other"] += 1
-    for d in defs:
-        by[d["ticker"]]["kpis"] += 1
-    for v in vals:
-        by[v["ticker"]]["kpi_values"] += 1
-    # Include every universe company even if it has no document/KPI/segment rows.
-    for tk, *_ in UNIVERSE:
-        by[tk]
-    out = {}
-    for tk, b in by.items():
-        out[tk] = {**b, "types": dict(b["types"])}
-    for tk, sg in seg.items():
-        out.setdefault(tk, {"docs": 0, "bytes": 0, "kpis": 0, "kpi_values": 0, "types": {}})
-        out[tk]["segment_tables"] = sg.get("tables")
-        out[tk]["segment_ties"] = sg.get("recon_ok")
-    # Cron reuses the previous coverage snapshot and the companies processed this run.
-    # Full per-company manifest verification remains available for explicit rebuilds.
-    prior = (sb.get_json("meta/coverage_ir.json") or {}).get("companies", {}) if coverage_updates is not None else {}
-    def coverage(tk):
-        if coverage_updates is None:
-            manifest = sb.get_json(f"ir/{tk}.json")
-            value = (manifest or {}).get("coverage")
-        else:
-            value = coverage_updates.get(tk) or (prior.get(tk) or {}).get("coverage")
-        value = value or {"version": 1, "status": "unverified", "limits": ["legacy coverage not verified"]}
-        if value.get("total_documents") is not None and value["total_documents"] != out[tk]["docs"]:
-            value = {**value, "status": "unverified", "limits": list(value.get("limits", [])) + ["manifest row count differs from stored documents"]}
-        return tk, value
+    for document in docs:
+        company = by[document["ticker"]]
+        company["docs"] += 1
+        company["bytes"] += document.get("bytes") or 0
+        company["types"][document.get("doc_type") or "other"] += 1
+    for definition in defs:
+        by[definition["ticker"]]["kpis"] += 1
+    for value in vals:
+        by[value["ticker"]]["kpi_values"] += 1
+    for ticker, *_ in UNIVERSE:
+        by[ticker]
+    out = {ticker: {**company, "types": dict(company["types"])} for ticker, company in by.items()}
+    for ticker, segment in seg.items():
+        out.setdefault(ticker, {"docs": 0, "bytes": 0, "kpis": 0, "kpi_values": 0, "types": {}})
+        out[ticker]["segment_tables"] = segment.get("tables")
+        out[ticker]["segment_ties"] = segment.get("recon_ok")
+    def coverage(ticker):
+        manifest = sb.get_json(f"ir/{ticker}.json")
+        return ticker, checked_coverage((manifest or {}).get("coverage"), out[ticker]["docs"])
     with ThreadPoolExecutor(8) as pool:
-        for tk, value in pool.map(coverage, out):
-            out[tk]["coverage"] = value
-    summary = {"companies": len(out), "coverage": dict(collections.Counter(v["coverage"]["status"] for v in out.values())), "companies_with_docs": sum(1 for v in out.values() if v["docs"]), "documents": len(docs), "bytes": sum(v["bytes"] for v in out.values()),
-               "companies_with_kpis": sum(1 for v in out.values() if v["kpis"]), "kpis": len(defs), "kpi_values": len(vals),
-               "companies_with_segments": sum(1 for v in out.values() if v.get("segment_tables")), "segment_tables": sum(v.get("segment_tables") or 0 for v in out.values())}
-    sb.put_json("meta/coverage_ir.json", {"generated": now_iso(), "summary": summary, "companies": out}, cache="max-age=300")
+        for ticker, value in pool.map(coverage, out):
+            out[ticker]["coverage"] = value
+    summary = summarize(out)
+    sb.put_json("meta/coverage_ir.json", {"generated": now_iso(), "kpi_counts_as_of": kpi_counts_as_of,
+                "segment_counts_as_of": segments.get("generated") or now_iso(), "summary": summary, "companies": out}, cache="max-age=300")
     return summary
-
 
 def _doc(sb, did):
     r = sb.select("ir_documents", f"select=*&id=eq.{did}")

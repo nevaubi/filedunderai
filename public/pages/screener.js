@@ -266,7 +266,7 @@ window.FU_PAGES = window.FU_PAGES || {};
     injectStyle();
     const d = SCR.data;
     page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Screener"), el("h1", {}, "S&P 500"),
-      el("div", { class: "sub" }, `${SCR.rows.length} companies, ${d.fields.length} fields from SEC filings, prices, insider filings and investor materials. Prices as of ${fdate(d.asof.prices)}. Describe a screen to the agent or build it with the filters; click any number for its source.`))));
+      el("div", { class: "sub" }, `${SCR.rows.length} companies · ${d.fields.length} fields · Prices as of ${fdate(d.asof.prices)}`))));
     const grid = el("div", { class: "sx-grid" + (ST.chatOpen ? "" : " nochat") });
     const main = el("div", { class: "sx-main" });
     const aside = el("aside", { class: "sx-chat panel" });
@@ -352,13 +352,15 @@ window.FU_PAGES = window.FU_PAGES || {};
     U.chips.innerHTML = "";
     const chip = (text, onEdit, onRemove, title) => el("span", { class: "sx-chip", title: title || "" },
       el("button", { class: "t", onclick: onEdit || null, disabled: !onEdit }, text),
-      el("button", { class: "x", "aria-label": "Remove " + text, onclick: onRemove }, svgUse("i-x")));
+      el("button", { class: "x", "aria-label": "Remove " + text, onclick: () => { onRemove(); if (U.chips.hidden) U.filtersBtn.focus(); } }, svgUse("i-x")));
     s.filters.forEach((f, i) => U.chips.append(chip(filterText(f), e => editFilter(i, e.currentTarget), () => { s.filters.splice(i, 1); setSpec(s, { columns: false, keepPreset: true }); }, fieldOf(f.field)?.d)));
     const lists = [["sectors", "Sector"], ["exclude_sectors", "Not sector"], ["industries", "Industry"], ["exclude_industries", "Not industry"], ["tickers", "Only"], ["exclude_tickers", "Not"]];
     lists.forEach(([k, lab]) => s[k].forEach(x => U.chips.append(chip(`${lab}: ${x}`, null, () => { s[k] = s[k].filter(y => y !== x); setSpec(s, { columns: false, keepPreset: true }); }))));
     if (s.index === "sp100") U.chips.append(chip("S&P 100 only", null, () => { s.index = "sp500"; setSpec(s, { columns: false, keepPreset: true }); }));
     if (s.similar_to) U.chips.append(chip(`Similar to ${s.similar_to.ticker} · ${s.similar_to.n} nearest`, null, () => { s.similar_to = null; if (s.sort?.field === "similarity") s.sort = null; setSpec(s, { columns: false, keepPreset: true }); }, "Nearest neighbours on standardized valuation, growth, quality, risk and correlation fields"));
     if (s.limit) U.chips.append(chip(`First ${s.limit}`, null, () => { s.limit = null; setSpec(s, { columns: false, keepPreset: true }); }));
+    U.chips.hidden = !U.chips.childElementCount;
+    if (U.chips.hidden) return;
     const add = el("button", { class: "btn sx-add", onclick: e => addFilterMenu(e.currentTarget) }, "+ Add filter");
     U.chips.append(add);
   }
@@ -529,7 +531,8 @@ window.FU_PAGES = window.FU_PAGES || {};
       el("div", { class: "sx-row" }, el("span", { class: "eyebrow" }, "Sectors"), sectors),
       el("div", { class: "sx-row" }, el("span", { class: "eyebrow" }, "Industry"), el("div", { class: "sx-inline" }, indMode, indIn, dl, el("button", { class: "btn", onclick: indAdd }, "Add"))),
       el("div", { class: "sx-row" }, el("span", { class: "eyebrow" }, "Exclude"), exIn),
-      el("div", { class: "sx-row" }, el("span", { class: "eyebrow" }, "Fields"), fsearch)), groupsBox);
+      el("div", { class: "sx-row" }, el("span", { class: "eyebrow" }, "Fields"), el("div", { class: "sx-inline" }, fsearch,
+        el("button", { class: "btn sx-add", onclick: e => addFilterMenu(e.currentTarget) }, "+ Add filter")))), groupsBox);
     const drawGroups = () => {
       groupsBox.innerHTML = "";
       const t = fsearch.value.trim().toLowerCase();
