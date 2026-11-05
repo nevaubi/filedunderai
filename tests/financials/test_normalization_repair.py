@@ -240,7 +240,9 @@ class NormalizationRepairTests(unittest.TestCase):
             rows = json.loads((Path(td) / 'AAPL/candidate-facts.json').read_text())
             retained = next(r for r in rows if r['period_end'] == '2026-06-30')
             self.assertEqual(retained, prior)
-            self.assertEqual(plan['companies'][0]['review']['preserved_reported_observations'], 1)
+            # The normalizer now preserves this exact reported source itself;
+            # the repair-specific fallback performs no additional replacements.
+            self.assertEqual(plan['companies'][0]['review']['preserved_reported_observations'], 0)
 
     def test_reported_database_rows_missing_from_bundle_are_not_silently_dropped(self):
         reported = dict(self.obsolete, label='Revenue', period_end='2026-06-30', period_start='2026-04-01',

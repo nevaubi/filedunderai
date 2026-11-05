@@ -21,6 +21,26 @@ test('claim validation rejects wrong value, units and mismatched metric; gaps un
 test('ledger pagination returns bounded intact records with explicit next offset',()=>{const e=context().FU_EVIDENCE; for(let i=0;i<44;i++)e.capture({...record,value:i});const p=e.list({limit:200});assert.equal(p.records.length,40);assert.equal(p.nextOffset,40);assert.equal(p.truncated,true);assert.equal(e.list({offset:40}).records.length,4);});
 function quarters(){return [['2025-10-01','2025-12-31'],['2026-01-01','2026-03-31'],['2026-04-01','2026-06-30'],['2026-07-01','2026-09-30']].map(([start,end])=>({tk:'AMT',label:'Revenue',stmt:'income',unit:'USD',v:10,start,end}));}
 test('TTM sums aligned flows and rejects balances, weighted shares, EPS, gaps, missing values',()=>{const f=context().FU_FINANCIAL;assert.equal(f.ttm(quarters()).v,40);for(const change of [{stmt:'balance'},{unit:'shares'},{unit:'USD/shares'},{start:null},{v:null}])assert.equal(f.ttm(quarters().map(c=>({...c,...change}))),null);const gap=quarters();gap[1].start='2026-01-02';assert.equal(f.ttm(gap),null);});
+test('TTM accepts a reported sixteen-week retail quarter while retaining continuity and duration guards', () => {
+  const f = context().FU_FINANCIAL;
+  const retail = [
+    ['2025-09-01', '2025-11-23', 67307000000],
+    ['2025-11-24', '2026-02-15', 69597000000],
+    ['2026-02-16', '2026-05-10', 70527000000],
+    ['2026-05-11', '2026-08-30', 95723000000],
+  ].map(([start, end, v]) => ({ tk: 'COST', label: 'Revenue', stmt: 'income', unit: 'USD', start, end, v }));
+  const total = f.ttm(retail);
+  assert.equal(total?.v, 303154000000);
+  assert.equal(total.start, '2025-09-01');
+  assert.equal(total.end, '2026-08-30');
+  assert.equal(total.calc.inputs.length, 4);
+  for (const changed of [
+    retail.map((r, i) => i === 1 ? { ...r, start: '2025-11-25' } : r),
+    retail.map((r, i) => i === 1 ? { ...r, start: '2025-11-23' } : r),
+    retail.map((r, i) => i === 3 ? { ...r, end: '2026-08-31' } : r),
+    retail.map(r => ({ ...r, unit: 'USD/shares', label: 'EPS diluted' })),
+  ]) assert.equal(f.ttm(changed), null);
+});
 test('calculator supports financial math and has no executable JS surface',()=>{const f=context().FU_FINANCIAL;assert.equal(f.formula('SUM(a, 2) * (3 + 1)',{a:5}),28);assert.equal(f.calculate({operation:'growth',values:[100,125]}),.25);assert.ok(Math.abs(f.calculate({operation:'cagr',values:[100,121],periods:2})-.1)<1e-12);for(const s of ['fetch("x")','globalThis.x','constructor.constructor(1)','1/0','a'])assert.throws(()=>f.formula(s));});
 function markdownContext(){const c=context(); c.esc=s=>String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));c.findCell=(t,m,p)=>t==='AMT'&&m===record.metric&&p===record.period?{}:null;c.evidenceForCell=()=>c.FU_EVIDENCE.capture(record);vm.runInContext(source.slice(source.indexOf('function resolveCitation('),source.indexOf('document.addEventListener("click", async e => { const b = e.target.closest(".cite')),c);vm.runInContext(source.slice(source.indexOf('function validateMarkdownNumbers('),source.indexOf('function conversationWindow(')),c);return c;}
 test('markdown table citations protect pipes and ampersands; malicious/unknown IDs unresolved',()=>{const c=markdownContext(),e=c.FU_EVIDENCE.capture(record),html=c.md('| Metric | Value |\n|---|---|\n| R&D | $2.7854B [[AMT|Research & development|Q3 FY26]] |'); assert.equal((html.match(/<td>/g)||[]).length,2);assert.ok(html.includes('Research &amp; development'));assert.ok(!html.includes('&amp;amp;'));assert.ok(html.includes(e.id));assert.ok(c.md('[[E:unknown]]').includes('Unresolved'));assert.ok(!c.md('[[E:<img src=x onerror=alert(1)>]]').includes('<img'));});

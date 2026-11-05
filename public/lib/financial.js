@@ -16,7 +16,8 @@
     const c = cells.slice().sort((a, b) => a.end.localeCompare(b.end)), first = c[0];
     // EPS is not additive across changing weighted share denominators. No fabricated TTM EPS.
     if (!['income', 'cashflow', 'ratios'].includes(first.stmt) || first.unit !== 'USD' || (first.stmt === 'ratios' && !['Free cash flow', 'Capital returned'].includes(first.label))) return null;
-    if (c.some(x => x.tk !== first.tk || x.stmt !== first.stmt || x.unit !== first.unit || x.label !== first.label || !Number.isFinite(x.v) || !x.start || !x.end || day(x.end) - day(x.start) < 70 || day(x.end) - day(x.start) > 105)) return null;
+    // Retail fiscal years may end with a reported sixteen-week quarter (112 inclusive days).
+    if (c.some(x => x.tk !== first.tk || x.stmt !== first.stmt || x.unit !== first.unit || x.label !== first.label || !Number.isFinite(x.v) || !x.start || !x.end || day(x.end) - day(x.start) < 70 || day(x.end) - day(x.start) > 111)) return null;
     if (c.some((x, i) => i && day(x.start) - day(c[i - 1].end) !== 1)) return null;
     const duration = day(c[3].end) - day(first.start) + 1;
     if (duration < 350 || duration > 380) return null;

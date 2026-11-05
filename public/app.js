@@ -1980,6 +1980,7 @@ function stackChart(host, data, o = {}) {
 /* ---------- KPIs extracted from IR documents ---------- */
 function kpiVals(it, K, aEnds) {
   const v = it.values || {};
+  if (K === "Y") return v.Y || {};
   if (K === "Q") return { ...Object.fromEntries(Object.entries(v.T || {}).map(([e, c]) => [e, { ...c, ttm: true }])), ...(v.I || {}), ...(v.Q || {}) };
   const out = { ...(v.A || {}) };
   Object.entries(v.I || {}).forEach(([e, c]) => { if (aEnds.has(e) && !out[e]) out[e] = c; });
@@ -2005,16 +2006,18 @@ function renderKpiGroups(host, tk, kpi, K0) {
     }).filter(g => g.items.length);
     if (hidRows) host.append(el("div", { class: "muted", style: "font-size:12px;padding:0 4px" }, `${hidRows.toLocaleString("en-US")} discontinued or older-basis KPI line${hidRows > 1 ? "s" : ""}${hidGroups ? ` (${hidGroups} whole table${hidGroups > 1 ? "s" : ""})` : ""} hidden. Switch to All series to show the full history of every reporting basis.`));
   }
-  groups.forEach(g => {
-    let K = K0;
+  // Cumulative figures retain their own tables; they are never standalone quarters or annual totals.
+  const views = groups.flatMap(g => [{ group: g, kind: K0 }, ...(g.items.some(it => Object.keys(it.values?.Y || {}).length) ? [{ group: g, kind: "Y" }] : [])]);
+  views.forEach(({ group: g, kind }) => {
+    let K = kind;
     const ends = new Set();
     g.items.forEach(it => Object.keys(kpiVals(it, K, aEnds)).forEach(e => ends.add(e)));
-    if (!ends.size) { K = K === "Q" ? "A" : "Q"; g.items.forEach(it => Object.keys(kpiVals(it, K, aEnds)).forEach(e => ends.add(e))); }
+    if (!ends.size && K !== "Y") { K = K === "Q" ? "A" : "Q"; g.items.forEach(it => Object.keys(kpiVals(it, K, aEnds)).forEach(e => ends.add(e))); }
     const periods = [...ends].sort().slice(-segRangeN(K));
     if (!periods.length) return;
     const tbl = el("table", { class: "segt" });
     // the published label wins (calendar-basis recasts and transition periods are labelled server-side)
-    const pubLabel = e => { for (const it of g.items) { const v = ((it.values || {})[K === "Q" ? "Q" : "A"] || {})[e]; if (v && v.label) return v.label; } return null; };
+    const pubLabel = e => { for (const it of g.items) { const v = ((it.values || {})[K] || {})[e]; if (v && v.label) return v.label; } return null; };
     tbl.append(el("thead", {}, el("tr", {}, el("th", { class: "nm" }, g.subcategory ? `${g.category} › ${g.subcategory}` : g.category), ...periods.map(e => el("th", { class: "r" }, pubLabel(e) || kpiPeriodLabel(tk, e, K), el("div", { class: "faint mono", style: "font-size:10.5px" }, e))))));
     const tb = el("tbody");
     let lastSub = null;
@@ -2039,27 +2042,36 @@ function renderKpiGroups(host, tk, kpi, K0) {
       tb.append(tr);
     });
     tbl.append(tb);
-    host.append(panel(g.subcategory ? `${g.category} · ${g.subcategory}` : g.category, el("span", { class: "chip acc" }, "From investor materials"), el("div", { class: "scroll" }, tbl),
+    const title = (g.subcategory ? `${g.category} · ${g.subcategory}` : g.category) + (K === "Y" ? " · Year to date" : "");
+    host.append(panel(title, el("span", { class: "chip acc" }, "From investor materials"), el("div", { class: "scroll" }, tbl),
+      K === "Y" ? el("div", { class: "src" }, "Cumulative figures from the start of the reporting year through each stated period end.") : null,
       el("div", { class: "src" }, g.note || "Values are read from the company's investor relations documents. Click any number to open the document at that value.")));
   });
 }
 const QMARK = { ">": ">", "<": "<", "~": "~" };
 const QWORD = { ">": "Lower bound (\"more than\")", "<": "Upper bound (\"nearly\")", "~": "Approximate" };
-function kpiPeriodLabel(tk, e, K) { try { return plabel(tk, e, K === "A" ? "A" : "Q"); } catch { return e; } }
+function kpiPeriodLabel(tk, e, K) { if (K === "Y") return `Year to date to ${e}`; try { return plabel(tk, e, K === "A" ? "A" : "Q"); } catch { return e; } }
 function fmtKpi(v, unit) {
   if (v == null) return "–";
   const u = (unit || "").toLowerCase();
-  if (u === "%" || u === "pct" || u === "percent") return (Math.abs(v) <= 1.5 && u !== "%" ? v * 100 : v).toFixed(1) + "%";
+  if (u === "%" || u === "pct" || u === "percent") return v.toFixed(1) + "%";
   if (u === "usd" || u === "$") return fmtM(v, "USD");
   if (u === "usd_per_unit" || u === "$/unit") return "$" + fnum(v, 2);
+  if (u === "usd_per_barrel") return (v < 0 ? "−$" : "$") + fnum(Math.abs(v), 2) + "/bbl";
   if (Math.abs(v) >= 1e9) return fnum(v / 1e9, 2) + "B";
   if (Math.abs(v) >= 1e6) return fnum(v / 1e6, 1) + "M";
   if (Math.abs(v) >= 1e4) return fnum(v, 0);
   return fnum(v, Math.abs(v) < 10 ? 2 : 1);
 }
-function openKpiSource(tk, it, K, e, v) {
-  const doc = (SEG[tk]?.ir?.documents || []).find(d => d.id === v.doc) || { id: v.doc, title: v.doc_title, storage_path: v.path, ext: v.ext, url: v.url };
-  openDoc(tk, doc, { page: v.page, quote: v.quote, printed: v.printed, value: v.v, sheet: v.sheet, cell: v.cell, label: `${it.name} · ${kpiPeriodLabel(tk, e, K)}`, display: (QMARK[v.q] || "") + fmtKpi(v.v, it.unit), derived: v.derived });
+async function openKpiSource(tk, it, K, e, v) {
+  let doc = (SEG[tk]?.ir?.documents || []).find(d => d.id === v.doc) || { id: v.doc, title: v.doc_title, storage_path: v.path, text_path: v.text_path, ext: v.ext, url: v.url };
+  if (v.doc && !doc.text_path && [".xlsx", ".xlsm", ".xls", ".csv", ".pptx", ".ppt", ".docx", ".doc", ".txt"].includes((doc.ext || "").toLowerCase())) {
+    // Older peer files omit text_path. Resolve the recorded document rather than guessing a storage path.
+    const ir = await getJSON(`ir/${tk}.json`).catch(() => null);
+    const stored = (ir?.documents || []).find(d => d.id === v.doc);
+    if (stored) doc = { ...doc, ...stored };
+  }
+  openDoc(tk, doc, { page: v.page, quote: v.quote, printed: v.printed, value: v.v, sheet: v.sheet, cell: v.cell, label: `${it.name} · ${v.label || kpiPeriodLabel(tk, e, K)}`, display: (QMARK[v.q] || "") + fmtKpi(v.v, it.unit), derived: v.derived });
 }
 
 /* ---------- IR document library ---------- */
@@ -2193,7 +2205,13 @@ async function sheetView(view, d, hl, status) {
       for (let ci = 0; ci < ncol; ci++) {
         const v = r[ci];
         const txt = v === "" || v == null ? "" : typeof v === "number" ? (Math.abs(v) < 1 && v !== 0 ? String(+v.toFixed(6)) : v.toLocaleString("en-US", { maximumFractionDigits: 4 })) : String(v);
-        const td = el("td", { class: typeof v === "number" ? "n" : "" }, txt);
+        const meta = tx.cell_metadata?.[cur]?.[`${colName(ci)}${ri + 1}`];
+        const detail = [];
+        if (meta?.formula) detail.push(`Formula: ${meta.formula}`);
+        if (meta?.number_format) detail.push(`Original number format: ${meta.number_format}`);
+        if (meta?.formula && meta.cached === false) detail.push("Missing cached result; no calculated value is stored in the source workbook.");
+        if (meta?.source_error) detail.push(`Source error: ${meta.source_error}`);
+        const td = el("td", { class: typeof v === "number" ? "n" : "", title: detail.length ? detail.join("\n") : null }, txt);
         const isHit = want ? (want.r === ri && want.c === ci) : (!hit && typeof v === "number" && hl.value != null && Math.abs(Math.abs(v) - Math.abs(hl.value)) <= Math.max(0.5, Math.abs(hl.value) * 1e-4)) || (!want && !hit && tokens.includes(txt));
         if (isHit) { td.classList.add("hit"); tr.classList.add("hl"); hit = hit || td; }
         tr.append(td);
@@ -2201,7 +2219,10 @@ async function sheetView(view, d, hl, status) {
       tb.append(tr);
     });
     t.append(tb); grid.innerHTML = ""; grid.append(t);
-    status.textContent = `${names.length} sheet${names.length === 1 ? "" : "s"}${hit ? " · value highlighted" : ""}`;
+    const quality = tx.extraction || {}, issues = [];
+    if (quality.source_cell_errors > 0) issues.push(`${quality.source_cell_errors} source cell error${quality.source_cell_errors === 1 ? "" : "s"}`);
+    if (quality.missing_formula_caches > 0) issues.push(`${quality.missing_formula_caches} formula${quality.missing_formula_caches === 1 ? "" : "s"} missing a cached result`);
+    status.textContent = `${names.length} sheet${names.length === 1 ? "" : "s"}${hit ? " · value highlighted" : ""}${issues.length ? " · " + issues.join(" · ") : ""}`;
     if (hit) requestAnimationFrame(() => { grid.scrollTop = hit.offsetTop - grid.clientHeight / 2; grid.scrollLeft = Math.max(0, hit.offsetLeft - grid.clientWidth / 2); });
   };
   draw();

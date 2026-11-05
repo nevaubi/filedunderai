@@ -4,10 +4,11 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 from etl import backfill_ir
 from etl.backfill import digest, encoded
-from etl.universe import ADDITIONAL_REGISTRY, BY_TICKER
+from etl.universe import ADDITIONAL_REGISTRY, BY_TICKER, registry_for
 
 
 class BackfillIRTests(unittest.TestCase):
@@ -50,6 +51,55 @@ class BackfillIRTests(unittest.TestCase):
         self.assertEqual(documents[0]['record']['ext'], '.html')
         self.assertEqual(documents[0]['record']['published'], '2026-08-26')
         self.assertIsNone(documents[0]['record']['period_end'])
+
+    def test_verified_original_from_second_approved_cohort_is_accepted(self):
+        ticker = 'GKOS'
+        cik = BY_TICKER[ticker]['cik']
+        manifest = json.loads(json.dumps(self.manifest))
+        manifest.update(ticker=ticker, cik=cik, name=BY_TICKER[ticker]['name'],
+                        cohort_id=registry_for(ticker)['cohort_id'])
+        doc = manifest['documents'][0]
+        url = self.url.replace(f'/data/{self.cik}/', f'/data/{cik}/')
+        body = self.body.replace(b'Okta', b'Glaukos')
+        path = self.root/f'ir-discovery/originals/{ticker}/release.html'
+        path.parent.mkdir(parents=True)
+        path.write_bytes(body)
+        doc['source_url'] = url
+        doc['original'].update(ticker=ticker, url=url, original_path=str(path),
+                               sha256=digest(body), bytes=len(body))
+        doc['original_validation'].update(target_cik=cik, target_ticker=ticker,
+                                          source_url=url, original_sha256=digest(body))
+        sub = json.loads(gzip.decompress((self.root/f'raw/sec/submissions/CIK{self.cik:010d}.json.gz').read_bytes()))
+        sub['cik'] = str(cik)
+        raw = encoded(sub)
+        (self.root/f'raw/sec/submissions/CIK{cik:010d}.json.gz').write_bytes(gzip.compress(raw))
+        (self.root/f'sec-manifests/{ticker}.json').write_bytes(encoded(
+            {'cik':cik, 'sources':{'submissions':{'sha256':digest(raw)}}}))
+        manifest_path = self.root/f'ir-discovery/companies/{ticker}.json'
+        manifest_path.write_bytes(encoded(manifest))
+        try:
+            prepared = backfill_ir.prepare_documents(self.root, ticker)
+        except ValueError as error:
+            self.fail(f'Approved second-cohort original was rejected: {error}')
+        self.assertEqual(prepared[0]['record']['ticker'], ticker)
+        self.assertEqual(prepared[0]['body'], body)
+        manifest['cohort_id'] = ADDITIONAL_REGISTRY['cohort_id']
+        manifest_path.write_bytes(encoded(manifest))
+        with self.assertRaisesRegex(ValueError, 'identity mismatch'):
+            backfill_ir.prepare_documents(self.root, ticker)
+
+    def test_publication_report_identifies_the_selected_cohort(self):
+        with patch.object(backfill_ir, 'publish_company', return_value={'ticker':'GKOS','status':'published'}):
+            backfill_ir.main(['--root',str(self.root),'--tickers','GKOS'])
+        report = json.loads((self.root/'ir-publication-report.json').read_bytes())
+        self.assertEqual(report['cohort_id'], registry_for('GKOS')['cohort_id'])
+
+    def test_mixed_cohort_batch_is_rejected_before_any_publication(self):
+        with patch.object(backfill_ir, 'publish_company',
+                          side_effect=lambda root,ticker:{'ticker':ticker,'status':'published'}) as publish:
+            with self.assertRaisesRegex(ValueError, 'exactly one cohort'):
+                backfill_ir.main(['--root',str(self.root),'--tickers','OKTA','GKOS'])
+        publish.assert_not_called()
 
     def test_validation_cannot_be_reused_for_another_issuer(self):
         self.manifest['documents'][0]['original_validation']['target_cik'] = 320193

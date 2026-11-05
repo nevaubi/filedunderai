@@ -161,17 +161,18 @@ class ExtractionTests(unittest.TestCase):
         self.assertEqual(ir.extract_text(b'', '.csv')['extraction']['status'], 'empty')
         self.assertEqual(ir.extract_text(b'binary', '.doc')['extraction']['status'], 'unsupported')
 
-    def test_sheet_limit_is_explicit_and_preserves_numeric_values(self):
+    def test_sheet_rectangle_does_not_truncate_cells_inside_global_budget(self):
         import openpyxl
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.cell(1, 1, 1.234567890123)
-        ws.cell(602, 61, 'outside budget')
+        ws.cell(602, 61, 'formerly truncated')
         raw = io.BytesIO(); wb.save(raw)
         result = ir.extract_text(raw.getvalue(), '.xlsx')
         self.assertEqual(result['sheets']['Sheet'][0][0], 1.234567890123)
-        self.assertEqual(result['extraction']['status'], 'limited')
-        self.assertTrue(result['extraction']['limits'])
+        self.assertEqual(result['extraction']['status'], 'verified')
+        self.assertEqual(result['sheets']['Sheet'][601][60], 'formerly truncated')
+        self.assertEqual(result['extraction']['limits'], [])
     def test_eighty_small_worksheets_retain_every_sheet_and_coordinate(self):
         import openpyxl
         wb = openpyxl.Workbook(); wb.remove(wb.active)
@@ -248,7 +249,8 @@ class ExtractionTests(unittest.TestCase):
         result = ir.extract_text(raw, '.xls')
         self.assertEqual(result['sheets']['Sheet 1'][0][0], 42)
         self.assertEqual(result['sheets']['Sheet 1'][2][1], '#DIV/0!')
-        self.assertEqual(result['extraction']['status'], 'verified')
+        self.assertEqual(result['extraction']['status'], 'limited')
+        self.assertEqual(result['extraction']['source_cell_errors'], 1)
 
 
 class PipelineTests(unittest.TestCase):
@@ -520,6 +522,37 @@ class PipelineTests(unittest.TestCase):
             result = ir.process_company(sb, 'TEST', 'Test', 1, repair_existing=True)
         self.assertEqual(sb.objects['ir', path], original)
         self.assertEqual(result['coverage']['extraction']['limited'], 1)
+
+    def test_explicit_repair_rechecks_legacy_verified_workbook_once(self):
+        import openpyxl
+        sb = Store(); did = existing(sb, 'https://ir.example.test/q1.xlsx')
+        row = sb.rows[did]; row['ext'] = '.xlsx'
+        book = openpyxl.Workbook(); book.active.cell(602, 2, 99)
+        raw = io.BytesIO(); book.save(raw)
+        sb.objects['ir', row['storage_path']] = raw.getvalue()
+        old_path = row['text_path']; old_text = sb.objects['ir', old_path]
+        state = ir._read_checkpoint(sb, 'TEST')
+        state['outcomes'][did] = {'status':'verified','nonempty':True,'limits':[],'errors':[]}
+        state['queues']['extractions'][did] = {'id':did,'status':'done','attempts':0}
+        ir._save_checkpoint(sb, state)
+        result = ir.process_company(sb, 'TEST', 'Test', 1, repair_existing=True)
+        self.assertEqual(result['repaired'], 1)
+        text = json.loads(sb.objects['ir', sb.rows[did]['text_path']])
+        self.assertEqual(text['sheets']['Sheet'][601][1], 99)
+        self.assertEqual(sb.objects['ir', old_path], old_text)
+        self.assertEqual(sb.objects['ir', row['storage_path']], raw.getvalue())
+        repeated = ir.process_company(sb, 'TEST', 'Test', 1, repair_existing=True)
+        self.assertEqual(repeated['repaired'], 0)
+
+    def test_new_workbook_version_retries_old_block_once_then_keeps_retry_bound(self):
+        sb = Store(); did = existing(sb, 'https://ir.example.test/q1.xls')
+        sb.rows[did]['ext'] = '.xls'
+        state = ir._read_checkpoint(sb, 'TEST')
+        state['outcomes'][did] = {'status':'failed','nonempty':False,'limits':[],'errors':['corrupt workbook']}
+        state['queues']['extractions'][did] = {'id':did,'status':'blocked','attempts':3}
+        ir._save_checkpoint(sb, state)
+        attempts = [ir.process_company(sb, 'TEST', 'Test', 1, repair_existing=True)['extraction_failed'] for _ in range(4)]
+        self.assertEqual(attempts, [1, 1, 1, 0])
 
     def test_html_error_page_cannot_be_verified_as_pdf(self):
         sb = Store()

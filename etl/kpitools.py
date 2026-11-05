@@ -8,6 +8,7 @@
     python -m etl.kpitools xbrl TICKER                    summary of the XBRL segment tables already on the site
     python -m etl.kpitools validate FILE                  check an extraction file: quotes, values, sums, Q4
     python -m etl.kpitools publish FILE                   validate, then write kpis/{T}.json and kpi rows
+    python -m etl.kpitools publish-additive FILE          add validated points; preserve existing values and sources
 
 Extraction file schema (JSON):
 {
@@ -32,13 +33,16 @@ Extraction file schema (JSON):
 Values are in base units: dollars (not millions), members (not millions), percentages as printed (12.5 means 12.5%).
 """
 import collections
+import copy
 import gzip
 import json
+import math
 import os
 import re
 import sys
 import urllib.parse
 import urllib.request
+from decimal import Decimal, InvalidOperation
 
 from .common import Supabase, load_env, now_iso, serialized_aggregates
 
@@ -64,10 +68,12 @@ def _cache_file(doc):
 
 
 def text_of(sb, doc):
-    if doc["id"] in _TEXT_CACHE:
-        return _TEXT_CACHE[doc["id"]]
     if not doc.get("text_path"):
         return None
+    # The original ID stays stable when a source-checked extraction is refreshed.
+    key = (doc["id"], doc["text_path"], doc.get("fetched_at"))
+    if key in _TEXT_CACHE:
+        return _TEXT_CACHE[key]
     path = _cache_file(doc)
     raw = None
     try:
@@ -99,7 +105,7 @@ def text_of(sb, doc):
     except OSError:
         pass
     t = json.loads(raw)
-    _TEXT_CACHE[doc["id"]] = t
+    _TEXT_CACHE[key] = t
     return t
 
 
@@ -113,7 +119,7 @@ def col_name(i):
 
 
 def parse_ref(ref):
-    m = re.match(r"^([A-Z]+)(\d+)$", (ref or "").upper())
+    m = re.fullmatch(r"([A-Z]+)([1-9]\d*)", ref.upper()) if isinstance(ref, str) else None
     if not m:
         return None
     c = 0
@@ -142,7 +148,38 @@ def numbers_in(text):
     return out
 
 
-def check_value(sb, docs_by_id, v):
+def _number(value, allow_text=False):
+    """Read a finite literal; never guess locale, strip labels, or coerce booleans."""
+    if isinstance(value, bool) or not isinstance(value, (int, float, Decimal, str)):
+        return None
+    if isinstance(value, str):
+        if not allow_text or not re.fullmatch(r"[+-]?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?", value.strip()):
+            return None
+        value = value.strip()
+    try:
+        number = Decimal(str(value))
+        return number if number.is_finite() else None
+    except InvalidOperation:
+        return None
+
+
+def _cell_equal(expected, actual):
+    """Allow floating-point representation noise, not financial rounding guesses."""
+    if expected == actual:
+        return True
+    a, b = float(expected), float(actual)
+    if not math.isfinite(a) or not math.isfinite(b):
+        return False
+    return abs(expected - actual) <= Decimal(str(max(math.ulp(a), math.ulp(b)))) * 4
+
+
+def _percent_format(number_format):
+    # A quoted/escaped percent is a literal, not Excel's percentage conversion.
+    cleaned = re.sub(r'"[^"]*"|\\.|\[[^\]]*\]', '', str(number_format or ''))
+    return '%' in cleaned
+
+
+def check_value(sb, docs_by_id, v, unit=None):
     """Returns a list of problems for one extracted value (empty when it checks out)."""
     errs = []
     d = docs_by_id.get(v.get("doc"))
@@ -154,6 +191,8 @@ def check_value(sb, docs_by_id, v):
     value = v.get("value")
     if value is None:
         return ["missing value"]
+    if _number(value) is None:
+        return ["value must be a finite number, not a boolean or text"]
     if t["kind"] == "sheets":
         sheet = v.get("sheet")
         rows = t["sheets"].get(sheet) if sheet else None
@@ -164,10 +203,25 @@ def check_value(sb, docs_by_id, v):
             return [f"bad cell reference {v.get('cell')!r}"]
         r, c = rc
         cellv = rows[r][c] if r < len(rows) and c < len(rows[r]) else None
-        if not isinstance(cellv, (int, float)):
-            return [f"{sheet}!{v.get('cell')} holds {cellv!r}, not a number"]
-        scale = v.get("scale") or 1
-        if not _close(cellv * scale, value) and not _close(cellv * scale * 100, value) and not _close(cellv, value):
+        number = _number(cellv, allow_text=True)
+        if number is None:
+            return [f"{sheet}!{v.get('cell')} holds {cellv!r}, not an unambiguous finite number"]
+        metadata = ((t.get("cell_metadata") or {}).get(sheet) or {}).get(v["cell"].upper(), {})
+        if metadata.get("formula") and metadata.get("cached") is False:
+            return [f"{sheet}!{v['cell']} has no cached formula result"]
+        percent = _percent_format(metadata.get("number_format"))
+        percent_unit = (unit or '').strip().lower() in ('%', 'pct', 'percent', 'percentage')
+        if percent and not percent_unit:
+            return [f"{sheet}!{v['cell']} is percentage-formatted but the KPI unit is not percent"]
+        # Percent KPI values are percentage points as printed. A true Excel %
+        # format proves x100; a quoted/escaped suffix leaves the raw points intact.
+        # Explicit scales must agree with that source evidence, never override it.
+        scale = _number(v["scale"]) if "scale" in v else Decimal(100 if percent else 1)
+        if scale is None or scale <= 0:
+            return ["scale must be a finite positive number"]
+        if percent_unit and scale != (100 if percent else 1):
+            return [f"{sheet}!{v['cell']} scale conflicts with the source percentage format"]
+        if not _cell_equal(number * scale, _number(value)):
             errs.append(f"{sheet}!{v.get('cell')} = {cellv} (x{scale}) does not match value {value}")
         return errs
     pages = t["pages"]
@@ -270,7 +324,7 @@ def validate(sb, data, fix=False):
             if isinstance(v.get("quote"), str) and "\x00" in v["quote"]:
                 v["quote"] = re.sub(r" +", " ", v["quote"].replace("\x00", " "))
             report["values"] += 1
-            errs = check_value(sb, docs, v)
+            errs = check_value(sb, docs, v, unit=k.get("unit"))
             if errs:
                 report["bad_values"].append({"kpi": k["id"], "period_end": v.get("period_end"), "kind": v.get("kind"), "errors": errs})
             else:
@@ -290,7 +344,7 @@ def validate(sb, data, fix=False):
     kunit = {k["id"]: (k.get("unit") or "").strip().lower() for k in data.get("kpis", [])}
     for dv in data.get("derived", []):
         # ratios, percentages and per-unit figures are not additive: a quarter cannot be derived by subtraction
-        if kunit.get(dv["kpi"]) in ("%", "pct", "percent", "ratio", "x", "bp", "usd_per_unit", "$/unit", "per_share", "usd_per_share"):
+        if kunit.get(dv["kpi"]) in ("%", "pct", "percent", "ratio", "x", "bp", "usd_per_unit", "$/unit", "per_share", "usd_per_share", "usd_per_barrel"):
             report["derived_bad"].append({**dv, "error": f"unit {kunit.get(dv['kpi'])} is not additive"})
             continue
         ins = []
@@ -387,9 +441,18 @@ def _label(fye, end, kind, ticker=None):
     return q
 
 
-def publish(sb, data, fye="1231"):
+@serialized_aggregates
+def publish(sb, data, fye="1231", additive=False):
     """Writes kpis/{T}.json (grouped for display) and kpi_definitions / kpi_values rows. Only validated values."""
-    report, data = validate(sb, data, fix=True)
+    data = copy.deepcopy(data)
+    if additive and len({k["id"] for k in data.get("kpis", [])}) != len(data.get("kpis", [])):
+        raise ValueError("Additive validation failed: duplicate KPI definitions")
+    if additive and any(not isinstance(k.get("unit"), str) or not k["unit"].strip()
+                        for k in data.get("kpis", []) if k.get("values") or any(d.get("kpi") == k["id"] for d in data.get("derived", []))):
+        raise ValueError("Additive validation failed: an explicit KPI unit is required")
+    report, data = validate(sb, data, fix=not additive)
+    if additive and any(report.get(key) for key in ("bad_values", "derived_bad", "tie_failures")):
+        raise ValueError("Additive validation failed; no values published: " + json.dumps(report, default=str)[:2000])
     tk = data["ticker"]
     # fiscal labels are always recomputed from the company's fiscal year end, never taken from the input file
     from .fundamentals import fy_label
@@ -442,7 +505,7 @@ def publish(sb, data, fye="1231"):
             d = docs.get(v["doc"], {})
             vals[v["kind"]][v["period_end"]] = {"v": v["value"], "doc": v["doc"], "page": v.get("page"), "sheet": v.get("sheet"), "cell": v.get("cell"),
                                                 "quote": v.get("quote"), "printed": v.get("printed"), "q": qualifier(v.get("quote"), v.get("printed")), "doc_title": (d.get("title") or "").split("||")[0][:120], "path": d.get("storage_path"),
-                                                "ext": d.get("ext"), "url": d.get("url"), "label": v.get("fiscal_label"),
+                                                "ext": d.get("ext"), "url": d.get("url"), "text_path": d.get("text_path"), "label": v.get("fiscal_label"),
                                                 "tie": tie.get((k["id"], v["kind"], v["period_end"]))}
             rows.append({"ticker": tk, "kpi_id": k["id"], "period_kind": v["kind"], "period_end": v["period_end"], "fiscal_label": v.get("fiscal_label"),
                          "value": v["value"], "unit": k.get("unit"), "source_kind": "ir", "source_id": v["doc"],
@@ -463,8 +526,10 @@ def publish(sb, data, fye="1231"):
                      "parent_id": k.get("parent"), "sums_to_parent": bool(k.get("sums_to_parent")), "source_kind": "ir", "description": k.get("description"),
                      "sort": order[k["id"]], "updated_at": now_iso()})
     bundle = {"ticker": tk, "generated": now_iso(), "notes": data.get("notes"),
-              "groups": [{"category": c, "subcategory": s, "items": items} for (c, s), items in groups.items() if any(any(it["values"][x]) for it in items for x in "QAIT")],
+              "groups": [{"category": c, "subcategory": s, "items": items} for (c, s), items in groups.items() if any(any(it["values"][x]) for it in items for x in "QAIYT")],
               "check": {"values": report["values"], "rejected": len(report["bad_values"]), "ties": len(report["ties"]), "tie_failures": len(report["tie_failures"])}}
+    if additive:
+        return _publish_additive(sb, data, bundle, defs, rows, report)
     sb.put_json(f"kpis/{tk}.json", bundle, cache="max-age=600")
     if defs:
         sb.upsert("kpi_definitions", defs, "ticker,kpi_id")
@@ -494,6 +559,141 @@ def publish(sb, data, fye="1231"):
         for i in range(0, len(dead), 50):
             ids = ",".join('"' + g.replace('"', '') + '"' for g in dead[i:i + 50])
             sb.delete("kpi_definitions", f"ticker=eq.{tk}&source_kind=eq.ir&kpi_id=in.({urllib.parse.quote(ids)})")
+    return report
+
+
+def _point_key(row):
+    return row["kpi_id"], row["period_kind"], row["period_end"]
+
+
+def _same_source_point(left, right):
+    fields = ("unit", "source_kind", "source_id", "derived", "fiscal_label")
+    anchor = lambda row: tuple((row.get("anchor") or {}).get(k) for k in ("page", "sheet", "cell", "quote"))
+    return (_number(left.get("value"), allow_text=True) == _number(right.get("value"), allow_text=True)
+            and all(left.get(k) == right.get(k) for k in fields) and anchor(left) == anchor(right))
+
+
+def _publish_additive(sb, data, candidate, defs, rows, report):
+    """Append under the aggregate lease, using inserts so a collision cannot overwrite.
+
+    Existing points/definitions remain byte-for-byte unchanged. Publication is not a
+    database/storage transaction: inserts are read back before the merged public bundle
+    is written, and an interrupted run can be retried with the identical candidate.
+    """
+    tk = data["ticker"]
+    query = f"select=*&ticker=eq.{urllib.parse.quote(tk, safe='')}"
+    definition_query = query + "&order=kpi_id"
+    value_query = query + "&source_kind=eq.ir&order=kpi_id,period_kind,period_end"
+    old_defs = sb.select("kpi_definitions", definition_query)
+    old_rows = sb.select("kpi_values", value_query)
+    by_def = {row["kpi_id"]: row for row in old_defs}
+    by_point = {_point_key(row): row for row in old_rows}
+    if len(by_def) != len(old_defs) or len(by_point) != len(old_rows):
+        raise ValueError("Additive conflict: duplicate stored definition or point")
+    proposed = {}
+    for row in rows:
+        key = _point_key(row)
+        previous = proposed.get(key) or by_point.get(key)
+        if previous is not None and not _same_source_point(previous, row):
+            raise ValueError(f"Additive conflict for {tk} {key}: value, unit, period label or source differs")
+        proposed[key] = row
+    supplied = {k["id"]: k for k in data.get("kpis", [])}
+    field_map = {"name": "name", "unit": "unit", "category": "category", "subcategory": "subcategory",
+                 "parent": "parent_id", "sums_to_parent": "sums_to_parent", "description": "description"}
+    for definition in defs:
+        old = by_def.get(definition["kpi_id"])
+        if old is None:
+            continue
+        provided = supplied[definition["kpi_id"]]
+        if old.get("source_kind") != "ir" or any(
+                key in provided and definition.get(field) != old.get(field) for key, field in field_map.items()):
+            raise ValueError(f"Additive definition conflict for {tk} {definition['kpi_id']}")
+
+    new_rows = [row for key, row in proposed.items() if key not in by_point]
+    new_defs = [row for row in defs if row["kpi_id"] not in by_def]
+    all_defs = {**by_def, **{row["kpi_id"]: row for row in new_defs}}
+    old_bundle = sb.get_json(f"kpis/{tk}.json")
+    if old_bundle is not None and (not isinstance(old_bundle, dict) or old_bundle.get("ticker") != tk
+                                   or not isinstance(old_bundle.get("groups"), list)):
+        raise ValueError("Additive conflict: invalid existing public KPI bundle")
+    if old_bundle is None and set(by_point) - set(proposed):
+        raise ValueError("Additive conflict: existing public bundle is missing; reconcile it separately")
+    merged = copy.deepcopy(old_bundle) if old_bundle is not None else {"ticker": tk, "groups": [], "notes": candidate.get("notes")}
+    items = {}
+    for group in merged["groups"]:
+        for item in group["items"]:
+            if item["id"] in items:
+                raise ValueError("Additive conflict: duplicate public KPI definition")
+            items[item["id"]] = item
+            for kind, points in item["values"].items():
+                for end, point in points.items():
+                    row = by_point.get((item["id"], kind, end))
+                    source = {"value": point["v"], "unit": item.get("unit"), "source_kind": "ir",
+                              "source_id": "derived" if point.get("derived") else point.get("doc"),
+                              "derived": point.get("derived"), "fiscal_label": point.get("label"),
+                              "anchor": None if point.get("derived") else {k: (point.get(k) or "")[:400] if k == "quote" else point.get(k)
+                                                                          for k in ("page", "sheet", "cell", "quote")}}
+                    if row is None or not _same_source_point(row, source):
+                        raise ValueError(f"Additive conflict: public/database point differs for {item['id']} {kind} {end}")
+    candidate_items = {it["id"]: it for group in candidate["groups"] for it in group["items"]}
+    changed = 0
+    # Only submitted, source-validated points may enter the public bundle. Other
+    # DB-only points remain untouched and require their own review.
+    for key, row in proposed.items():
+        kid, kind, end = key
+        if kid not in all_defs or all_defs[kid].get("source_kind") != "ir":
+            raise ValueError(f"Additive conflict: missing IR definition for {kid}")
+        if kid not in items:
+            definition = all_defs[kid]
+            item = copy.deepcopy(candidate_items.get(kid)) or {
+                "id": kid, "name": definition["name"], "unit": definition.get("unit"),
+                "parent": definition.get("parent_id"), "depth": 0, "subcategory": definition.get("subcategory"),
+                "sums_to_parent": bool(definition.get("sums_to_parent")), "description": definition.get("description"),
+                "values": {k: {} for k in "QAIYT"}}
+            # Points are added only from the validated candidate below.
+            item["values"] = {k: {} for k in "QAIYT"}
+            category = definition.get("category") or "Operating metrics"
+            group = next((g for g in merged["groups"] if g.get("category") == category and g.get("subcategory") is None), None)
+            if group is None:
+                group = {"category": category, "subcategory": None, "items": []}
+                merged["groups"].append(group)
+            group["items"].append(item)
+            items[kid] = item
+        item = items[kid]
+        points = item["values"].setdefault(kind, {})
+        if end in points:
+            continue
+        point = ((candidate_items.get(kid) or {}).get("values", {}).get(kind) or {}).get(end)
+        if point is None:
+            raise ValueError(f"Additive conflict: validated public source point is missing for {key}")
+        points[end] = copy.deepcopy(point)
+        changed += 1
+
+    report.update(mode="additive", added_values=len(new_rows), added_definitions=len(new_defs),
+                  unchanged_values=len(proposed) - len(new_rows), restored_public_values=changed - len(new_rows),
+                  validation_scope="submitted_additions_only")
+    # Plain INSERT, never UPSERT: even an uncooperative concurrent writer cannot
+    # make a reviewed addition replace a different stored source point.
+    for table, additions in (("kpi_definitions", new_defs), ("kpi_values", new_rows)):
+        for start in range(0, len(additions), 500):
+            sb._aggregate_lease.check()
+            sb.insert(table, additions[start:start + 500], returning=False)
+    if new_defs or new_rows:
+        after_defs = {r["kpi_id"]: r for r in sb.select("kpi_definitions", definition_query)}
+        after_rows = {_point_key(r): r for r in sb.select("kpi_values", value_query)}
+        if any(after_defs.get(k) != v for k, v in by_def.items()) or any(after_rows.get(k) != v for k, v in by_point.items()):
+            raise RuntimeError("Additive readback failed: existing data changed")
+        if any(r["kpi_id"] not in after_defs for r in new_defs) or any(
+                key not in after_rows or not _same_source_point(row, after_rows[key]) for key, row in proposed.items()):
+            raise RuntimeError("Additive readback failed: inserted data missing or different")
+    if changed:
+        merged["generated"] = now_iso()
+        merged["last_addition"] = {"at": merged["generated"], "values": len(new_rows),
+                                    "validation_scope": "submitted_additions_only"}
+        sb._aggregate_lease.check()
+        sb.put_json(f"kpis/{tk}.json", merged, cache="max-age=600")
+        if sb.get_json(f"kpis/{tk}.json") != merged:
+            raise RuntimeError("Additive public bundle readback failed")
     return report
 
 
@@ -568,16 +768,16 @@ def main():
         b = sb.get_json(f"segments/{args[0]}.json") or {}
         for t in b.get("tables", []):
             print(f"{t['metric']} by {t['category_label']}{' (summary)' if t.get('view') else ''}: " + ", ".join(r["label"] for r in t["rows"]))
-    elif cmd in ("validate", "publish"):
+    elif cmd in ("validate", "publish", "publish-additive"):
         data = json.load(open(args[0]))
         if cmd == "validate":
             report, _ = validate(sb, data)
         else:
-            report = publish(sb, data)
+            report = publish(sb, data, additive=cmd == "publish-additive")
         print(json.dumps({k: (v if not isinstance(v, list) else v[:40]) for k, v in report.items()}, indent=1, default=str))
         print(f"\nvalues={report['values']} rejected={len(report['bad_values'])} ties={len(report['ties'])} tie_failures={len(report['tie_failures'])} "
               f"tie_incomplete={len(report.get('tie_incomplete', []))} derived_bad={len(report['derived_bad'])}")
-        if cmd == "publish":
+        if cmd in ("publish", "publish-additive"):
             print(f"PUBLISHED kpis/{data['ticker']}.json and kpi rows")
 
 
