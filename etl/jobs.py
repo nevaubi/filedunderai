@@ -703,6 +703,7 @@ def build_feed(sb, limit=400):
 
 
 # ---------------------------------------------------------------- macro
+@serialized_aggregates
 def macro_job(sb, refresh_news=True, brief=True):
     with Run(sb, "macro") as run:
         prev = _cache(sb, "macro.json", {})

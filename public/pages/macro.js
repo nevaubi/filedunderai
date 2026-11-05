@@ -170,6 +170,34 @@ window.FU_PAGES = window.FU_PAGES || {};
     avg3: { name: "3-month avg", get: (m, ds) => ds.length >= 3 ? { d: ds.at(-1)[0], v: ds.slice(-3).reduce((a, x) => a + x[1], 0) / 3 } : null },
   };
 
+  function ipoTable(frequency) {
+    const ids = Object.keys(MS.cat.series).filter(id => {
+      const m = META(id);
+      return id.startsWith("SEC_IPO:") && m.group === "sec_ipo" && m.frequency === frequency && !m.hidden
+        && Array.isArray(m.stats?.last) && m.stats.last.length === 2 && m.stats.last[1] != null;
+    }).sort((a, b) => (META(a).source_column || a).localeCompare(META(b).source_column || b));
+    if (!ids.length) return null;
+    const table = el("table", { class: "t" }, el("thead", {}, el("tr", {},
+      el("th", {}, "Source measure"), el("th", {}, "Source period"), el("th", { class: "r" }, "Latest reported"), el("th", {}, "Units"))));
+    const body = el("tbody");
+    for (const id of ids) {
+      const m = META(id), [d, value] = m.stats.last;
+      body.append(el("tr", { "data-series-id": id, "data-period": d },
+        el("td", {}, m.source_label || m.title), el("td", { class: "mono" }, periodLabel(m, d)),
+        el("td", { class: "r num" }, el("button", { class: "chip link acc mono",
+          title: `${m.title}, ${periodLabel(m, d)} (${d}), ${m.units}. Open the source row`, onclick: () => openMacro(id, d) }, fv(m, value))),
+        el("td", { class: "muted" }, m.units)));
+    }
+    table.append(body);
+    const headings = [...new Set(ids.map(id => META(id).source_range_heading).filter(Boolean))];
+    return panel(`IPO summary statistics — ${frequency === "A" ? "annual" : "quarterly"}`,
+      el("a", { href: META(ids[0]).data_url, target: "_blank", rel: "noopener", class: "btn" }, "SEC workbook ↗"),
+      el("div", { class: "mx-meta" }, headings.map(heading => el("span", {}, heading))),
+      el("div", { class: "mx-tbl" }, table),
+      el("div", { class: "mx-meta" }, "Annual and quarterly periods remain separate. Average and median proceeds are not additive. Each row shows its latest available source period."),
+      metaLine(ids));
+  }
+
   /* ---------- page ---------- */
   const SECTIONS = [
     ["rates", "Rates and liquidity", () => [
@@ -224,6 +252,7 @@ window.FU_PAGES = window.FU_PAGES || {};
         chartPanel({ title: "Bank failures per year (FDIC)", ids: ["FDIC:FAILURES"], kind: "bar", bars: 20 })]),
       gridOf("g2", [latestTable("FDIC-insured institutions, year end", ["FDIC:ASSET", "FDIC:DEP", "FDIC:NETINC", "FDIC:NTLNLS", "FDIC:BANKS", "FDIC:FAILED_ASSETS"], [COL.last, COL.prev, COL.chg], { first: "Measure" }),
         chartPanel({ title: "Funding demand reported by dealers (SCOOS)", ids: ["FRB:SCOOS:EXH_E3_C1.Q53.NP", "FRB:SCOOS:EXH_E3_C1.Q57.NP", "FRB:SCOOS:EXH_E3_C2.Q61.NP"], zero: true, start: "2010-01-01" })]),
+      ipoTable("A"), ipoTable("Q"),
     ]],
     ["global", "Global and OECD", () => [oecdTable(),
       gridOf("g2", [chartPanel({ title: "Unemployment rates (OECD)", ids: ["OECD:UNR:USA", "OECD:UNR:EA", "OECD:UNR:JPN", "OECD:UNR:GBR"] }),
