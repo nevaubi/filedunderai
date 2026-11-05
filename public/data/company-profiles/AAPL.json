@@ -14,7 +14,14 @@
   "industry": "Consumer Electronics",
   "headquarters": "Cupertino, California, United States",
   "founded": 1976,
-  "employees": null,
+  "employees": {
+    "count": 167000,
+    "basis": "reported",
+    "scope": "full_time_equivalent",
+    "as_of": "2026-09-26",
+    "approximate": true,
+    "source_url": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm"
+  },
   "professional_profile_count": 201335,
   "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
   "professional_profile_count_source": {
@@ -168,9 +175,15 @@
         "domain": "apple.com",
         "likelihood": 10
       }
+    },
+    {
+      "name": "Apple 2026 Form 10-K, Human Capital",
+      "url": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm",
+      "observed_at": "2026-11-05T14:33:09Z",
+      "as_of": "2026-09-26"
     }
   ],
-  "updated_at": "2026-11-05T14:15:13Z",
+  "updated_at": "2026-11-05T14:33:09Z",
   "field_sources": {
     "website": {
       "name": "Apple company overview and 50th anniversary",
@@ -215,6 +228,12 @@
       "name": "Apple company overview and 50th anniversary",
       "url": "https://www.apple.com/newsroom/2026/03/apple-to-celebrate-50-years-of-thinking-different/",
       "observed_at": "2026-11-05T14:15:13Z"
+    },
+    "employees": {
+      "name": "Apple 2026 Form 10-K, Human Capital",
+      "url": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm",
+      "observed_at": "2026-11-05T14:33:09Z",
+      "as_of": "2026-09-26"
     }
   },
   "coverage": {
@@ -231,7 +250,14 @@
       "founded": "2026-11-05T14:15:13Z",
       "professional_profile_count": "2026-11-05T14:09:43Z",
       "description": "2026-11-05T14:15:13Z",
-      "leadership": "2026-11-05T14:15:13Z"
+      "leadership": "2026-11-05T14:15:13Z",
+      "employees": "2026-11-05T14:33:09Z"
     }
+  },
+  "employees_source": {
+    "name": "Apple 2026 Form 10-K, Human Capital",
+    "url": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm",
+    "observed_at": "2026-11-05T14:33:09Z",
+    "as_of": "2026-09-26"
   }
 }
