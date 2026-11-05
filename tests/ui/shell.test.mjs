@@ -22,6 +22,8 @@ function setup() {
     return node;
   };
   w.IDX = { AAPL: { name: 'Apple', price: 123.45, chg_1d: .0123 }, MSFT: { name: 'Microsoft', price: null, chg_1d: null } };
+  w.PX = {};
+  w.eval(app.slice(app.indexOf('function companySummary('), app.indexOf('async function getJSON(')));
   const values = { watch: ['AAPL', 'MSFT'] };
   w.store = { get: (key, fallback) => values[key] ?? fallback, set: (key, value) => { values[key] = value; } };
   w.miniLogo = ticker => w.el('span', { class: 'mlogo', 'aria-hidden': 'true' }, ticker[0]);
@@ -116,6 +118,20 @@ test('quote tape reports an unavailable date for a null timestamp while preservi
     assert.match(quote.title, /close date unavailable$/);
     assert.match(quote.getAttribute('aria-label'), /date unavailable$/);
     assert.ok(!quote.title.includes('1970'));
+  } finally { h.close(); }
+});
+
+test('a watched company outside the screener uses its loaded close without joining the index', () => {
+  const h = setup();
+  try {
+    const { w } = h;
+    w.FU_COMPANIES = { get: ticker => ticker === 'AAON' ? { ticker, name: 'AAON', screener_eligible: false } : null };
+    w.PX.AAON = { bars: [{ t: new Date('2026-11-03'), c: 60 }, { t: new Date('2026-11-04'), c: 58.25 }] };
+    w.toggleWatch('AAON');
+    assert.equal(w.document.querySelector('#wl [data-t="AAON"] .price').textContent, '$58.25');
+    assert.equal(w.document.querySelector('#wl [data-t="AAON"] .p').textContent, '−2.9%');
+    assert.equal(w.IDX.AAON, undefined);
+    assert.equal(w.companySummary('AAON').screener_eligible, false);
   } finally { h.close(); }
 });
 
