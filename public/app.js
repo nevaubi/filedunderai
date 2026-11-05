@@ -2063,6 +2063,20 @@ function fmtKpi(v, unit) {
   if (Math.abs(v) >= 1e4) return fnum(v, 0);
   return fnum(v, Math.abs(v) < 10 ? 2 : 1);
 }
+function workbookPercentEvidence(v, unit) {
+  // Optional, explicitly reviewed source metadata. Never infer precision from
+  // the KPI's magnitude or apply a display conversion to the stored value.
+  if (v.derived || !["%", "pct", "percent"].includes((unit || "").toLowerCase())
+      || v.source_number_format !== "0%" || v.scale !== 100
+      || v.normalization_rule !== "float(Decimal(str(decoded_cached_float)) * Decimal(100))"
+      || typeof v.source_cached_value !== "number" || !Number.isFinite(v.source_cached_value)
+      || typeof v.v !== "number" || !Number.isFinite(v.v)
+      || typeof v.raw_numeric_token !== "string" || !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(v.raw_numeric_token)
+      || typeof v.printed !== "string" || !/^[+-]?\d+%$/.test(v.printed) || v.source_displayed_value !== v.printed
+      || typeof v.precision_note !== "string" || !v.precision_note.trim()) return null;
+  return { printed: v.printed, cached: v.source_cached_value, normalized: v.v, raw: v.raw_numeric_token,
+    format: v.source_number_format, scale: v.scale, note: v.precision_note };
+}
 async function openKpiSource(tk, it, K, e, v) {
   let doc = (SEG[tk]?.ir?.documents || []).find(d => d.id === v.doc) || { id: v.doc, title: v.doc_title, storage_path: v.path, text_path: v.text_path, ext: v.ext, url: v.url };
   if (v.doc && !doc.text_path && [".xlsx", ".xlsm", ".xls", ".csv", ".pptx", ".ppt", ".docx", ".doc", ".txt"].includes((doc.ext || "").toLowerCase())) {
@@ -2071,7 +2085,7 @@ async function openKpiSource(tk, it, K, e, v) {
     const stored = (ir?.documents || []).find(d => d.id === v.doc);
     if (stored) doc = { ...doc, ...stored };
   }
-  openDoc(tk, doc, { page: v.page, quote: v.quote, printed: v.printed, value: v.v, sheet: v.sheet, cell: v.cell, label: `${it.name} · ${v.label || kpiPeriodLabel(tk, e, K)}`, display: (QMARK[v.q] || "") + fmtKpi(v.v, it.unit), derived: v.derived });
+  openDoc(tk, doc, { page: v.page, quote: v.quote, printed: v.printed, value: v.v, sheet: v.sheet, cell: v.cell, label: `${it.name} · ${v.label || kpiPeriodLabel(tk, e, K)}`, display: (QMARK[v.q] || "") + fmtKpi(v.v, it.unit), derived: v.derived, workbook_percent: workbookPercentEvidence(v, it.unit) });
 }
 
 /* ---------- IR document library ---------- */
@@ -2120,6 +2134,17 @@ function openDoc(tk, d, hl) {
     el("div", { class: "row" }, hl.display ? el("span", { class: "chip acc mono", style: "font-size:13.5px;height:26px" }, hl.display) : null,
       el("span", { class: "muted", style: "font-size:12.5px" }, [DOC_TYPES[d.doc_type] || "", d.fiscal_label || "", hl.page ? "page " + hl.page : "", hl.sheet ? `${hl.sheet}${hl.cell ? "!" + hl.cell : ""}` : ""].filter(Boolean).join(" · "))));
   if (hl.derived) db.append(el("div", { class: "note" }, "Derived value: " + hl.derived.formula + ". The document below shows the reported input."));
+  if (hl.workbook_percent) {
+    const evidence = hl.workbook_percent;
+    db.append(el("div", { class: "note", "data-workbook-percent-evidence": "" }, el("b", {}, "Workbook precision"),
+      el("dl", { class: "kv" },
+        el("dt", {}, "Workbook display"), el("dd", {}, evidence.printed),
+        el("dt", {}, "Cached fraction"), el("dd", { class: "mono" }, String(evidence.cached)),
+        el("dt", {}, "Normalized KPI"), el("dd", { class: "mono" }, String(evidence.normalized) + " percentage points"),
+        el("dt", {}, "Original numeric token"), el("dd", { class: "mono" }, evidence.raw),
+        el("dt", {}, "Source format and scale"), el("dd", {}, `${evidence.format}; fraction × ${evidence.scale}`)),
+      el("div", {}, evidence.note)));
+  }
   const status = el("span", { class: "faint", style: "font-size:12px" }, "Loading…");
   const bar = el("div", { class: "viewer-bar" }, el("span", { class: "badge-src" }, "Original document"), el("span", { class: "eyebrow" }, docTitle(d).slice(0, 80)), el("span", { style: "flex:1" }), status);
   const view = el("div", { class: "viewer docv" });

@@ -168,6 +168,9 @@ def check_reported_fact_replacements(sb, ticker, rows):
             changed = any(prior.get(key) != candidate.get(key) for key in ("value", "unit", "period_start", "concept"))
             if old_date and (not new_date or new_date < old_date):
                 reason = "older_reported_filing"
+            elif any(prior.get(key) != candidate.get(key) for key in ("concept", "unit", "period_start")):
+                # A newer source date does not establish equal accounting scope.
+                reason = "reported_accounting_scope_changed"
             elif changed and (not old_date or not new_date):
                 reason = "changed_reported_value_unknown_date"
             elif changed and old_date == new_date:

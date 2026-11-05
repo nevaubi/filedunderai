@@ -150,6 +150,18 @@ class ScheduledFactSafety(unittest.TestCase):
             self.process(store, cumulative_sources())
         self.assertEqual((store.writes, store.db), ([], []))
 
+    def test_newer_equal_reported_concept_switch_cannot_publish_without_review(self):
+        prior = reported_row(concept="SalesRevenueNet")
+        store = CompanyStore([prior])
+        previous = {"ticker": "AAPL", "generated": "previous"}
+        store.data["companies/AAPL.json"] = copy.deepcopy(previous)
+        latest = observation(150, "2026-04-01", "2026-06-30", Q3, "2026-11-01")
+        with self.assertRaisesRegex(ValueError, "reported_accounting_scope_changed"):
+            self.process(store, [latest])
+        self.assertEqual(store.data["companies/AAPL.json"], previous)
+        self.assertEqual(store.facts, [prior])
+        self.assertEqual((store.writes, store.db), ([], []))
+
     def test_failed_fact_write_does_not_replace_company_bundle(self):
         store = CompanyStore()
         previous = {"ticker": "AAPL", "generated": "previous"}
@@ -162,6 +174,22 @@ class ScheduledFactSafety(unittest.TestCase):
 
 
 class DirectPersistenceSafety(unittest.TestCase):
+    def test_newer_reported_scope_changes_require_review_before_upsert(self):
+        changes = [
+            {"concept": "SalesRevenueNet"},
+            {"unit": "EUR"},
+            {"period_start": "2026-04-02"},
+        ]
+        for change in changes:
+            with self.subTest(change=change):
+                prior = reported_row()
+                store = FactStore([prior])
+                latest = dict(prior, filed="2026-11-01", accession=Q3, **change)
+                with self.assertRaisesRegex(ValueError, "reported_accounting_scope_changed"):
+                    jobs.persist_normalized_facts(store, "AAPL", [latest])
+                self.assertEqual(store.rows, [prior])
+                self.assertEqual(store.ops, [])
+
     def test_direct_persistence_rejects_unsafe_reported_replacements_before_upsert(self):
         changes = [
             {"derived": True, "filed": "2026-11-01", "accession": Q3},

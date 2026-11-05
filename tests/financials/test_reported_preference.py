@@ -355,6 +355,44 @@ class ReportedPreferenceTests(unittest.TestCase):
             ScheduledFactSafety().process(store, values)
         self.assertEqual((store.writes, store.db, store.facts), ([], [], []))
 
+    def test_repair_equivalence_helper_cannot_erase_an_explicit_source_ambiguity(self):
+        raw = source(direct_start='2026-04-02')
+        raw['facts']['us-gaap']['Revenues']['units']['USD'].append(
+            observation(110, '2026-04-01', '2026-06-30', REVISION, '2026-07-01'))
+        statements = normalize(raw)
+        selected = copy.deepcopy(statements['income'][0]['quarterly'][-1])
+        self.assertEqual(selected['selection_conflict']['reason'], 'reported_period_or_value_ambiguity')
+        prior = {'ticker': 'AAPL', 'statement': 'income', 'label': 'Revenue', 'kind': 'Q',
+                 'period_end': '2026-06-30', 'period_start': '2026-04-01', 'concept': 'Revenues',
+                 'unit': 'USD', 'value': 110, 'accession': REVISION, 'form': '10-Q',
+                 'filed': '2026-07-01', 'derived': False}
+        bundle = {'ticker': 'AAPL', 'statements': statements}
+        count = repair_normalization.retain_proved_reported_observations(bundle, [prior], raw['facts'], '2026-11-05')
+        self.assertEqual(count, 0)
+        self.assertEqual(statements['income'][0]['quarterly'][-1], selected)
+        self.assertEqual(len(source_quality.comparability_review(statements, as_of='2026-11-05')['current_conflicts']), 1)
+        self.assertEqual(repair_normalization.review_database_replacements([prior], repair_normalization.rows_for(bundle))['blockers'][0]['reason'], 'reported_to_derived')
+        prove(raw, statements)
+
+    def test_repair_equivalence_helper_cannot_hide_a_different_accounting_concept(self):
+        raw = source(total=150)
+        direct = raw['facts']['us-gaap']['Revenues']['units']['USD'].pop(1)
+        raw['facts']['us-gaap']['SalesRevenueNet'] = {'units': {'USD': [direct]}}
+        statements = normalize(raw)
+        selected = copy.deepcopy(statements['income'][0]['quarterly'][-1])
+        self.assertEqual((selected['v'], selected['c']), (100, 'Revenues'))
+        self.assertTrue(selected.get('derived'))
+        prior = {'ticker': 'AAPL', 'statement': 'income', 'label': 'Revenue', 'kind': 'Q',
+                 'period_end': '2026-06-30', 'period_start': '2026-04-01', 'concept': 'SalesRevenueNet',
+                 'unit': 'USD', 'value': 100, 'accession': Q2, 'form': '10-Q',
+                 'filed': '2026-08-01', 'derived': False}
+        bundle = {'ticker': 'AAPL', 'statements': statements}
+        count = repair_normalization.retain_proved_reported_observations(bundle, [prior], raw['facts'], '2026-11-05')
+        self.assertEqual(count, 0)
+        self.assertEqual(statements['income'][0]['quarterly'][-1], selected)
+        self.assertEqual(repair_normalization.review_database_replacements([prior], repair_normalization.rows_for(bundle))['blockers'][0]['reason'], 'reported_to_derived')
+        prove(raw, statements)
+
 
 if __name__ == '__main__':
     unittest.main()
