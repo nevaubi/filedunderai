@@ -12,6 +12,7 @@ import gzip
 import hashlib
 import json
 import math
+import time
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -393,11 +394,26 @@ def _parallel(items, fn, workers, phase, log=None):
     return results
 
 
+READBACK_DELAYS = (0.5, 1, 2, 4, 8)
+
+
 def _verified_put(sb, bucket, path, body, content_type="application/json"):
+    """Write, then require the stored bytes to match.
+
+    Storage overwrites are read-after-write eventually consistent: the first
+    read of a replaced object can return the previous version for about a
+    second. Retry the read-back for a bounded time before declaring a mismatch;
+    a write that never becomes visible still fails.
+    """
     cache = "no-store" if bucket == "raw" or path.startswith("meta/") else "max-age=300"
     sb.put_object(bucket, path, body, content_type=content_type, cache=cache)
-    if digest(sb.get_object(bucket, path) or b"") != digest(body):
-        raise RuntimeError(f"Source/public read-back SHA mismatch: {bucket}/{path}")
+    expected = digest(body)
+    for delay in (0,) + READBACK_DELAYS:
+        if delay:
+            time.sleep(delay)
+        if digest(sb.get_object(bucket, path) or b"") == expected:
+            return
+    raise RuntimeError(f"Source/public read-back SHA mismatch: {bucket}/{path}")
 
 
 def _publish(sb, items, cohort_hash, workers=10, log=None):
