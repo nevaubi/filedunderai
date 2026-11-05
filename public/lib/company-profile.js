@@ -86,18 +86,55 @@
     const moneyFmt = helpers.fmtMoney || money;
     const card = (title, extra, className = '') => node('section', { class: 'cp-card ' + className }, node('div', { class: 'cp-card-head' }, node('h2', {}, title), extra));
     const button = (text, tab) => node('button', { class: 'cp-text-button', onclick: () => onTab?.(tab) }, text + ' →');
+    const ai = aiSummary(); if (ai) rootNode.append(ai);
     const chart = node('div', { class: 'cp-price-chart' });
     const facts = card('At a glance', null, 'cp-facts');
-    const first = node('div', { class: 'cp-market-grid' }, chart, facts); rootNode.append(first);
+    const financials = card('Financial snapshot', button('Full financials', 'financials'), 'cp-financials');
+    const first = node('div', { class: 'cp-market-grid' }, chart, node('div', { class: 'cp-side' }, financials, facts)); rootNode.append(first);
     if (root.FU_COMPANY_CHART) chartCleanup = root.FU_COMPANY_CHART.render(chart, { ticker, companyName: name, prices, benchmarkPrices });
     else chart.append(node('div', { class: 'cp-card cp-unavailable' }, node('h2', {}, 'Price history'), node('p', {}, 'Price chart is temporarily unavailable.')));
     const description = card('About ' + name, null, 'cp-description');
-    const financials = card('Financial snapshot', button('Full financials', 'financials'), 'cp-financials');
-    const second = node('div', { class: 'cp-detail-grid' }, description, financials); rootNode.append(second);
-    const leadership = card('Leadership', null, 'cp-leadership');
     const related = card('Related companies', node('a', { href: '#companies', class: 'cp-text-button' }, 'Explore all →'), 'cp-related');
-    rootNode.append(node('div', { class: 'cp-leadership-grid' }, leadership, related));
+    rootNode.append(node('div', { class: 'cp-detail-grid' }, description, related));
+    const leadership = card('Leadership', null, 'cp-leadership'); rootNode.append(leadership);
     const recent = card('Company context', button('All coverage', 'news'), 'cp-recent'); rootNode.append(recent);
+
+    // Model-written summary from the company bundle. Labeled as AI output; metric and article chips keep their sources.
+    function aiSummary() {
+      if (!Object.hasOwn(options, 'ai')) return null;
+      const data = options.ai || null;
+      const narratives = (Array.isArray(data?.narratives) ? data.narratives : []).filter(n => n && typeof n.title === 'string' && n.title.trim());
+      const highlights = (Array.isArray(data?.highlights) ? data.highlights : []).filter(h => typeof h === 'string' && h.trim());
+      const generated = data?.generatedAt && Number.isFinite(+new Date(data.generatedAt)) ? dateLabel(data.generatedAt) : null;
+      const head = node('div', { class: 'cp-card-head cp-ai-head' },
+        node('div', { class: 'cp-ai-title' },
+          node('span', { class: 'cp-ai-badge', title: 'Written by a language model from the filings, the latest earnings release and recent coverage. Check figures against the linked sources.' }, node('span', { class: 'cp-ai-mark', 'aria-hidden': 'true' }, '✦'), 'AI-generated'),
+          node('h2', { id: 'cp-ai-heading-' + ticker }, 'Research summary'),
+          data ? node('span', { class: 'cp-ai-meta' }, generated ? 'Generated ' + generated : 'Generation date unavailable') : null),
+        node('div', { class: 'cp-ai-actions' }, button('Narratives & coverage', 'news'), button('Release & IR', 'earnings')));
+      const section = node('section', { class: 'cp-card cp-ai', 'aria-labelledby': 'cp-ai-heading-' + ticker }, head);
+      if (!narratives.length && !highlights.length) {
+        section.append(node('p', { class: 'cp-ai-empty' }, 'No AI-generated summary is available for ' + ticker + ' in this snapshot. The figures below come directly from filings and market data.'));
+        return section;
+      }
+      const stanceName = { bull: 'Bullish', bear: 'Bearish', neutral: 'Neutral' };
+      const list = node('div', { class: 'cp-ai-narratives' });
+      for (const n of narratives.slice(0, 3)) {
+        const metrics = (Array.isArray(n.metrics) ? n.metrics : []).map(label => helpers.metricChip?.(label)).filter(Boolean);
+        const refs = (Array.isArray(n.news) ? n.news : []).map(i => {
+          const item = (options.news || [])[i - 1], url = safeUrl(item?.url);
+          return url ? node('a', { class: 'cp-ai-ref', href: url, target: '_blank', rel: 'noopener noreferrer', title: item.title || url }, '[' + i + '] ' + new URL(url).hostname.replace(/^www\./, '')) : null;
+        }).filter(Boolean);
+        list.append(node('article', { class: 'cp-ai-item' },
+          node('div', { class: 'cp-ai-item-head' }, n.stance ? node('span', { class: 'cp-stance ' + (stanceName[n.stance] ? n.stance : '') }, stanceName[n.stance] || String(n.stance)) : null, node('h3', {}, n.title)),
+          typeof n.summary === 'string' && n.summary.trim() ? node('p', {}, n.summary) : null,
+          metrics.length || refs.length ? node('div', { class: 'cp-ai-refs' }, metrics, refs) : null));
+      }
+      const grid = node('div', { class: 'cp-ai-grid' + (highlights.length ? '' : ' cp-ai-single') }, list);
+      if (highlights.length) grid.append(node('div', { class: 'cp-ai-highlights' }, node('h3', {}, 'Release highlights'), node('ul', {}, highlights.slice(0, 6).map(h => node('li', {}, h)))));
+      section.append(grid, node('p', { class: 'cp-ai-note' }, 'AI-generated text can contain errors. Metric chips open the reported value and its filing; numbered chips open the cited article. Statements without a chip are unverified.'));
+      return section;
+    }
 
     function financialTable() {
       const lq = model?.latestQ?.(), annual = model?.latestA?.();
