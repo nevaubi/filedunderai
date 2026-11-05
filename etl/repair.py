@@ -78,7 +78,7 @@ def rebuild(bundle, facts, vintage='latest', as_of=None, price=None, archived=Tr
     candidate['normalization'] = {'version':2, 'vintage':vintage, 'as_of':as_of, 'source':'archived_companyfacts' if archived else 'public_observations', 'review_required':True}
     prior, after = value_index(bundle), value_index(candidate)
     changes = [{'path':k,'before':prior.get(k),'after':after.get(k)} for k in sorted(prior.keys()|after.keys()) if prior.get(k)!=after.get(k)]
-    fund = fundamentals.compute(candidate['statements'],profile,price)
+    fund = fundamentals.compute(candidate['statements'], profile, price, ticker=candidate.get('ticker'))
     report = {'ticker':bundle.get('ticker'), 'mode':'offline_candidate_only', 'vintage':vintage,'as_of':as_of,
               'changed_periods':len(changes), 'changes':changes, 'fundamentals':fund,
               'shares_before':bundle.get('profile',{}).get('sharesOutstanding'), 'shares_after':profile['sharesOutstanding'],

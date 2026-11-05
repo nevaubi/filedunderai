@@ -394,7 +394,7 @@ def _candidate(bundle, raw, as_of, generated, before_facts=()):
     tables = sec.filing_tables(cf['facts'], candidate['statements'], candidate.get('filings') or [], cik)
     candidate['filingTables'], omitted = retain_proved_filing_tables(tables, proof)
     candidate['provenance']['reconstructed_tables'] = {'scope': 'verified_source_records_only', 'omitted_cells': omitted}
-    candidate['fundamentals'] = fundamentals.compute(candidate['statements'], candidate['profile'], None)
+    candidate['fundamentals'] = fundamentals.compute(candidate['statements'], candidate['profile'], None, ticker=ticker)
     # A raw cache that predates a reported period is not a complete repair.
     prior_reported = {key for key, row in fact_map(rows_for(bundle)).items() if not row['derived']}
     lost_reported = sorted(prior_reported - set(fact_map(rows_for(candidate))))

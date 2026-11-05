@@ -6,6 +6,7 @@ Preparation is read-only remotely. Apply is a separate leased operation.
 import argparse
 import base64
 import contextlib
+import copy
 import datetime as dt
 import gzip
 import hashlib
@@ -24,7 +25,12 @@ from . import common, fundamentals, jobs, screener as sc
 
 CODE_PATHS = ('etl/screener.py', 'etl/jobs.py', 'etl/fundamentals.py', 'etl/sec.py',
               'etl/source_provenance.py', 'etl/source_quality.py', 'etl/universe.py',
-              'etl/common.py', 'etl/repair_screener.py')
+              'etl/common.py', 'etl/kpi_taxonomy.py', 'etl/repair_screener.py')
+SHARED_FINANCIAL_FIELDS = (
+    ('market_cap', 'mcap'), ('pe_ttm', 'pe'), ('ps_ttm', 'ps'),
+    ('fcf_yield', 'fcf_yield'), ('dividend_yield', 'div_yield'),
+    ('buyback_yield', 'bb_yield'), ('rev_growth_lq', 'rev_g_q'), ('net_margin_ttm', 'nm'),
+)
 
 
 def code_paths():
@@ -163,7 +169,7 @@ def _scope(bucket, path, tickers):
         return path == 'company_metrics.json'
     if bucket != 'public-data':
         return False
-    if path in ('index.json', 'screener.json', 'screener/corr.json'):
+    if path in ('index.json', 'screener.json', 'screener/corr.json', 'meta/fundamentals.json'):
         return True
     source = re.fullmatch(r'screener/src/([A-Z0-9.-]+)\.json', path)
     proof = re.fullmatch(r'sources/screener/([A-Z0-9.-]+)/[a-f0-9]{64}\.json', path)
@@ -175,6 +181,39 @@ def _unique(rows, key, expected):
     if len(result) != len(rows) or set(result) != set(expected):
         raise ValueError('Candidate ticker membership/uniqueness mismatch')
     return result
+
+
+def recompute_fund_snapshot(original, read_bundle, workers=8):
+    """Refresh derived summaries only, keeping all identity/coverage metadata."""
+    corrected, changes = copy.deepcopy(original), {}
+    selected = sorted(t for t in sc.TICKERS if fundamentals.normalized(original.get(t) or {}))
+    def one(ticker):
+        bundle = read_bundle(ticker)
+        if not isinstance(bundle, dict) or not fundamentals.normalized(bundle) or bundle.get('ticker') != ticker:
+            raise ValueError('Fundamental recomputation requires the same normalized issuer bundle: ' + ticker)
+        if bundle.get('cik') is not None and int(bundle['cik']) != sc.BY_TICKER[ticker]['cik']:
+            raise ValueError('Fundamental recomputation issuer CIK mismatch: ' + ticker)
+        value = fundamentals.compute(bundle.get('statements') or {}, bundle.get('profile') or {}, None, ticker=ticker)
+        derived = {'fund': value}
+        for field, label in (('div_ttm', 'Dividends paid'), ('bb_ttm', 'Buybacks')):
+            derived[field] = fundamentals.ttm(bundle.get('statements') or {}, label, ('cashflow',), end=value['latest_quarter_end'])
+        before = original[ticker].get('fund') or {}
+        fields = {('fund.' + key): {'before': before.get(key), 'after': value.get(key),
+                    'before_present': key in before, 'after_present': key in value}
+                  for key in sorted(set(before) | set(value))
+                  if key not in before or key not in value or before[key] != value[key]}
+        for field in ('div_ttm', 'bb_ttm'):
+            old = original[ticker]
+            if field not in old or old[field] != derived[field]:
+                fields[field] = {'before': old.get(field), 'after': derived[field],
+                                 'before_present': field in old, 'after_present': True}
+        return ticker, derived, fields
+    with ThreadPoolExecutor(workers) as ex:
+        for ticker, derived, fields in ex.map(one, selected):
+            corrected[ticker].update(derived)
+            if fields:
+                changes[ticker] = fields
+    return corrected, changes
 
 
 def _load_candidate(path, reviewed_sha256):
@@ -209,12 +248,17 @@ def _load_candidate(path, reviewed_sha256):
         if digest(content) != entry['sha256']:
             raise ValueError('Candidate output hash mismatch: ' + entry['path'])
         outputs[key] = (entry, content)
-    required = {('public-data', p) for p in ('index.json', 'screener.json', 'screener/corr.json')}
+    required = {('public-data', p) for p in ('index.json', 'screener.json', 'screener/corr.json', 'meta/fundamentals.json')}
     required |= {('public-data', f'screener/src/{t}.json') for t in tickers}
     required |= {('raw', sc.FUND_PATH), ('relations', 'company_metrics.json')}
     if not required <= set(outputs):
         raise ValueError('Candidate lacks required outputs')
     read = lambda bucket, name: json.loads(outputs[bucket, name][1])
+    original_fund = json.loads(_path(path.parent, 'inputs', 'public-data', 'meta/fundamentals.json').read_bytes())
+    corrected_fund, changes = recompute_fund_snapshot(original_fund,
+        lambda t: json.loads(_path(path.parent, 'inputs', 'public-data', f'companies/{t}.json').read_bytes()))
+    if read('public-data', 'meta/fundamentals.json') != corrected_fund or plan.get('fundamental_changes') != changes:
+        raise ValueError('Corrected fundamentals metadata differs from the sealed source recomputation')
     screen, index = read('public-data', 'screener.json'), read('public-data', 'index.json')
     generation = plan.get('aggregation_id')
     if not re.fullmatch(r'[a-f0-9]{24}', generation or '') or screen.get('aggregation_id') != generation or index.get('aggregation_id') != generation:
@@ -235,8 +279,11 @@ def _load_candidate(path, reviewed_sha256):
         a, b, m = ir[t], sr[t], mr[t]
         if a.get('price') != b.get('price') or a.get('price') != m.get('price') or a.get('as_of') != m.get('as_of'):
             raise ValueError('Candidate exact price/date parity failed: ' + t)
-        if sc.sig(a.get('market_cap')) != b.get('mcap') or a.get('market_cap') != m.get('market_cap'):
+        if a.get('market_cap') != m.get('market_cap'):
             raise ValueError('Candidate market-cap parity failed: ' + t)
+        for index_field, screen_field in SHARED_FINANCIAL_FIELDS:
+            if sc.sig(a.get(index_field)) != b.get(screen_field):
+                raise ValueError('Candidate shared financial parity failed: ' + t + '/' + index_field)
         source = read('public-data', f'screener/src/{t}.json')
         if source.get('tk') != t or source.get('generated') != screen.get('generated'):
             raise ValueError('Candidate provenance generation mismatch: ' + t)
@@ -257,22 +304,12 @@ def _load_candidate(path, reviewed_sha256):
     return plan, outputs, metrics, ir
 
 
-def _material_fund(fund):
-    """Legacy synthetic financial values are not read by the guarded index."""
-    result = {}
-    for t in sc.TICKERS:
-        row = dict(fund.get(t) or {})
-        if not fundamentals.normalized(row):
-            f = row.get('fund') or {}
-            row['fund'] = {k: f.get(k) for k in ('latest_quarter', 'latest_quarter_end')}
-        result[t] = row
-    return result
-
-
 def _check_snapshots(sb, plan, root):
-    original = json.loads(_path(root, 'inputs', 'public-data', 'meta/fundamentals.json').read_bytes())
-    current = sb.get_json('meta/fundamentals.json') or {}
-    if encoded(_material_fund(current)) != encoded(_material_fund(original)):
+    fund_entry = next(e for e in plan['inputs'] if (e['bucket'], e['path']) == ('public-data', 'meta/fundamentals.json'))
+    current = sb.get_object('public-data', 'meta/fundamentals.json')
+    # The whole metadata object is replaced, so every original byte must still
+    # match, including staged/legacy issuers that are preserved in the output.
+    if current is None or digest(current) != fund_entry['sha256']:
         raise ValueError('Fundamental inputs changed since preparation')
     close_entry = next(e for e in plan['inputs'] if (e['bucket'], e['path']) == ('raw', sc.CLOSES_PATH))
     raw = sb.get_object('raw', sc.CLOSES_PATH)
@@ -743,6 +780,9 @@ def prepare_candidate(sb, output, workers=8):
             manifest.update(normalized_tickers=normalized,
                 legacy_tickers=sorted(set(sc.TICKERS)-set(normalized)),
                 normalized_metadata_sha256={t: digest(encoded(fund[t])) for t in normalized})
+            fund, changes = recompute_fund_snapshot(fund, lambda t: store.get_json(f'companies/{t}.json'), workers)
+            manifest['fundamental_changes'] = changes
+            store.put_json('meta/fundamentals.json', fund, cache='no-store')
             prior_index = _unique(old_index['companies'], 'ticker', sc.TICKERS)
             failures = []
             for t in sc.TICKERS:
@@ -773,7 +813,7 @@ def prepare_candidate(sb, output, workers=8):
             old = _unique([dict(zip(old_screen['cols'], row), ticker=row[0]) for row in old_screen['rows']], 'ticker', sc.TICKERS)
             bad_price = [t for t in sc.TICKERS if sr[t].get('price') != ir[t].get('price')]
             comparisons = {}
-            for left, right in (('market_cap', 'mcap'), ('pe_ttm', 'pe')):
+            for left, right in SHARED_FINANCIAL_FIELDS:
                 comparisons[right] = [{'ticker': t, 'index': ir[t].get(left), 'screener': sr[t].get(right)}
                     for t in sc.TICKERS if sc.sig(ir[t].get(left)) != sr[t].get(right)]
             missing_cache = sorted(set(normalized)-set(cache))
@@ -789,11 +829,12 @@ def prepare_candidate(sb, output, workers=8):
                 'missing_normalized_cache': missing_cache, 'unexpected_legacy_cache': legacy_cache,
                 'market_cap_mismatches_after_screener_rounding': comparisons['mcap'],
                 'pe_mismatches_after_screener_rounding': comparisons['pe'],
+                'shared_financial_mismatches': {left: comparisons[right] for left, right in SHARED_FINANCIAL_FIELDS},
                 'same_columns': old_screen['cols'] == screen['cols'], 'same_tickers': set(old) == set(sr), 'groups': groups}
             manifest.update(result=result, candidate_index_rows=len(ir), validation=validation,
                 previous_screener_generated=old_screen.get('generated'), candidate_generated=screen['generated'],
                 example_rows={t: {'index': ir[t], 'screener': sr[t]} for t in ('MSFT', 'AAL', 'NVDA') if t in ir},
-                ready_for_publication_review=not (bad_price or missing_cache or legacy_cache or comparisons['mcap'] or comparisons['pe']) and validation['same_columns'] and validation['same_tickers'])
+                ready_for_publication_review=not (bad_price or missing_cache or legacy_cache or any(comparisons.values())) and validation['same_columns'] and validation['same_tickers'])
             if code_signatures() != manifest['code_sha256']:
                 raise ValueError('Calculation code changed during preparation; replay the captured inputs with stable code')
     except BaseException as error:

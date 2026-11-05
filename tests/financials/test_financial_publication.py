@@ -116,7 +116,7 @@ class FinancialPublication(unittest.TestCase):
         code = textwrap.dedent(src[src.index('            price = out.get("price")'):src.index('            # correlations')])
         out, prov = {"price": 10}, screener.Prov()
         inp = {"eps": 2, "recs": {"eps": []}}
-        scope = dict(screener.__dict__, out=out, prov=prov, inp=inp, fundc={"TEST": {}}, tk="TEST",
+        scope = dict(screener.__dict__, out=out, prov=prov, inp=inp, fundc={"TEST": {}}, fm={}, tk="TEST",
                      dates=["2026-11-04"], c=[10], fx=None, pp={"price": {"p": [["2026-11-04", 10]]}})
         exec(compile(code, "production_valuation_branch", "exec"), scope)
         self.assertNotIn("mcap", out)

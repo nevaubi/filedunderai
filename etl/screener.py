@@ -416,6 +416,13 @@ def _rec(r, concept):
     return rec
 
 
+def _share_observation_key(record):
+    value = record.get('val')
+    reported = (record.get('basis') == 'reported_outstanding' and not record.get('derived')
+                and type(value) in (int, float) and math.isfinite(value) and value > 0)
+    return (reported, record.get('end') or '', record.get('available_at') or record.get('filed') or '', record.get('accn') or '')
+
+
 def extract_company(sb, tk, since):
     """Quarterly statement records since `since` for the screener labels, plus extra concepts from companyfacts."""
     b = sb.get_json(f"companies/{tk}.json") or {}
@@ -434,7 +441,9 @@ def extract_company(sb, tk, since):
             history[lab] = [_rec(r, row["concept"]) for r in (row.get("filing_history") or {}).get("quarterly", []) if r["end"] >= since]
     prof = b.get("profile") or {}
     shares = prof.get("sharesOutstanding") or {}
-    out = {"pipeline_version": b["pipeline_version"], "q": q, "filing_history": history, "fye": prof.get("fiscalYearEnd"), "shares": dict(shares, v=shares.get("val"))}
+    out = {"ticker": tk, "pipeline_version": b["pipeline_version"], "q": q, "filing_history": history, "fye": prof.get("fiscalYearEnd"),
+           "valuation_basis": fundamentals.valuation_hold(tk, prof.get("valuation_basis")),
+           "shares": dict(shares, v=shares.get("val"))}
     cik = BY_TICKER[tk]["cik"]
     strict = tk in STRICT_SOURCE_TICKERS
     cf_raw = None
@@ -470,9 +479,12 @@ def extract_company(sb, tk, since):
             for row in rows:
                 q[row["label"]] = [_rec(r, row["concept"]) for r in row["quarterly"] if r["end"] >= since]
                 history[row["label"]] = [_rec(r, row["concept"]) for r in row["filing_history"]["quarterly"] if r["end"] >= since]
-        # The same cover-page definition is used by company index and screener.
+        # A newer filing/iXBRL profile count may precede its DEI appearance in
+        # Company Facts. Do not regress it to an older archived observation.
         reported = sec.shares_outstanding(facts) or {}
-        out["shares"] = dict(reported, v=reported.get("val"))
+        if _share_observation_key(reported) > _share_observation_key(shares):
+            shares = reported
+        out["shares"] = dict(shares, v=shares.get("val"))
     return out
 
 
@@ -548,6 +560,7 @@ class Prov:
 class Facts:
     def __init__(self, data, splits, as_of=None):
         self.data, self.as_of = data, as_of
+        self.valuation_basis = fundamentals.valuation_hold(data.get("ticker"), data.get("valuation_basis"), as_of)
         source = data.get("filing_history") if as_of else data.get("q")
         self.q = {}
         for lab, records in (source or {}).items():
@@ -566,12 +579,13 @@ class Facts:
                     picked[r[0]] = r
             self.q[lab] = sorted(picked.values(), key=lambda r:r[0])
         self.splits = splits or []
-        grid = self.q.get("Net income") or self.q.get("Revenue") or []
-        self.ends = [r[0] for r in grid]
+        self.ends = sorted({r[0] for label in ("Net income", "Revenue") for r in self.q.get(label, [])})
 
     def adj(self, label, rec):
         """Split-adjusted value: per-share figures and share counts filed before a split are restated to today's basis."""
         if not rec:
+            return None
+        if label in PER_SHARE and fundamentals.basis_blocks(self.valuation_basis, "eps_ttm"):
             return None
         v = abs(rec[2]) if label in OUTFLOWS else rec[2]
         if label in PER_SHARE or label in SHARE_COUNT:
@@ -597,13 +611,19 @@ class Facts:
         """Sum of the four quarters ending at `end` and the records used."""
         if label in INSTANT or label in SHARE_COUNT:
             return None, []
-        recs = []
-        for k in range(4):
-            r = self.at(label, self.shift(end, k))
-            if not r:
-                return None, []
-            recs.append(r)
-        if not fundamentals.consecutive_quarters([{ "start":r[1], "end":r[0]} for r in recs]):
+        if label in PER_SHARE and fundamentals.basis_blocks(self.valuation_basis, "eps_ttm"):
+            return None, []
+        # Historical growth queries shift calendar days; resolve that request to
+        # the actual common fiscal quarter before requiring exact coverage.
+        if self.ends:
+            nearest = min(self.ends, key=lambda value: abs(days_between(value, end)))
+            if abs(days_between(nearest, end)) <= 20:
+                end = nearest
+        # Fiscal quarters need not be 91 days apart (retailers may report a
+        # 16-week final quarter). Select actual records, then prove continuity.
+        eligible = [r for r in self.q.get(label, []) if r[0] <= end]
+        recs = list(reversed(eligible[-4:]))
+        if len(recs) != 4 or recs[0][0] != end or not fundamentals.consecutive_quarters([{ "start":r[1], "end":r[0]} for r in recs]):
             return None, []
         return sum(self.adj(label, r) for r in recs), recs
 
@@ -679,8 +699,14 @@ def growth_block(fx, out, prov, key, label, end):
 
 def fundamentals_for(tk, data, splits, price, sector):
     """All fact-based fields that do not depend on price history; returns (values, provenance, valuation inputs)."""
-    fx = Facts(data, splits)
+    # Warm caches may predate the embedded issuer/policy fields; the caller's
+    # canonical ticker still applies current sourced valuation holds.
+    fx = Facts(dict(data, ticker=tk), splits)
     out, prov = {}, Prov()
+    if fundamentals.basis_blocks(fx.valuation_basis, "eps_ttm"):
+        for field in ("pe", "earn_yield"):
+            prov.put(field, fx.valuation_basis.get("reason") or "A consistent share basis is required",
+                     status="held", valuation_basis=fx.valuation_basis)
     if not fx.ends:
         return out, prov, fx, None
     end = fx.ends[-1]
@@ -1368,7 +1394,9 @@ def activity(sb, fundcache, today):
             p[f"ins_net_{sfx}"] = dict(meta, x=f"Open-market purchases ${w.get('buy_value') or 0:,.0f} − sales ${w.get('sell_value') or 0:,.0f} (Form 4, codes P and S)")
             p[f"ins_net_{sfx}_n"] = dict(meta, x=f"{w.get('buys') or 0} purchases − {w.get('sells') or 0} sales")
             p[f"ins_buyers_{sfx}"] = dict(meta, x=f"{w.get('buyers') or 0} distinct buyers")
-        if tk not in STRICT_SOURCE_TICKERS and (tk in by_news or tk in fundcache):
+        # Financial cache eligibility is independent of the established original
+        # cohort's stored news window. Additional-company coverage stays held.
+        if tk not in STRICT_SOURCE_TICKERS:
             items = sorted(by_news.get(tk, []), key=lambda n: n.get("published_at") or "", reverse=True)
             o["news_30d"] = len(items)
             p["news_30d"] = {"x": f"News items published since {(today - dt.timedelta(days=30)).isoformat()}", "u": [[n["url"], n["title"][:140], (n.get("published_at") or "")[:10]] for n in items[:12]]}
@@ -1456,19 +1484,19 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
                     prov.put("pe", f"Close {price} on {price_date} / diluted EPS of the last four quarters ({eps:.2f}, split-adjusted)", inp["recs"]["eps"], p=[[price_date, price]])
                 out["earn_yield"] = eps / price
                 prov.put("earn_yield", f"Diluted EPS of the last four quarters ({eps:.2f}) / close {price}", inp["recs"]["eps"], p=[[price_date, price]])
-            sh = dict((fundc.get(tk) or {}).get("shares") or {})
-            mcap = fundamentals.market_cap(price, dict(sh, val=sh.get("v")), price_date)
+            # Current capitalization uses the same canonical, independently
+            # reported observation as the index. Financial normalization can
+            # remain pending without erasing a separately evidenced share count.
+            sh = dict(fm.get("shares_metadata") or {})
+            sh["v"] = sh.get("val")
+            mcap = fundamentals.market_cap(price, sh, price_date)
             if mcap is not None:
                 out["mcap"] = mcap
                 share_ref = None
-                if sh.get("dil"):
-                    share_ref = ("Diluted shares", sh["dil"])
-                    basis = f"diluted weighted shares for the quarter ended {sh['end']} (split-adjusted{'; Class A at 1,500 Class B' if tk in CLASS_RATIO else ''}), used because the cover page count is reported by share class"
-                else:
-                    if sh.get("accn"):
-                        share_ref = ("Shares outstanding (cover page)", [sh.get("end"), "", sh["v"], sh["accn"], sh.get("filed") or "", sh.get("form") or "", "EntityCommonStockSharesOutstanding", 0])
-                    classes = f" (share classes {' + '.join(f'{x:,.0f}' for x in sh['parts'])})" if len(sh.get("parts") or []) > 1 else ""
-                    basis = f"shares outstanding{classes} (cover page, as of {sh.get('end')})"
+                if sh.get("accn"):
+                    share_ref = ("Shares outstanding (cover page)", [sh.get("end"), "", sh["v"], sh["accn"], sh.get("filed") or "", sh.get("form") or "", "EntityCommonStockSharesOutstanding", 0])
+                classes = f" (share classes {' + '.join(f'{x:,.0f}' for x in sh['parts'])})" if len(sh.get("parts") or []) > 1 else ""
+                basis = f"shares outstanding{classes} (cover page, as of {sh.get('end')})"
                 prov.put("mcap", f"Close {price} on {price_date} × {sh['v']:,.0f} {basis}", [share_ref] if share_ref else [], p=[[price_date, price]])
                 if inp:
                     R = inp["recs"]
@@ -1608,7 +1636,9 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
                 if isinstance(x, bool):
                     row.append(1 if x else 0)
                 elif fid == "price":
-                    row.append(round(x, 2) if x is not None else None)
+                    # Retain the exact stored close shared by index/provenance.
+                    # Display formatting belongs to the client.
+                    row.append(x)
                 else:
                     row.append(sig(x))
             out_rows.append(row)
