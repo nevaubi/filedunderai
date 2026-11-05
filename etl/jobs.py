@@ -42,16 +42,23 @@ def _cache(sb, path, default, strict=False):
 
 
 def preserve_filing_owners(sb, rows):
-    """Hold additional-issuer aliases of globally owned filing accessions.
+    """Preserve filing ownership and emit one unambiguous row per accession.
 
     Local StageStore writes are checked independently by the backfill publisher.
     Live stores must provide a successful owner lookup; never treat its failure
-    as an empty table. Existing-universe rows retain their original write path.
+    as an empty table. Unique existing-universe rows retain their original path.
+    A shared incoming accession requires its existing owner, or a review hold.
     """
     rows = list(rows)
+    if getattr(sb, "stage_only", False) is True:
+        return rows, []
+    grouped = {}
+    for row in rows:
+        grouped.setdefault(row["accession"], []).append(row)
+    repeated = {accession for accession, group in grouped.items() if len(group) > 1}
     additional = {t for t, *_ in ADDITIONAL_LIST}
-    guarded = [r for r in rows if r["ticker"] in additional]
-    if not guarded or getattr(sb, "stage_only", False) is True:
+    guarded = [r for r in rows if r["ticker"] in additional or r["accession"] in repeated]
+    if not guarded:
         return rows, []
     lookup = getattr(sb, "select", None)
     if not callable(lookup):
@@ -69,16 +76,40 @@ def preserve_filing_owners(sb, rows):
                 raise RuntimeError("Incomplete or conflicting live filing ownership lookup")
             owners[row["accession"]] = row["ticker"]
     kept, held = [], []
-    for row in rows:
-        owner = owners.get(row["accession"])
-        if row["ticker"] in additional and owner is not None and owner != row["ticker"]:
-            held.append({"accession": row["accession"], "ticker": row["ticker"], "owner_ticker": owner})
-        else:
-            kept.append(row)
+    for accession, group in grouped.items():
+        owner = owners.get(accession)
+        eligible, held_tickers = [], set()
+        for row in group:
+            if (row["ticker"] in additional or accession in repeated) and owner is not None and owner != row["ticker"]:
+                if row["ticker"] not in held_tickers:
+                    held.append({"accession": accession, "ticker": row["ticker"], "owner_ticker": owner})
+                    held_tickers.add(row["ticker"])
+            else:
+                eligible.append(row)
+        candidates = sorted({row["ticker"] for row in eligible})
+        if len(candidates) > 1:
+            held.extend({"accession": accession, "ticker": ticker, "owner_ticker": owner,
+                         "reason": "ambiguous_incoming_owner", "candidate_tickers": candidates} for ticker in candidates)
+            continue
+        if not eligible:
+            continue
+        # Fetch timestamps do not change filing identity. Other disagreement
+        # needs review; choosing whichever worker completed last is unsafe.
+        identity = {k: v for k, v in eligible[0].items() if k != "updated_at"}
+        if any({k: v for k, v in row.items() if k != "updated_at"} != identity for row in eligible[1:]):
+            held.append({"accession": accession, "ticker": candidates[0], "owner_ticker": owner,
+                         "reason": "conflicting_incoming_filing"})
+            continue
+        kept.append(eligible[0])
     return kept, held
 
 
 def _held_filing_message(row):
+    if row.get("reason") == "ambiguous_incoming_owner":
+        return (f"Held filing alias {row['accession']} for {row['ticker']}; owner unassigned because the incoming "
+                f"batch lists multiple issuers ({', '.join(row['candidate_tickers'])}).")
+    if row.get("reason") == "conflicting_incoming_filing":
+        return f"Held filing {row['accession']} for {row['ticker']}; incoming filing details disagree."
     return f"Held filing alias {row['accession']} for {row['ticker']}; existing owner {row['owner_ticker']} preserved."
 
 

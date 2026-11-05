@@ -57,6 +57,69 @@ class FilingStore(MemoryStore):
 
 
 class FilingOwnershipTests(unittest.TestCase):
+    def test_unowned_cross_issuer_batch_holds_each_alias_without_picking_an_owner(self):
+        # The archived LITE and MRVL submissions both contain this Nov 2, 2026
+        # Form 425. One database accession cannot be assigned by worker order.
+        accession = "0001193125-26-443876"
+        sb = FilingStore()
+        rows = [{"accession": accession, "ticker": ticker, "form": "425"}
+                for ticker in ("LITE", "MRVL")]
+        rows.append({"accession": OWN, "ticker": "LITE", "form": "4"})
+        kept, held = jobs.preserve_filing_owners(sb, rows)
+        self.assertEqual(kept, [rows[-1]])
+        self.assertEqual({row["ticker"] for row in held}, {"LITE", "MRVL"})
+        self.assertTrue(all(row["owner_ticker"] is None and row["reason"] == "ambiguous_incoming_owner"
+                            and row["candidate_tickers"] == ["LITE", "MRVL"] for row in held))
+        self.assertTrue(all("unassigned" in jobs._held_filing_message(row) for row in held))
+
+    def test_duplicate_batch_preserves_existing_owner_even_for_legacy_issuers(self):
+        sb = FilingStore()
+        sb.filings[SHARED]["ticker"] = "MSFT"
+        rows = [{"accession": SHARED, "ticker": ticker} for ticker in ("AAPL", "MSFT")]
+        kept, held = jobs.preserve_filing_owners(sb, rows)
+        self.assertEqual(kept, [rows[1]])
+        self.assertEqual(held, [{"accession": SHARED, "ticker": "AAPL", "owner_ticker": "MSFT"}])
+        self.assertEqual(len(sb.lookups), 1)
+
+    def test_identical_incoming_duplicates_collapse_but_conflicting_payloads_are_held(self):
+        sb = FilingStore()
+        row = {"accession": OWN, "ticker": "AAPL", "form": "4", "updated_at": "2026-11-05T18:00:00Z"}
+        kept, held = jobs.preserve_filing_owners(sb, [row, {**row, "updated_at": "2026-11-05T18:00:01Z"}])
+        self.assertEqual(kept, [row])
+        self.assertEqual(held, [])
+        kept, held = jobs.preserve_filing_owners(sb, [row, {**row, "form": "8-K"}])
+        self.assertEqual(kept, [])
+        self.assertEqual(len(held), 1)
+        self.assertEqual(held[0]["reason"], "conflicting_incoming_filing")
+
+    def test_duplicate_legacy_owner_lookup_failure_refuses_the_batch(self):
+        sb = FilingStore()
+        sb.lookup_error = RuntimeError("ownership lookup unavailable")
+        with self.assertRaisesRegex(RuntimeError, "ownership"):
+            jobs.preserve_filing_owners(sb, [{"accession": SHARED, "ticker": ticker} for ticker in ("AAPL", "MSFT")])
+
+    def test_light_sync_never_sends_duplicate_conflict_keys(self):
+        sb = FilingStore()
+        accession = "0001193125-26-443876"
+        fl = [filing(accession, "425"), filing(OLD, "10-Q")]
+        fund = {ticker: {"latest_accession": OLD, "material_accession": OLD, "pipeline_version": jobs.PIPELINE_VERSION}
+                for ticker in ("LITE", "MRVL")}
+        stats = {}
+        original_upsert = sb.upsert
+        def unique_upsert(table, rows, *args, **kwargs):
+            if table == "filings":
+                keys = [row["accession"] for row in rows]
+                self.assertEqual(len(keys), len(set(keys)), "Postgres rejects duplicate ON CONFLICT keys in one batch")
+            return original_upsert(table, rows, *args, **kwargs)
+        sb.upsert = unique_upsert
+        with patch.object(jobs.sec, "submissions", return_value={}), patch.object(jobs.sec, "filing_list", return_value=fl), patch("builtins.print"):
+            changed = jobs.detect_changes(sb, ["LITE", "MRVL"], fund, time.time() + 30, ownership_stats=stats)
+        self.assertEqual(changed, [])
+        self.assertEqual(stats["held_filing_alias_count"], 2)
+        self.assertNotIn(accession, sb.filings)
+        self.assertIn("meta/check_cursor.json", sb.data)
+        self.assertTrue(all(any(accession in warning for warning in fund[ticker]["warnings"]) for ticker in fund))
+
     def test_company_refresh_preserves_owner_and_reports_held_accession(self):
         sb = FilingStore()
         original = copy.deepcopy(sb.filings[SHARED])
