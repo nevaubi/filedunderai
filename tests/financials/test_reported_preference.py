@@ -234,6 +234,127 @@ class ReportedPreferenceTests(unittest.TestCase):
         with self.assertRaises(ProvenanceError):
             prove(raw, statements)
 
+    def test_same_filing_direct_and_derived_disagreement_keeps_reported_history(self):
+        # EPR's2010Q4 reproducer: lease scope ranks the cumulative Revenues
+        # context above a direct quarter in the same annual filing.
+        raw = source()
+        raw['facts']['us-gaap']['Revenues']['units']['USD'].append(
+            observation(100, '2026-04-01', '2026-06-30', LATER, '2026-11-01'))
+        raw['facts']['us-gaap']['OperatingLeaseLeaseIncome'] = {'units': {'USD': [
+            observation(10, '2026-01-01', '2026-06-30', LATER, '2026-11-01')]}}
+        statements = normalize(raw)
+        row = statements['income'][0]
+        point = row['quarterly'][-1]
+        self.assertEqual((point['v'], point['filed'], point['accn']), (100, '2026-11-01', LATER))
+        self.assertEqual(point['selection_conflict']['reason'], 'same_date_derived_value_differs_from_reported')
+        self.assertEqual(point['selection_conflict']['alternative']['v'], 110)
+        history = row['filing_history']['quarterly']
+        self.assertTrue(any(p['accn'] == LATER and not p.get('derived') and p['v'] == 100 for p in history))
+        self.assertTrue(any(p['accn'] == LATER and p.get('derived') and p['v'] == 110 for p in history))
+        prove(raw, statements)
+        data = {'ticker': 'AAPL', 'filing_history': {'Revenue': [screener._rec(p, 'Revenues') for p in history]}}
+        self.assertIsNone(screener.Facts(data, [], as_of='2026-11-01').at('Revenue', '2026-06-30'))
+        self.assertEqual(screener.Facts(data, [], as_of='2026-10-31').at('Revenue', '2026-06-30')[2], 100)
+
+    def test_same_date_direct_first_conflict_is_order_independent_and_source_proved(self):
+        raw = source()
+        raw['facts']['us-gaap']['Revenues']['units']['USD'].append(
+            observation(100, '2026-04-01', '2026-06-30', LATER, '2026-11-01'))
+        original = copy.deepcopy(raw)
+        for reverse in (False, True):
+            with self.subTest(reverse=reverse):
+                candidate = copy.deepcopy(raw)
+                if reverse:
+                    candidate['facts']['us-gaap']['Revenues']['units']['USD'].reverse()
+                statements = normalize(candidate)
+                row = statements['income'][0]
+                point = row['quarterly'][-1]
+                self.assertEqual((point['v'], point['accn'], point['filed']), (100, LATER, '2026-11-01'))
+                self.assertEqual(point['selection_conflict']['reason'], 'same_date_derived_value_differs_from_reported')
+                self.assertEqual(point['selection_conflict']['alternative']['v'], 110)
+                history = row['filing_history']['quarterly']
+                self.assertTrue(any(p['accn'] == LATER and p.get('derived') and p['v'] == 110 for p in history))
+                self.assertTrue(any(p['accn'] == LATER and not p.get('derived') and p['v'] == 100 for p in history))
+                prove(candidate, statements)
+                data = {'ticker': 'AAPL', 'filing_history': {'Revenue': [screener._rec(p, 'Revenues') for p in history]}}
+                self.assertIsNone(screener.Facts(data, [], as_of='2026-11-01').at('Revenue', '2026-06-30'))
+                self.assertEqual(screener.Facts(data, [], as_of='2026-10-31').at('Revenue', '2026-06-30')[2], 100)
+        self.assertEqual(raw, original)
+
+    def test_all_same_date_derived_alternatives_are_retained_and_independently_checked(self):
+        raw = source()
+        raw['facts']['us-gaap']['Revenues']['units']['USD'].extend([
+            observation(100, '2026-04-01', '2026-06-30', LATER, '2026-11-01'),
+            observation(170, '2026-01-01', '2026-06-30', REVISION, '2026-11-01'),
+        ])
+        statements = normalize(raw)
+        point = statements['income'][0]['quarterly'][-1]
+        conflict = point['selection_conflict']
+        alternatives = [conflict['alternative'], *conflict['additional_alternatives']]
+        self.assertEqual({p['v'] for p in alternatives}, {110, 120})
+        history = statements['income'][0]['filing_history']['quarterly']
+        self.assertTrue(all(any(h['accn'] == p['accn'] and h['v'] == p['v'] and h.get('derived')
+                                for h in history) for p in alternatives))
+        proof = prove(raw, statements)
+        self.assertEqual(len(proof['points']['/income/0/quarterly/1']['selection_conflict']['additional_alternatives']), 1)
+        changed = copy.deepcopy(statements)
+        changed['income'][0]['quarterly'][-1]['selection_conflict']['additional_alternatives'][0]['v'] = 999
+        with self.assertRaises(ProvenanceError):
+            prove(raw, changed)
+
+    def test_later_reported_revision_is_not_held_by_an_older_derived_disagreement(self):
+        raw = source()
+        raw['facts']['us-gaap']['Revenues']['units']['USD'].extend([
+            observation(100, '2026-04-01', '2026-06-30', LATER, '2026-11-01'),
+            observation(105, '2026-04-01', '2026-06-30', REVISION, '2026-12-01'),
+        ])
+        statements = normalize(raw)
+        point = statements['income'][0]['quarterly'][-1]
+        self.assertEqual((point['v'], point['filed']), (105, '2026-12-01'))
+        self.assertNotIn('selection_conflict', point)
+        prove(raw, statements)
+        history = statements['income'][0]['filing_history']['quarterly']
+        data = {'ticker': 'AAPL', 'filing_history': {'Revenue': [screener._rec(p, 'Revenues') for p in history]}}
+        self.assertIsNone(screener.Facts(data, [], as_of='2026-11-01').at('Revenue', '2026-06-30'))
+        self.assertEqual(screener.Facts(data, [], as_of='2026-12-01').at('Revenue', '2026-06-30')[2], 105)
+
+    def test_same_date_alternative_with_future_source_leg_cannot_hold_a_valid_reported_point(self):
+        raw = source()
+        values = raw['facts']['us-gaap']['Revenues']['units']['USD']
+        values[0]['filed'] = '2026-02-01'
+        values.append(observation(100, '2026-04-01', '2026-06-30', LATER, '2026-11-01'))
+        statements, excluded = partition_supported_periods(normalize(raw))
+        point = statements['income'][0]['quarterly'][-1]
+        self.assertEqual(point['v'], 100)
+        self.assertNotIn('selection_conflict', point)
+        self.assertTrue(excluded)
+        prove(raw, statements)
+
+    def test_exact_decimal_subtraction_rounding_does_not_become_a_value_correction(self):
+        for same_date in (False, True):
+            with self.subTest(same_date=same_date):
+                raw = source(total=300.1)
+                values = raw['facts']['us-gaap']['Revenues']['units']['USD']
+                values[0]['val'], values[1]['val'], values[2]['val'] = 100.2, 199.9, 300.1
+                if same_date:
+                    values.append(observation(199.9, '2026-04-01', '2026-06-30', LATER, '2026-11-01'))
+                statements = normalize(raw)
+                point = statements['income'][0]['quarterly'][-1]
+                self.assertEqual(point['v'], 199.9)
+                self.assertFalse(point.get('derived'))
+                self.assertNotIn('selection_conflict', point)
+                prove(raw, statements)
+
+    def test_new_issuer_same_date_direct_first_conflict_fails_before_any_write(self):
+        from test_company_fact_safety import CompanyStore, ScheduledFactSafety
+        raw = source()
+        values = raw['facts']['us-gaap']['Revenues']['units']['USD']
+        values.append(observation(100, '2026-04-01', '2026-06-30', LATER, '2026-11-01'))
+        store = CompanyStore()
+        with self.assertRaisesRegex(ValueError, 'comparability review'):
+            ScheduledFactSafety().process(store, values)
+        self.assertEqual((store.writes, store.db, store.facts), ([], [], []))
+
 
 if __name__ == '__main__':
     unittest.main()

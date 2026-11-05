@@ -1,5 +1,7 @@
 """SEC EDGAR: company profile, filing index and XBRL statements with filing-level attribution."""
 import datetime as dt
+from fractions import Fraction
+import json
 
 from .common import sec_json
 from .fundamentals import norm_fye
@@ -115,6 +117,40 @@ def _revenue_rank(facts, r, names):
     return names.index(c), "reported concept priority within accounting scope"
 
 
+def _supported_source_periods(point, cutoff=None, active=frozenset()):
+    """Invalid source chronology cannot create a new selection disagreement."""
+    if not isinstance(point, dict) or id(point) in active or len(active) >= 32:
+        return False
+    end, filed = point.get('end'), point.get('filed')
+    available = point.get('available_at') or filed
+    if not end or not filed or end > filed or (cutoff and available > cutoff):
+        return False
+    derivation = point.get('derived')
+    if isinstance(derivation, dict):
+        return all(_supported_source_periods(derivation.get(key), available, active | {id(point)})
+                   for key in ('from', 'minus'))
+    return True
+
+
+def _same_reported_amount(reported, alternative):
+    if reported['v'] == alternative['v']:
+        return True
+    derivation = alternative.get('derived')
+    if not isinstance(derivation, dict):
+        return False
+    try:
+        big, small = derivation['from']['v'], derivation['minus']['v']
+        # Recognize only exact decimal agreement whose normalized discrepancy is
+        # reproduced by binary float subtraction. This is not a value tolerance
+        # and never rewrites a reported amount or a source derivation.
+        return (isinstance(alternative['v'], float)
+                and (isinstance(big, float) or isinstance(small, float))
+                and alternative['v'] == big - small
+                and Fraction(str(reported['v'])) == Fraction(str(big)) - Fraction(str(small)))
+    except (KeyError, TypeError, ValueError, OverflowError):
+        return False
+
+
 def prefer_reported_observation(selected, options):
     """Preserve the latest direct observation for one already unit-matched series.
 
@@ -137,15 +173,28 @@ def prefer_reported_observation(selected, options):
             'reason': 'reported_period_or_value_ambiguity',
             'reported_observations': [{k: v for k, v in r.items() if not k.startswith('_')}
                                       for r in sorted(latest, key=lambda r: (r['accn'], r.get('start') or '', r['v']))]})
-    if not selected.get('derived'):
-        return selected
-    preferred = dict(max(latest, key=lambda r: r["accn"]),
-                     selection_reason="Preserved exact reported observation over an equal later derived value")
-    if preferred["v"] != selected["v"]:
-        preferred["selection_reason"] = "Preserved latest reported observation; conflicting later derivation requires comparability review"
-        preferred["selection_conflict"] = {
-            "reason": "later_derived_value_differs_from_reported",
-            "alternative": {k: v for k, v in selected.items() if not k.startswith("_")}}
+    preferred = (dict(max(latest, key=lambda r: r["accn"]),
+                      selection_reason="Preserved exact reported observation over an equal later derived value")
+                 if selected.get('derived') else dict(selected))
+    same_date = latest_date == (selected.get('available_at') or selected['filed'])
+    candidates = ([r for r in options if r.get('derived') and r['c'] == preferred['c']
+                   and r.get('start') == preferred.get('start') and r['end'] == preferred['end']
+                   and (r.get('available_at') or r['filed']) == latest_date]
+                  if same_date else [selected] if selected.get('derived') else [])
+    alternatives = {}
+    for candidate in candidates:
+        if _supported_source_periods(candidate) and not _same_reported_amount(preferred, candidate):
+            clean = {k: v for k, v in candidate.items() if not k.startswith('_')}
+            alternatives[json.dumps(clean, sort_keys=True, separators=(',', ':'))] = clean
+    alternatives = [alternatives[key] for key in sorted(alternatives)]
+    if alternatives:
+        preferred['selection_reason'] = 'Preserved latest reported observation; conflicting derivation requires comparability review'
+        preferred['selection_conflict'] = {
+            'reason': ('same_date_derived_value_differs_from_reported' if same_date
+                       else 'later_derived_value_differs_from_reported'),
+            'alternative': alternatives[0]}
+        if len(alternatives) > 1:
+            preferred['selection_conflict']['additional_alternatives'] = alternatives[1:]
     return preferred
 
 
@@ -231,17 +280,49 @@ def build_series(facts, stmt, vintage="latest", as_of=None, concepts=None, insta
             return sorted(chosen, key=lambda r:r["end"])
         def clean(records):
             return [{k:v for k,v in r.items() if not k.startswith("_")} for r in records]
-        def history(records):
-            grouped = {}
+        def history(records, selected):
+            grouped, same_period_date = {}, {}
             for r in records:
                 key = (r["end"], r["accn"], r["available_at"])
                 prev = grouped.get(key)
                 if not prev or (r["_rank"], bool(r.get("derived"))) < (prev["_rank"], bool(prev.get("derived"))):
                     grouped[key] = r
-            return clean(sorted(grouped.values(), key=lambda r:(r["end"], r["available_at"], r["accn"])))
+                scope = (r['c'], r.get('start'), r['end'], r['available_at'])
+                same_period_date.setdefault(scope, []).append(r)
+            result = clean(sorted(grouped.values(), key=lambda r:(r["end"], r["available_at"], r["accn"])))
+            identity = lambda r: (r['end'], r.get('start'), r['accn'], r['filed'], r['c'], r['v'], bool(r.get('derived')))
+            observations = list(selected)
+            # A newer report can resolve today's choice while a historical
+            # as-of date still needs both sides of an older same-date conflict.
+            for options in same_period_date.values():
+                direct = [r for r in options if not r.get('derived') and _supported_source_periods(r)]
+                derived = [r for r in options if r.get('derived') and _supported_source_periods(r)]
+                if any(not _same_reported_amount(r, d) for r in direct for d in derived):
+                    observations.extend(clean(direct + derived))
+            for point in selected:
+                conflict = point.get('selection_conflict') or {}
+                if conflict.get('alternative'):
+                    observations.append(conflict['alternative'])
+                    observations.extend(conflict.get('additional_alternatives', []))
+            for point in observations:
+                historical = dict(point)
+                conflict = historical.get('selection_conflict') or {}
+                # A later disagreement must not become known at the direct
+                # observation's earlier filing date. Same-date ambiguity is
+                # already public then and can be retained in its history row.
+                if conflict.get('reason') == 'later_derived_value_differs_from_reported':
+                    historical.pop('selection_conflict')
+                    historical['selection_reason'] = 'reported source observation'
+                found = next((i for i, r in enumerate(result) if identity(r) == identity(historical)), None)
+                if found is None:
+                    result.append(historical)
+                elif historical.get('selection_conflict'):
+                    result[found] = historical
+            return sorted(result, key=lambda r: (r['end'], r['available_at'], r['accn'], bool(r.get('derived'))))
+        selected_annual, selected_quarterly = clean(select(annual)), clean(select(quarterly))
         out.append({"label": label, "concept": concept, "unit": unit, "vintage": vintage, "as_of": as_of,
-                    "annual": clean(select(annual)), "quarterly": clean(select(quarterly)),
-                    "filing_history": {"annual": history(annual), "quarterly": history(quarterly)}})
+                    "annual": selected_annual, "quarterly": selected_quarterly,
+                    "filing_history": {"annual": history(annual, selected_annual), "quarterly": history(quarterly, selected_quarterly)}})
     return out
 
 

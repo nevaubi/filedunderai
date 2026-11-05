@@ -308,20 +308,35 @@ def validate_statement_provenance(snapshot, statements, expected_cik, snapshot_s
             conflict = point['selection_conflict']
             if not isinstance(conflict, dict):
                 _fail(path, 'invalid source selection conflict')
-            if conflict.get('reason') == 'later_derived_value_differs_from_reported':
-                if derived is not None or set(conflict) != {'reason', 'alternative'}:
+            if conflict.get('reason') in ('later_derived_value_differs_from_reported',
+                                          'same_date_derived_value_differs_from_reported'):
+                if (derived is not None or not {'reason', 'alternative'}.issubset(conflict)
+                        or set(conflict) - {'reason', 'alternative', 'additional_alternatives'}):
                     _fail(path, 'invalid reported selection conflict')
-                alternative = conflict['alternative']
-                if (not isinstance(alternative, dict) or not alternative.get('derived')
-                        or 'selection_conflict' in alternative):
-                    _fail(path, 'selection conflict requires one complete derived alternative')
-                checked = validate_point(alternative, row, statement, namespace, allowed,
-                                         path + '/selection_conflict/alternative', active, bucket)
-                if ((checked['concept'], checked['start'], checked['end']) != (concept, start, end)
-                        or checked['value'] == value or checked['available'] <= available):
-                    _fail(path, 'selection conflict differs in scope or is not a later conflicting derivation')
-                proof['selection_conflict'] = {'reason': conflict['reason'], 'alternative': checked['proof'],
-                                               'reported_value': str(value), 'alternative_value': str(checked['value'])}
+                additional = conflict.get('additional_alternatives', [])
+                if (not isinstance(additional, list)
+                        or ('additional_alternatives' in conflict and not additional)):
+                    _fail(path, 'invalid additional source alternatives')
+                same_date = conflict['reason'] == 'same_date_derived_value_differs_from_reported'
+                checked_alternatives = []
+                for index, alternative in enumerate([conflict['alternative'], *additional]):
+                    if (not isinstance(alternative, dict) or not alternative.get('derived')
+                            or 'selection_conflict' in alternative):
+                        _fail(path, 'selection conflict requires complete derived alternatives')
+                    suffix = '/alternative' if index == 0 else f'/additional_alternatives/{index - 1}'
+                    checked = validate_point(alternative, row, statement, namespace, allowed,
+                                             path + '/selection_conflict' + suffix, active, bucket)
+                    chronology_matches = checked['available'] == available if same_date else checked['available'] > available
+                    if ((checked['concept'], checked['start'], checked['end']) != (concept, start, end)
+                            or checked['value'] == value or not chronology_matches):
+                        _fail(path, 'selection conflict differs in scope or declared availability')
+                    checked_alternatives.append(checked)
+                first = checked_alternatives[0]
+                proof['selection_conflict'] = {'reason': conflict['reason'], 'alternative': first['proof'],
+                                               'reported_value': str(value), 'alternative_value': str(first['value'])}
+                if additional:
+                    proof['selection_conflict']['additional_alternatives'] = [
+                        {'proof': r['proof'], 'value': str(r['value'])} for r in checked_alternatives[1:]]
             elif conflict.get('reason') == 'reported_period_or_value_ambiguity':
                 observations = conflict.get('reported_observations')
                 if set(conflict) != {'reason', 'reported_observations'} or not isinstance(observations, list) or not observations:
