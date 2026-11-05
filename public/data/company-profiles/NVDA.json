@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "ticker": "NVDA",
+  "cik": 1045810,
+  "name": "NVIDIA",
+  "description": "NVIDIA develops processors, computing systems, networking and software for AI and other demanding workloads. Its platform connects GPU hardware with CUDA libraries and tools for developers. Customers use its technology for AI training and inference, graphics, gaming, simulation, robotics, autonomous driving and scientific computing. Its product ecosystem includes GeForce and RTX graphics, Omniverse simulation and DRIVE automotive technology. Founded in 1993, the company is led by cofounder Jensen Huang.",
+  "description_source": {
+    "name": "NVIDIA in Brief, 2026",
+    "url": "https://nvidianews.nvidia.com/_gallery/get_file/?file_ext=.pdf&file_id=62acc991b3aed36cab48537d&ir=1",
+    "observed_at": "2026-11-05T14:15:13Z"
+  },
+  "source_url": "https://nvidianews.nvidia.com/_gallery/get_file/?file_ext=.pdf&file_id=62acc991b3aed36cab48537d&ir=1",
+  "website": "https://www.nvidia.com/",
+  "industry": "Computer Hardware",
+  "headquarters": "Santa Clara, California, United States",
+  "founded": 1993,
+  "employees": null,
+  "professional_profile_count": 47560,
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "UfpkcWwT0wtdMrMoKi8shQuv1NMk",
+    "observed_at": "2026-11-05T14:09:56Z",
+    "match": {
+      "ticker": "NVDA",
+      "domain": "nvidia.com",
+      "likelihood": 10
+    }
+  },
+  "provider_record_id": "UfpkcWwT0wtdMrMoKi8shQuv1NMk",
+  "leadership": [
+    {
+      "name": "Jensen Huang",
+      "role": "Founder, President and Chief Executive Officer",
+      "start_date": "1993",
+      "profile_url": "https://nvidianews.nvidia.com/bios/jensen-huang",
+      "source_url": "https://nvidianews.nvidia.com/bios/jensen-huang",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:15:13Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://nvidianews.nvidia.com/bios/jensen-huang",
+      "photo_url": "https://s201.q4cdn.com/141608511/files/images/founders/nvidia-jensenhuang-headshots-js0400-c-w-lightened2x2.png",
+      "photo_source_url": "https://investor.nvidia.com/governance/management-team/default.aspx",
+      "photo_credit": "NVIDIA"
+    },
+    {
+      "name": "Colette Kress",
+      "role": "Executive Vice President and Chief Financial Officer",
+      "start_date": "2013-09",
+      "profile_url": "https://www.nvidia.com/en-us/about-nvidia/governance/management-team/colette-kress/",
+      "source_url": "https://www.nvidia.com/en-us/about-nvidia/governance/management-team/colette-kress/",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:15:13Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://nvidianews.nvidia.com/news/nvidia-appoints-colette-kress-as-chief-financial-officer",
+      "photo_url": "https://s201.q4cdn.com/141608511/files/images/management/Colette_Kress_s.jpg",
+      "photo_source_url": "https://investor.nvidia.com/governance/management-team/default.aspx",
+      "photo_credit": "NVIDIA",
+      "tenure_note": "NVIDIA announced the appointment on September 16, 2013, to take effect later that month; the source does not give an exact start day."
+    },
+    {
+      "name": "Debora Shoquist",
+      "role": "Executive Vice President, Operations",
+      "start_date": "2009",
+      "profile_url": "https://www.nvidia.com/en-us/about-nvidia/governance/management-team/debora-shoquist/",
+      "source_url": "https://www.nvidia.com/en-us/about-nvidia/governance/management-team/debora-shoquist/",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:15:13Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://www.nvidia.com/en-us/about-nvidia/governance/management-team/debora-shoquist/",
+      "photo_url": "https://s201.q4cdn.com/141608511/files/images/management/Debora-Shoquist.jpg",
+      "photo_source_url": "https://investor.nvidia.com/governance/management-team/default.aspx",
+      "photo_credit": "NVIDIA",
+      "tenure_note": "The official biography says Shoquist joined in 2007 and was promoted to executive vice president two years later; 2009 is calculated from those dates."
+    },
+    {
+      "name": "Tim Teter",
+      "role": "Executive Vice President, General Counsel and Secretary",
+      "start_date": null,
+      "profile_url": "https://www.nvidia.com/en-us/about-nvidia/governance/management-team/tim-teter/",
+      "source_url": "https://www.nvidia.com/en-us/about-nvidia/governance/management-team/tim-teter/",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:15:13Z",
+      "group": "Executive leadership",
+      "photo_url": "https://s201.q4cdn.com/141608511/files/images/management/Tim_Tetersquare_s.jpg",
+      "photo_source_url": "https://investor.nvidia.com/governance/management-team/default.aspx",
+      "photo_credit": "NVIDIA",
+      "tenure_note": "The official biography gives a company join year but does not explicitly date appointment to the current role."
+    }
+  ],
+  "images": [
+    {
+      "url": "https://msftstories.thesourcemediaassets.com/sites/759/2026/10/Microsoft-Chairman-and-CEO-Satya-Nadella-and-Jensen-Huang-founder-president-and-CEO-of-NVIDIA.jpg",
+      "source_url": "https://news.microsoft.com/windows-surface-october-2026-news/",
+      "title": "NVIDIA at Microsoft’s Windows and Surface event",
+      "caption": "Jensen Huang and Satya Nadella at the San Francisco event, as identified in Microsoft’s official media gallery.",
+      "kind": "Official partner context",
+      "credit": "Microsoft",
+      "observed_at": "2026-11-05T14:15:13Z"
+    }
+  ],
+  "sources": [
+    {
+      "name": "NVIDIA in Brief, 2026",
+      "url": "https://nvidianews.nvidia.com/_gallery/get_file/?file_ext=.pdf&file_id=62acc991b3aed36cab48537d&ir=1",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "NVIDIA corporate contact information",
+      "url": "https://www.nvidia.com/en-us/contact/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "NVIDIA current management team",
+      "url": "https://investor.nvidia.com/governance/management-team/default.aspx",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "NVIDIA chief financial officer appointment",
+      "url": "https://nvidianews.nvidia.com/news/nvidia-appoints-colette-kress-as-chief-financial-officer",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Microsoft official Windows and Surface media gallery, October 2026",
+      "url": "https://news.microsoft.com/windows-surface-october-2026-news/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Jensen Huang official biography",
+      "url": "https://nvidianews.nvidia.com/bios/jensen-huang",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Colette Kress official biography",
+      "url": "https://www.nvidia.com/en-us/about-nvidia/governance/management-team/colette-kress/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Debora Shoquist official biography",
+      "url": "https://www.nvidia.com/en-us/about-nvidia/governance/management-team/debora-shoquist/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Tim Teter official biography",
+      "url": "https://www.nvidia.com/en-us/about-nvidia/governance/management-team/tim-teter/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "UfpkcWwT0wtdMrMoKi8shQuv1NMk",
+      "observed_at": "2026-11-05T14:09:56Z",
+      "match": {
+        "ticker": "NVDA",
+        "domain": "nvidia.com",
+        "likelihood": 10
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T14:15:13Z",
+  "field_sources": {
+    "website": {
+      "name": "NVIDIA in Brief, 2026",
+      "url": "https://nvidianews.nvidia.com/_gallery/get_file/?file_ext=.pdf&file_id=62acc991b3aed36cab48537d&ir=1",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "UfpkcWwT0wtdMrMoKi8shQuv1NMk",
+      "observed_at": "2026-11-05T14:09:56Z",
+      "match": {
+        "ticker": "NVDA",
+        "domain": "nvidia.com",
+        "likelihood": 10
+      }
+    },
+    "headquarters": {
+      "name": "NVIDIA corporate contact information",
+      "url": "https://www.nvidia.com/en-us/contact/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    "founded": {
+      "name": "NVIDIA in Brief, 2026",
+      "url": "https://nvidianews.nvidia.com/_gallery/get_file/?file_ext=.pdf&file_id=62acc991b3aed36cab48537d&ir=1",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "UfpkcWwT0wtdMrMoKi8shQuv1NMk",
+      "observed_at": "2026-11-05T14:09:56Z",
+      "match": {
+        "ticker": "NVDA",
+        "domain": "nvidia.com",
+        "likelihood": 10
+      }
+    },
+    "description": {
+      "name": "NVIDIA in Brief, 2026",
+      "url": "https://nvidianews.nvidia.com/_gallery/get_file/?file_ext=.pdf&file_id=62acc991b3aed36cab48537d&ir=1",
+      "observed_at": "2026-11-05T14:15:13Z"
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "available",
+    "official_updated_at": "2026-11-05T14:15:13Z",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T14:15:13Z",
+      "industry": "2026-11-05T14:09:56Z",
+      "headquarters": "2026-11-05T14:15:13Z",
+      "founded": "2026-11-05T14:15:13Z",
+      "professional_profile_count": "2026-11-05T14:09:56Z",
+      "description": "2026-11-05T14:15:13Z",
+      "leadership": "2026-11-05T14:15:13Z"
+    }
+  }
+}

@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "ticker": "AAPL",
+  "cik": 320193,
+  "name": "Apple",
+  "description": "Apple develops devices, software and services for communication, work, entertainment and personal computing. Its product families include iPhone, Mac, iPad, Apple Watch and Apple Vision Pro. Its services include the App Store, iCloud, Apple Music, Apple TV and Apple Pay. Apple combines hardware and software across these products and was founded in 1976.",
+  "description_source": {
+    "name": "Apple company overview and 50th anniversary",
+    "url": "https://www.apple.com/newsroom/2026/03/apple-to-celebrate-50-years-of-thinking-different/",
+    "observed_at": "2026-11-05T14:15:13Z"
+  },
+  "source_url": "https://www.apple.com/newsroom/2026/03/apple-to-celebrate-50-years-of-thinking-different/",
+  "website": "https://www.apple.com/",
+  "industry": "Consumer Electronics",
+  "headquarters": "Cupertino, California, United States",
+  "founded": 1976,
+  "employees": null,
+  "professional_profile_count": 201335,
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "q9dK2WXoX3CC6B9nfAtljgGTIX32",
+    "observed_at": "2026-11-05T14:09:43Z",
+    "match": {
+      "ticker": "AAPL",
+      "domain": "apple.com",
+      "likelihood": 10
+    }
+  },
+  "provider_record_id": "q9dK2WXoX3CC6B9nfAtljgGTIX32",
+  "leadership": [
+    {
+      "name": "John Ternus",
+      "role": "Chief Executive Officer",
+      "start_date": "2026-09-01",
+      "profile_url": "https://www.apple.com/leadership/john-ternus/",
+      "source_url": "https://www.apple.com/leadership/john-ternus/",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:15:13Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://www.apple.com/newsroom/2026/04/tim-cook-to-become-apple-executive-chairman-john-ternus-to-become-apple-ceo/",
+      "photo_url": "https://www.apple.com/leadership/images/bio/John_Ternus_bio.png.small_2x.png",
+      "photo_source_url": "https://www.apple.com/leadership/john-ternus/",
+      "photo_credit": "Apple"
+    },
+    {
+      "name": "Kevan Parekh",
+      "role": "Chief Financial Officer",
+      "start_date": "2025-01-01",
+      "profile_url": "https://www.apple.com/leadership/kevan-parekh/",
+      "source_url": "https://www.apple.com/leadership/kevan-parekh/",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:15:13Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://www.apple.com/newsroom/2024/08/apple-announces-chief-financial-officer-transition/",
+      "photo_url": "https://www.apple.com/leadership/images/bio/Kevan_Parekh_bio.png.small_2x.png",
+      "photo_source_url": "https://www.apple.com/leadership/kevan-parekh/",
+      "photo_credit": "Apple"
+    },
+    {
+      "name": "Sabih Khan",
+      "role": "Chief Operating Officer",
+      "start_date": "2025-07",
+      "profile_url": "https://www.apple.com/leadership/sabih-khan/",
+      "source_url": "https://www.apple.com/leadership/sabih-khan/",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:15:13Z",
+      "group": "Executive leadership",
+      "start_date_source_url": "https://www.apple.com/newsroom/2025/07/apple-announces-chief-operating-officer-transition/",
+      "photo_url": "https://www.apple.com/leadership/images/bio/Sabih_Khan_image.png.small_2x.png",
+      "photo_source_url": "https://www.apple.com/leadership/sabih-khan/",
+      "photo_credit": "Apple",
+      "tenure_note": "Apple announced the appointment on July 8, 2025, to take effect later that month; the source does not give an exact start day."
+    },
+    {
+      "name": "Tim Cook",
+      "role": "Executive Chair",
+      "start_date": "2026-09-01",
+      "profile_url": "https://www.apple.com/leadership/tim-cook/",
+      "source_url": "https://www.apple.com/leadership/tim-cook/",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T14:15:13Z",
+      "group": "Board of directors",
+      "start_date_source_url": "https://www.apple.com/newsroom/2026/04/tim-cook-to-become-apple-executive-chairman-john-ternus-to-become-apple-ceo/",
+      "photo_url": "https://www.apple.com/leadership/images/bio/Tim_Cook_bio.png.small_2x.png",
+      "photo_source_url": "https://www.apple.com/leadership/tim-cook/",
+      "photo_credit": "Apple"
+    }
+  ],
+  "images": [
+    {
+      "url": "https://www.apple.com/newsroom/images/2026/04/tim-cook-to-become-apple-executive-chairman-john-ternus-to-become-apple-ceo/article/Apple-John-Ternus-Tim-Cook_Full-Bleed-Image.jpg.large.jpg",
+      "source_url": "https://www.apple.com/newsroom/2026/04/tim-cook-to-become-apple-executive-chairman-john-ternus-to-become-apple-ceo/",
+      "title": "Apple’s CEO and board leadership transition",
+      "caption": "Tim Cook and John Ternus at Apple Park in the official announcement of the September 2026 leadership transition.",
+      "published_at": "2026-04-20",
+      "kind": "Leadership transition",
+      "credit": "Apple",
+      "observed_at": "2026-11-05T14:15:13Z"
+    }
+  ],
+  "sources": [
+    {
+      "name": "Apple company overview and 50th anniversary",
+      "url": "https://www.apple.com/newsroom/2026/03/apple-to-celebrate-50-years-of-thinking-different/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Apple corporate contact information",
+      "url": "https://www.apple.com/contact/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Apple current leadership",
+      "url": "https://www.apple.com/leadership/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Apple CEO and executive chair transition",
+      "url": "https://www.apple.com/newsroom/2026/04/tim-cook-to-become-apple-executive-chairman-john-ternus-to-become-apple-ceo/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Apple chief financial officer transition",
+      "url": "https://www.apple.com/newsroom/2024/08/apple-announces-chief-financial-officer-transition/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Apple chief operating officer transition",
+      "url": "https://www.apple.com/newsroom/2025/07/apple-announces-chief-operating-officer-transition/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Apple fourth-quarter 2026 results",
+      "url": "https://www.apple.com/newsroom/2026/11/apple-reports-fourth-quarter-results/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "John Ternus official biography",
+      "url": "https://www.apple.com/leadership/john-ternus/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Kevan Parekh official biography",
+      "url": "https://www.apple.com/leadership/kevan-parekh/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Sabih Khan official biography",
+      "url": "https://www.apple.com/leadership/sabih-khan/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "Tim Cook official biography",
+      "url": "https://www.apple.com/leadership/tim-cook/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "q9dK2WXoX3CC6B9nfAtljgGTIX32",
+      "observed_at": "2026-11-05T14:09:43Z",
+      "match": {
+        "ticker": "AAPL",
+        "domain": "apple.com",
+        "likelihood": 10
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T14:15:13Z",
+  "field_sources": {
+    "website": {
+      "name": "Apple company overview and 50th anniversary",
+      "url": "https://www.apple.com/newsroom/2026/03/apple-to-celebrate-50-years-of-thinking-different/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "q9dK2WXoX3CC6B9nfAtljgGTIX32",
+      "observed_at": "2026-11-05T14:09:43Z",
+      "match": {
+        "ticker": "AAPL",
+        "domain": "apple.com",
+        "likelihood": 10
+      }
+    },
+    "headquarters": {
+      "name": "Apple corporate contact information",
+      "url": "https://www.apple.com/contact/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    "founded": {
+      "name": "Apple company overview and 50th anniversary",
+      "url": "https://www.apple.com/newsroom/2026/03/apple-to-celebrate-50-years-of-thinking-different/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "q9dK2WXoX3CC6B9nfAtljgGTIX32",
+      "observed_at": "2026-11-05T14:09:43Z",
+      "match": {
+        "ticker": "AAPL",
+        "domain": "apple.com",
+        "likelihood": 10
+      }
+    },
+    "description": {
+      "name": "Apple company overview and 50th anniversary",
+      "url": "https://www.apple.com/newsroom/2026/03/apple-to-celebrate-50-years-of-thinking-different/",
+      "observed_at": "2026-11-05T14:15:13Z"
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "available",
+    "official_updated_at": "2026-11-05T14:15:13Z",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T14:15:13Z",
+      "industry": "2026-11-05T14:09:43Z",
+      "headquarters": "2026-11-05T14:15:13Z",
+      "founded": "2026-11-05T14:15:13Z",
+      "professional_profile_count": "2026-11-05T14:09:43Z",
+      "description": "2026-11-05T14:15:13Z",
+      "leadership": "2026-11-05T14:15:13Z"
+    }
+  }
+}
