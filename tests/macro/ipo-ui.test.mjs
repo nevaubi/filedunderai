@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 
 const source = 'https://www.sec.gov/files/sec-stats-ipos-20260922.xlsx';
-const sourcePage = 'https://www.sec.gov/data-research/statistics-data-visualizations';
+const sourcePage = 'https://www.sec.gov/data-research/statistics-data-visualizations/initial-public-offerings-ipos';
 const metrics = ['COUNT', 'TOTAL_PROCEEDS', 'AVERAGE_PROCEEDS', 'MEDIAN_PROCEEDS'];
 const groups = ['TOTAL', 'US', 'NON_US', 'CORPORATE', 'SPAC', 'FUND'];
 
@@ -24,7 +24,7 @@ function catalog() {
   return { generated: '2026-11-05T00:00:00Z', series, calendar: [], changes: [] };
 }
 
-function setup(c = catalog()) {
+function setup(c = catalog(), histories = {}) {
   const dom = new JSDOM('<main></main><aside id="drawer"><div id="dh"></div><div id="db"></div></aside><div id="scrim"></div>',
     { url: 'https://research.example/#macro', runScripts: 'outside-only' });
   const w = dom.window, requests = [];
@@ -55,10 +55,10 @@ function setup(c = catalog()) {
     if (path === 'macro/catalog.json') return structuredClone(c);
     const match = Object.values(c.series).find(m => path.endsWith(m.id.replace(/[^A-Za-z0-9_.-]/g, '_') + '.json'));
     assert.ok(match, `unexpected fixture request ${path}`);
-    const [d, value] = match.stats.last;
-    if (path.startsWith('macro/s/')) return { obs: [[d, value]], vin: { [d]: '2026-11-05' }, retrieved: '2026-11-05T00:00:00Z', published: null };
-    if (path.startsWith('macro/snap/')) return { url: source, cols: ['Time Period', match.source_label], keys: [d],
-      rows: [[match.frequency === 'A' ? '2025' : '2026:Q2', String(value)]], hl: 1, source_sheet: 'Stats Table' };
+    const obs = histories[match.id] || (match.stats?.last ? [match.stats.last] : []);
+    if (path.startsWith('macro/s/')) return { obs, vin: Object.fromEntries(obs.map(([d]) => [d, '2026-11-05'])), retrieved: '2026-11-05T00:00:00Z', published: null };
+    if (path.startsWith('macro/snap/')) return { url: source, cols: ['Time Period', match.source_label], keys: obs.map(([d]) => d),
+      rows: obs.map(([d, value]) => [match.frequency === 'A' ? d.slice(0, 4) : `${d.slice(0, 4)}:Q${Math.ceil(+d.slice(5, 7) / 3)}`, String(value)]), hl: 1, source_sheet: 'Stats Table' };
     throw new Error(`unexpected fixture request ${path}`);
   };
   w.eval(readFileSync('public/pages/macro.js', 'utf8'));
@@ -106,18 +106,45 @@ test('a displayed IPO value opens its exact period and original workbook source 
   } finally { h.close(); }
 });
 
-test('missing latest cells stay absent and each displayed row retains its own source period', async () => {
+test('all rows share the total-count period and missing measures never carry an older value forward', async () => {
   const c = catalog();
   c.series['SEC_IPO:COUNT_FUND:Q'].stats = null;
   c.series['SEC_IPO:TOTAL_PROCEEDS_FUND:Q'].stats.last = ['2025-12-31', 12.5];
+  c.series['SEC_IPO:AVERAGE_PROCEEDS_FUND:Q'].stats.last = ['2026-03-31', 315.4];
   const h = setup(c);
   try {
     await h.w.FU_PAGES.macro();
-    assert.equal(h.w.page.querySelectorAll('[data-series-id^="SEC_IPO:"]').length, 47);
-    assert.equal(h.w.page.querySelector('[data-series-id="SEC_IPO:COUNT_FUND:Q"]'), null);
-    const older = h.w.page.querySelector('[data-series-id="SEC_IPO:TOTAL_PROCEEDS_FUND:Q"]');
-    assert.match(older.textContent, /Q4 2025/);
-    assert.doesNotMatch(older.textContent, /Q2 2026/);
+    await new Promise(resolve => setTimeout(resolve, 0));
+    assert.equal(h.w.page.querySelectorAll('[data-series-id^="SEC_IPO:"]').length, 48);
+    for (const id of ['SEC_IPO:COUNT_FUND:Q', 'SEC_IPO:TOTAL_PROCEEDS_FUND:Q', 'SEC_IPO:AVERAGE_PROCEEDS_FUND:Q']) {
+      const missing = h.w.page.querySelector(`[data-series-id="${id}"]`);
+      assert.equal(missing.dataset.period, '2026-06-30');
+      assert.match(missing.textContent, /Q2 2026/);
+      assert.equal(missing.querySelector('td.num').textContent, '–');
+      assert.equal(missing.querySelector('button'), null);
+      assert.doesNotMatch(missing.textContent, /Q4 2025|Q1 2026|12\.5|315\.4/);
+    }
+  } finally { h.close(); }
+});
+
+test('an exact historical anchor value opens that series and period, while zero remains a number', async () => {
+  const c = catalog(), id = 'SEC_IPO:AVERAGE_PROCEEDS_FUND:Q';
+  c.series[id].stats.last = ['2026-09-30', 99.9];
+  c.series['SEC_IPO:COUNT_FUND:Q'].stats.last[1] = 0;
+  const h = setup(c, { [id]: [['2026-03-31', 11.1], ['2026-06-30', 22.2], ['2026-09-30', 99.9]] });
+  try {
+    await h.w.FU_PAGES.macro();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    const row = h.w.page.querySelector(`[data-series-id="${id}"]`);
+    assert.equal(row.dataset.period, '2026-06-30');
+    assert.match(row.textContent, /Q2 2026/);
+    assert.equal(row.querySelector('button').textContent, '22.2');
+    assert.equal(h.w.page.querySelector('[data-series-id="SEC_IPO:COUNT_FUND:Q"] button').textContent, '0');
+    row.querySelector('button').click();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    assert.equal(h.w.drawer.querySelector('td.hit').textContent, '22.2');
+    assert.match(h.w.drawer.textContent, /2026:Q2/);
+    assert.ok(h.requests.includes('macro/snap/SEC_IPO_AVERAGE_PROCEEDS_FUND_Q.json'));
   } finally { h.close(); }
 });
 

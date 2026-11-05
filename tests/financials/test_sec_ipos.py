@@ -51,7 +51,19 @@ class IpoSourceCollector(unittest.TestCase):
                          (26, ('2000-12-31', '459'), ('2025-12-31', '375')))
         self.assertEqual((len(quarter['obs']), quarter['obs'][-1]), (106, ('2026-06-30', '109')))
         self.assertTrue(all(d <= '2026-06-30' for d,v in quarter['obs']))
-        self.assertIsNone(quarter['published'])
+        self.assertEqual(quarter['published'], '2026-09-22')
+        self.assertEqual(quarter['meta']['source_url'], sec_ipos.SOURCE_PAGE)
+        evidence = quarter['snap']['publication_evidence']
+        self.assertEqual(evidence['date'], quarter['published'])
+        self.assertEqual(evidence['source_url'], 'https://www.sec.gov/data-research/statistics-data-visualizations/initial-public-offerings-ipos')
+        self.assertEqual(evidence['section'], 'Citation')
+        self.assertEqual(evidence['field'], 'Publication Date')
+        self.assertEqual(evidence['workbook_sha256'], SHA)
+        self.assertEqual(quarter['meta']['publication_evidence'], evidence)
+        self.assertIn('pricing date', quarter['meta']['notes'])
+        self.assertIn('primary offices', quarter['meta']['notes'])
+        self.assertIn('LSEG SDC Platinum', quarter['meta']['notes'])
+        self.assertIn('Dealogic ECM', quarter['meta']['notes'])
         self.assertEqual(quarter['meta']['original_sha256'], SHA)
         self.assertIn('2026:Q2', quarter['meta']['source_range_heading'])
         self.assertEqual(sum(len(r['obs']) for r in out), 3080)
@@ -78,6 +90,15 @@ class IpoSourceCollector(unittest.TestCase):
     def test_future_or_incomplete_period_cannot_be_promoted_from_filename(self):
         with self.assertRaisesRegex(ValueError, 'after the review date'):
             sec_ipos.parse_workbook(self.raw, source_url=sec_ipos.URL, as_of='2026-05-31')
+
+    def test_release_evidence_is_bound_to_exact_source_url_and_bytes(self):
+        for body, url in ((self.raw, sec_ipos.URL.replace('20260922', '20260923')),
+                          (changed_cell(self.raw, 'B134', '110', 'n'), sec_ipos.URL)):
+            series = sec_ipos.parse_workbook(body, source_url=url, as_of='2026-11-05')
+            self.assertTrue(all(row['published'] is None for row in series))
+            self.assertTrue(all(row['snap']['publication_evidence'] is None for row in series))
+        with self.assertRaisesRegex(ValueError, 'publication.*after the review date'):
+            sec_ipos.parse_workbook(self.raw, as_of='2026-09-21')
 
     def test_unknown_period_label_requires_review(self):
         with self.assertRaisesRegex(ValueError, 'period label'):

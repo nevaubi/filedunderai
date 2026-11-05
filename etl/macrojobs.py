@@ -24,9 +24,7 @@ def _state(sb):
 
 @serialized_aggregates
 def _publish(sb, touched, log=print):
-    reg = mstore.load_registry(sb)
-    reg.update(touched)
-    return mstore.publish_catalog(sb, reg, log=log)
+    return mstore.publish_catalog(sb, touched, log=log)
 
 
 @serialized_aggregates
@@ -117,8 +115,7 @@ def migrate_legacy(sb, log=print):
     series = legacy_series_from_rows(rows)
     touched = {}
     out = mstore.save(sb, series, touched, prev_reg=reg, log=log)
-    reg.update(touched)
-    sb.put_json("macro/registry.json", reg, cache="no-store")
+    _publish(sb, touched, log=log)
     return sum(out.values())
 
 

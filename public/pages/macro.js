@@ -173,19 +173,26 @@ window.FU_PAGES = window.FU_PAGES || {};
   function ipoTable(frequency) {
     const ids = Object.keys(MS.cat.series).filter(id => {
       const m = META(id);
-      return id.startsWith("SEC_IPO:") && m.group === "sec_ipo" && m.frequency === frequency && !m.hidden
-        && Array.isArray(m.stats?.last) && m.stats.last.length === 2 && m.stats.last[1] != null;
+      return id.startsWith("SEC_IPO:") && m.group === "sec_ipo" && m.frequency === frequency && !m.hidden;
     }).sort((a, b) => (META(a).source_column || a).localeCompare(META(b).source_column || b));
     if (!ids.length) return null;
+    const anchor = META(`SEC_IPO:COUNT_TOTAL:${frequency}`)?.stats?.last;
+    const d = Array.isArray(anchor) && anchor.length === 2 && Number.isFinite(anchor[1]) ? anchor[0] : null;
     const table = el("table", { class: "t" }, el("thead", {}, el("tr", {},
-      el("th", {}, "Source measure"), el("th", {}, "Source period"), el("th", { class: "r" }, "Latest reported"), el("th", {}, "Units"))));
+      el("th", {}, "Source measure"), el("th", {}, "Source period"), el("th", { class: "r" }, "Reported value"), el("th", {}, "Units"))));
     const body = el("tbody");
     for (const id of ids) {
-      const m = META(id), [d, value] = m.stats.last;
-      body.append(el("tr", { "data-series-id": id, "data-period": d },
-        el("td", {}, m.source_label || m.title), el("td", { class: "mono" }, periodLabel(m, d)),
-        el("td", { class: "r num" }, el("button", { class: "chip link acc mono",
-          title: `${m.title}, ${periodLabel(m, d)} (${d}), ${m.units}. Open the source row`, onclick: () => openMacro(id, d) }, fv(m, value))),
+      const m = META(id), last = m.stats?.last, cell = el("td", { class: "r num" });
+      const show = value => cell.replaceChildren(Number.isFinite(value)
+        ? el("button", { class: "chip link acc mono",
+            title: `${m.title}, ${periodLabel(m, d)} (${d}), ${m.units}. Open the source row`, onclick: () => openMacro(id, d) }, fv(m, value))
+        : "–");
+      show(d && last?.[0] === d ? last[1] : null);
+      // A different latest period cannot stand in for the count anchor.
+      // Load history only when needed, and require an exact date match.
+      if (d && last && last[0] !== d) getSer(id).then(s => show((s.obs || []).find(row => row[0] === d)?.[1]));
+      body.append(el("tr", { "data-series-id": id, "data-period": d || "" },
+        el("td", {}, m.source_label || m.title), el("td", { class: "mono" }, periodLabel(m, d) || "–"), cell,
         el("td", { class: "muted" }, m.units)));
     }
     table.append(body);
@@ -194,7 +201,7 @@ window.FU_PAGES = window.FU_PAGES || {};
       el("a", { href: META(ids[0]).data_url, target: "_blank", rel: "noopener", class: "btn" }, "SEC workbook ↗"),
       el("div", { class: "mx-meta" }, headings.map(heading => el("span", {}, heading))),
       el("div", { class: "mx-tbl" }, table),
-      el("div", { class: "mx-meta" }, "Annual and quarterly periods remain separate. Average and median proceeds are not additive. Each row shows its latest available source period."),
+      el("div", { class: "mx-meta" }, "Annual and quarterly periods remain separate. Every measure uses the latest total IPO count period for its frequency; a dash means no value for that period. Average and median proceeds are not additive."),
       metaLine(ids));
   }
 

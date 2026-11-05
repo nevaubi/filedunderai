@@ -17,7 +17,9 @@ import zipfile
 from .common import request, SEC_UA, sec_throttle
 
 URL = 'https://www.sec.gov/files/sec-stats-ipos-20260922.xlsx'
-SOURCE_PAGE = 'https://www.sec.gov/data-research/statistics-data-visualizations'
+SOURCE_PAGE = 'https://www.sec.gov/data-research/statistics-data-visualizations/initial-public-offerings-ipos'
+REVIEWED_SHA256 = '8499e48223bb72d93cd5919a4f3b2f84776d020b120e3133d992841da5ba5450'
+PUBLICATION_DATE = '2026-09-22'
 NS = {'s': 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'}
 REL = '{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id'
 METRICS = (
@@ -160,6 +162,14 @@ def parse_workbook(body, source_url=URL, as_of=None, since=2000):
         if serials != list(range(serials[0], serials[-1] + 1)):
             raise ValueError('Missing or unsorted source period row')
     original_sha = hashlib.sha256(body).hexdigest()
+    publication = ({'date': PUBLICATION_DATE, 'source_url': SOURCE_PAGE, 'section': 'Citation',
+                    'field': 'Publication Date', 'workbook_url': URL, 'workbook_sha256': REVIEWED_SHA256}
+                   if source_url == URL and original_sha == REVIEWED_SHA256 else None)
+    published = publication['date'] if publication else None
+    if published and published > as_of:
+        raise ValueError('Source publication occurs after the review date')
+    release_note = ('Publication date 2026-09-22 is stated in the official landing-page Citation and is the ingestion vintage.'
+                    if publication else 'No verified publication date for these source bytes; ingestion uses retrieval vintage.')
     out = []
     for column, metric, label in METRICS:
         count = metric.startswith('COUNT_')
@@ -181,20 +191,23 @@ def parse_workbook(body, source_url=URL, as_of=None, since=2000):
                     'provider': 'U.S. Securities and Exchange Commission',
                     'title': label + (' — annual' if frequency == 'A' else ' — quarterly'),
                     'units': 'Offerings' if count else 'US$ millions', 'frequency': frequency,
-                    'seasonal_adj': None, 'geography': 'U.S. capital markets; issuer origin as stated',
+                    'seasonal_adj': None, 'geography': 'United States IPO market',
                     'source_url': SOURCE_PAGE, 'data_url': source_url, 'source_key': 'Stats Table!' + column + ':' + frequency,
                     'section': 'credit', 'release': 'SEC:IPO', 'group': 'sec_ipo', 'dp': 0 if count else 1,
                     'original_sha256': original_sha, 'original_bytes': len(body), 'source_column': column,
                     'source_label': label, 'source_range_heading': heading, 'supplementary_statistics': True,
+                    'publication_evidence': publication,
                     'notes': 'Source-reported IPO statistics. Annual and quarterly periods remain separate. '
                              'Proceeds remain in the source unit, US$ millions; average and median proceeds are not additive. '
                              'Blank and masked/dash cells are missing, not zero. The workbook filename is not a release or period date. '
-                             'No explicit release date is provided in this source table; ingestion uses retrieval vintage.'}
+                             'U.S.-market IPOs are assigned by pricing date. U.S./non-U.S. issuers are classified by primary offices at offering. '
+                             'SEC staff statistics use LSEG SDC Platinum and Dealogic ECM data. ' + release_note}
             snap = {'url': source_url, 'cols': ['Time Period', label], 'rows': snapshot_rows, 'keys': keys, 'hl': 1,
                     'source_sheet': 'Stats Table', 'original_sha256': original_sha, 'original_bytes': len(body),
+                    'source_page': SOURCE_PAGE, 'publication_evidence': publication,
                     'cells': cells, 'source_range_heading': heading,
                     'numeric_policy': 'Observation strings follow the exact published number format; original cached XML tokens retained per cell.'}
-            out.append({'meta': meta, 'obs': observations, 'published': None, 'snap': snap})
+            out.append({'meta': meta, 'obs': observations, 'published': published, 'snap': snap})
     return out
 
 
