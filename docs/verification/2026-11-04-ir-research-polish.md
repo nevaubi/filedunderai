@@ -73,9 +73,18 @@ An interrupted publication was resumed only after validating the private backup 
 
 The final aggregate index was published under the aggregate lease and exactly read back at `2026-11-05T00:10:38Z`. It contains 73,420 documents, 227,953 KPI definitions, 3,944,368 IR KPI values and 2,912 segment tables. KPI counts are explicitly as of `2026-11-05T00:07:30.948382Z`; segment counts retain `2026-11-04T09:16:53Z`. The previous index and grouped-count inputs were backed up privately before publication. The compact public verification receipt is [2026-11-05-ir-reconciliation.json](2026-11-05-ir-reconciliation.json).
 
-Initial production UI checks confirmed white workspace surfaces and a measured 102 px title/tabs/ribbon area (39 + 27 + 36 px), compared with 160 px before the change. A blank-cell `=2+3` draft survived Document-to-Spreadsheet mode changes, Enter produced 5, and Undo restored the blank cell. The screener Actions menu retained its tools and Escape restored focus to Actions. Report research depth was selectable without a provider request; the default was restored to Detailed after the check.
+The complete correction set was merged in [PR 13](https://github.com/nevaubi/filedunderai/pull/13), following the initial release in PR 11 and the isolated API guard in PR 12. The reviewed head was `a9d714f56b2e8fccece58184883b5ef8322d3e29`; the production merge is `d77bd866c14da65342e024f8354755eb5433c3be`, with tree `7be67dc779dd482a0bca5d947911908fa1a64eee`. GitHub verification passed for both the PR (run `41940377142`) and main (run `41940525435`). Preview and production Vercel checks succeeded; the production deployment is `29jNLhm3LSfhJ6XX5zD2Uv5sf7h8`.
 
-Final follow-up code deployment, simplified empty-filter layout and Earnings & IR entry-point checks are pending. This section is updated with actual outcomes before final delivery.
+Production browser checks on [Filed Under](https://filedunderai.vercel.app/) confirmed:
+
+- The final screener shows the short company/field-count/price-date subtitle, hides the empty filter row and exposes Add filter within Filters. The 19 presets and Actions tools remain available; Escape closes the menu and restores focus. Statistics are collapsed and the assistant is initially closed.
+- The workspace uses white document/ribbon surfaces and a neutral canvas. Its measured title/tabs/ribbon area is 102 px (39 + 27 + 36 px), compared with 160 px before the change: a 36% reduction. A blank-cell `=2+3` draft survived Document-to-Spreadsheet mode changes, Enter produced 5, and Undo restored the blank cell. Existing sheet content was retained.
+- Report research depth is selectable without a provider request. The default was restored to Detailed after the check.
+- Entergy's library appears at the top of Earnings & IR and exposes all 242 documents. Pagination was exercised through the final 201–242 page, where Next is disabled. The repaired Investor Guide opens with all 80 sheets and readable extracted table content; its original and stored-file links are present.
+- Vylor's Earnings & IR library exposes all 16 captured releases with their actual publication dates. Its coverage remains explicitly unverified rather than claiming that every historical archive is complete.
+- Data Status shows 73,420 IR documents across 500 companies, 227,953 KPI definitions, 3,944,368 IR KPI values and 2,912 segment tables. KPI and segment ages reflect their independent count timestamps instead of inheriting the newer IR publication time.
+
+Final production screenshots were captured as `filedunder-screener-final-20261105.jpg` and `filedunder-document-final-20261105.jpg` and inspected before delivery. The document capture shows Document mode selected with the white editing page visible. These UI checks verify the requested interactions and displayed coverage, not the health of every unrelated data pipeline.
 
 ## Limits
 
