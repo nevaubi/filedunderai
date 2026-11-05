@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "GVA",
+  "cik": 861459,
+  "name": "GRANITE CONSTRUCTION INC",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://graniteconstruction.com",
+  "industry": "construction",
+  "headquarters": "watsonville, california, united states",
+  "linkedin_url": "https://linkedin.com/company/granite-construction",
+  "founded": 1922,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "5001-10000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "SQoCP1LYmkC3VPEKVVetXAFI62ju",
+    "observed_at": "2026-11-05T20:01:27Z",
+    "match": {
+      "ticker": "GVA",
+      "domain": "graniteconstruction.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.2609876207751947
+    }
+  },
+  "provider_record_id": "SQoCP1LYmkC3VPEKVVetXAFI62ju",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "SQoCP1LYmkC3VPEKVVetXAFI62ju",
+      "observed_at": "2026-11-05T20:01:27Z",
+      "match": {
+        "ticker": "GVA",
+        "domain": "graniteconstruction.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2609876207751947
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:01:27Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "SQoCP1LYmkC3VPEKVVetXAFI62ju",
+      "observed_at": "2026-11-05T20:01:27Z",
+      "match": {
+        "ticker": "GVA",
+        "domain": "graniteconstruction.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2609876207751947
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "SQoCP1LYmkC3VPEKVVetXAFI62ju",
+      "observed_at": "2026-11-05T20:01:27Z",
+      "match": {
+        "ticker": "GVA",
+        "domain": "graniteconstruction.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2609876207751947
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "SQoCP1LYmkC3VPEKVVetXAFI62ju",
+      "observed_at": "2026-11-05T20:01:27Z",
+      "match": {
+        "ticker": "GVA",
+        "domain": "graniteconstruction.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2609876207751947
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "SQoCP1LYmkC3VPEKVVetXAFI62ju",
+      "observed_at": "2026-11-05T20:01:27Z",
+      "match": {
+        "ticker": "GVA",
+        "domain": "graniteconstruction.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2609876207751947
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "SQoCP1LYmkC3VPEKVVetXAFI62ju",
+      "observed_at": "2026-11-05T20:01:27Z",
+      "match": {
+        "ticker": "GVA",
+        "domain": "graniteconstruction.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2609876207751947
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "SQoCP1LYmkC3VPEKVVetXAFI62ju",
+      "observed_at": "2026-11-05T20:01:27Z",
+      "match": {
+        "ticker": "GVA",
+        "domain": "graniteconstruction.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2609876207751947
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "SQoCP1LYmkC3VPEKVVetXAFI62ju",
+      "observed_at": "2026-11-05T20:01:27Z",
+      "match": {
+        "ticker": "GVA",
+        "domain": "graniteconstruction.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2609876207751947
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:01:27Z",
+      "industry": "2026-11-05T20:01:27Z",
+      "headquarters": "2026-11-05T20:01:27Z",
+      "founded": "2026-11-05T20:01:27Z",
+      "employee_size_range": "2026-11-05T20:01:27Z",
+      "linkedin_url": "2026-11-05T20:01:27Z"
+    }
+  }
+}

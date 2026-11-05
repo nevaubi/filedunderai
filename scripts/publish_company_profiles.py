@@ -1,6 +1,7 @@
 """Publish verified company profiles with backups, a lease, and exact readback."""
 import argparse
 import concurrent.futures
+import copy
 import datetime as dt
 import json
 from pathlib import Path
@@ -9,7 +10,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from etl.common import AggregateLease, Supabase, now_iso
-from etl.company_profiles import merge_official_profile, safe_url, partial_date, _provider_source
+from etl.company_profiles import (merge_official_profile, safe_url, partial_date, _provider_source,
+                                  _field_source, _field_observed_at, _unique_sources, _timestamp)
 from etl.universe import BY_TICKER
 from scripts.backfill_company_profiles import read_json, write_json
 from scripts.generate_company_directory import build_directory
@@ -37,6 +39,8 @@ def validate_profile(profile):
         for forbidden in ('emails', 'email', 'phone', 'mobile_phone', 'location_street_address', 'birth_date'):
             if forbidden in person:
                 raise ValueError('Unrelated personal fields cannot be published')
+    if profile.get('leadership') and (profile.get('coverage') or {}).get('status') not in ('official_sources','official_with_provider_metadata'):
+        raise ValueError('Sourced leadership requires official coverage status')
     return profile
 
 
@@ -48,10 +52,46 @@ def merge_publication(incoming, previous):
         raise ValueError('Published issuer identity mismatch')
     # Start with the new metadata; the per-field merge protects newer official
     # evidence already live without dropping incoming provider supplements.
-    return merge_official_profile(incoming, previous)
+    merged = copy.deepcopy(merge_official_profile(incoming, previous))
+    # An official-only collector may intentionally supply no provider metadata.
+    # Retain previously verified company facts only in empty fields, with their
+    # original provider attribution; never copy provider people or headcounts.
+    provider_fields = ('description', 'website', 'industry', 'headquarters', 'founded',
+                       'linkedin_url', 'professional_profile_count', 'employee_size_range')
+    copied = []
+    now = dt.datetime.now(dt.timezone.utc)
+    for field in provider_fields:
+        source = _field_source(previous, field)
+        observed = _timestamp(source.get('observed_at')) if isinstance(source, dict) else None
+        if (merged.get(field) not in (None, '', [], {}) or previous.get(field) in (None, '', [], {})
+                or not _provider_source(source) or (observed and observed > now)):
+            continue
+        merged[field] = copy.deepcopy(previous[field])
+        merged.setdefault('field_sources', {})[field] = copy.deepcopy(source)
+        for suffix in ('_source', '_basis'):
+            if previous.get(field + suffix) is not None:
+                merged[field + suffix] = copy.deepcopy(previous[field + suffix])
+        if field == 'description':
+            merged['description_source'] = copy.deepcopy(source)
+            merged['description_provider'] = 'People Data Labs'
+        copied.append(observed)
+    if copied:
+        if not merged.get('provider_record_id') and previous.get('provider_record_id'):
+            merged['provider_record_id'] = previous['provider_record_id']
+        merged['sources'] = _unique_sources(list(merged.get('sources') or []) + list(previous.get('sources') or []))
+        coverage = merged.setdefault('coverage', {})
+        if coverage.get('status') == 'official_sources':
+            coverage.setdefault('official_updated_at', merged.get('updated_at'))
+            coverage['status'] = 'official_with_provider_metadata'
+        coverage['description'] = 'available' if merged.get('description') else 'unavailable'
+        coverage['field_observed_at'] = _field_observed_at(merged)
+        dates = [date for date in [_timestamp(merged.get('updated_at')), *copied] if date and date <= now]
+        if dates:
+            merged['updated_at'] = max(dates).strftime('%Y-%m-%dT%H:%M:%SZ')
+    return merged
 
 
-def publish(directory, fundamentals, sb, report_path):
+def publish(directory, fundamentals, sb, report_path, workers=12):
     files = sorted(path for path in Path(directory).glob('*.json') if path.name != 'index.json')
     proposed = {path.stem: validate_profile(read_json(path)) for path in files}
     stamp = now_iso()
@@ -90,7 +130,7 @@ def publish(directory, fundamentals, sb, report_path):
                 write_json(local_path, result)
             return {'ticker': ticker, 'status': 'published', 'profile': result, 'local_changed': local_changed}
         try:
-            with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=max(1,min(16,workers))) as pool:
                 for result in pool.map(one, proposed):
                     results.append(result)
                     print(json.dumps({'ticker': result['ticker'], 'status': result['status']}), flush=True)
@@ -126,8 +166,9 @@ def main():
     parser.add_argument('--profiles', type=Path, default=ROOT / 'public/data/company-profiles')
     parser.add_argument('--fundamentals', type=Path, required=True)
     parser.add_argument('--report', type=Path, required=True)
+    parser.add_argument('--workers', type=int, default=12)
     args = parser.parse_args()
-    publish(args.profiles, args.fundamentals, Supabase(), args.report)
+    publish(args.profiles, args.fundamentals, Supabase(), args.report, args.workers)
 
 
 if __name__ == '__main__':

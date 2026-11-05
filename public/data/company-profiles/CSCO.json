@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "ticker": "CSCO",
+  "cik": 858877,
+  "name": "Cisco",
+  "description": "Cisco develops technology that connects and protects organizations’ infrastructure and data. Its portfolio supports networking and related business technology, with leadership across product development, customer experience, global sales, finance and operations.",
+  "description_source": {
+    "name": "Cisco business context",
+    "url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/robbins-chuck.html",
+    "observed_at": "2026-11-05T19:40:50Z"
+  },
+  "source_url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/robbins-chuck.html",
+  "website": "https://www.cisco.com/",
+  "industry": null,
+  "headquarters": null,
+  "founded": null,
+  "employees": null,
+  "leadership": [
+    {
+      "name": "Chuck Robbins",
+      "role": "Chair and Chief Executive Officer",
+      "profile_url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/robbins-chuck.html",
+      "photo_url": null,
+      "linkedin_url": "https://www.linkedin.com/in/chuck-robbins",
+      "start_date": "2017-12-11",
+      "source_url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/robbins-chuck.html",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.cisco.com/exec-bios",
+      "photo_credit": "Cisco",
+      "linkedin_source_url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/robbins-chuck.html",
+      "start_date_source_url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/robbins-chuck.html",
+      "tenure_note": "CEO since July 2015 and Chair since December 11, 2017. Tenure shown begins with the combined current title.",
+      "photo_original_url": "https://newsroom.cisco.com/c/dam/r/newsroom/en/us/assets/executives/chuck-robbins/Chuck_Robbins_Thumbnail3.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Mark Patterson",
+      "role": "EVP and Chief Financial Officer",
+      "profile_url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/patterson-mark.html",
+      "photo_url": null,
+      "linkedin_url": "https://www.linkedin.com/in/mark-patterson-009b2355",
+      "start_date": null,
+      "source_url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/patterson-mark.html",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.cisco.com/exec-bios",
+      "photo_credit": "Cisco",
+      "linkedin_source_url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/patterson-mark.html",
+      "photo_original_url": "https://newsroom.cisco.com/c/dam/r/newsroom/en/us/assets/executives/mark-patterson/Mark-Patterson-Thumbnail-2025.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Jeetu Patel",
+      "role": "President and Chief Product Officer",
+      "profile_url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/jeetu-patel.html",
+      "photo_url": null,
+      "linkedin_url": "https://www.linkedin.com/in/jeetupatel",
+      "start_date": null,
+      "source_url": "https://newsroom.cisco.com/exec-bios",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.cisco.com/exec-bios",
+      "photo_credit": "Cisco",
+      "photo_original_url": "https://newsroom.cisco.com/c/dam/r/newsroom/en/us/assets/executives/jeetu-patel/Patel_Jeetu_Thumbnail_1000x1200_0425.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Francine Katsoudas",
+      "role": "EVP and Chief People, Policy & Purpose Officer",
+      "profile_url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/katsoudas-francine.html",
+      "photo_url": null,
+      "linkedin_url": "https://www.linkedin.com/in/fkatsoudas",
+      "start_date": null,
+      "source_url": "https://newsroom.cisco.com/exec-bios",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.cisco.com/exec-bios",
+      "photo_credit": "Cisco",
+      "photo_original_url": "https://newsroom.cisco.com/c/dam/r/newsroom/en/us/assets/executives/francine-katsoudas/Fran-Katsoudas-1000x1200-V2.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Dev Stahlkopf",
+      "role": "EVP and Chief Legal Officer",
+      "profile_url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/dev-stahlkopf.html",
+      "photo_url": null,
+      "linkedin_url": "https://www.linkedin.com/in/dev-stahlkopf",
+      "start_date": null,
+      "source_url": "https://newsroom.cisco.com/exec-bios",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.cisco.com/exec-bios",
+      "photo_credit": "Cisco",
+      "photo_original_url": "https://newsroom.cisco.com/c/dam/r/newsroom/en/us/assets/executives/dev-stahlkopf/Dev_Stahlkopf_Thumbnail2.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Liz Centoni",
+      "role": "EVP and Chief Customer Experience Officer",
+      "profile_url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/liz-centoni.html",
+      "photo_url": null,
+      "linkedin_url": "https://www.linkedin.com/in/lizcentoni",
+      "start_date": null,
+      "source_url": "https://newsroom.cisco.com/exec-bios",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.cisco.com/exec-bios",
+      "photo_credit": "Cisco",
+      "photo_original_url": "https://newsroom.cisco.com/c/dam/r/newsroom/en/us/assets/executives/liz-centoni/Liz_Centoni_Thumbnail.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Thimaya Subaiya",
+      "role": "EVP, Operations",
+      "profile_url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/thimaya-subaiya.html",
+      "photo_url": null,
+      "linkedin_url": "https://www.linkedin.com/in/thimaya",
+      "start_date": null,
+      "source_url": "https://newsroom.cisco.com/exec-bios",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.cisco.com/exec-bios",
+      "photo_credit": "Cisco",
+      "photo_original_url": "https://newsroom.cisco.com/c/dam/r/newsroom/en/us/assets/executives/thimaya-subaiya/Thimaya_Subaiya_Thumbnail2.jpg",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Oliver Tuszik",
+      "role": "EVP, Global Sales and Chief Sales Officer",
+      "profile_url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/oliver-tuszik.html",
+      "photo_url": null,
+      "linkedin_url": "https://www.linkedin.com/in/olivertuszik/",
+      "start_date": null,
+      "source_url": "https://newsroom.cisco.com/exec-bios",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://newsroom.cisco.com/exec-bios",
+      "photo_credit": "Cisco",
+      "photo_original_url": "https://newsroom.cisco.com/c/dam/r/newsroom/en/us/assets/executives/oliver-tuszik/Oliver_Tuszik_Thumbnail4.jpg",
+      "photo_status": "source_unavailable"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Cisco official leadership roster",
+      "url": "https://newsroom.cisco.com/exec-bios",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Chuck Robbins official biography",
+      "url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/robbins-chuck.html",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Chuck Robbins role start evidence",
+      "url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/robbins-chuck.html",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Mark Patterson official biography",
+      "url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/patterson-mark.html",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Cisco business context",
+      "url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/robbins-chuck.html",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "Official company source",
+      "url": "https://newsroom.cisco.com/exec-bios",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    "description": {
+      "name": "Cisco business context",
+      "url": "https://newsroom.cisco.com/c/r/newsroom/en/us/executives/robbins-chuck.html",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  },
+  "coverage": {
+    "status": "official_sources",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T19:40:50Z",
+    "leadership_scope": "Selected leaders from the company’s published leadership roster; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:40:50Z",
+      "description": "2026-11-05T19:40:50Z",
+      "leadership": "2026-11-05T19:40:50Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  }
+}

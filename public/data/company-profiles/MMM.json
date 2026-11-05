@@ -1,0 +1,337 @@
+{
+  "schema_version": 1,
+  "ticker": "MMM",
+  "cik": 66740,
+  "name": "3M",
+  "description": "3m touches virtually every part of your life. our people and technology make the impossible, possible. every day we apply our science to enhance people’s lives. this is 3m science. applied to life.™",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "goDmKHm4nyHq8LOtJlZLMAHGIAdM",
+    "observed_at": "2026-11-05T19:43:14Z",
+    "match": {
+      "ticker": "MMM",
+      "domain": "3m.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://3m.com",
+  "industry": "Mechanical or Industrial Engineering",
+  "headquarters": "St. Paul, Minnesota, United States",
+  "linkedin_url": "https://linkedin.com/company/3m",
+  "founded": 1902,
+  "employees": null,
+  "professional_profile_count": 39460,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "goDmKHm4nyHq8LOtJlZLMAHGIAdM",
+    "observed_at": "2026-11-05T19:43:14Z",
+    "match": {
+      "ticker": "MMM",
+      "domain": "3m.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "goDmKHm4nyHq8LOtJlZLMAHGIAdM",
+  "leadership": [
+    {
+      "name": "Bill Brown",
+      "role": "Chairman and CEO",
+      "profile_url": "https://investors.3m.com/governance/corporate-officers#member-bio-30866",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/f8dd5e3e8ee2aae9c7cef543.jpg",
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://investors.3m.com/governance/corporate-officers",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://investors.3m.com/governance/corporate-officers",
+      "photo_credit": "3M",
+      "photo_original_url": "https://d1io3yog0oux5.cloudfront.net/_561e0ea88f737eb60b1493aefb384fe1/3m/db/3210/30866/photo_resized_square.jpg",
+      "photo_sha256": "acd44521246f4dcb7ec93ef9f83b52957202f9993d84827787db5c62465bf635",
+      "photo_cached_at": "2026-11-05T20:21:06Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Anurag Maheshwari",
+      "role": "Executive Vice President, Chief Financial Officer",
+      "profile_url": "https://investors.3m.com/governance/corporate-officers#member-bio-30886",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/495a179465759187949b5a97.png",
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://investors.3m.com/governance/corporate-officers",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://investors.3m.com/governance/corporate-officers",
+      "photo_credit": "3M",
+      "photo_original_url": "https://d1io3yog0oux5.cloudfront.net/_561e0ea88f737eb60b1493aefb384fe1/3m/db/3210/30886/photo_resized_square.png",
+      "photo_sha256": "f6d64abaaac198cef1d5185cbb13857dd3404dede8902796d3559ef9c0edb8cb",
+      "photo_cached_at": "2026-11-05T20:21:06Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Wendy Bauer",
+      "role": "Group President, Transportation & Electronics",
+      "profile_url": "https://investors.3m.com/governance/corporate-officers#member-bio-30876",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/25427bd86aa7700a8c0dfa2f.png",
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://investors.3m.com/governance/corporate-officers",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://investors.3m.com/governance/corporate-officers",
+      "photo_credit": "3M",
+      "photo_original_url": "https://d1io3yog0oux5.cloudfront.net/_561e0ea88f737eb60b1493aefb384fe1/3m/db/3210/30876/photo_resized_square.png",
+      "photo_sha256": "c8f6f375b1d73cde8f1aa9c113d8c63cfb09b3b42b781cf9a482a1b86d054bde",
+      "photo_cached_at": "2026-11-05T20:21:05Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Karina Chavez",
+      "role": "Group President, Consumer Business",
+      "profile_url": "https://investors.3m.com/governance/corporate-officers#member-bio-29872",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/c27a1b7830858b158b708bbb.jpg",
+      "linkedin_url": null,
+      "start_date": "2023-04",
+      "start_date_source_url": "https://investors.3m.com/governance/corporate-officers",
+      "source_url": "https://investors.3m.com/governance/corporate-officers",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://investors.3m.com/governance/corporate-officers",
+      "photo_credit": "3M",
+      "photo_original_url": "https://d1io3yog0oux5.cloudfront.net/_561e0ea88f737eb60b1493aefb384fe1/3m/db/3210/29872/photo_resized_square.jpg",
+      "photo_sha256": "b29b33aaffb9f1e3d22c88a5b989ef1b1f8e1ac4e26cae0f746b10f2471459b2",
+      "photo_cached_at": "2026-11-05T20:20:53Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Jennifer Cunningham",
+      "role": "Executive Vice President, Chief Human Resources Officer",
+      "profile_url": "https://investors.3m.com/governance/corporate-officers#member-bio-31011",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/5816d4de1939761a2432a2b1.jpg",
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://investors.3m.com/governance/corporate-officers",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://investors.3m.com/governance/corporate-officers",
+      "photo_credit": "3M",
+      "photo_original_url": "https://d1io3yog0oux5.cloudfront.net/_561e0ea88f737eb60b1493aefb384fe1/3m/db/3210/31011/photo_resized_square.jpg",
+      "photo_sha256": "8483f0d74cff78a01489f34ee85372a450b31899385ef6fa6e6691c8632e7ab4",
+      "photo_cached_at": "2026-11-05T20:21:18Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Paul Gallagher",
+      "role": "Group President, Enterprise Supply Chain",
+      "profile_url": "https://investors.3m.com/governance/corporate-officers#member-bio-30984",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/07f3a1eba08a95c3d59c8c66.png",
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://investors.3m.com/governance/corporate-officers",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://investors.3m.com/governance/corporate-officers",
+      "photo_credit": "3M",
+      "photo_original_url": "https://d1io3yog0oux5.cloudfront.net/_561e0ea88f737eb60b1493aefb384fe1/3m/db/3210/30984/photo_resized_square.png",
+      "photo_sha256": "72d86a968649a72d9829c69fd929a7b39ea9b9405d622d16c00174f6217f2201",
+      "photo_cached_at": "2026-11-05T20:21:18Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Bobby George",
+      "role": "Executive Vice President, Chief Information and Digital Officer",
+      "profile_url": "https://investors.3m.com/governance/corporate-officers#member-bio-31012",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/9d2f88547bffca68b11e25a5.png",
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://investors.3m.com/governance/corporate-officers",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://investors.3m.com/governance/corporate-officers",
+      "photo_credit": "3M",
+      "photo_original_url": "https://d1io3yog0oux5.cloudfront.net/_561e0ea88f737eb60b1493aefb384fe1/3m/db/3210/31012/photo_resized_square.png",
+      "photo_sha256": "18198b69e857b5d8b3a92f347849852e7660bf391b9ab95fcb278a9902f54dd6",
+      "photo_cached_at": "2026-11-05T20:21:18Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Chris Goralski",
+      "role": "Group President, Safety & Industrial",
+      "profile_url": "https://investors.3m.com/governance/corporate-officers#member-bio-30219",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/14d1054b7befbbaa9ab5c412.jpg",
+      "linkedin_url": null,
+      "start_date": null,
+      "source_url": "https://investors.3m.com/governance/corporate-officers",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://investors.3m.com/governance/corporate-officers",
+      "photo_credit": "3M",
+      "photo_original_url": "https://d1io3yog0oux5.cloudfront.net/_561e0ea88f737eb60b1493aefb384fe1/3m/db/3210/30219/photo_resized_square.jpg",
+      "photo_sha256": "a7c7192ea0ac8df29a3b4ff9b2d7a0ab1f71b29cc508a19eec5e8b90363c8eda",
+      "photo_cached_at": "2026-11-05T20:21:06Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Tushar Kshirsagar",
+      "role": "Executive Vice President, Chief Technology Officer and Environmental Responsibility",
+      "profile_url": "https://investors.3m.com/governance/corporate-officers#member-bio-31019",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/c2ff2d1acfaa33741af70fd4.jpg",
+      "linkedin_url": null,
+      "start_date": "2026-10",
+      "start_date_source_url": "https://investors.3m.com/governance/corporate-officers",
+      "source_url": "https://investors.3m.com/governance/corporate-officers",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:19:29Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://investors.3m.com/governance/corporate-officers",
+      "photo_credit": "3M",
+      "photo_original_url": "https://d1io3yog0oux5.cloudfront.net/_561e0ea88f737eb60b1493aefb384fe1/3m/db/3210/31019/photo_resized_square.jpg",
+      "photo_sha256": "333f4fc897a7a4bc2fcf081cd3cf363beccfc765b6453feee2f3c686993c5caa",
+      "photo_cached_at": "2026-11-05T20:21:18Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "goDmKHm4nyHq8LOtJlZLMAHGIAdM",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "MMM",
+        "domain": "3m.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    {
+      "name": "Official leadership source",
+      "url": "https://investors.3m.com/governance/corporate-officers",
+      "observed_at": "2026-11-05T20:19:29Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:28:47Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "goDmKHm4nyHq8LOtJlZLMAHGIAdM",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "MMM",
+        "domain": "3m.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "goDmKHm4nyHq8LOtJlZLMAHGIAdM",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "MMM",
+        "domain": "3m.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "goDmKHm4nyHq8LOtJlZLMAHGIAdM",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "MMM",
+        "domain": "3m.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "goDmKHm4nyHq8LOtJlZLMAHGIAdM",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "MMM",
+        "domain": "3m.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "goDmKHm4nyHq8LOtJlZLMAHGIAdM",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "MMM",
+        "domain": "3m.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "goDmKHm4nyHq8LOtJlZLMAHGIAdM",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "MMM",
+        "domain": "3m.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "goDmKHm4nyHq8LOtJlZLMAHGIAdM",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "MMM",
+        "domain": "3m.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "leadership_scope": "Selected corporate and business-unit executives verified against current official company sources; not a complete roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:14Z",
+      "industry": "2026-11-05T19:43:14Z",
+      "headquarters": "2026-11-05T19:43:14Z",
+      "founded": "2026-11-05T19:43:14Z",
+      "professional_profile_count": "2026-11-05T19:43:14Z",
+      "employee_size_range": "2026-11-05T19:43:14Z",
+      "linkedin_url": "2026-11-05T19:43:14Z",
+      "description": "2026-11-05T19:43:14Z",
+      "leadership": "2026-11-05T20:19:29Z"
+    },
+    "official_updated_at": "2026-11-05T20:19:29Z",
+    "portraits": "available_for_all_selected_leaders"
+  },
+  "description_provider": "People Data Labs"
+}

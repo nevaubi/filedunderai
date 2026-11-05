@@ -59,6 +59,8 @@ def build_directory(profiles=None, generated_at=None, fundamentals=None):
                        if isinstance(person, dict) and person.get('name') and (person.get('role') or person.get('title'))]
             row['leadership_count'] = len(leaders)
             row['portrait_count'] = sum(bool(person.get('photo_url')) for person in leaders)
+            row['portrait_source_count'] = sum(bool(person.get('photo_original_url') or person.get('photo_url')) for person in leaders)
+            row['cached_portrait_count'] = sum(bool(person.get('photo_url') and person.get('photo_sha256')) for person in leaders)
             row['coverage']['leadership'] = 'available' if leaders else 'unavailable'
             row['profile_updated_at'] = profile.get('updated_at')
             if profile.get('ir_url'):
@@ -75,7 +77,9 @@ def build_directory(profiles=None, generated_at=None, fundamentals=None):
                    'with_metadata':sum(c['coverage']['profile'] == 'available' for c in rows),
                    'with_leadership':sum(c.get('leadership_count', 0) > 0 for c in rows),
                    'leaders':sum(c.get('leadership_count', 0) for c in rows),
-                   'portraits':sum(c.get('portrait_count', 0) for c in rows)},
+                   'portraits':sum(c.get('portrait_count', 0) for c in rows),
+                   'portrait_sources':sum(c.get('portrait_source_count', 0) for c in rows),
+                   'cached_portraits':sum(c.get('cached_portrait_count', 0) for c in rows)},
         'companies': rows,
     }
 

@@ -1,0 +1,218 @@
+{
+  "schema_version": 1,
+  "ticker": "DIS",
+  "cik": 1744489,
+  "name": "Disney",
+  "description": "The Walt Disney Company is an international entertainment and media business operating through Disney Entertainment, ESPN and Disney Experiences.",
+  "description_source": {
+    "name": "Disney official leadership roster",
+    "url": "https://thewaltdisneycompany.com/about/",
+    "observed_at": "2026-11-05T19:45:54Z"
+  },
+  "source_url": "https://thewaltdisneycompany.com/about/",
+  "website": "https://thewaltdisneycompany.com/",
+  "industry": null,
+  "headquarters": null,
+  "founded": null,
+  "employees": null,
+  "leadership": [
+    {
+      "name": "Josh D’Amaro",
+      "role": "Chief Executive Officer, The Walt Disney Company",
+      "profile_url": "https://thewaltdisneycompany.com/leadership/josh-damaro/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/c8d92e162971ff0808b3b870.jpg",
+      "start_date": "2026-03-18",
+      "source_url": "https://thewaltdisneycompany.com/about/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:52:11Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://thewaltdisneycompany.com/about/",
+      "photo_credit": "Disney",
+      "start_date_source_url": "https://thewaltdisneycompany.com/press-releases/josh-damaro-named-next-chief-executive-officer-of-the-walt-disney-company/",
+      "tenure_note": "The company appointment announcement gives this effective date for CEO.",
+      "photo_original_url": "https://thewaltdisneycompany.com/app/uploads/2020/05/Josh-DAmaro_395x395-1024x1024.jpg",
+      "photo_sha256": "5a3cedb799c15bf3b9706994ef52005bf8a8ae2a3ceef377ca49321bd4c4122c",
+      "photo_cached_at": "2026-11-05T19:57:09Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Hugh Johnston",
+      "role": "Senior Executive Vice President & Chief Financial Officer, The Walt Disney Company",
+      "profile_url": "https://thewaltdisneycompany.com/leadership/hugh-johnston/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/01f6444ef5e055aea927be6d.jpg",
+      "start_date": "2023-12-04",
+      "source_url": "https://thewaltdisneycompany.com/about/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:52:11Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://thewaltdisneycompany.com/about/",
+      "photo_credit": "Disney",
+      "start_date_source_url": "https://thewaltdisneycompany.com/press-releases/the-walt-disney-company-names-hugh-johnston-as-senior-executive-vice-president-and-chief-financial-officer/",
+      "tenure_note": "The company appointment announcement gives this effective date for Senior Executive Vice President and Chief Financial Officer.",
+      "photo_original_url": "https://thewaltdisneycompany.com/app/uploads/2023/12/Hugh-Johnston_395x395-1024x1024.jpg",
+      "photo_sha256": "ccf22f8921cef2c16165052132ddaa4bbf2bce41c92df325829566c8f7a69f31",
+      "photo_cached_at": "2026-11-05T19:57:18Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Dana Walden",
+      "role": "President and Chief Creative Officer, The Walt Disney Company",
+      "profile_url": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/6958ec2aa0d323d22775f1aa.jpg",
+      "start_date": "2026-03-18",
+      "source_url": "https://thewaltdisneycompany.com/about/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:52:11Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://thewaltdisneycompany.com/about/",
+      "photo_credit": "Disney",
+      "start_date_source_url": "https://thewaltdisneycompany.com/press-releases/josh-damaro-named-next-chief-executive-officer-of-the-walt-disney-company/",
+      "tenure_note": "The company appointment announcement gives this effective date for President and Chief Creative Officer.",
+      "photo_original_url": "https://thewaltdisneycompany.com/app/uploads/2022/07/Dana_Walden-headshot-1024x1024.jpg",
+      "photo_sha256": "031be749a2681aaf310d47434b61ec9a2d1bb50be53c8f3312e90ebab4d95290",
+      "photo_cached_at": "2026-11-05T19:57:09Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Tinisha Agramonte",
+      "role": "Executive Vice President and Chief Opportunity & Inclusion Officer, The Walt Disney Company",
+      "profile_url": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/7727ca6265e77b70a3399751.jpg",
+      "start_date": null,
+      "source_url": "https://thewaltdisneycompany.com/about/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://thewaltdisneycompany.com/about/",
+      "photo_credit": "Disney",
+      "photo_original_url": "https://thewaltdisneycompany.com/app/uploads/2025/12/Tinisha-Agramote-Headshot-345.jpg",
+      "photo_sha256": "114c385ac024f9afd0e521366861dcef80d03d06538a2f6cf90f18c3002eaebd",
+      "photo_cached_at": "2026-11-05T19:57:18Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Karandeep Anand",
+      "role": "Senior Executive Vice President and Chief Technology Officer, The Walt Disney Company",
+      "profile_url": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/ae6fabcc66e65d00664bbc61.png",
+      "start_date": null,
+      "source_url": "https://thewaltdisneycompany.com/about/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://thewaltdisneycompany.com/about/",
+      "photo_credit": "Disney",
+      "photo_original_url": "https://thewaltdisneycompany.com/app/uploads/2026/09/Karandeep-Anand-Background.png",
+      "photo_sha256": "042095e1d9be0bb587919ecd168b083e8d8989c2e6b07024e37c0cda8e431543",
+      "photo_cached_at": "2026-11-05T19:57:21Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Asad Ayaz",
+      "role": "Chief Marketing and Brand Officer, The Walt Disney Company",
+      "profile_url": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/cd36f474503e8721c12d57ff.jpg",
+      "start_date": null,
+      "source_url": "https://thewaltdisneycompany.com/about/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://thewaltdisneycompany.com/about/",
+      "photo_credit": "Disney",
+      "photo_original_url": "https://thewaltdisneycompany.com/app/uploads/2023/04/AsadAyaz_395x395.png",
+      "photo_sha256": "2db8e63986a6070fd6f29ba7c14c722c1279ffc348bc4bae1f5a15fb061b9d02",
+      "photo_cached_at": "2026-11-05T20:03:07Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "David L. Bowdich",
+      "role": "Executive Vice President and Chief Security Officer, The Walt Disney Company",
+      "profile_url": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/f53b0688e4bb0de160aa21f1.jpg",
+      "start_date": null,
+      "source_url": "https://thewaltdisneycompany.com/about/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://thewaltdisneycompany.com/about/",
+      "photo_credit": "Disney",
+      "photo_original_url": "https://thewaltdisneycompany.com/app/uploads/2023/01/Dave-Bowdich-395x395-1.jpg",
+      "photo_sha256": "714e73f9910f016bb1e71657c618bffd3d717face9f3a301b35220c0333458b9",
+      "photo_cached_at": "2026-11-05T19:57:09Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Sonia Coleman",
+      "role": "Senior Executive Vice President and Chief People Officer, The Walt Disney Company",
+      "profile_url": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/34eb7f92db6d1a23c4b21958.jpg",
+      "start_date": null,
+      "source_url": "https://thewaltdisneycompany.com/about/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:45:54Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://thewaltdisneycompany.com/about/",
+      "photo_credit": "Disney",
+      "photo_original_url": "https://thewaltdisneycompany.com/app/uploads/2023/04/Sonia_Coleman_Headshot_395x395-1024x1024.jpg",
+      "photo_sha256": "f25568b63d8e36cb04454088d212b2c5f61e6f9b5c691c8100523b550e6cc4c5",
+      "photo_cached_at": "2026-11-05T19:57:14Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Disney official leadership roster",
+      "url": "https://thewaltdisneycompany.com/about/",
+      "observed_at": "2026-11-05T19:45:54Z"
+    },
+    {
+      "name": "Josh D’Amaro appointment evidence",
+      "url": "https://thewaltdisneycompany.com/press-releases/josh-damaro-named-next-chief-executive-officer-of-the-walt-disney-company/",
+      "observed_at": "2026-11-05T19:52:11Z"
+    },
+    {
+      "name": "Hugh Johnston appointment evidence",
+      "url": "https://thewaltdisneycompany.com/press-releases/the-walt-disney-company-names-hugh-johnston-as-senior-executive-vice-president-and-chief-financial-officer/",
+      "observed_at": "2026-11-05T19:52:11Z"
+    },
+    {
+      "name": "Josh D’Amaro official biography",
+      "url": "https://thewaltdisneycompany.com/leadership/josh-damaro/",
+      "observed_at": "2026-11-05T19:52:11Z"
+    },
+    {
+      "name": "Hugh Johnston official biography",
+      "url": "https://thewaltdisneycompany.com/leadership/hugh-johnston/",
+      "observed_at": "2026-11-05T19:52:11Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "Disney official leadership roster",
+      "url": "https://thewaltdisneycompany.com/about/",
+      "observed_at": "2026-11-05T19:45:54Z"
+    },
+    "description": {
+      "name": "Disney official leadership roster",
+      "url": "https://thewaltdisneycompany.com/about/",
+      "observed_at": "2026-11-05T19:45:54Z"
+    }
+  },
+  "coverage": {
+    "status": "official_sources",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T19:52:11Z",
+    "leadership_scope": "Selected corporate executives from the current official leadership page; not a complete officer or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:45:54Z",
+      "description": "2026-11-05T19:45:54Z",
+      "leadership": "2026-11-05T19:52:11Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  }
+}

@@ -180,12 +180,31 @@ class BudgetedFetch:
         return result
 
 
-def load_issuers(path):
+def load_issuers(path, verified_domains=None):
     rows = read_json(path, [])
-    return {row['ticker']: {**BY_TICKER[row['ticker']], 'legal_name': row.get('name'),
+    issuers={row['ticker']: {**BY_TICKER[row['ticker']], 'legal_name': row.get('name'),
                            'website': row.get('website') or None}
             for row in rows if row.get('ticker') in BY_TICKER
             and row.get('cik') == BY_TICKER[row['ticker']]['cik']}
+    if verified_domains:
+        evidence=read_json(verified_domains, {})
+        if evidence and (evidence.get('schema_version')!=1 or not isinstance(evidence.get('issuers'),dict)):
+            raise ValueError('Invalid reviewed issuer-domain map')
+        for ticker,item in evidence.get('issuers',{}).items():
+            issuer=issuers.get(ticker)
+            if (not issuer or item.get('ticker')!=ticker or item.get('cik')!=issuer['cik']
+                or str(item.get('returned_ticker','')).upper().replace('.','-')!=ticker
+                or not item.get('candidate_id') or not profiles.safe_url(item.get('source_url'))
+                or not profiles._timestamp(item.get('observed_at'))
+                or profiles._timestamp(item['observed_at'])>profiles._utc()):
+                raise ValueError('Reviewed domain lacks exact issuer identity or dated official evidence: '+ticker)
+            domain=profiles._domain(item.get('domain'))
+            if not domain:
+                raise ValueError('Invalid reviewed company domain: '+ticker)
+            issuer['website']='https://'+domain
+            issuer['identity_domain_source']={'name':'Official issuer domain verification',
+                'url':item['source_url'],'observed_at':item['observed_at'],'reason':item.get('reason')}
+    return issuers
 
 
 def verified_records(directory, issuers, basics_directory=None):
@@ -293,6 +312,43 @@ def fetch_people(args, requester, issuers):
             item['token'] = result.get('scroll_token') if len(result.get('data', [])) == request['cost'] else None
 
 
+def apply_portrait_manifest(directory, manifest_path):
+    manifest=read_json(manifest_path, {})
+    entries=manifest.get('entries',{})
+    changed_profiles=[]
+    for path in Path(directory).glob('*.json'):
+        if path.name=='index.json':
+            continue
+        profile=read_json(path)
+        changed=False
+        for person in profile.get('leadership',[]):
+            original=person.get('photo_original_url') or person.get('photo_url')
+            item=entries.get(original,{})
+            if item.get('status')=='cached':
+                values={'photo_original_url':original,'photo_url':item['cached_url'],
+                        'photo_sha256':item['sha256'],'photo_cached_at':item['verified_at'],
+                        'photo_status':'cached_and_verified'}
+                if any(person.get(key)!=value for key,value in values.items()):
+                    person.update(values)
+                    changed=True
+            elif (item.get('status')=='error'
+                  and item.get('error_stage') in (None,'source_download')
+                  and item.get('error') in ('http_403','image_content_type_or_signature_mismatch')):
+                if person.get('photo_url'):
+                    person['photo_original_url']=original
+                    person['photo_url']=None
+                    person['photo_status']='source_unavailable'
+                    changed=True
+        if changed:
+            coverage=profile.get('coverage',{})
+            if coverage.get('status') in ('official_sources','official_with_provider_metadata'):
+                coverage.setdefault('official_updated_at',profile.get('updated_at'))
+            profile['updated_at']=now_iso()
+            write_json(path,profile)
+            changed_profiles.append(profile['ticker'])
+    return changed_profiles
+
+
 def assemble(args, issuers):
     records = verified_records(args.cache, issuers, args.basics_cache)
     people = {}
@@ -313,12 +369,15 @@ def assemble(args, issuers):
         profile['description_provider'] = 'People Data Labs'
         old = read_json(output / (ticker + '.json'))
         if old:
+            if old.get('leadership') and (old.get('coverage') or {}).get('status') not in ('official_sources','official_with_provider_metadata'):
+                raise ValueError('Existing leadership needs official coverage status before assembly: '+ticker)
             profile = profiles.merge_official_profile(profile, old, provider_people=candidates)
         if not profiles._provider_source(profile.get('description_source')):
             profile.pop('description_provider', None)
         write_json(output / (ticker + '.json'), profile)
         counts['provider_companies'] += 1
         counts['official_leaders'] += len(profile.get('leadership', []))
+    counts['portrait_profiles_updated']=len(apply_portrait_manifest(output,args.portrait_manifest))
     write_json(Path(args.cache) / 'assembly-summary.json', counts)
     print(json.dumps(counts), flush=True)
 
@@ -330,12 +389,14 @@ def main():
     parser.add_argument('--plan', type=Path)
     parser.add_argument('--cache', type=Path, required=True)
     parser.add_argument('--basics-cache', type=Path, default=ROOT / 'cache/company-basic-backfill')
+    parser.add_argument('--verified-domains', type=Path, default=ROOT / 'cache/company-basic-backfill/verified-issuer-domains.json')
+    parser.add_argument('--portrait-manifest', type=Path, default=ROOT / 'cache/company-profile-backfill/portrait-cache.json')
     parser.add_argument('--output', type=Path, default=ROOT / 'public/data/company-profiles')
     parser.add_argument('--company-enrich-limit', type=int, default=95)
     parser.add_argument('--company-search-limit', type=int, default=96)
     parser.add_argument('--people-limit', type=int, default=498)
     args = parser.parse_args()
-    issuers = load_issuers(args.issuers)
+    issuers = load_issuers(args.issuers, args.verified_domains)
     if not issuers:
         raise ValueError('No registry-verified issuers')
     if args.phase == 'assemble':

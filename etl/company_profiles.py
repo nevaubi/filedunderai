@@ -289,6 +289,8 @@ def build_profile(issuer,record,observed_at=None,people=None,_endpoint='company/
     docs={'company/search':COMPANY_SEARCH_DOCS,'company/enrich':COMPANY_DOCS,'company/clean':COMPANY_CLEAN_DOCS}[_endpoint]
     match={'ticker':issuer['ticker'],'domain':_domain(record.get('website')),
            'basis':'ticker_and_verified_domain' if _domain(issuer.get('website') or issuer.get('domain')) else 'ticker_and_exact_issuer_name'}
+    if issuer.get('identity_domain_source'):
+        match['domain_source']=copy.deepcopy(issuer['identity_domain_source'])
     if _endpoint=='company/enrich': match['likelihood']=record.get('likelihood')
     if _endpoint=='company/clean':
         # Cleaner scores/fuzzy flags are provider diagnostics, not probabilities.
@@ -301,9 +303,11 @@ def build_profile(issuer,record,observed_at=None,people=None,_endpoint='company/
     loc=record.get('location') if isinstance(record.get('location'),dict) else {}
     hq=', '.join(str(loc[k]).strip() for k in ['locality','region','country'] if isinstance(loc.get(k),str) and loc[k].strip()) or None
     founded=record.get('founded')
-    founded=founded if type(founded) is int and 1800<=founded<=_utc(observed_at).year else None
+    founded=founded if type(founded) is int and 1000<=founded<=_utc(observed_at).year else None
     count=record.get('employee_count')
     count=count if type(count) is int and count>=0 else None
+    size=_text(record.get('size'),30)
+    size=size if size and re.fullmatch(r'\d+(?:-\d+|\+)',size) else None
     # Even fresh provider employment records can misidentify a division's chief
     # or an outdated role as corporate leadership. Only an official roster may
     # establish a name and role; provider candidates can supplement its links.
@@ -314,10 +318,11 @@ def build_profile(issuer,record,observed_at=None,people=None,_endpoint='company/
         'website':safe_url(record.get('website')),'industry':_text(record.get('industry'),150),'headquarters':hq,
         'linkedin_url':_linkedin_url(record.get('linkedin_url'),'company'),
         'founded':founded,'employees':None,'professional_profile_count':count,
+        'employee_size_range':size,'employee_size_range_basis':'Provider-reported size band; not company-reported workforce',
         'professional_profile_count_basis':'People Data Labs profiles associated with the company; not company-reported headcount',
         'professional_profile_count_source':source,'provider_record_id':source['record_id'],
         'leadership':leadership,'images':[],'sources':[source],'updated_at':observed_at,
-        'field_sources':{k:source for k in ['website','industry','headquarters','founded','professional_profile_count','linkedin_url']},
+        'field_sources':{k:source for k in ['website','industry','headquarters','founded','professional_profile_count','employee_size_range','linkedin_url']},
         'coverage':{'status':'provider_enriched','description':'available' if description else 'unavailable',
                     'leadership':'partial_provider_records' if leadership else 'unavailable','images':'unavailable',
                     'leadership_scope':'Selected leadership profiles; this is not a complete executive or board roster.'},
@@ -373,7 +378,13 @@ def merge_official_profile(profile,official,now=None,provider_people=None):
     incoming_leaders=_current_official_leadership(official,now)
     previous_leaders=_current_official_leadership(profile,now)
     leaders=previous_leaders; using_incoming=False
-    if incoming_leaders and (not previous_leaders or max(p['observed_at'] for p in incoming_leaders)>=max(p['observed_at'] for p in previous_leaders)):
+    def roster_rank(record,people):
+        observed=max(_timestamp(person['observed_at']) for person in people)
+        updated=_timestamp(record.get('updated_at'))
+        # Role evidence always wins. A later cache/link/tenure update breaks a
+        # tie without pretending that the official role was reverified then.
+        return observed, updated if updated and observed<=updated<=now else observed
+    if incoming_leaders and (not previous_leaders or roster_rank(official,incoming_leaders)>roster_rank(profile,previous_leaders)):
         leaders=incoming_leaders; using_incoming=True
     if leaders:
         for leader in leaders:
@@ -381,16 +392,23 @@ def merge_official_profile(profile,official,now=None,provider_people=None):
                         _provider_source({'name':person.get('source_name'),'url':person.get('source_url')})
                         and _person_name(person.get('name'))==_person_name(leader.get('name'))
                         and _role_family(person)==_role_family(leader)]
-            if not leader.get('linkedin_url') and len(candidates)==1:
-                person=candidates[0]
-                verified=partial_date(person.get('provider_verified_at'),now)
-                url=_linkedin_url(person.get('linkedin_url') or person.get('profile_url'),'in')
-                if url and verified and len(verified)==10 and (now.date()-dt.date.fromisoformat(verified)).days<=180:
+            if not leader.get('linkedin_url'):
+                valid_links=[]
+                for person in candidates:
+                    verified=partial_date(person.get('provider_verified_at'),now)
+                    url=_linkedin_url(person.get('linkedin_url') or person.get('profile_url'),'in')
+                    if url and verified and len(verified)==10 and (now.date()-dt.date.fromisoformat(verified)).days<=180:
+                        valid_links.append((url,verified,person))
+                # CEO and chair/CEO records may identify the same profile. Only
+                # conflicting current URLs make an otherwise exact match ambiguous.
+                if len({url for url,_,_ in valid_links})==1:
+                    url,verified,person=max(valid_links,key=lambda match:match[1])
                     leader['linkedin_url']=url
                     leader['linkedin_source']={'name':'People Data Labs','url':PEOPLE_DOCS,
                                                'observed_at':person.get('observed_at'),'provider_verified_at':verified}
         merged['leadership']=leaders
         evidence_dates.extend(_timestamp(p['observed_at']) for p in leaders)
+        evidence_dates.append(roster_rank(official if using_incoming else profile,leaders)[1])
     else:
         # Provider-only rows and expired official rosters never become current
         # corporate leadership simply because metadata was refreshed.

@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "ticker": "NBIX",
+  "cik": 914475,
+  "name": "NEUROCRINE BIOSCIENCES INC",
+  "description": "neurocrine biosciences is a leading biopharmaceutical company with a simple purpose: to relieve suffering for people with great needs. we are dedicated to discovering, developing and commercializing life-changing treatments for patients with under-addressed neurological, psychiatric, endocrine and immunological disorders. the company's diverse portfolio includes fda-approved treatments for tardive dyskinesia, chorea associated with huntington's disease, classic congenital adrenal hyperplasia, hyperphagia in patients with prader-willi syndrome, endometriosis* and uterine fibroids,* as well as a robust pipeline including multiple compounds in mid- to late-phase clinical development across our core therapeutic areas. for three decades, we have applied our unique insight into neuroscience and the interconnections between brain and body systems to treat complex conditions. we relentlessly pursue medicines to ease the burden of debilitating diseases and disorders because you deserve brave science.\n\nreview our community guidelines: https://bit.ly/neurocrinelinkedinguidelines\n\n*in collaboration with abbvie",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "eTAaFYjxVNCEVDpoBkBLNgNQo8D3",
+    "observed_at": "2026-11-05T19:46:27Z",
+    "match": {
+      "ticker": "NBIX",
+      "domain": "neurocrine.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://neurocrine.com",
+  "industry": "Biotechnology",
+  "headquarters": "San Diego, California, United States",
+  "linkedin_url": "https://linkedin.com/company/neurocrine",
+  "founded": 1992,
+  "employees": null,
+  "professional_profile_count": 2172,
+  "employee_size_range": "1001-5000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "eTAaFYjxVNCEVDpoBkBLNgNQo8D3",
+    "observed_at": "2026-11-05T19:46:27Z",
+    "match": {
+      "ticker": "NBIX",
+      "domain": "neurocrine.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "eTAaFYjxVNCEVDpoBkBLNgNQo8D3",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "eTAaFYjxVNCEVDpoBkBLNgNQo8D3",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "NBIX",
+        "domain": "neurocrine.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:46:27Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "eTAaFYjxVNCEVDpoBkBLNgNQo8D3",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "NBIX",
+        "domain": "neurocrine.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "eTAaFYjxVNCEVDpoBkBLNgNQo8D3",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "NBIX",
+        "domain": "neurocrine.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "eTAaFYjxVNCEVDpoBkBLNgNQo8D3",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "NBIX",
+        "domain": "neurocrine.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "eTAaFYjxVNCEVDpoBkBLNgNQo8D3",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "NBIX",
+        "domain": "neurocrine.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "eTAaFYjxVNCEVDpoBkBLNgNQo8D3",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "NBIX",
+        "domain": "neurocrine.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "eTAaFYjxVNCEVDpoBkBLNgNQo8D3",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "NBIX",
+        "domain": "neurocrine.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "eTAaFYjxVNCEVDpoBkBLNgNQo8D3",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "NBIX",
+        "domain": "neurocrine.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:46:27Z",
+      "industry": "2026-11-05T19:46:27Z",
+      "headquarters": "2026-11-05T19:46:27Z",
+      "founded": "2026-11-05T19:46:27Z",
+      "professional_profile_count": "2026-11-05T19:46:27Z",
+      "employee_size_range": "2026-11-05T19:46:27Z",
+      "linkedin_url": "2026-11-05T19:46:27Z",
+      "description": "2026-11-05T19:46:27Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

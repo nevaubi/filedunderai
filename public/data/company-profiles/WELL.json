@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "ticker": "WELL",
+  "cik": 766704,
+  "name": "Welltower",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://welltower.com",
+  "industry": "real estate",
+  "headquarters": "united states",
+  "linkedin_url": "https://linkedin.com/company/welltower",
+  "founded": 1970,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "201-500",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "GO0l7J0HWtdMc1xFgrhKuQbZudsF",
+    "observed_at": "2026-11-05T20:10:11Z",
+    "match": {
+      "ticker": "WELL",
+      "domain": "welltower.com",
+      "basis": "ticker_and_verified_domain",
+      "domain_source": {
+        "name": "Official issuer domain verification",
+        "url": "https://welltower.com/",
+        "observed_at": "2026-11-05T20:15:15Z",
+        "reason": "The official homepage identifies Welltower Inc. and ticker WELL. The returned name adds a trademark symbol and exchange annotation."
+      },
+      "provider_fuzzy_match": true,
+      "provider_score": 1.6309297535714575
+    }
+  },
+  "provider_record_id": "GO0l7J0HWtdMc1xFgrhKuQbZudsF",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "GO0l7J0HWtdMc1xFgrhKuQbZudsF",
+      "observed_at": "2026-11-05T20:10:11Z",
+      "match": {
+        "ticker": "WELL",
+        "domain": "welltower.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://welltower.com/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official homepage identifies Welltower Inc. and ticker WELL. The returned name adds a trademark symbol and exchange annotation."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.6309297535714575
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:10:11Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "GO0l7J0HWtdMc1xFgrhKuQbZudsF",
+      "observed_at": "2026-11-05T20:10:11Z",
+      "match": {
+        "ticker": "WELL",
+        "domain": "welltower.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://welltower.com/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official homepage identifies Welltower Inc. and ticker WELL. The returned name adds a trademark symbol and exchange annotation."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.6309297535714575
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "GO0l7J0HWtdMc1xFgrhKuQbZudsF",
+      "observed_at": "2026-11-05T20:10:11Z",
+      "match": {
+        "ticker": "WELL",
+        "domain": "welltower.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://welltower.com/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official homepage identifies Welltower Inc. and ticker WELL. The returned name adds a trademark symbol and exchange annotation."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.6309297535714575
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "GO0l7J0HWtdMc1xFgrhKuQbZudsF",
+      "observed_at": "2026-11-05T20:10:11Z",
+      "match": {
+        "ticker": "WELL",
+        "domain": "welltower.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://welltower.com/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official homepage identifies Welltower Inc. and ticker WELL. The returned name adds a trademark symbol and exchange annotation."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.6309297535714575
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "GO0l7J0HWtdMc1xFgrhKuQbZudsF",
+      "observed_at": "2026-11-05T20:10:11Z",
+      "match": {
+        "ticker": "WELL",
+        "domain": "welltower.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://welltower.com/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official homepage identifies Welltower Inc. and ticker WELL. The returned name adds a trademark symbol and exchange annotation."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.6309297535714575
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "GO0l7J0HWtdMc1xFgrhKuQbZudsF",
+      "observed_at": "2026-11-05T20:10:11Z",
+      "match": {
+        "ticker": "WELL",
+        "domain": "welltower.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://welltower.com/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official homepage identifies Welltower Inc. and ticker WELL. The returned name adds a trademark symbol and exchange annotation."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.6309297535714575
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "GO0l7J0HWtdMc1xFgrhKuQbZudsF",
+      "observed_at": "2026-11-05T20:10:11Z",
+      "match": {
+        "ticker": "WELL",
+        "domain": "welltower.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://welltower.com/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official homepage identifies Welltower Inc. and ticker WELL. The returned name adds a trademark symbol and exchange annotation."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.6309297535714575
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "GO0l7J0HWtdMc1xFgrhKuQbZudsF",
+      "observed_at": "2026-11-05T20:10:11Z",
+      "match": {
+        "ticker": "WELL",
+        "domain": "welltower.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://welltower.com/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official homepage identifies Welltower Inc. and ticker WELL. The returned name adds a trademark symbol and exchange annotation."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.6309297535714575
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:10:11Z",
+      "industry": "2026-11-05T20:10:11Z",
+      "headquarters": "2026-11-05T20:10:11Z",
+      "founded": "2026-11-05T20:10:11Z",
+      "employee_size_range": "2026-11-05T20:10:11Z",
+      "linkedin_url": "2026-11-05T20:10:11Z"
+    }
+  }
+}

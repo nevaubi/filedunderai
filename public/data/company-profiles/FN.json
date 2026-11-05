@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "ticker": "FN",
+  "cik": 1408710,
+  "name": "Fabrinet",
+  "description": "fabrinet is the trusted manufacturing partner of the world’s most demanding oems. we offer a full range of services. we provide complex optical and electro-mechanical components, modules, and bulk optics. these components serve the markets of data communications, telecommunications, networking, medical devices, and automotive technologies. our customers are top-tier oems. we provide our customers with a seamless transition from a product’s prototype through its final production.\r\n\r\nwe offer full support for testing and process development. we also support design for manufacturing and a full-turnkey supply chain. this allows us to help with the development and continuous improvement of a product.\r\n\r\nour services come with fabrinet’s focus on quality, flexibility, and competitiveness, all of which we tailor to match the unique needs of our customers.\r\n\r\nwe are hiring the following positions:\r\n\r\ngeneral manager\r\nqa director\r\nquality manager\r\noperation manager\r\nengineering manager\r\nprogram coordination manager\r\nnpi manager\r\noracle applications manager\r\nsmt manager\r\nlogistic manager\r\nmaterial controls manager\r\ninventory controls manager\r\nplanning manager\r\nhr manager\r\nhrd manager\r\n\r\nquality engineer\r\nprocess engineer\r\ntest engineer\r\nnpi engineer\r\nsmt engineer\r\nsupply chain engineer\r\nmaintenance engineer\r\nprogram management coordinator\r\nplanner\r\nbuyer",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "FecJc2Iro9vIcTqHHxuFuwmXsb34",
+    "observed_at": "2026-11-05T19:44:32Z",
+    "match": {
+      "ticker": "FN",
+      "domain": "fabrinet.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 9
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+  "website": "https://fabrinet.com",
+  "industry": "Electrical/Electronic Manufacturing",
+  "headquarters": "Ban Talat Rangsit, Pathum Thani, Thailand",
+  "linkedin_url": "https://linkedin.com/company/fabrinet",
+  "founded": 2000,
+  "employees": null,
+  "professional_profile_count": 958,
+  "employee_size_range": "5001-10000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "FecJc2Iro9vIcTqHHxuFuwmXsb34",
+    "observed_at": "2026-11-05T19:44:32Z",
+    "match": {
+      "ticker": "FN",
+      "domain": "fabrinet.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 9
+    }
+  },
+  "provider_record_id": "FecJc2Iro9vIcTqHHxuFuwmXsb34",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "FecJc2Iro9vIcTqHHxuFuwmXsb34",
+      "observed_at": "2026-11-05T19:44:32Z",
+      "match": {
+        "ticker": "FN",
+        "domain": "fabrinet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:44:32Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "FecJc2Iro9vIcTqHHxuFuwmXsb34",
+      "observed_at": "2026-11-05T19:44:32Z",
+      "match": {
+        "ticker": "FN",
+        "domain": "fabrinet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "FecJc2Iro9vIcTqHHxuFuwmXsb34",
+      "observed_at": "2026-11-05T19:44:32Z",
+      "match": {
+        "ticker": "FN",
+        "domain": "fabrinet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "FecJc2Iro9vIcTqHHxuFuwmXsb34",
+      "observed_at": "2026-11-05T19:44:32Z",
+      "match": {
+        "ticker": "FN",
+        "domain": "fabrinet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "FecJc2Iro9vIcTqHHxuFuwmXsb34",
+      "observed_at": "2026-11-05T19:44:32Z",
+      "match": {
+        "ticker": "FN",
+        "domain": "fabrinet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "FecJc2Iro9vIcTqHHxuFuwmXsb34",
+      "observed_at": "2026-11-05T19:44:32Z",
+      "match": {
+        "ticker": "FN",
+        "domain": "fabrinet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "FecJc2Iro9vIcTqHHxuFuwmXsb34",
+      "observed_at": "2026-11-05T19:44:32Z",
+      "match": {
+        "ticker": "FN",
+        "domain": "fabrinet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "FecJc2Iro9vIcTqHHxuFuwmXsb34",
+      "observed_at": "2026-11-05T19:44:32Z",
+      "match": {
+        "ticker": "FN",
+        "domain": "fabrinet.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:44:32Z",
+      "industry": "2026-11-05T19:44:32Z",
+      "headquarters": "2026-11-05T19:44:32Z",
+      "founded": "2026-11-05T19:44:32Z",
+      "professional_profile_count": "2026-11-05T19:44:32Z",
+      "employee_size_range": "2026-11-05T19:44:32Z",
+      "linkedin_url": "2026-11-05T19:44:32Z",
+      "description": "2026-11-05T19:44:32Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

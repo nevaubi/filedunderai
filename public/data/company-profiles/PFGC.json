@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "PFGC",
+  "cik": 1618673,
+  "name": "Performance Food Group Co",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://pfgc.com",
+  "industry": "food & beverages",
+  "headquarters": "richmond, virginia, united states",
+  "linkedin_url": "https://linkedin.com/company/performancefoodgroup",
+  "founded": 1885,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "NdyZAxQ09ddUkRwABgqKbwnKdatm",
+    "observed_at": "2026-11-05T20:06:12Z",
+    "match": {
+      "ticker": "PFGC",
+      "domain": "pfgc.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.300881017077509
+    }
+  },
+  "provider_record_id": "NdyZAxQ09ddUkRwABgqKbwnKdatm",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "NdyZAxQ09ddUkRwABgqKbwnKdatm",
+      "observed_at": "2026-11-05T20:06:12Z",
+      "match": {
+        "ticker": "PFGC",
+        "domain": "pfgc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.300881017077509
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:06:12Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "NdyZAxQ09ddUkRwABgqKbwnKdatm",
+      "observed_at": "2026-11-05T20:06:12Z",
+      "match": {
+        "ticker": "PFGC",
+        "domain": "pfgc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.300881017077509
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "NdyZAxQ09ddUkRwABgqKbwnKdatm",
+      "observed_at": "2026-11-05T20:06:12Z",
+      "match": {
+        "ticker": "PFGC",
+        "domain": "pfgc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.300881017077509
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "NdyZAxQ09ddUkRwABgqKbwnKdatm",
+      "observed_at": "2026-11-05T20:06:12Z",
+      "match": {
+        "ticker": "PFGC",
+        "domain": "pfgc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.300881017077509
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "NdyZAxQ09ddUkRwABgqKbwnKdatm",
+      "observed_at": "2026-11-05T20:06:12Z",
+      "match": {
+        "ticker": "PFGC",
+        "domain": "pfgc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.300881017077509
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "NdyZAxQ09ddUkRwABgqKbwnKdatm",
+      "observed_at": "2026-11-05T20:06:12Z",
+      "match": {
+        "ticker": "PFGC",
+        "domain": "pfgc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.300881017077509
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "NdyZAxQ09ddUkRwABgqKbwnKdatm",
+      "observed_at": "2026-11-05T20:06:12Z",
+      "match": {
+        "ticker": "PFGC",
+        "domain": "pfgc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.300881017077509
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "NdyZAxQ09ddUkRwABgqKbwnKdatm",
+      "observed_at": "2026-11-05T20:06:12Z",
+      "match": {
+        "ticker": "PFGC",
+        "domain": "pfgc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.300881017077509
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:06:12Z",
+      "industry": "2026-11-05T20:06:12Z",
+      "headquarters": "2026-11-05T20:06:12Z",
+      "founded": "2026-11-05T20:06:12Z",
+      "employee_size_range": "2026-11-05T20:06:12Z",
+      "linkedin_url": "2026-11-05T20:06:12Z"
+    }
+  }
+}

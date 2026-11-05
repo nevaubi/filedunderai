@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "ticker": "SPG",
+  "cik": 1063761,
+  "name": "Simon Property Group",
+  "description": "simon is a global leader in the ownership of premier shopping, dining, entertainment and mixed-use destinations and an s&p 100 company (simon property group, nyse: spg). our properties across north america, europe, and asia provide community gathering places for millions of people every day and generate billions in annual sales. \n\nour portfolio includes assets of national and international renown - proven assets that are the preferred location for retailers.  in addition to our high quality properties, simon is also known for our strong balance sheet, a long-tenured and well-respected senior management team, and our innovative spirit, as reflected in a 50 + year history of successful retail real estate development, management & leasing.  \n\nemployment at simon is considered the pinnacle of a career by real estate professionals due to our leadership position in the industry.  with a total market capitalization of over $80 billion, we are well positioned to continue to deliver strong financial results and create shareholder value.  headquartered in indianapolis, indiana, we employ approximately 4,800 people across the united states.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "5Bhv7c5esXaedlNfmBFF5A4OgsNd",
+    "observed_at": "2026-11-05T19:43:36Z",
+    "match": {
+      "ticker": "SPG",
+      "domain": "simon.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://simon.com",
+  "industry": "Real Estate",
+  "headquarters": "Indianapolis, Indiana, United States",
+  "linkedin_url": "https://linkedin.com/company/simon-property-group",
+  "founded": 1960,
+  "employees": null,
+  "professional_profile_count": 2716,
+  "employee_size_range": "5001-10000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "5Bhv7c5esXaedlNfmBFF5A4OgsNd",
+    "observed_at": "2026-11-05T19:43:36Z",
+    "match": {
+      "ticker": "SPG",
+      "domain": "simon.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "5Bhv7c5esXaedlNfmBFF5A4OgsNd",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "5Bhv7c5esXaedlNfmBFF5A4OgsNd",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SPG",
+        "domain": "simon.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:43:36Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "5Bhv7c5esXaedlNfmBFF5A4OgsNd",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SPG",
+        "domain": "simon.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "5Bhv7c5esXaedlNfmBFF5A4OgsNd",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SPG",
+        "domain": "simon.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "5Bhv7c5esXaedlNfmBFF5A4OgsNd",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SPG",
+        "domain": "simon.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "5Bhv7c5esXaedlNfmBFF5A4OgsNd",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SPG",
+        "domain": "simon.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "5Bhv7c5esXaedlNfmBFF5A4OgsNd",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SPG",
+        "domain": "simon.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "5Bhv7c5esXaedlNfmBFF5A4OgsNd",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SPG",
+        "domain": "simon.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "5Bhv7c5esXaedlNfmBFF5A4OgsNd",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SPG",
+        "domain": "simon.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:36Z",
+      "industry": "2026-11-05T19:43:36Z",
+      "headquarters": "2026-11-05T19:43:36Z",
+      "founded": "2026-11-05T19:43:36Z",
+      "professional_profile_count": "2026-11-05T19:43:36Z",
+      "employee_size_range": "2026-11-05T19:43:36Z",
+      "linkedin_url": "2026-11-05T19:43:36Z",
+      "description": "2026-11-05T19:43:36Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

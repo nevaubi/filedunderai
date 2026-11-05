@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "ticker": "AVGO",
+  "cik": 1730168,
+  "name": "Broadcom",
+  "description": "Broadcom designs, develops and supplies semiconductors and infrastructure software for organizations with complex, mission-critical technology needs. Its corporate operations include a Semiconductor Solutions Group and an Infrastructure Software Group. The company is incorporated in Delaware and headquartered in Palo Alto, California.",
+  "description_source": {
+    "name": "Broadcom business context",
+    "url": "https://investors.broadcom.com/news-releases/news-release-details/broadcom-announces-planned-chief-financial-officer-transition",
+    "observed_at": "2026-11-05T19:40:50Z"
+  },
+  "source_url": "https://investors.broadcom.com/news-releases/news-release-details/broadcom-announces-planned-chief-financial-officer-transition",
+  "website": "https://www.broadcom.com/",
+  "industry": null,
+  "headquarters": "Palo Alto, California, United States",
+  "founded": null,
+  "employees": null,
+  "leadership": [
+    {
+      "name": "Hock E. Tan",
+      "role": "President and Chief Executive Officer",
+      "profile_url": "https://www.broadcom.com/company/about-us/executives/hock-e-tan",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/41029826e51e0273cbf3b70e.jpg",
+      "start_date": "2006-03",
+      "source_url": "https://www.broadcom.com/company/about-us/executives/hock-e-tan",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.broadcom.com/company/about-us/executives",
+      "photo_credit": "Broadcom",
+      "start_date_source_url": "https://www.broadcom.com/company/about-us/executives/hock-e-tan",
+      "photo_original_url": "https://www.broadcom.com/media/blt4ac44e0e6c6d8341/blt74b0a70907edd3fa/63fd4ee961a09910bc4d097f/Hock_Tan.jpg?width=100",
+      "photo_sha256": "48d691824aa07996519673b6b89968f8620b42c155b4882955c7f3ea7f38d30d",
+      "photo_cached_at": "2026-11-05T19:59:14Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Amie Thuener",
+      "role": "Chief Financial Officer and Principal Accounting Officer",
+      "profile_url": "https://www.broadcom.com/company/about-us/executives/amie-thuener",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/503be2de6af15898654e954a.jpg",
+      "start_date": "2026-06-12",
+      "source_url": "https://www.broadcom.com/company/about-us/executives/amie-thuener",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.broadcom.com/company/about-us/executives",
+      "photo_credit": "Broadcom",
+      "start_date_source_url": "https://investors.broadcom.com/news-releases/news-release-details/broadcom-announces-planned-chief-financial-officer-transition",
+      "tenure_note": "The appointment announcement dates the CFO role to June 12, 2026; it does not separately date the Principal Accounting Officer title.",
+      "photo_original_url": "https://www.broadcom.com/media/blt4ac44e0e6c6d8341/blt6942b356f979823e/6a3ac2b8e8066259283531a1/Amie-Thuener.jpg?width=100",
+      "photo_sha256": "d8a144af4a568b02c33fda84b7175845e3021ded26ea35ed1050a8b7c915ec2e",
+      "photo_cached_at": "2026-11-05T19:59:14Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Charlie Kawwas, Ph.D.",
+      "role": "President, Semiconductor Solutions Group",
+      "profile_url": "https://www.broadcom.com/company/about-us/executives/charlie-kawwas",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/a1fec5acdd6b85c30f3a99a2.jpg",
+      "start_date": null,
+      "source_url": "https://www.broadcom.com/company/about-us/executives",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.broadcom.com/company/about-us/executives",
+      "photo_credit": "Broadcom",
+      "photo_original_url": "https://www.broadcom.com/media/blt4ac44e0e6c6d8341/blt13dcd6e2d0923c10/6037266f8095d30fa65dab33/Charlie_Kawwas?width=100",
+      "photo_sha256": "3ee8e474c91af3aa44755931cfd84bbefa15676e54b4514ae881d5aab0d314cd",
+      "photo_cached_at": "2026-11-05T19:59:03Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Ram Velaga",
+      "role": "President, Infrastructure Software Group",
+      "profile_url": "https://www.broadcom.com/company/about-us/executives/ram-velaga",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/cdeb79296380fabf3fffbb4f.jpg",
+      "start_date": null,
+      "source_url": "https://www.broadcom.com/company/about-us/executives",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.broadcom.com/company/about-us/executives",
+      "photo_credit": "Broadcom",
+      "photo_original_url": "https://www.broadcom.com/media/blt4ac44e0e6c6d8341/blt7b3d885da87b900f/64e68d7e8c0a709786820729/Ram_Velaga-269x392.jpg?width=100",
+      "photo_sha256": "c917baf40bd4cd069b5dab72429423e01403f3e37bad2f1000dc1d394bbdb7af",
+      "photo_cached_at": "2026-11-05T19:59:14Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Mark Brazeal",
+      "role": "Chief Legal and Corporate Affairs Officer",
+      "profile_url": "https://www.broadcom.com/company/about-us/executives/mark-brazeal",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/5d1c067404e1198c4cca094c.jpg",
+      "start_date": null,
+      "source_url": "https://www.broadcom.com/company/about-us/executives",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.broadcom.com/company/about-us/executives",
+      "photo_credit": "Broadcom",
+      "photo_original_url": "https://www.broadcom.com/media/blt4ac44e0e6c6d8341/blt469834190b909942/6ad709e98d32946fe211d56d/Mark-Brazeal-269x392.jpg?width=100",
+      "photo_sha256": "0f3a7e94dcd1a26be2310f7d6d0f938f69d4f97a9c1f508909cd08e6cc231469",
+      "photo_cached_at": "2026-11-05T19:59:03Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Alan Davidson",
+      "role": "Chief Information Officer",
+      "profile_url": "https://www.broadcom.com/company/about-us/executives/alan-davidson",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/bfce332b2faa20356bf60075.jpg",
+      "start_date": null,
+      "source_url": "https://www.broadcom.com/company/about-us/executives",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.broadcom.com/company/about-us/executives",
+      "photo_credit": "Broadcom",
+      "photo_original_url": "https://www.broadcom.com/media/blt4ac44e0e6c6d8341/blt1a223934c1853460/6aa0e3a8508cca769aa168b3/Alan-Davidson-269x392.jpg?width=100",
+      "photo_sha256": "2934edc0c55cdaab40cb86f8b6d179496d09773c90aba88d9f97b56d2103b54b",
+      "photo_cached_at": "2026-11-05T19:59:03Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Jill Turner",
+      "role": "Vice President, Human Resources",
+      "profile_url": "https://www.broadcom.com/company/about-us/executives/jill-turner",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/6113391f62a4f6238c84097e.jpg",
+      "start_date": null,
+      "source_url": "https://www.broadcom.com/company/about-us/executives",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.broadcom.com/company/about-us/executives",
+      "photo_credit": "Broadcom",
+      "photo_original_url": "https://www.broadcom.com/media/blt4ac44e0e6c6d8341/blt47a54c8b6ee7045f/6758bb569628e1da521e4759/Jill_Turner.jpg?width=100",
+      "photo_sha256": "4d4691fae8e2d48726f249d09de23d62d67b11a53cddb1c2acd46961849dd847",
+      "photo_cached_at": "2026-11-05T19:59:03Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Yuan Xing Lee, Ph.D.",
+      "role": "Vice President, Central Engineering",
+      "profile_url": "https://www.broadcom.com/company/about-us/executives/yuan-xing-lee",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/657193fda8932a2225d9e9c0.jpg",
+      "start_date": null,
+      "source_url": "https://www.broadcom.com/company/about-us/executives",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.broadcom.com/company/about-us/executives",
+      "photo_credit": "Broadcom",
+      "photo_original_url": "https://www.broadcom.com/media/blt4ac44e0e6c6d8341/blt5ae90e1062d39f93/603726ae8acfa70d306d9f27/Yuan_Xing_Lee?width=100",
+      "photo_sha256": "b011786b72a5ae7ddf214eb5f6d0f45e54c1992bd96a615a3edaebc27699c150",
+      "photo_cached_at": "2026-11-05T19:59:03Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Broadcom official leadership roster",
+      "url": "https://www.broadcom.com/company/about-us/executives",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Hock E. Tan official biography",
+      "url": "https://www.broadcom.com/company/about-us/executives/hock-e-tan",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Hock E. Tan role start evidence",
+      "url": "https://www.broadcom.com/company/about-us/executives/hock-e-tan",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Amie Thuener official biography",
+      "url": "https://www.broadcom.com/company/about-us/executives/amie-thuener",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Amie Thuener role start evidence",
+      "url": "https://investors.broadcom.com/news-releases/news-release-details/broadcom-announces-planned-chief-financial-officer-transition",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Broadcom business context",
+      "url": "https://investors.broadcom.com/news-releases/news-release-details/broadcom-announces-planned-chief-financial-officer-transition",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "Official company source",
+      "url": "https://www.broadcom.com/company/about-us/executives",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    "description": {
+      "name": "Broadcom business context",
+      "url": "https://investors.broadcom.com/news-releases/news-release-details/broadcom-announces-planned-chief-financial-officer-transition",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    "headquarters": {
+      "name": "Official company source",
+      "url": "https://investors.broadcom.com/news-releases/news-release-details/broadcom-announces-planned-chief-financial-officer-transition",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  },
+  "coverage": {
+    "status": "official_sources",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T19:40:50Z",
+    "leadership_scope": "Selected leaders from the company’s published leadership roster; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:40:50Z",
+      "description": "2026-11-05T19:40:50Z",
+      "headquarters": "2026-11-05T19:40:50Z",
+      "leadership": "2026-11-05T19:40:50Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  }
+}

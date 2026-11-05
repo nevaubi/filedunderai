@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "ticker": "LLY",
+  "cik": 59478,
+  "name": "Eli Lilly",
+  "description": "Eli Lilly and Company develops medicines using biotechnology, chemistry and genetic medicine. Its research and products address diabetes, obesity, Alzheimer’s disease, immune system disorders and cancer. Its businesses include cardiometabolic health, immunology, neuroscience and oncology, supported by research laboratories and global manufacturing operations.",
+  "description_source": {
+    "name": "Eli Lilly business context",
+    "url": "https://investor.lilly.com/news-releases/news-release-details/lilly-appoints-lucas-montarce-executive-vice-president-and-chief",
+    "observed_at": "2026-11-05T19:40:50Z"
+  },
+  "source_url": "https://investor.lilly.com/news-releases/news-release-details/lilly-appoints-lucas-montarce-executive-vice-president-and-chief",
+  "website": "https://www.lilly.com/",
+  "industry": null,
+  "headquarters": null,
+  "founded": null,
+  "employees": null,
+  "leadership": [
+    {
+      "name": "David A. Ricks",
+      "role": "Chair and Chief Executive Officer, Eli Lilly and Company",
+      "profile_url": "https://www.lilly.com/about/leadership/david-ricks",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/ea91cc09d277a78bc03f7798.avif",
+      "start_date": "2017-06",
+      "source_url": "https://www.lilly.com/about/leadership/david-ricks",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lilly.com/about/leadership",
+      "photo_credit": "Eli Lilly",
+      "linkedin_url": "https://www.linkedin.com/in/davearicks/",
+      "linkedin_source_url": "https://www.lilly.com/about/leadership/david-ricks",
+      "start_date_source_url": "https://www.lilly.com/about/leadership/david-ricks",
+      "tenure_note": "CEO since January 2017 and Chair since June 2017. Tenure shown begins with the combined current title.",
+      "photo_original_url": "https://delivery-p137454-e1438138.adobeaemcloud.com/adobe/assets/urn:aaid:aem:ac51ef02-1e93-4b17-a8a5-d58b4737a078/as/Lilly.com-Small-Square-326x326-ECBios_0000_DaveRicks2025.avif?assetname=Lilly.com-Small-Square-326x326-ECBios_0000_DaveRicks2025.jpg",
+      "photo_sha256": "04d99e629a6f94f829d79c75647c8d3d8588c988c8442f373f4683d9f5ab92f9",
+      "photo_cached_at": "2026-11-05T19:54:52Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Lucas Montarce",
+      "role": "Executive Vice President and Chief Financial Officer, Eli Lilly and Company",
+      "profile_url": "https://www.lilly.com/about/leadership/lucas-montarce",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/98947f4e811015bc40c4a35f.avif",
+      "start_date": "2024-09-09",
+      "source_url": "https://www.lilly.com/about/leadership/lucas-montarce",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lilly.com/about/leadership",
+      "photo_credit": "Eli Lilly",
+      "linkedin_url": "https://www.linkedin.com/in/lucas-montarce/",
+      "linkedin_source_url": "https://www.lilly.com/about/leadership/lucas-montarce",
+      "start_date_source_url": "https://investor.lilly.com/news-releases/news-release-details/lilly-appoints-lucas-montarce-executive-vice-president-and-chief",
+      "photo_original_url": "https://delivery-p137454-e1438138.adobeaemcloud.com/adobe/assets/urn:aaid:aem:49ebcb6d-55c7-4dd6-b96b-3490f5eaa9a8/as/Lilly.com-Small-Square-326x326-ECBios_0002_LucasMontarce2025.avif?assetname=Lilly.com-Small-Square-326x326-ECBios_0002_LucasMontarce2025.jpg",
+      "photo_sha256": "e838a4cd8f965e273ac87dd08718f72cd8b52094b516ba09b4df314c859a5dd4",
+      "photo_cached_at": "2026-11-05T19:54:42Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Daniel M. Skovronsky, M.D., Ph.D.",
+      "role": "Chief Scientific and Product Officer and President, Lilly Research Laboratories, Eli Lilly and Company",
+      "profile_url": "https://www.lilly.com/about/leadership/daniel-skovronsky",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/85c8387d27ea76830b4a4669.avif",
+      "start_date": null,
+      "source_url": "https://www.lilly.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lilly.com/about/leadership",
+      "photo_credit": "Eli Lilly",
+      "photo_original_url": "https://delivery-p137454-e1438138.adobeaemcloud.com/adobe/assets/urn:aaid:aem:54059d06-33d7-4a20-86f4-59e73e3910cd/as/Lilly.com-Small-Square-326x326-ECBios_0009_DanSkovronsky2025.avif?assetname=Lilly.com-Small-Square-326x326-ECBios_0009_DanSkovronsky2025.jpg",
+      "photo_sha256": "d94d23b2c6cd8c798896886d82d53a64949a78c88c4111ab740065e6899f7858",
+      "photo_cached_at": "2026-11-05T19:54:42Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Anat Hakim",
+      "role": "Executive Vice President, General Counsel and Secretary, Eli Lilly and Company",
+      "profile_url": "https://www.lilly.com/about/leadership/anat-hakim",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/3ac56e7a860e9fbdf71bd28c.avif",
+      "start_date": null,
+      "source_url": "https://www.lilly.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lilly.com/about/leadership",
+      "photo_credit": "Eli Lilly",
+      "photo_original_url": "https://delivery-p137454-e1438138.adobeaemcloud.com/adobe/assets/urn:aaid:aem:8c83970a-8767-4d28-bc3f-fa76db271ef0/as/Lilly.com-Small-Square-326x326-ECBios_0011_AnatHakim2025.avif?assetname=Lilly.com-Small-Square-326x326-ECBios_0011_AnatHakim2025.jpg",
+      "photo_sha256": "b1a64fed00c4064734ce1c4dbc1a8f8d56332a5fdf77e816596fc5b427cc199b",
+      "photo_cached_at": "2026-11-05T19:54:53Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Eric Dozier",
+      "role": "Executive Vice President and Chief People Officer, Eli Lilly and Company",
+      "profile_url": "https://www.lilly.com/about/leadership/eric-dozier",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/937972d847fe5351ec8067dd.avif",
+      "start_date": null,
+      "source_url": "https://www.lilly.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lilly.com/about/leadership",
+      "photo_credit": "Eli Lilly",
+      "photo_original_url": "https://delivery-p137454-e1438138.adobeaemcloud.com/adobe/assets/urn:aaid:aem:64977d18-bf56-46ee-99b8-9aee891c1f0c/as/Lilly.com-Small-Square-326x326-ECBios_0006_EricDozier2025.avif?assetname=Lilly.com-Small-Square-326x326-ECBios_0006_EricDozier2025.jpg",
+      "photo_sha256": "23420f371ef97184fe958aada249020c4d95ab3cff1c3821559938e7e11dc398",
+      "photo_cached_at": "2026-11-05T19:54:42Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Kenneth Custer, Ph.D.",
+      "role": "Executive Vice President and President, Lilly Cardiometabolic Health, Eli Lilly and Company",
+      "profile_url": "https://www.lilly.com/about/leadership/kenneth-custer",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/94edf7c040619a1d41776c7c.avif",
+      "start_date": null,
+      "source_url": "https://www.lilly.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lilly.com/about/leadership",
+      "photo_credit": "Eli Lilly",
+      "photo_original_url": "https://delivery-p137454-e1438138.adobeaemcloud.com/adobe/assets/urn:aaid:aem:0d3b44e1-a780-4bd7-893a-0bd1221f5f27/as/Lilly.com-Small-Square-326x326-ECBios_0003_KenCuster2025.avif?assetname=Lilly.com-Small-Square-326x326-ECBios_0003_KenCuster2025.jpg",
+      "photo_sha256": "a68b51b1d762ba06d9cb660510fd1d69ff5f392722fdeb3612051b0cc93b3aaf",
+      "photo_cached_at": "2026-11-05T19:54:42Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Patrik Jonsson",
+      "role": "Executive Vice President and President, Lilly International, Eli Lilly and Company",
+      "profile_url": "https://www.lilly.com/about/leadership/patrik-jonsson",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/358223ee1ba53c777a315b32.avif",
+      "start_date": null,
+      "source_url": "https://www.lilly.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lilly.com/about/leadership",
+      "photo_credit": "Eli Lilly",
+      "photo_original_url": "https://delivery-p137454-e1438138.adobeaemcloud.com/adobe/assets/urn:aaid:aem:af947d63-acde-4502-8f87-fce451c1c746/as/Lilly.com-Small-Square-326x326-ECBios_0000_PatrikJonsson2025.avif?assetname=Lilly.com-Small-Square-326x326-ECBios_0000_PatrikJonsson2025.jpg",
+      "photo_sha256": "dd47b7c38046d342d3d934a93e8eec29926ce836d58d0da04af5658b48780eb7",
+      "photo_cached_at": "2026-11-05T19:54:53Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Ilya Yuffa",
+      "role": "Executive Vice President and President, Lilly USA and Global Customer Capabilities, Eli Lilly and Company",
+      "profile_url": "https://www.lilly.com/about/leadership/ilya-yuffa",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/9213eeb6d390dfa519d2d2cc.avif",
+      "start_date": null,
+      "source_url": "https://www.lilly.com/about/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.lilly.com/about/leadership",
+      "photo_credit": "Eli Lilly",
+      "photo_original_url": "https://delivery-p137454-e1438138.adobeaemcloud.com/adobe/assets/urn:aaid:aem:77b1577d-41b5-40b8-82d3-4f428329a3de/as/Lilly.com-Small-Square-326x326-ECBios_0005_IlyaYuffa2025.avif?assetname=Lilly.com-Small-Square-326x326-ECBios_0005_IlyaYuffa2025.jpg",
+      "photo_sha256": "05447b579109587d73b3adf78a6ce845441956a965306aaa41d8dacc8cec629b",
+      "photo_cached_at": "2026-11-05T19:54:53Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Eli Lilly official leadership roster",
+      "url": "https://www.lilly.com/about/leadership",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "David A. Ricks official biography",
+      "url": "https://www.lilly.com/about/leadership/david-ricks",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "David A. Ricks role start evidence",
+      "url": "https://www.lilly.com/about/leadership/david-ricks",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Lucas Montarce official biography",
+      "url": "https://www.lilly.com/about/leadership/lucas-montarce",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Lucas Montarce role start evidence",
+      "url": "https://investor.lilly.com/news-releases/news-release-details/lilly-appoints-lucas-montarce-executive-vice-president-and-chief",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Eli Lilly business context",
+      "url": "https://investor.lilly.com/news-releases/news-release-details/lilly-appoints-lucas-montarce-executive-vice-president-and-chief",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "Official company source",
+      "url": "https://www.lilly.com/about/leadership",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    "description": {
+      "name": "Eli Lilly business context",
+      "url": "https://investor.lilly.com/news-releases/news-release-details/lilly-appoints-lucas-montarce-executive-vice-president-and-chief",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  },
+  "coverage": {
+    "status": "official_sources",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T19:40:50Z",
+    "leadership_scope": "Selected leaders from the company’s published leadership roster; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:40:50Z",
+      "description": "2026-11-05T19:40:50Z",
+      "leadership": "2026-11-05T19:40:50Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  }
+}

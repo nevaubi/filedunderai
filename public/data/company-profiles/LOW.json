@@ -1,0 +1,350 @@
+{
+  "schema_version": 1,
+  "ticker": "LOW",
+  "cik": 60667,
+  "name": "Lowe's",
+  "description": "lowe’s companies, inc. (nyse: low) is a fortune® 50 home improvement company serving approximately 20 million customers a week in the united states. lowe’s and its related businesses operate or service more than 2,200 home improvement and hardware stores and employ over 300,000 associates. based in mooresville, n.c., lowe’s supports the communities it serves through programs focused on creating safe, affordable housing and helping to develop the next generation of skilled trade experts. for more information, visit lowes.com.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "i1OVj2WzZPW6IXolWPCBPAuMj6z0",
+    "observed_at": "2026-11-05T19:43:14Z",
+    "match": {
+      "ticker": "LOW",
+      "domain": "lowes.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://corporate.lowes.com",
+  "industry": "Retail",
+  "headquarters": "Mooresville, North Carolina, United States",
+  "linkedin_url": "https://linkedin.com/company/lowe's-home-improvement",
+  "founded": 1921,
+  "employees": null,
+  "professional_profile_count": 75707,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "i1OVj2WzZPW6IXolWPCBPAuMj6z0",
+    "observed_at": "2026-11-05T19:43:14Z",
+    "match": {
+      "ticker": "LOW",
+      "domain": "lowes.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "i1OVj2WzZPW6IXolWPCBPAuMj6z0",
+  "leadership": [
+    {
+      "name": "Marvin R. Ellison",
+      "role": "Chairman, President and Chief Executive Officer",
+      "profile_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership/marvin-r-ellison",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/37d01685c6bbc6f9b6f7c4ba.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:05Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "photo_credit": "Lowe's",
+      "photo_original_url": "https://corporate.lowes.com/sites/lowes-corp/files/BOD-images/Marvin-R.Ellison_0.jpg",
+      "photo_sha256": "80303700ca5547be7685c85a1e4d8544ad66a7d50e16e876ab3bff4f32ba0d04",
+      "photo_cached_at": "2026-11-05T20:09:41Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "William P. (Bill) Boltz",
+      "role": "Executive Vice President, Merchandising",
+      "profile_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership/william-p-bill-boltz",
+      "photo_url": "https://corporate.lowes.com/sites/lowes-corp/files/2025-11/111025_Bill%20Boltz_GK2659_8x10_Store.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:05Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "photo_credit": "Lowe's"
+    },
+    {
+      "name": "Janice Dupré",
+      "role": "Executive Vice President, Human Resources",
+      "profile_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership/janice-dupre",
+      "photo_url": "https://corporate.lowes.com/sites/lowes-corp/files/2025-10/Janice%20Dupre_101425_GK1905_8x10_Store.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:05Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "photo_credit": "Lowe's"
+    },
+    {
+      "name": "Adam Filipponi",
+      "role": "Executive Vice President, Strategy and Business Development",
+      "profile_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership/adam-filipponi",
+      "photo_url": "https://corporate.lowes.com/sites/lowes-corp/files/2025-05/Adam%20Filipponi_043025_GK1050_8x10_Store.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:05Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "photo_credit": "Lowe's"
+    },
+    {
+      "name": "Seemantini Godbole",
+      "role": "Executive Vice President, Chief Information and AI Officer",
+      "profile_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership/seemantini-godbole",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/873d8a96d8dd444009687137.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:05Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "photo_credit": "Lowe's",
+      "photo_original_url": "https://corporate.lowes.com/sites/lowes-corp/files/BOD-images/Seemantini-Godbole.jpg",
+      "photo_sha256": "52fe57de0ae5c6be87f7be23cb028fb935e77165cfa7d60ac62920083e61f75d",
+      "photo_cached_at": "2026-11-05T20:09:40Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Joseph M. McFarland III",
+      "role": "Executive Vice President, Pro and Home Services",
+      "profile_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership/joseph-m-mcfarland-iii",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/c7bb9ac1aff7ada6c45dcd5c.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:05Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "photo_credit": "Lowe's",
+      "photo_original_url": "https://corporate.lowes.com/sites/lowes-corp/files/BOD-images/Joe_McFarland_Website.jpg",
+      "photo_sha256": "d3616fa5cd5291ceb19d47453c53b3a375f53b85f105beaf6e0db285f177fe0d",
+      "photo_cached_at": "2026-11-05T20:09:40Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Ruben Mendoza",
+      "role": "Executive Vice President, President of FBM",
+      "profile_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership/ruben-mendoza",
+      "photo_url": "https://corporate.lowes.com/sites/lowes-corp/files/2025-10/Ruben_279A7352_8x10_Store.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:05Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "photo_credit": "Lowe's"
+    },
+    {
+      "name": "Juliette W. Pryor",
+      "role": "Executive Vice President, Chief Legal Officer and Corporate Secretary",
+      "profile_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership/juliette-w-pryor",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/f90ad0ead5f3d3707ce75f50.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:05Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "photo_credit": "Lowe's",
+      "photo_original_url": "https://corporate.lowes.com/sites/lowes-corp/files/lowes-corp/who-we-are/lowes-leadership/Pryor_Juliette_390-0652-Retouched_8x10_Store.jpg",
+      "photo_sha256": "43434e53e837caaea2458b397e1ea7c5ddf5cbbaf18aa2dc73447f4495a9a815",
+      "photo_cached_at": "2026-11-05T20:09:50Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Brandon Sink",
+      "role": "Executive Vice President, Chief Financial Officer",
+      "profile_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership/brandon-sink",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/d1ec3700c213efd5da0c3bf8.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:05Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "photo_credit": "Lowe's",
+      "photo_original_url": "https://corporate.lowes.com/sites/lowes-corp/files/BOD-images/Brandon%20Sink0108_8x10_Store_website.jpg",
+      "photo_sha256": "69d4c6b42b39b760fac7828576155429225cdb6b34b871046a8e1215aed6dd1c",
+      "photo_cached_at": "2026-11-05T20:09:41Z",
+      "linkedin_url": "https://linkedin.com/in/brandon-sink-4120965",
+      "linkedin_source": {
+        "name": "People Data Labs",
+        "url": "https://docs.peopledatalabs.com/docs/person-search-api",
+        "observed_at": "2026-11-05T20:16:24Z",
+        "provider_verified_at": "2026-10-03"
+      },
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Margi R. Vagell",
+      "role": "Executive Vice President, Supply Chain",
+      "profile_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership/margi-r-vagell",
+      "photo_url": "https://corporate.lowes.com/sites/lowes-corp/files/2025-05/Margi%20Vagell_052025_GK1121_8x10_Store.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:05Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "photo_credit": "Lowe's"
+    },
+    {
+      "name": "Quonta D. Vance",
+      "role": "Executive Vice President, Stores",
+      "profile_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership/quonta-d-vance",
+      "photo_url": "https://corporate.lowes.com/sites/lowes-corp/files/2026-04/que%20-vance-032426-gk3391-8x10-store.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:05Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "photo_credit": "Lowe's"
+    },
+    {
+      "name": "Jennifer E. Wilson",
+      "role": "Executive Vice President, Chief Marketing Officer",
+      "profile_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership/jennifer-e-wilson",
+      "photo_url": "https://corporate.lowes.com/sites/lowes-corp/files/2026-10/260831JanWilson_8x10_Store.jpg",
+      "start_date": null,
+      "source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:05Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "photo_credit": "Lowe's"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Lowe's official leadership roster",
+      "url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "observed_at": "2026-11-05T20:02:05Z"
+    },
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "i1OVj2WzZPW6IXolWPCBPAuMj6z0",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "LOW",
+        "domain": "lowes.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "Lowe's official leadership roster",
+      "url": "https://corporate.lowes.com/who-we-are/lowes-leadership/executive-leadership",
+      "observed_at": "2026-11-05T20:02:05Z"
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "i1OVj2WzZPW6IXolWPCBPAuMj6z0",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "LOW",
+        "domain": "lowes.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "i1OVj2WzZPW6IXolWPCBPAuMj6z0",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "LOW",
+        "domain": "lowes.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "i1OVj2WzZPW6IXolWPCBPAuMj6z0",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "LOW",
+        "domain": "lowes.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "i1OVj2WzZPW6IXolWPCBPAuMj6z0",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "LOW",
+        "domain": "lowes.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "i1OVj2WzZPW6IXolWPCBPAuMj6z0",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "LOW",
+        "domain": "lowes.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "i1OVj2WzZPW6IXolWPCBPAuMj6z0",
+      "observed_at": "2026-11-05T19:43:14Z",
+      "match": {
+        "ticker": "LOW",
+        "domain": "lowes.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T20:02:05Z",
+    "leadership_scope": "Leaders listed on the current official company leadership roster; business-unit roles retain their published scope. This is not a complete board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:02:05Z",
+      "industry": "2026-11-05T19:43:14Z",
+      "headquarters": "2026-11-05T19:43:14Z",
+      "founded": "2026-11-05T19:43:14Z",
+      "professional_profile_count": "2026-11-05T19:43:14Z",
+      "employee_size_range": "2026-11-05T19:43:14Z",
+      "linkedin_url": "2026-11-05T19:43:14Z",
+      "description": "2026-11-05T19:43:14Z",
+      "leadership": "2026-11-05T20:02:05Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  },
+  "description_provider": "People Data Labs"
+}

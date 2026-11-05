@@ -1,0 +1,354 @@
+{
+  "schema_version": 1,
+  "ticker": "SPGI",
+  "cik": 64040,
+  "name": "S&P Global",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://www.spglobal.com",
+  "industry": "financial services",
+  "headquarters": "new york, new york, united states",
+  "linkedin_url": "https://linkedin.com/company/spglobal",
+  "founded": null,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "mOKd9ThQAaHt1DCmO7x8DgTKQdHu",
+    "observed_at": "2026-11-05T20:08:08Z",
+    "match": {
+      "ticker": "SPGI",
+      "domain": "spglobal.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.1308049918516785
+    }
+  },
+  "provider_record_id": "mOKd9ThQAaHt1DCmO7x8DgTKQdHu",
+  "leadership": [
+    {
+      "name": "Martina L. Cheung",
+      "role": "President & Chief Executive Officer S&P Global Inc.",
+      "profile_url": "https://investor.spglobal.com/our-leadership/person-details/default.aspx?ItemId=dc865669-5653-40b1-805d-5481aed84e2b",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/7097529753b5c1f9f37c9e58.jpg",
+      "photo_source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "photo_credit": "S&P Global",
+      "start_date": null,
+      "source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:45Z",
+      "group": "Executive leadership",
+      "photo_original_url": "https://s29.q4cdn.com/690959130/files/images/2025/SPGI_Enterprise_4041300_Martina_Square_817x817.jpg",
+      "photo_sha256": "06571731ca0ac37eec00ba0f04f5a04fc79503064bbdf28e3a18b8a86660e587",
+      "photo_cached_at": "2026-11-05T20:24:40Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Eric Aboaf",
+      "role": "Chief Financial Officer and Executive Vice President, S&P Global",
+      "profile_url": "https://investor.spglobal.com/our-leadership/person-details/default.aspx?ItemId=e83e8bed-fd2e-4919-9bcc-5ef04c072b44",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/038a1b631b7bb2018b201a70.jpg",
+      "photo_source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "photo_credit": "S&P Global",
+      "start_date": null,
+      "source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:45Z",
+      "group": "Executive leadership",
+      "photo_original_url": "https://s29.q4cdn.com/690959130/files/images/2025/EA-Pic-3.jpg",
+      "photo_sha256": "91cbaf8a9b76d61af0cec44329f4f57601ed4440b070872f7e85cb2a5c219af4",
+      "photo_cached_at": "2026-11-05T20:24:27Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Firdaus Bhathena",
+      "role": "Executive Vice President and Chief Technology & Transformation Officer S&P Global Inc.",
+      "profile_url": "https://investor.spglobal.com/our-leadership/person-details/default.aspx?ItemId=0cf73daa-4a46-4b87-a97f-16bf3cc187c5",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/839c8c5f5a0414c332c2daae.jpg",
+      "photo_source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "photo_credit": "S&P Global",
+      "start_date": null,
+      "source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:45Z",
+      "group": "Executive leadership",
+      "photo_original_url": "https://s29.q4cdn.com/690959130/files/images/2026/_FirdausBhathena_420x500.jpg",
+      "photo_sha256": "e8d191a581853db6c3bda40dbdebd5f824ce17bdb379bb0599d969656cbc3964",
+      "photo_cached_at": "2026-11-05T20:24:44Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Catherine Clay",
+      "role": "Chief Executive Officer, S&P Dow Jones Indices",
+      "profile_url": "https://investor.spglobal.com/our-leadership/person-details/default.aspx?ItemId=dd42e44d-f2da-4aeb-846e-9122f7ec409b",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/9c2e417a8b1f35740c09f012.jpg",
+      "photo_source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "photo_credit": "S&P Global",
+      "start_date": null,
+      "source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:45Z",
+      "group": "Executive leadership",
+      "photo_original_url": "https://s29.q4cdn.com/690959130/files/doc_person/2025/Corp-0126-catherine-clay-420x500.jpg",
+      "photo_sha256": "1a6639f2267c94e4b59efc111af7609074ab18212b9a8c99f45f02ffaa068922",
+      "photo_cached_at": "2026-11-05T20:24:20Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Dave Ernsberger",
+      "role": "President, S&P Global Energy",
+      "profile_url": "https://investor.spglobal.com/our-leadership/person-details/default.aspx?ItemId=322cca74-5b6d-4c21-8e95-afc94f87a275",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/750fb8660e23277d60e219ea.jpg",
+      "photo_source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "photo_credit": "S&P Global",
+      "start_date": null,
+      "source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:45Z",
+      "group": "Executive leadership",
+      "photo_original_url": "https://s29.q4cdn.com/690959130/files/images/2024/DaveErnsberger_IR-Site.jpg",
+      "photo_sha256": "2a6b4bacc7aa7e1c0860c7849d0150dcd148e1cd0050e44cab8c42db4018a4c2",
+      "photo_cached_at": "2026-11-05T20:24:27Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Girish Ganesan",
+      "role": "Chief People Officer, S&P Global",
+      "profile_url": "https://investor.spglobal.com/our-leadership/person-details/default.aspx?ItemId=341fbd88-aafe-43dc-84ff-69af538ffe4e",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/a48dc0ff67817d2659ab3c25.jpg",
+      "photo_source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "photo_credit": "S&P Global",
+      "start_date": null,
+      "source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:45Z",
+      "group": "Executive leadership",
+      "photo_original_url": "https://s29.q4cdn.com/690959130/files/doc_person/2026/girish_1026_420x500-Oct2026.jpg",
+      "photo_sha256": "51345a12f5b1aab85e47c1c040f3a96f9fe778850b4da51b15c10a866c3a264e",
+      "photo_cached_at": "2026-11-05T20:24:27Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Thomas Kim",
+      "role": "Chief Legal Officer, S&P Global Inc.",
+      "profile_url": "https://investor.spglobal.com/our-leadership/person-details/default.aspx?ItemId=7f0900a9-aacb-4d67-b5e2-8b7b01012bd5",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/8ed26131133b67aadc8027cc.jpg",
+      "photo_source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "photo_credit": "S&P Global",
+      "start_date": null,
+      "source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:45Z",
+      "group": "Executive leadership",
+      "photo_original_url": "https://s29.q4cdn.com/690959130/files/images/2026/ThomasKim_420x500-2026.jpg",
+      "photo_sha256": "8cc76af115a14efeab239e327ef4f1e7a7ea16fc1e23a42369951fcde4651da4",
+      "photo_cached_at": "2026-11-05T20:24:44Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Yann Le Pallec",
+      "role": "President, S&P Global Ratings",
+      "profile_url": "https://investor.spglobal.com/our-leadership/person-details/default.aspx?ItemId=9e3e006a-fadc-4f1b-86dc-617c47bdb254",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/7d7475ef39f672b4cc909f32.jpg",
+      "photo_source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "photo_credit": "S&P Global",
+      "start_date": null,
+      "source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:45Z",
+      "group": "Executive leadership",
+      "photo_original_url": "https://s29.q4cdn.com/690959130/files/images/2024/YannLePallec_IR-Site.jpg",
+      "photo_sha256": "e7794337f794255b752cef380b4e3679388ed0a63649d6c46681ef364b66feb1",
+      "photo_cached_at": "2026-11-05T20:24:35Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Sally Moore",
+      "role": "Chief Client Officer and Co-Head of Market Intelligence, Kensho Data & Platforms, S&P Global Inc.",
+      "profile_url": "https://investor.spglobal.com/our-leadership/person-details/default.aspx?ItemId=fc9ce1ae-6037-4c34-ae3d-5ddd0ccc01ba",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/9523597693f31b10d52fec70.png",
+      "photo_source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "photo_credit": "S&P Global",
+      "start_date": null,
+      "source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:45Z",
+      "group": "Executive leadership",
+      "photo_original_url": "https://s29.q4cdn.com/690959130/files/images/2026/SallyMoore_IR2.png",
+      "photo_sha256": "2f01ea375bbeb53c7e21be18a3d015cdb7f6f0e504b07a57a3b4006eed828679",
+      "photo_cached_at": "2026-11-05T20:24:36Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Darren Thomas",
+      "role": "Co-Head of Market Intelligence, Enterprise Solutions, S&P Global Inc.",
+      "profile_url": "https://investor.spglobal.com/our-leadership/person-details/default.aspx?ItemId=8e7782f2-0a74-4c8a-bbf5-dd4c98e75c77",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/d24c39d8ef2e0def0a5d012e.png",
+      "photo_source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "photo_credit": "S&P Global",
+      "start_date": null,
+      "source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:45Z",
+      "group": "Executive leadership",
+      "photo_original_url": "https://s29.q4cdn.com/690959130/files/images/2026/darrenthomas_IR.png",
+      "photo_sha256": "7422087f030ce862d3f916d6a4b76685f1a4206f28facf49f65f6113a87105ad",
+      "photo_cached_at": "2026-11-05T20:24:53Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Christina Twomey",
+      "role": "Chief Communications Officer, S&P Global",
+      "profile_url": "https://investor.spglobal.com/our-leadership/person-details/default.aspx?ItemId=14831c16-a2b3-4ba1-9a32-33c465e0c28c",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/ddbdbaad91f43829f8652269.jpg",
+      "photo_source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "photo_credit": "S&P Global",
+      "start_date": null,
+      "source_url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:02:45Z",
+      "group": "Executive leadership",
+      "photo_original_url": "https://s29.q4cdn.com/690959130/files/images/2025/SPGI_Enterprise_4296100_Christina-Twomey_420x500.jpg",
+      "photo_sha256": "20bb4d8962e3812b119cb02e825af10c1a829056ed77178e503881018636597f",
+      "photo_cached_at": "2026-11-05T20:24:36Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "S&P Global official leadership roster",
+      "url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "observed_at": "2026-11-05T20:02:45Z"
+    },
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "mOKd9ThQAaHt1DCmO7x8DgTKQdHu",
+      "observed_at": "2026-11-05T20:08:08Z",
+      "match": {
+        "ticker": "SPGI",
+        "domain": "spglobal.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.1308049918516785
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:28:47Z",
+  "field_sources": {
+    "website": {
+      "name": "S&P Global official leadership roster",
+      "url": "https://investor.spglobal.com/our-leadership/executive-committee/",
+      "observed_at": "2026-11-05T20:02:45Z"
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "mOKd9ThQAaHt1DCmO7x8DgTKQdHu",
+      "observed_at": "2026-11-05T20:08:08Z",
+      "match": {
+        "ticker": "SPGI",
+        "domain": "spglobal.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.1308049918516785
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "mOKd9ThQAaHt1DCmO7x8DgTKQdHu",
+      "observed_at": "2026-11-05T20:08:08Z",
+      "match": {
+        "ticker": "SPGI",
+        "domain": "spglobal.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.1308049918516785
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "mOKd9ThQAaHt1DCmO7x8DgTKQdHu",
+      "observed_at": "2026-11-05T20:08:08Z",
+      "match": {
+        "ticker": "SPGI",
+        "domain": "spglobal.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.1308049918516785
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "mOKd9ThQAaHt1DCmO7x8DgTKQdHu",
+      "observed_at": "2026-11-05T20:08:08Z",
+      "match": {
+        "ticker": "SPGI",
+        "domain": "spglobal.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.1308049918516785
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "mOKd9ThQAaHt1DCmO7x8DgTKQdHu",
+      "observed_at": "2026-11-05T20:08:08Z",
+      "match": {
+        "ticker": "SPGI",
+        "domain": "spglobal.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.1308049918516785
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "mOKd9ThQAaHt1DCmO7x8DgTKQdHu",
+      "observed_at": "2026-11-05T20:08:08Z",
+      "match": {
+        "ticker": "SPGI",
+        "domain": "spglobal.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.1308049918516785
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "unavailable",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "official_updated_at": "2026-11-05T20:02:45Z",
+    "leadership_scope": "Leaders listed in the current official Executive Leadership Team. This is not a complete board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:02:45Z",
+      "industry": "2026-11-05T20:08:08Z",
+      "headquarters": "2026-11-05T20:08:08Z",
+      "employee_size_range": "2026-11-05T20:08:08Z",
+      "linkedin_url": "2026-11-05T20:08:08Z",
+      "leadership": "2026-11-05T20:02:45Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  }
+}

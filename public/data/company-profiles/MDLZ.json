@@ -1,0 +1,428 @@
+{
+  "schema_version": 1,
+  "ticker": "MDLZ",
+  "cik": 1103982,
+  "name": "Mondelez",
+  "description": "mondelēz international, inc. (nasdaq: mdlz) is an american multinational confectionery, food, and beverage company based in illinois which employs approximately 80,000 individuals around the world.\n\nour purpose\nour purpose is to empower people to snack right. we will lead the future of snacking around the world by offering the right snack, for the right moment, made the right way.\n\nour brands\nwe’re leading the future of snacking with iconic brands such as oreo, belvita and lu biscuits; cadbury dairy milk, milka and toblerone chocolate; sour patch kids candy and trident gum.\n\nour people \nour 80,000+ colleagues around the world are key to the success of our business. our values and leadership commitments of love our consumers and brands, grow every day, and do what's right shapes our culture – what we believe in, stand for, and what guides our actions and decisions. great people and great brands. that’s who we are.\n\nour strategies\nwe are uniquely positioned to lead the future of snacking with strong leadership in our categories, an unparalleled portfolio of global and local brands and a solid footprint in fast-growing markets. aimed at delivering sustainable growth, our strategic plan is centered around three strategic priorities:\n\n•\tgrowth: accelerate consumer-centric growth\n•\texecution: drive operational excellence\n•\tculture: build a winning growth culture",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "DcbCYupXc1WZ93VT3kyI8QVZJn43",
+    "observed_at": "2026-11-05T19:43:20Z",
+    "match": {
+      "ticker": "MDLZ",
+      "domain": "mondelezinternational.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://mondelezinternational.com",
+  "industry": "Food Production",
+  "headquarters": "Chicago, Illinois, United States",
+  "linkedin_url": "https://linkedin.com/company/mondelezinternational",
+  "founded": 2012,
+  "employees": null,
+  "professional_profile_count": 37566,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "DcbCYupXc1WZ93VT3kyI8QVZJn43",
+    "observed_at": "2026-11-05T19:43:20Z",
+    "match": {
+      "ticker": "MDLZ",
+      "domain": "mondelezinternational.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "DcbCYupXc1WZ93VT3kyI8QVZJn43",
+  "leadership": [
+    {
+      "name": "Dirk Van De Put",
+      "role": "Chair & Chief Executive Officer",
+      "profile_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/dirk-van-de-put/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/d045b43a703bb20331250bf4.webp",
+      "start_date": null,
+      "source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "photo_credit": "Mondelez",
+      "photo_original_url": "https://images.ctfassets.net/zo243s55pyir/2jXXYw86Ihrjy2lslN4iDn/d8664f1a1a713d945f5ab95ffb33e509/Dirk_Van_de.png?fm=webp&q=80",
+      "photo_sha256": "0859f59a21a4ff76a37fa1dcf1592c29b476f39a39932220cb6aa0d94bfeef29",
+      "photo_cached_at": "2026-11-05T20:21:31Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Amit Banati",
+      "role": "Executive Vice President, Chief Financial Officer",
+      "profile_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/amit-banati/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/cdc54d34116f78ea2204a88f.webp",
+      "start_date": null,
+      "source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "photo_credit": "Mondelez",
+      "photo_original_url": "https://images.ctfassets.net/zo243s55pyir/07WcNausZNQYPBYsuRoto/ecafc7eceffd001a16ac35cd616f8152/Amit_Banati_th.png?fm=webp&q=80",
+      "photo_sha256": "164b77d03fc850cc6711d414845a2859ac8c5988f82200b03ee04a2001161843",
+      "photo_cached_at": "2026-11-05T20:21:31Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Mary E. Barnard",
+      "role": "Executive Vice President, Business Transformation",
+      "profile_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/mary-barnard/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/2a385c0b6d1bc3600582c891.webp",
+      "start_date": null,
+      "source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "photo_credit": "Mondelez",
+      "photo_original_url": "https://images.ctfassets.net/zo243s55pyir/38bGhcLYBVMgYidnHyHlY9/ac705b6ebaa2f56e393c5f3494b43d63/Mary_Barnard_th.png?fm=webp&q=80",
+      "photo_sha256": "366d0c97b2bbbe865f73b59ad3871f93c3bc50ba333e9391d0012501a4cbb505",
+      "photo_cached_at": "2026-11-05T20:21:44Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Filippo Catalano",
+      "role": "Chief Information & Digital Officer",
+      "profile_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/filippo-catalano/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/6ec15e504af8aec337e2d8f6.webp",
+      "start_date": null,
+      "source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "photo_credit": "Mondelez",
+      "photo_original_url": "https://images.ctfassets.net/zo243s55pyir/7bAwpgdC0wdKXtN761VNEm/3ebd32e659b692696b916875e3604467/Filippo-Catalano_th.png?fm=webp&q=80",
+      "photo_sha256": "25596d9b10d7f3258de6799688cf51737801a5146f0b4b7a9efb423822b2aee0",
+      "photo_cached_at": "2026-11-05T20:22:13Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Norberto Chaclin",
+      "role": "Executive Vice President, Chief Research & Development Officer",
+      "profile_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/norberto-chaclin/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/51a347a1f2a1641b6e8e4942.webp",
+      "start_date": null,
+      "source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "photo_credit": "Mondelez",
+      "photo_original_url": "https://images.ctfassets.net/zo243s55pyir/3wEdFepUCNhHcfLlMQvMBD/6f7319940c9182202c5a502d525ab61d/Norberto_Chaclin_th.png?fm=webp&q=80",
+      "photo_sha256": "ab5abf00e64ee7b8be7938fa455233df863dc640679bc2211613b754eaf9e57b",
+      "photo_cached_at": "2026-11-05T20:21:57Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Deepak Iyer",
+      "role": "Executive Vice President & President, Asia Pacific, Middle East & Africa",
+      "profile_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/deepak-iyer/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/61e08e0310921bcd34cd6edf.webp",
+      "start_date": null,
+      "source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "photo_credit": "Mondelez",
+      "photo_original_url": "https://images.ctfassets.net/zo243s55pyir/34RWSsYbeXLbqUHkouqYUK/7b304649325a3c81079c5dfcd4f7df4c/Deepak_Iyer_th.png?fm=webp&q=80",
+      "photo_sha256": "91a453be9f33681761fdf5a3de1b312da5ea5a9b0cd831e6b42bf85456a6a1aa",
+      "photo_cached_at": "2026-11-05T20:21:44Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Volker Kuhn",
+      "role": "Executive Vice President & President, Europe",
+      "profile_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/volker-kuhn/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/a9b78aaf4b6b46f26293bb7b.webp",
+      "start_date": null,
+      "source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "photo_credit": "Mondelez",
+      "photo_original_url": "https://images.ctfassets.net/zo243s55pyir/6avS8Al0OScr26EB5d0Y0T/c54d7f1ac4d077bfdd05ca78cd8a9f25/Volker_Kuhn_th.png?fm=webp&q=80",
+      "photo_sha256": "acf66180426dc204b9e4107d089c22abac78576d85cf2653e3ebf0f3d7524bc3",
+      "photo_cached_at": "2026-11-05T20:21:58Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Stephanie Lilak",
+      "role": "Executive Vice President & Chief People Officer",
+      "profile_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/stephanie-lilak/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/e8ca57e84c8b3b2a1280b2cd.webp",
+      "start_date": null,
+      "source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "photo_credit": "Mondelez",
+      "photo_original_url": "https://images.ctfassets.net/zo243s55pyir/lPooEgJl23rgO3hpPhUi5/3f5acdc712aeea1649e1ce5929fe823c/Stephanie_Lilak_headshot.png?fm=webp&q=80",
+      "photo_sha256": "5b3d9b2c0d2aeefd071fe016576b1fe9e645d23f7d0d56e65311026aac65b8dd",
+      "photo_cached_at": "2026-11-05T20:22:13Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Mariano Lozano",
+      "role": "Executive Vice President & President, Latin America",
+      "profile_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/mariano-lozano/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/9143ef21006fe1d5759a8963.webp",
+      "start_date": null,
+      "source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "photo_credit": "Mondelez",
+      "photo_original_url": "https://images.ctfassets.net/zo243s55pyir/1LGbzVmJtPKGEE8wfT6nq2/4c950d84a71940eafef26eabec68627d/Mariano_Lozano_th.png?fm=webp&q=80",
+      "photo_sha256": "4dd40a09203e3b9bfc5dc905f269de61e79a93b56558ac681715f98dd858e25b",
+      "photo_cached_at": "2026-11-05T20:21:31Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Darren O’Brien",
+      "role": "Chief Cocoa Officer, Chief Corporate & Government Affairs Officer",
+      "profile_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/darren-obrien/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/3501fd2b16072222a16891be.webp",
+      "start_date": null,
+      "source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "photo_credit": "Mondelez",
+      "photo_original_url": "https://images.ctfassets.net/zo243s55pyir/2yAofOJrVS0bSGSfKR5LP8/beeaacb2acbec7e1f3af2818b641372d/Darren_Obrien_th.png?fm=webp&q=80",
+      "photo_sha256": "59618b18e0c355186a9facf20bcb732f5cc73273510f44bed87350b1b7022889",
+      "photo_cached_at": "2026-11-05T20:21:44Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Claudio Parrotta",
+      "role": "Executive Vice President & Chief Supply Chain Officer",
+      "profile_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/claudio-parrotta/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/455d00e1e6cc930fc1f7c076.webp",
+      "start_date": null,
+      "source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "photo_credit": "Mondelez",
+      "photo_original_url": "https://images.ctfassets.net/zo243s55pyir/7zq6I7h5lpLAHup7MUonpy/a5820b8c1dd564a1f1c06ce1295884c4/Claudio_Parrotta_th.png?fm=webp&q=80",
+      "photo_sha256": "acd2e26b849eb2d8ec677e660b0889590ea961ce6f10d346118eba07ee0974ba",
+      "photo_cached_at": "2026-11-05T20:22:13Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Martin Renaud",
+      "role": "Executive Vice President, Chief Marketing & Sales Officer",
+      "profile_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/martin-renaud/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/9928e0d1eb099ab93de18aaa.webp",
+      "start_date": null,
+      "source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "photo_credit": "Mondelez",
+      "photo_original_url": "https://images.ctfassets.net/zo243s55pyir/23sp5ygZGz70S9ArLiDPVc/4bbeb60ad5c49d1ff080f4b48b0f901a/Martin_Renaud_th.png?fm=webp&q=80",
+      "photo_sha256": "7ef14550330e9dbf97a6b14139d578b4b881470c119e21de69b20d4c75d5b5d2",
+      "photo_cached_at": "2026-11-05T20:21:31Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Laura Stein",
+      "role": "Executive Vice President, Corporate & Legal Affairs, General Counsel and Corporate Secretary",
+      "profile_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/laura-stein/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/58d8f0c80b36e631d17c6da9.webp",
+      "start_date": null,
+      "source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "photo_credit": "Mondelez",
+      "photo_original_url": "https://images.ctfassets.net/zo243s55pyir/5wcuKoFNGVDKR03coHwbit/6893d8735d9e954b0d16fdabbfb108dc/Laura_Stein_th.png?fm=webp&q=80",
+      "photo_sha256": "d29c9c5b4b8e7794a97572fe096971e560b3c25fed52cd77550838215e6dd703",
+      "photo_cached_at": "2026-11-05T20:21:57Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Gustavo Valle",
+      "role": "Executive Vice President & President, North America",
+      "profile_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/gustavo-valle/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/30ab371d2ae424ac7763c68b.webp",
+      "start_date": null,
+      "source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "photo_credit": "Mondelez",
+      "photo_original_url": "https://images.ctfassets.net/zo243s55pyir/5g4sU3e5AjqNSs9wqrqrH0/f21fbdc4497e0511dbfadd803f7d308e/Gustavo_Valle_th_2024.png?fm=webp&q=80",
+      "photo_sha256": "31dc944b99adf05e9a5acdc6816e04808d7bd7b0ba18a09bfbfba91a062ec4a0",
+      "photo_cached_at": "2026-11-05T20:21:57Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Luca Zaramella",
+      "role": "Executive Vice President, Chief Operating Officer",
+      "profile_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/luca-zaramella/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/c72f549c42f2e37feb07eb69.webp",
+      "start_date": null,
+      "source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "photo_credit": "Mondelez",
+      "photo_original_url": "https://images.ctfassets.net/zo243s55pyir/38t6im8ELNLGP8aJcYBW5S/f37045bedfa7c53541ca2f6ece5db240/Luca_Zaramella_th.jpg?fm=webp&q=80",
+      "photo_sha256": "fb89a02f0dad2b08c5207c88ced210e035f0eb8162de6ae0fb0824d52d6ae904",
+      "photo_cached_at": "2026-11-05T20:21:44Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "DcbCYupXc1WZ93VT3kyI8QVZJn43",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MDLZ",
+        "domain": "mondelezinternational.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    {
+      "name": "Mondelez official leadership roster",
+      "url": "https://www.mondelezinternational.com/about-us/leadership/executive-team/",
+      "observed_at": "2026-11-05T20:20:23Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "DcbCYupXc1WZ93VT3kyI8QVZJn43",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MDLZ",
+        "domain": "mondelezinternational.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "DcbCYupXc1WZ93VT3kyI8QVZJn43",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MDLZ",
+        "domain": "mondelezinternational.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "DcbCYupXc1WZ93VT3kyI8QVZJn43",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MDLZ",
+        "domain": "mondelezinternational.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "DcbCYupXc1WZ93VT3kyI8QVZJn43",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MDLZ",
+        "domain": "mondelezinternational.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "DcbCYupXc1WZ93VT3kyI8QVZJn43",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MDLZ",
+        "domain": "mondelezinternational.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "DcbCYupXc1WZ93VT3kyI8QVZJn43",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MDLZ",
+        "domain": "mondelezinternational.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "DcbCYupXc1WZ93VT3kyI8QVZJn43",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MDLZ",
+        "domain": "mondelezinternational.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "leadership_scope": "Current official leadership roster; published regional and subsidiary role scopes are retained. Non-executive directors and memorial entries are excluded.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:20Z",
+      "industry": "2026-11-05T19:43:20Z",
+      "headquarters": "2026-11-05T19:43:20Z",
+      "founded": "2026-11-05T19:43:20Z",
+      "professional_profile_count": "2026-11-05T19:43:20Z",
+      "employee_size_range": "2026-11-05T19:43:20Z",
+      "linkedin_url": "2026-11-05T19:43:20Z",
+      "description": "2026-11-05T19:43:20Z",
+      "leadership": "2026-11-05T20:20:23Z"
+    },
+    "official_updated_at": "2026-11-05T20:20:23Z",
+    "portraits": "available_for_all_selected_leaders"
+  },
+  "description_provider": "People Data Labs"
+}

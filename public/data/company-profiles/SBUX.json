@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "ticker": "SBUX",
+  "cik": 829224,
+  "name": "Starbucks",
+  "description": "at starbucks, we like to say that we are not in the coffee business serving people, but in the people business serving coffee. here, our employees - who we call partners – are the heart of the starbucks experience, and being a partner means aspiring to become part of something bigger: inspiring positive change in the world and growing in your career and in your community. \n\nit’s an opportunity to be your personal best.  starbucks is an equal opportunity employer of all qualified individuals, including minorities, veterans and individuals with disabilities.\n\nin everything we do, we are dedicated to our mission: with every cup, with every conversation, with every community – we nurture the limitless possibilities of human connection.\n\njoin us. inspire with every cup. explore opportunities, benefits and more at starbucks.com/careers",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "CY9mfehNBgJpBt29E5IRJwWIef53",
+    "observed_at": "2026-11-05T19:43:36Z",
+    "match": {
+      "ticker": "SBUX",
+      "domain": "starbucks.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://starbucks.com",
+  "industry": "Retail",
+  "headquarters": "Seattle, Washington, United States",
+  "linkedin_url": "https://linkedin.com/company/starbucks",
+  "founded": 1971,
+  "employees": null,
+  "professional_profile_count": 100261,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "CY9mfehNBgJpBt29E5IRJwWIef53",
+    "observed_at": "2026-11-05T19:43:36Z",
+    "match": {
+      "ticker": "SBUX",
+      "domain": "starbucks.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "CY9mfehNBgJpBt29E5IRJwWIef53",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "CY9mfehNBgJpBt29E5IRJwWIef53",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SBUX",
+        "domain": "starbucks.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:43:36Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "CY9mfehNBgJpBt29E5IRJwWIef53",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SBUX",
+        "domain": "starbucks.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "CY9mfehNBgJpBt29E5IRJwWIef53",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SBUX",
+        "domain": "starbucks.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "CY9mfehNBgJpBt29E5IRJwWIef53",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SBUX",
+        "domain": "starbucks.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "CY9mfehNBgJpBt29E5IRJwWIef53",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SBUX",
+        "domain": "starbucks.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "CY9mfehNBgJpBt29E5IRJwWIef53",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SBUX",
+        "domain": "starbucks.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "CY9mfehNBgJpBt29E5IRJwWIef53",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SBUX",
+        "domain": "starbucks.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "CY9mfehNBgJpBt29E5IRJwWIef53",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "SBUX",
+        "domain": "starbucks.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:36Z",
+      "industry": "2026-11-05T19:43:36Z",
+      "headquarters": "2026-11-05T19:43:36Z",
+      "founded": "2026-11-05T19:43:36Z",
+      "professional_profile_count": "2026-11-05T19:43:36Z",
+      "employee_size_range": "2026-11-05T19:43:36Z",
+      "linkedin_url": "2026-11-05T19:43:36Z",
+      "description": "2026-11-05T19:43:36Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

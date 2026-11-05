@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "HRL",
+  "cik": 48465,
+  "name": "Hormel Foods",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://hormelfoods.com",
+  "industry": "consumer goods",
+  "headquarters": "austin, minnesota, united states",
+  "linkedin_url": "https://linkedin.com/company/hormel-foods",
+  "founded": 1891,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "Q1wSI6B16l9zX1JUCcD12wH4NZ6O",
+    "observed_at": "2026-11-05T20:02:07Z",
+    "match": {
+      "ticker": "HRL",
+      "domain": "hormelfoods.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.3010299956639813
+    }
+  },
+  "provider_record_id": "Q1wSI6B16l9zX1JUCcD12wH4NZ6O",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Q1wSI6B16l9zX1JUCcD12wH4NZ6O",
+      "observed_at": "2026-11-05T20:02:07Z",
+      "match": {
+        "ticker": "HRL",
+        "domain": "hormelfoods.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3010299956639813
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:02:07Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Q1wSI6B16l9zX1JUCcD12wH4NZ6O",
+      "observed_at": "2026-11-05T20:02:07Z",
+      "match": {
+        "ticker": "HRL",
+        "domain": "hormelfoods.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3010299956639813
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Q1wSI6B16l9zX1JUCcD12wH4NZ6O",
+      "observed_at": "2026-11-05T20:02:07Z",
+      "match": {
+        "ticker": "HRL",
+        "domain": "hormelfoods.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3010299956639813
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Q1wSI6B16l9zX1JUCcD12wH4NZ6O",
+      "observed_at": "2026-11-05T20:02:07Z",
+      "match": {
+        "ticker": "HRL",
+        "domain": "hormelfoods.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3010299956639813
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Q1wSI6B16l9zX1JUCcD12wH4NZ6O",
+      "observed_at": "2026-11-05T20:02:07Z",
+      "match": {
+        "ticker": "HRL",
+        "domain": "hormelfoods.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3010299956639813
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Q1wSI6B16l9zX1JUCcD12wH4NZ6O",
+      "observed_at": "2026-11-05T20:02:07Z",
+      "match": {
+        "ticker": "HRL",
+        "domain": "hormelfoods.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3010299956639813
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Q1wSI6B16l9zX1JUCcD12wH4NZ6O",
+      "observed_at": "2026-11-05T20:02:07Z",
+      "match": {
+        "ticker": "HRL",
+        "domain": "hormelfoods.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3010299956639813
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "Q1wSI6B16l9zX1JUCcD12wH4NZ6O",
+      "observed_at": "2026-11-05T20:02:07Z",
+      "match": {
+        "ticker": "HRL",
+        "domain": "hormelfoods.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.3010299956639813
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:02:07Z",
+      "industry": "2026-11-05T20:02:07Z",
+      "headquarters": "2026-11-05T20:02:07Z",
+      "founded": "2026-11-05T20:02:07Z",
+      "employee_size_range": "2026-11-05T20:02:07Z",
+      "linkedin_url": "2026-11-05T20:02:07Z"
+    }
+  }
+}

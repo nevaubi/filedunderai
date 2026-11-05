@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "ticker": "OVV",
+  "cik": 1792580,
+  "name": "Ovintiv Inc.",
+  "description": "ovintiv is a leading north american energy producer focused on developing its multi-basin portfolio of oil, natural gas liquids and natural gas producing plays. we have large and contiguous acreage positions in north america’s top resource plays where we deliver unmatched value through continuous innovation.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "Q9O990C3wumaMKCaYLqqqQSQe2Kz",
+    "observed_at": "2026-11-05T19:43:57Z",
+    "match": {
+      "ticker": "OVV",
+      "domain": "ovintiv.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://ovintiv.com",
+  "industry": "Oil & Energy",
+  "headquarters": "Denver, Colorado, United States",
+  "linkedin_url": "https://linkedin.com/company/ovintiv",
+  "founded": 2020,
+  "employees": null,
+  "professional_profile_count": 899,
+  "employee_size_range": "1001-5000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "Q9O990C3wumaMKCaYLqqqQSQe2Kz",
+    "observed_at": "2026-11-05T19:43:57Z",
+    "match": {
+      "ticker": "OVV",
+      "domain": "ovintiv.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "Q9O990C3wumaMKCaYLqqqQSQe2Kz",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "Q9O990C3wumaMKCaYLqqqQSQe2Kz",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "OVV",
+        "domain": "ovintiv.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:43:57Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "Q9O990C3wumaMKCaYLqqqQSQe2Kz",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "OVV",
+        "domain": "ovintiv.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "Q9O990C3wumaMKCaYLqqqQSQe2Kz",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "OVV",
+        "domain": "ovintiv.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "Q9O990C3wumaMKCaYLqqqQSQe2Kz",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "OVV",
+        "domain": "ovintiv.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "Q9O990C3wumaMKCaYLqqqQSQe2Kz",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "OVV",
+        "domain": "ovintiv.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "Q9O990C3wumaMKCaYLqqqQSQe2Kz",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "OVV",
+        "domain": "ovintiv.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "Q9O990C3wumaMKCaYLqqqQSQe2Kz",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "OVV",
+        "domain": "ovintiv.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "Q9O990C3wumaMKCaYLqqqQSQe2Kz",
+      "observed_at": "2026-11-05T19:43:57Z",
+      "match": {
+        "ticker": "OVV",
+        "domain": "ovintiv.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:57Z",
+      "industry": "2026-11-05T19:43:57Z",
+      "headquarters": "2026-11-05T19:43:57Z",
+      "founded": "2026-11-05T19:43:57Z",
+      "professional_profile_count": "2026-11-05T19:43:57Z",
+      "employee_size_range": "2026-11-05T19:43:57Z",
+      "linkedin_url": "2026-11-05T19:43:57Z",
+      "description": "2026-11-05T19:43:57Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

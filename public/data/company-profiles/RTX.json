@@ -1,0 +1,393 @@
+{
+  "schema_version": 1,
+  "ticker": "RTX",
+  "cik": 101829,
+  "name": "RTX",
+  "description": "rtx is comprised of three market-leading businesses – collins aerospace, pratt & whitney and raytheon – working as one to answer the biggest questions and solve the hardest problems in aerospace and defense.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "1SfsFu3XbjaFfA7ntTeFsAj9CDxL",
+    "observed_at": "2026-11-05T19:43:36Z",
+    "match": {
+      "ticker": "RTX",
+      "domain": "rtx.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://www.rtx.com",
+  "industry": "Aviation & Aerospace",
+  "headquarters": "Arlington, Virginia, United States",
+  "linkedin_url": "https://linkedin.com/company/raytheontechnologies",
+  "founded": 2020,
+  "employees": null,
+  "professional_profile_count": 12022,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "1SfsFu3XbjaFfA7ntTeFsAj9CDxL",
+    "observed_at": "2026-11-05T19:43:36Z",
+    "match": {
+      "ticker": "RTX",
+      "domain": "rtx.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "1SfsFu3XbjaFfA7ntTeFsAj9CDxL",
+  "leadership": [
+    {
+      "name": "Christopher T. Calio",
+      "role": "Chairman & Chief Executive Officer",
+      "profile_url": "https://www.rtx.com/who-we-are/our-leadership/christopher-calio",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/fd0c5348b9eff53a636b8a58.jpg",
+      "start_date": null,
+      "source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "photo_credit": "RTX",
+      "photo_original_url": "https://prd-sc102-cdn.rtx.com/-/media/rtx/c/calio/calio.jpg?rev=3fbba477bc0a436fbc894c1757206cf3&rid=ca831c7b1709488bb8a93d4088799733",
+      "photo_sha256": "e1b5d0686511c8525e5c892c69bbb6fc9dd20d8e97db5bf1d26159d3ed3a9a4c",
+      "photo_cached_at": "2026-11-05T20:12:30Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Troy Brunk",
+      "role": "President, Collins Aerospace",
+      "profile_url": "https://www.rtx.com/who-we-are/our-leadership/troy-brunk",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/faf039c689ec1774b0095803.jpg",
+      "start_date": null,
+      "source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "photo_credit": "RTX",
+      "photo_original_url": "https://prd-sc102-cdn.rtx.com/-/media/rtx/t/troy_brunk-_headshot_648x776.jpg?rev=0fa4f715ea8b44779cbf4c9b4382e071&rid=ca831c7b1709488bb8a93d4088799733",
+      "photo_sha256": "279a798217d173f735a873b2d610676f43e34aaf39984e4462baff03c6c2f496",
+      "photo_cached_at": "2026-11-05T20:12:53Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Art Cameron",
+      "role": "Global Government Relations",
+      "profile_url": "https://www.rtx.com/who-we-are/our-leadership/art-cameron",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/f242842e553e97fd3aa109eb.jpg",
+      "start_date": null,
+      "source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "photo_credit": "RTX",
+      "photo_original_url": "https://prd-sc102-cdn.rtx.com/-/media/rtx/a/art-cameron.jpg?rev=848fd913105647df86f3cfb1c674aaaa&rid=ca831c7b1709488bb8a93d4088799733",
+      "photo_sha256": "f13d5b2c40abb9d1a72cc25ed26e5f53c120f84ac9efdc09f8055319f48d0964",
+      "photo_cached_at": "2026-11-05T20:12:30Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Vincent M. Campisi",
+      "role": "Chief Digital Officer",
+      "profile_url": "https://www.rtx.com/who-we-are/our-leadership/vince-campisi",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/2a3e5d9c5d2e8a21d3b8f935.png",
+      "start_date": null,
+      "source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "photo_credit": "RTX",
+      "photo_original_url": "https://prd-sc102-cdn.rtx.com/-/media/rtx/our-company/our-leadership/media/leadership/06-2023/rtx-slt-campisi-648x776.png?rev=44bb379b126346148c788055549457a3&rid=ca831c7b1709488bb8a93d4088799733",
+      "photo_sha256": "6fa3d877cc60a186a2d77930181abc64e8c3f8229b7ee724cbfbf8a9b3511f6e",
+      "photo_cached_at": "2026-11-05T20:12:42Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Paolo Dal Cin",
+      "role": "Operations, Supply Chain & Quality and Environment, Health & Safety",
+      "profile_url": "https://www.rtx.com/who-we-are/our-leadership/paolo-dal-cin",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/d44037d2b9f12d4a7e98f453.png",
+      "start_date": null,
+      "source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "photo_credit": "RTX",
+      "photo_original_url": "https://prd-sc102-cdn.rtx.com/-/media/rtx/our-company/our-leadership/media/leadership/06-2023/rtx-slt-dal-cin-648x776.png?rev=02dff93cdb814fb3b44763b93a0cd212&rid=ca831c7b1709488bb8a93d4088799733",
+      "photo_sha256": "9ae7f44c213ac74b11b92e632536155036ba9081922d73bbf12684a03a371164",
+      "photo_cached_at": "2026-11-05T20:12:42Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Juan M. de Bedout",
+      "role": "Chief Technology Officer",
+      "profile_url": "https://www.rtx.com/who-we-are/our-leadership/juan-m-de-bedout",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/fcdf5c79dfe8c41c64ef1b49.jpg",
+      "start_date": null,
+      "source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "photo_credit": "RTX",
+      "photo_original_url": "https://prd-sc102-cdn.rtx.com/-/media/rtx/our-company/our-leadership/media/leadership/debedout_juan_648x776.jpg?rev=132e580e9bc84dd28c69cb7fb46b769f&rid=ca831c7b1709488bb8a93d4088799733",
+      "photo_sha256": "a38a9cac66f2d97c297fddf698035809418d897697a9018c0090aabd25fffc3a",
+      "photo_cached_at": "2026-11-05T20:12:53Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Shane G. Eddy",
+      "role": "President, Pratt & Whitney",
+      "profile_url": "https://www.rtx.com/who-we-are/our-leadership/shane-g-eddy",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/57b111198163c5aee0325228.png",
+      "start_date": null,
+      "source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "photo_credit": "RTX",
+      "photo_original_url": "https://prd-sc102-cdn.rtx.com/-/media/rtx/our-company/our-leadership/media/leadership/06-2023/rtx-slt-eddy-648x776.png?rev=b43b6281a0e4417983189c5d1104cbd9&rid=ca831c7b1709488bb8a93d4088799733",
+      "photo_sha256": "73ba321491cdced940f740a24527b28f9f04c7067ea71ffa8fc75c3ac5a45d12",
+      "photo_cached_at": "2026-11-05T20:12:42Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Pamela Erickson",
+      "role": "Chief Communications Officer",
+      "profile_url": "https://www.rtx.com/who-we-are/our-leadership/pamela-erickson",
+      "photo_url": null,
+      "start_date": null,
+      "source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "photo_credit": "RTX",
+      "photo_original_url": "https://prd-sc102-cdn.rtx.com/-/media/rtx/our-company/our-leadership/media/leadership/06-2023/rtx-slt-erickson-648x776.png?rev=c18c2dc38f1d49cb80dd4dc98d4ff0bf&rid=ca831c7b1709488bb8a93d4088799733",
+      "photo_status": "source_unavailable"
+    },
+    {
+      "name": "Phil Jasper",
+      "role": "President, Raytheon",
+      "profile_url": "https://www.rtx.com/who-we-are/our-leadership/phil-jasper",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/c1355e3969fdd685e02f599e.jpg",
+      "start_date": null,
+      "source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "photo_credit": "RTX",
+      "photo_original_url": "https://prd-sc102-cdn.rtx.com/-/media/rtx/our-company/our-leadership/media/leadership/2021-jasper-portrait_648_776.jpg?rev=02d6c890a9064d7c9c3426d2dca20104&rid=ca831c7b1709488bb8a93d4088799733",
+      "photo_sha256": "307ca48b1ee26d52f921cafd1a1283f4bf4635f78624e3c6a61fdb8df5a39e13",
+      "photo_cached_at": "2026-11-05T20:12:52Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Jesse Klempner",
+      "role": "Corporate Strategy & Development",
+      "profile_url": "https://www.rtx.com/who-we-are/our-leadership/jesse-klempner",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/14dab9a6e2fe9bbb690780b7.jpg",
+      "start_date": null,
+      "source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "photo_credit": "RTX",
+      "photo_original_url": "https://prd-sc102-cdn.rtx.com/-/media/rtx/j/jesse-klempner-542x649.jpg?rev=55185e70636240778a681b14407ff203&rid=ca831c7b1709488bb8a93d4088799733",
+      "photo_sha256": "c4acd0da642f9d6117af1b27e768d119ed0fa65b9d90a3f5bcb161cbfbaefa77",
+      "photo_cached_at": "2026-11-05T20:12:30Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Raja Maharajh",
+      "role": "General Counsel",
+      "profile_url": "https://www.rtx.com/who-we-are/our-leadership/raja-maharajh",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/aaf7d6882b270f73606edcc4.png",
+      "start_date": null,
+      "source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "photo_credit": "RTX",
+      "linkedin_url": "https://linkedin.com/in/raja-maharajh-5309934",
+      "linkedin_source": {
+        "name": "People Data Labs",
+        "url": "https://docs.peopledatalabs.com/docs/person-search-api",
+        "observed_at": "2026-11-05T20:16:24Z",
+        "provider_verified_at": "2026-09-20"
+      },
+      "photo_original_url": "https://prd-sc102-cdn.rtx.com/-/media/rtx/our-company/our-leadership/media/leadership/06-2023/rtx-slt-maharajh-648x776.png?rev=d0d34dc63c3e4a719dcdf6454e780ef8&rid=ca831c7b1709488bb8a93d4088799733",
+      "photo_sha256": "8bf5cd60a2145b40b07f2694aa57b87e098a6d74880e95555d973091e804686d",
+      "photo_cached_at": "2026-11-05T20:12:42Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Neil G. Mitchill, Jr.",
+      "role": "Chief Financial Officer",
+      "profile_url": "https://www.rtx.com/who-we-are/our-leadership/neil-g-mitchill",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/286b2762c4e6e702283c96ec.png",
+      "start_date": null,
+      "source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "photo_credit": "RTX",
+      "photo_original_url": "https://prd-sc102-cdn.rtx.com/-/media/rtx/our-company/our-leadership/media/leadership/06-2023/rtx-slt-mitchill-648x776.png?rev=183ccbede8784de6824c45dca14cdc50&rid=ca831c7b1709488bb8a93d4088799733",
+      "photo_sha256": "67dc3ff6a755252244b78a917ef20bd50caa9074bd1dcbea2169843dc4dac07d",
+      "photo_cached_at": "2026-11-05T20:12:42Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Dantaya Williams",
+      "role": "Chief Human Resources Officer",
+      "profile_url": "https://www.rtx.com/who-we-are/our-leadership/dantaya-williams",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/3569e1ee011f553ba7dfa3da.jpg",
+      "start_date": null,
+      "source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:00:35Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.rtx.com/who-we-are/our-leadership",
+      "photo_credit": "RTX",
+      "photo_original_url": "https://prd-sc102-cdn.rtx.com/-/media/rtx/our-company/our-leadership/media/leadership/dantaya_williams_06102020.jpg?rev=e1f7d3ffbafa4f8bb99ce357235c9eb4&rid=ca831c7b1709488bb8a93d4088799733",
+      "photo_sha256": "245cd5bfb0cea29f1ecc21594dca0eec66363ca987ed3d0f29b0564127289966",
+      "photo_cached_at": "2026-11-05T20:12:53Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "RTX official leadership roster",
+      "url": "https://www.rtx.com/who-we-are/our-leadership",
+      "observed_at": "2026-11-05T20:00:35Z"
+    },
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "1SfsFu3XbjaFfA7ntTeFsAj9CDxL",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "RTX",
+        "domain": "rtx.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "RTX official leadership roster",
+      "url": "https://www.rtx.com/who-we-are/our-leadership",
+      "observed_at": "2026-11-05T20:00:35Z"
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "1SfsFu3XbjaFfA7ntTeFsAj9CDxL",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "RTX",
+        "domain": "rtx.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "1SfsFu3XbjaFfA7ntTeFsAj9CDxL",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "RTX",
+        "domain": "rtx.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "1SfsFu3XbjaFfA7ntTeFsAj9CDxL",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "RTX",
+        "domain": "rtx.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "1SfsFu3XbjaFfA7ntTeFsAj9CDxL",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "RTX",
+        "domain": "rtx.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "1SfsFu3XbjaFfA7ntTeFsAj9CDxL",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "RTX",
+        "domain": "rtx.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "1SfsFu3XbjaFfA7ntTeFsAj9CDxL",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "RTX",
+        "domain": "rtx.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T20:00:35Z",
+    "leadership_scope": "Leaders listed on the current official company leadership roster; business-unit roles retain their published scope. This is not a complete board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:00:35Z",
+      "industry": "2026-11-05T19:43:36Z",
+      "headquarters": "2026-11-05T19:43:36Z",
+      "founded": "2026-11-05T19:43:36Z",
+      "professional_profile_count": "2026-11-05T19:43:36Z",
+      "employee_size_range": "2026-11-05T19:43:36Z",
+      "linkedin_url": "2026-11-05T19:43:36Z",
+      "description": "2026-11-05T19:43:36Z",
+      "leadership": "2026-11-05T20:00:35Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  },
+  "description_provider": "People Data Labs"
+}

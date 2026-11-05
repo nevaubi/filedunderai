@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "ticker": "ABBV",
+  "cik": 1551152,
+  "name": "AbbVie",
+  "description": "AbbVie is a global biopharmaceutical company that develops medicines and other healthcare products. Its leadership organization includes research and development, commercial operations, immunology, oncology, neuroscience, medical affairs and Allergan Aesthetics.",
+  "description_source": {
+    "name": "AbbVie business context",
+    "url": "https://www.abbvie.com/who-we-are/our-leaders/robert-michael",
+    "observed_at": "2026-11-05T19:40:50Z"
+  },
+  "source_url": "https://www.abbvie.com/who-we-are/our-leaders/robert-michael",
+  "website": "https://www.abbvie.com/",
+  "industry": null,
+  "headquarters": null,
+  "founded": null,
+  "employees": null,
+  "leadership": [
+    {
+      "name": "Robert A. Michael",
+      "role": "Chairman of the Board and Chief Executive Officer",
+      "profile_url": "https://www.abbvie.com/who-we-are/our-leaders/robert-michael",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/f0e4f679a59e05b99b487900.avif",
+      "start_date": null,
+      "source_url": "https://www.abbvie.com/who-we-are/our-leaders/robert-michael",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "photo_credit": "AbbVie",
+      "linkedin_url": "https://www.linkedin.com/in/rob-michael",
+      "linkedin_source_url": "https://www.abbvie.com/who-we-are/our-leaders/robert-michael",
+      "tenure_note": "CEO since 2024. The official biography does not separately date the current Chairman title.",
+      "photo_original_url": "https://delivery-p157365-e1666014.adobeaemcloud.com/adobe/assets/urn:aaid:aem:002783c9-3f5c-41c7-931b-cf720ed0ce61/as/rob-michael-headshot.jpg?width=750&auto-format=true&max-quality=85",
+      "photo_sha256": "c617d14d2f6a508c8e1b5fbdf223d95f9e889e3dba90d1d0a84efd48159879fa",
+      "photo_cached_at": "2026-11-05T19:54:52Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Scott T. Reents",
+      "role": "Executive Vice President, Chief Financial Officer",
+      "profile_url": "https://www.abbvie.com/who-we-are/our-leaders/scott-reents",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/ea0f2fd4ce4efbc6636ef8f0.avif",
+      "start_date": null,
+      "source_url": "https://www.abbvie.com/who-we-are/our-leaders/scott-reents",
+      "source_name": "Official biography",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "photo_credit": "AbbVie",
+      "linkedin_url": "https://www.linkedin.com/in/scott-reents-28762898/",
+      "linkedin_source_url": "https://www.abbvie.com/who-we-are/our-leaders/scott-reents",
+      "photo_original_url": "https://delivery-p157365-e1666014.adobeaemcloud.com/adobe/assets/urn:aaid:aem:82214c28-8b1e-43ca-ba92-4202f7b12f42/as/scott-reents-headshot.jpg?width=750&auto-format=true&max-quality=85",
+      "photo_sha256": "e9a9cd1314ad2ea31098f845a038bee1987a32e4288c2ea41e6a373900a7013d",
+      "photo_cached_at": "2026-11-05T19:55:03Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Roopal Thakkar, M.D.",
+      "role": "Executive Vice President, Research & Development, Chief Scientific Officer",
+      "profile_url": "https://www.abbvie.com/who-we-are/our-leaders/roopal-thakkar",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/a9305e515131d1713dbe7652.avif",
+      "start_date": null,
+      "source_url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "photo_credit": "AbbVie",
+      "photo_original_url": "https://delivery-p157365-e1666014.adobeaemcloud.com/adobe/assets/urn:aaid:aem:2da4abbc-9a2d-4b78-b63d-b4f99661b634/as/roopal-thakkar-headshot.jpg?width=750&auto-format=true&max-quality=85",
+      "photo_sha256": "1583850d4ad8e6302a03a480bd9af99df177682e82282125b5d382571d90e401",
+      "photo_cached_at": "2026-11-05T19:55:03Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Azita Saleki, Ph.D.",
+      "role": "Executive Vice President, Chief Operations Officer",
+      "profile_url": "https://www.abbvie.com/who-we-are/our-leaders/azita-saleki",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/b21f1eab2fefc2d6aa9f5e50.avif",
+      "start_date": null,
+      "source_url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "photo_credit": "AbbVie",
+      "photo_original_url": "https://delivery-p157365-e1666014.adobeaemcloud.com/adobe/assets/urn:aaid:aem:a84ea2f3-d58b-45d2-8ed7-11ef9c32c11e/as/azita-saleki-gerhardt-headshot.jpg?width=750&auto-format=true&max-quality=85",
+      "photo_sha256": "d87156fd5480d0f94a0ee5441ac06add5ebd07cb526070342bc6f3e95056c646",
+      "photo_cached_at": "2026-11-05T19:55:03Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Perry C. Siatis",
+      "role": "Executive Vice President, General Counsel and Secretary",
+      "profile_url": "https://www.abbvie.com/who-we-are/our-leaders/perry-siatis",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/84d462a68b74ca09b9d8070a.avif",
+      "start_date": null,
+      "source_url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "photo_credit": "AbbVie",
+      "photo_original_url": "https://delivery-p157365-e1666014.adobeaemcloud.com/adobe/assets/urn:aaid:aem:b53a42e2-6dc9-4d50-8475-b50443843a87/as/perry-siatis-headshot.jpg?width=750&auto-format=true&max-quality=85",
+      "photo_sha256": "d3d37b869f5ed6f09ace2e3f6d743d46910b486e8385e92df755dd440d228371",
+      "photo_cached_at": "2026-11-05T19:55:03Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Jeffrey R. Stewart",
+      "role": "Executive Vice President, Chief Commercial Officer",
+      "profile_url": "https://www.abbvie.com/who-we-are/our-leaders/jeffrey-stewart",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/a65e6d8f71be25a2ee62ee8f.avif",
+      "start_date": null,
+      "source_url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "photo_credit": "AbbVie",
+      "photo_original_url": "https://delivery-p157365-e1666014.adobeaemcloud.com/adobe/assets/urn:aaid:aem:7755ccb8-7449-4dea-8c67-7c6503b27212/as/jeff-stewart-headshot1.jpg?width=750&auto-format=true&max-quality=85",
+      "photo_sha256": "eb52f737d95c5a80bb94811f310a2fa9e552e0f74708521c3cbabdef871df6ad",
+      "photo_cached_at": "2026-11-05T19:55:03Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Demetris D. Crum",
+      "role": "Executive Vice President, Chief Human Resources Officer",
+      "profile_url": "https://www.abbvie.com/who-we-are/our-leaders/demetris-crum",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/44b189b70f04d7877baee922.avif",
+      "start_date": null,
+      "source_url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "photo_credit": "AbbVie",
+      "photo_original_url": "https://delivery-p157365-e1666014.adobeaemcloud.com/adobe/assets/urn:aaid:aem:25c7da8b-2457-4820-bf89-f616276a965a/as/d-crum-headshot.jpg?width=750&auto-format=true&max-quality=85",
+      "photo_sha256": "eab965fa28599e903db4e95807fc37f1b36dacae15cdc3d0cc98970b957f350e",
+      "photo_cached_at": "2026-11-05T19:54:53Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Nicholas Donoghoe, M.D.",
+      "role": "Executive Vice President, Chief Business and Strategy Officer",
+      "profile_url": "https://www.abbvie.com/who-we-are/our-leaders/nicholas-donoghoe",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/3a411c2e6bdcd97ba624eba4.avif",
+      "start_date": null,
+      "source_url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T19:40:50Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "photo_credit": "AbbVie",
+      "photo_original_url": "https://delivery-p157365-e1666014.adobeaemcloud.com/adobe/assets/urn:aaid:aem:e437d634-5204-4c2e-bda5-59a096bb65b1/as/nicholas-donoghoe-headshot.jpg?width=750&auto-format=true&max-quality=85",
+      "photo_sha256": "b65317d1a38aca074abcd8f24f3eb9ee7181c1101ec7c5baba1494f2e7472467",
+      "photo_cached_at": "2026-11-05T19:55:03Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "AbbVie official leadership roster",
+      "url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Robert A. Michael official biography",
+      "url": "https://www.abbvie.com/who-we-are/our-leaders/robert-michael",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "Scott T. Reents official biography",
+      "url": "https://www.abbvie.com/who-we-are/our-leaders/scott-reents",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    {
+      "name": "AbbVie business context",
+      "url": "https://www.abbvie.com/who-we-are/our-leaders/robert-michael",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "Official company source",
+      "url": "https://www.abbvie.com/who-we-are/our-leaders.html",
+      "observed_at": "2026-11-05T19:40:50Z"
+    },
+    "description": {
+      "name": "AbbVie business context",
+      "url": "https://www.abbvie.com/who-we-are/our-leaders/robert-michael",
+      "observed_at": "2026-11-05T19:40:50Z"
+    }
+  },
+  "coverage": {
+    "status": "official_sources",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "employees": "not_collected",
+    "official_updated_at": "2026-11-05T19:40:50Z",
+    "leadership_scope": "Selected leaders from the company’s published leadership roster; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:40:50Z",
+      "description": "2026-11-05T19:40:50Z",
+      "leadership": "2026-11-05T19:40:50Z"
+    },
+    "portraits": "available_for_all_selected_leaders"
+  }
+}

@@ -48,7 +48,7 @@
       "observed_at": "2026-11-05T14:15:13Z",
       "group": "Executive leadership",
       "start_date_source_url": "https://news.microsoft.com/facts-about-microsoft/",
-      "photo_url": "https://news.microsoft.com/source/wp-content/uploads/2024/10/MS-Exec-Nadella-Satya.jpg",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/fefead92e8843efb012cbe0c.jpg",
       "photo_source_url": "https://news.microsoft.com/source/exec/satya-nadella/",
       "photo_credit": "Brian Smale and Microsoft",
       "photo_license": "CC BY-SA 4.0",
@@ -56,7 +56,11 @@
       "additional_roles": [
         "Chairman"
       ],
-      "tenure_note": "The start date refers to the chief executive officer role. The current official biography also identifies Nadella as chairman."
+      "tenure_note": "The start date refers to the chief executive officer role. The current official biography also identifies Nadella as chairman.",
+      "photo_original_url": "https://news.microsoft.com/source/wp-content/uploads/2024/10/MS-Exec-Nadella-Satya.jpg",
+      "photo_sha256": "fce021706c233bcfcf62961e2287f4f82615e57f563c001623064dc41a49941c",
+      "photo_cached_at": "2026-11-05T19:56:08Z",
+      "photo_status": "cached_and_verified"
     },
     {
       "name": "Amy Hood",
@@ -68,9 +72,13 @@
       "observed_at": "2026-11-05T14:15:13Z",
       "group": "Executive leadership",
       "start_date_source_url": "https://news.microsoft.com/source/exec/amy-hood/",
-      "photo_url": "https://news.microsoft.com/source/wp-content/uploads/2024/07/amy-hood.jpg",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/a229a9b0d97687a76393fea1.jpg",
       "photo_source_url": "https://news.microsoft.com/source/exec/amy-hood/",
-      "photo_credit": "Microsoft"
+      "photo_credit": "Microsoft",
+      "photo_original_url": "https://news.microsoft.com/source/wp-content/uploads/2024/07/amy-hood.jpg",
+      "photo_sha256": "2c2952b64905aff8253f5909595c87716a86a1d39817ae66cba6e878044a2d1b",
+      "photo_cached_at": "2026-11-05T19:56:08Z",
+      "photo_status": "cached_and_verified"
     },
     {
       "name": "Brad Smith",
@@ -82,11 +90,15 @@
       "observed_at": "2026-11-05T14:15:13Z",
       "group": "Executive leadership",
       "start_date_source_url": "https://news.microsoft.com/source/2021/09/14/microsoft-announces-quarterly-dividend-increase-and-new-share-repurchase-program-2/",
-      "photo_url": "https://news.microsoft.com/source/wp-content/uploads/2024/07/brad.jpg",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/336749d9052b6be85635881f.jpg",
       "photo_source_url": "https://news.microsoft.com/source/exec/brad-smith/",
       "photo_credit": "Brian Smale and Microsoft",
       "photo_license": "CC BY-SA 4.0",
-      "photo_license_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+      "photo_license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "photo_original_url": "https://news.microsoft.com/source/wp-content/uploads/2024/07/brad.jpg",
+      "photo_sha256": "f6fb7fd8f1dd7078a946972f50449c8dadaedddff6c6a3d669e1a0457eecfd4b",
+      "photo_cached_at": "2026-11-05T19:56:08Z",
+      "photo_status": "cached_and_verified"
     },
     {
       "name": "Judson Althoff",
@@ -183,7 +195,7 @@
       "as_of": "2026-06-30"
     }
   ],
-  "updated_at": "2026-11-05T14:33:09Z",
+  "updated_at": "2026-11-05T20:24:21Z",
   "field_sources": {
     "website": {
       "name": "Microsoft 2026 Annual Report",

@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "ticker": "ENTG",
+  "cik": 1101302,
+  "name": "ENTEGRIS INC",
+  "description": "artificial intelligence, augmented reality, internet of things – these are not just trends, they are drivers changing the way people live across the globe.  with these new drivers and the increasing speed of innovation, there comes an expectation for higher-quality, higher-performing technologies at a faster pace.  \n \nevery day, and for more than 50 years, entegris’ singular mission has been to help customers utilize our advanced science-based solutions to support demand drivers; to innovate faster and more efficiently; and ultimately to transform the world. through the power of our solutions and technology expertise, entegris provides customers with innovative, science-based solutions to their toughest technology challenges.\n \nheadquartered in billerica, massachusetts, entegris employs approximately 7,700 people worldwide, with roughly half employed in asia-pacific or europe.\n \nwith research and development, customer service, analytical labs, and manufacturing in asia-pacific, north america and europe, entegris supports customers around the globe as they take technology to the next level.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "nI6gusrbDCcCU4JzKx3rUgRwdHeT",
+    "observed_at": "2026-11-05T19:43:50Z",
+    "match": {
+      "ticker": "ENTG",
+      "domain": "entegris.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://entegris.com",
+  "industry": "Semiconductors",
+  "headquarters": "Billerica, Massachusetts, United States",
+  "linkedin_url": "https://linkedin.com/company/entegris",
+  "founded": 1966,
+  "employees": null,
+  "professional_profile_count": 4131,
+  "employee_size_range": "5001-10000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "nI6gusrbDCcCU4JzKx3rUgRwdHeT",
+    "observed_at": "2026-11-05T19:43:50Z",
+    "match": {
+      "ticker": "ENTG",
+      "domain": "entegris.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "nI6gusrbDCcCU4JzKx3rUgRwdHeT",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "nI6gusrbDCcCU4JzKx3rUgRwdHeT",
+      "observed_at": "2026-11-05T19:43:50Z",
+      "match": {
+        "ticker": "ENTG",
+        "domain": "entegris.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:43:50Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "nI6gusrbDCcCU4JzKx3rUgRwdHeT",
+      "observed_at": "2026-11-05T19:43:50Z",
+      "match": {
+        "ticker": "ENTG",
+        "domain": "entegris.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "nI6gusrbDCcCU4JzKx3rUgRwdHeT",
+      "observed_at": "2026-11-05T19:43:50Z",
+      "match": {
+        "ticker": "ENTG",
+        "domain": "entegris.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "nI6gusrbDCcCU4JzKx3rUgRwdHeT",
+      "observed_at": "2026-11-05T19:43:50Z",
+      "match": {
+        "ticker": "ENTG",
+        "domain": "entegris.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "nI6gusrbDCcCU4JzKx3rUgRwdHeT",
+      "observed_at": "2026-11-05T19:43:50Z",
+      "match": {
+        "ticker": "ENTG",
+        "domain": "entegris.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "nI6gusrbDCcCU4JzKx3rUgRwdHeT",
+      "observed_at": "2026-11-05T19:43:50Z",
+      "match": {
+        "ticker": "ENTG",
+        "domain": "entegris.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "nI6gusrbDCcCU4JzKx3rUgRwdHeT",
+      "observed_at": "2026-11-05T19:43:50Z",
+      "match": {
+        "ticker": "ENTG",
+        "domain": "entegris.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "nI6gusrbDCcCU4JzKx3rUgRwdHeT",
+      "observed_at": "2026-11-05T19:43:50Z",
+      "match": {
+        "ticker": "ENTG",
+        "domain": "entegris.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:50Z",
+      "industry": "2026-11-05T19:43:50Z",
+      "headquarters": "2026-11-05T19:43:50Z",
+      "founded": "2026-11-05T19:43:50Z",
+      "professional_profile_count": "2026-11-05T19:43:50Z",
+      "employee_size_range": "2026-11-05T19:43:50Z",
+      "linkedin_url": "2026-11-05T19:43:50Z",
+      "description": "2026-11-05T19:43:50Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

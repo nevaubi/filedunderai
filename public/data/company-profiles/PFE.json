@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "ticker": "PFE",
+  "cik": 78003,
+  "name": "Pfizer",
+  "description": "we’re celebrating over 175 years of daring scientific innovation—and we’re not done yet. let’s outdo yesterday. protect your health at pfizerforall.com\n \nfor additional information on our guidelines, please visit  http://www.pfizer.com/community-guidelines",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "w9C0Znhx6QgUFVBDCwL5kQhGY93j",
+    "observed_at": "2026-11-05T19:43:29Z",
+    "match": {
+      "ticker": "PFE",
+      "domain": "pfizer.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://pfizer.com",
+  "industry": "Pharmaceuticals",
+  "headquarters": "New York, New York, United States",
+  "linkedin_url": "https://linkedin.com/company/pfizer",
+  "founded": 1848,
+  "employees": null,
+  "professional_profile_count": 80214,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "w9C0Znhx6QgUFVBDCwL5kQhGY93j",
+    "observed_at": "2026-11-05T19:43:29Z",
+    "match": {
+      "ticker": "PFE",
+      "domain": "pfizer.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "w9C0Znhx6QgUFVBDCwL5kQhGY93j",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "w9C0Znhx6QgUFVBDCwL5kQhGY93j",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "PFE",
+        "domain": "pfizer.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:43:29Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "w9C0Znhx6QgUFVBDCwL5kQhGY93j",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "PFE",
+        "domain": "pfizer.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "w9C0Znhx6QgUFVBDCwL5kQhGY93j",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "PFE",
+        "domain": "pfizer.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "w9C0Znhx6QgUFVBDCwL5kQhGY93j",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "PFE",
+        "domain": "pfizer.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "w9C0Znhx6QgUFVBDCwL5kQhGY93j",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "PFE",
+        "domain": "pfizer.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "w9C0Znhx6QgUFVBDCwL5kQhGY93j",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "PFE",
+        "domain": "pfizer.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "w9C0Znhx6QgUFVBDCwL5kQhGY93j",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "PFE",
+        "domain": "pfizer.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "w9C0Znhx6QgUFVBDCwL5kQhGY93j",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "PFE",
+        "domain": "pfizer.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:29Z",
+      "industry": "2026-11-05T19:43:29Z",
+      "headquarters": "2026-11-05T19:43:29Z",
+      "founded": "2026-11-05T19:43:29Z",
+      "professional_profile_count": "2026-11-05T19:43:29Z",
+      "employee_size_range": "2026-11-05T19:43:29Z",
+      "linkedin_url": "2026-11-05T19:43:29Z",
+      "description": "2026-11-05T19:43:29Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

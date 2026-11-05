@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "ticker": "CRBG",
+  "cik": 1889539,
+  "name": "Corebridge Financial, Inc.",
+  "description": "corebridge financial is one of the largest and most established providers of retirement solutions and life insurance products in the united states, with a long and proven track record of serving our clients. at corebridge, we proudly partner with financial professionals and institutions to help make it possible for more people to take action in their financial lives – for today and tomorrow. \n\na diversified portfolio across our four core businesses—individual retirement, retirement services, life insurance and institutional markets—enables us to help drive positive outcomes for those we serve, maximize growth opportunities and manage risk. \n\nproducts and services are written or provided by wholly owned subsidiaries of corebridge financial, inc.\n\nsocial media policy: https://www.corebridgefinancial.com/social-media-policy",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "MndAkXktq4pbfHHl1Z2oogJ5V2VP",
+    "observed_at": "2026-11-05T19:46:27Z",
+    "match": {
+      "ticker": "CRBG",
+      "domain": "corebridgefinancial.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://corebridgefinancial.com",
+  "industry": "Financial Services",
+  "headquarters": "Houston, Texas, United States",
+  "linkedin_url": "https://linkedin.com/company/corebridgefinancial",
+  "founded": null,
+  "employees": null,
+  "professional_profile_count": 3491,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "MndAkXktq4pbfHHl1Z2oogJ5V2VP",
+    "observed_at": "2026-11-05T19:46:27Z",
+    "match": {
+      "ticker": "CRBG",
+      "domain": "corebridgefinancial.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "MndAkXktq4pbfHHl1Z2oogJ5V2VP",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "MndAkXktq4pbfHHl1Z2oogJ5V2VP",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "CRBG",
+        "domain": "corebridgefinancial.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:46:27Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "MndAkXktq4pbfHHl1Z2oogJ5V2VP",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "CRBG",
+        "domain": "corebridgefinancial.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "MndAkXktq4pbfHHl1Z2oogJ5V2VP",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "CRBG",
+        "domain": "corebridgefinancial.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "MndAkXktq4pbfHHl1Z2oogJ5V2VP",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "CRBG",
+        "domain": "corebridgefinancial.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "MndAkXktq4pbfHHl1Z2oogJ5V2VP",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "CRBG",
+        "domain": "corebridgefinancial.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "MndAkXktq4pbfHHl1Z2oogJ5V2VP",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "CRBG",
+        "domain": "corebridgefinancial.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "MndAkXktq4pbfHHl1Z2oogJ5V2VP",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "CRBG",
+        "domain": "corebridgefinancial.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "MndAkXktq4pbfHHl1Z2oogJ5V2VP",
+      "observed_at": "2026-11-05T19:46:27Z",
+      "match": {
+        "ticker": "CRBG",
+        "domain": "corebridgefinancial.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:46:27Z",
+      "industry": "2026-11-05T19:46:27Z",
+      "headquarters": "2026-11-05T19:46:27Z",
+      "professional_profile_count": "2026-11-05T19:46:27Z",
+      "employee_size_range": "2026-11-05T19:46:27Z",
+      "linkedin_url": "2026-11-05T19:46:27Z",
+      "description": "2026-11-05T19:46:27Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

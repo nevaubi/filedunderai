@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "ticker": "CUBE",
+  "cik": 1298675,
+  "name": "CubeSmart",
+  "description": "in the simplest terms, at cubesmart, we own and operate self-storage facilities. in reality, what we do is much more than that. many customers seek out storage when facing challenging life events. that’s why our mission is to simplify the challenges that accompany those circumstances - through innovative solutions, unparalleled service, and genuine care. that’s where our teammates come in.\n\nat cubesmart we say that it’s what’s inside that counts. to us, this is far more than a tagline about storage. it is also about what you will find in a career here. we believe our teammates are the heart of all that we do, which is why we care deeply about the experience we offer. it’s also why we’ve been recognized as one of the 50 most engaged workplaces in north america by achievers, a global provider of employee engagement tools.\n\ncubesmart is a place where you’ll make a difference, helping customers during some of their most challenging times, supporting them when they need it most. here, you’ll belong to a team that works together to simplify challenges and innovate solutions that make storing with us easy and makes working with us exciting. at cubesmart, you’ll grow with us, discovering countless opportunities to develop your skills, maximize your potential, and expand your career.\n\nat cubesmart, when we say it’s what’s inside that counts, we’re saying “you count.” \n\ninterested in working at cubesmart? visit http://www.cubesmart.com/careers to view available jobs.\n\ninterested in selling your facility? we're looking to buy existing properties! email our acquisitions team at inquiry@cubesmart.com.\n\nfind cubesmart on the web: \n\ncompany website: http://cubesmart.com \n\nblog: http://cubesmart.com/blog\n\nfacebook: http://www.facebook.com/cubesmart\n\ntwitter: http://www.twitter.com/cubesmart\n\nyoutube: https://www.youtube.com/cubesmartstorage",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "0FIBQAT4mmPvegf6p5IipQA81rY9",
+    "observed_at": "2026-11-05T19:45:24Z",
+    "match": {
+      "ticker": "CUBE",
+      "domain": "cubesmart.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 9
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+  "website": "https://cubesmart.com",
+  "industry": "Real Estate",
+  "headquarters": "Malvern, Pennsylvania, United States",
+  "linkedin_url": "https://linkedin.com/company/cubesmart",
+  "founded": 2004,
+  "employees": null,
+  "professional_profile_count": 1163,
+  "employee_size_range": "1001-5000",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "0FIBQAT4mmPvegf6p5IipQA81rY9",
+    "observed_at": "2026-11-05T19:45:24Z",
+    "match": {
+      "ticker": "CUBE",
+      "domain": "cubesmart.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 9
+    }
+  },
+  "provider_record_id": "0FIBQAT4mmPvegf6p5IipQA81rY9",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "0FIBQAT4mmPvegf6p5IipQA81rY9",
+      "observed_at": "2026-11-05T19:45:24Z",
+      "match": {
+        "ticker": "CUBE",
+        "domain": "cubesmart.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:45:24Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "0FIBQAT4mmPvegf6p5IipQA81rY9",
+      "observed_at": "2026-11-05T19:45:24Z",
+      "match": {
+        "ticker": "CUBE",
+        "domain": "cubesmart.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "0FIBQAT4mmPvegf6p5IipQA81rY9",
+      "observed_at": "2026-11-05T19:45:24Z",
+      "match": {
+        "ticker": "CUBE",
+        "domain": "cubesmart.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "0FIBQAT4mmPvegf6p5IipQA81rY9",
+      "observed_at": "2026-11-05T19:45:24Z",
+      "match": {
+        "ticker": "CUBE",
+        "domain": "cubesmart.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "0FIBQAT4mmPvegf6p5IipQA81rY9",
+      "observed_at": "2026-11-05T19:45:24Z",
+      "match": {
+        "ticker": "CUBE",
+        "domain": "cubesmart.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "0FIBQAT4mmPvegf6p5IipQA81rY9",
+      "observed_at": "2026-11-05T19:45:24Z",
+      "match": {
+        "ticker": "CUBE",
+        "domain": "cubesmart.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "0FIBQAT4mmPvegf6p5IipQA81rY9",
+      "observed_at": "2026-11-05T19:45:24Z",
+      "match": {
+        "ticker": "CUBE",
+        "domain": "cubesmart.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "0FIBQAT4mmPvegf6p5IipQA81rY9",
+      "observed_at": "2026-11-05T19:45:24Z",
+      "match": {
+        "ticker": "CUBE",
+        "domain": "cubesmart.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:45:24Z",
+      "industry": "2026-11-05T19:45:24Z",
+      "headquarters": "2026-11-05T19:45:24Z",
+      "founded": "2026-11-05T19:45:24Z",
+      "professional_profile_count": "2026-11-05T19:45:24Z",
+      "employee_size_range": "2026-11-05T19:45:24Z",
+      "linkedin_url": "2026-11-05T19:45:24Z",
+      "description": "2026-11-05T19:45:24Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

@@ -1,4 +1,5 @@
 """Bounded bulk enrichment must be safe to resume after a paid timeout."""
+import copy
 import tempfile
 import unittest
 from pathlib import Path
@@ -7,6 +8,120 @@ from scripts.publish_company_profiles import validate_profile, merge_publication
 
 
 class BulkProfileTests(unittest.TestCase):
+    @staticmethod
+    def official_profile():
+        stamp = '2026-11-05T14:00:00Z'
+        return {'schema_version': 1, 'ticker': 'AAPL', 'cik': 320193,
+                'updated_at': stamp, 'coverage': {'status': 'official_sources', 'official_updated_at': stamp},
+                'sources': [{'name': 'Apple', 'url': 'https://apple.com/leadership', 'observed_at': stamp}],
+                'leadership': [{'name': 'Current Executive', 'role': 'Chief Executive Officer',
+                                'source_name': 'Apple', 'source_url': 'https://apple.com/leadership',
+                                'observed_at': stamp, 'photo_url': 'https://apple.com/old.jpg',
+                                'photo_source_url': 'https://apple.com/leadership'}]}
+
+    def test_same_roster_observation_preserves_more_recent_portrait_link_and_tenure_supplements(self):
+        previous = self.official_profile()
+        incoming = copy.deepcopy(previous)
+        incoming['updated_at'] = '2026-11-05T15:00:00Z'
+        incoming['leadership'][0].update(
+            photo_url='https://apple.com/new.jpg',
+            linkedin_url='https://www.linkedin.com/in/current-executive/',
+            linkedin_source_url='https://apple.com/executive',
+            start_date='2025-01', start_date_source_url='https://apple.com/appointment')
+        result = merge_publication(incoming, previous)
+        person = result['leadership'][0]
+        self.assertEqual(person.get('photo_url'), 'https://apple.com/new.jpg')
+        self.assertEqual(person.get('linkedin_url'), 'https://www.linkedin.com/in/current-executive/')
+        self.assertEqual(person.get('start_date'), '2025-01')
+        self.assertEqual(person['observed_at'], '2026-11-05T14:00:00Z')
+        # An older local file must not erase a newer published supplement either.
+        reverse = merge_publication(previous, incoming)
+        self.assertEqual(reverse['leadership'], result['leadership'])
+        self.assertEqual(reverse['updated_at'], '2026-11-05T15:00:00Z')
+        self.assertEqual(reverse['coverage']['official_updated_at'], '2026-11-05T14:00:00Z')
+
+    def test_more_recent_cache_timestamp_cannot_override_newer_role_evidence(self):
+        previous = self.official_profile()
+        previous['leadership'][0].update(name='New Executive', observed_at='2026-11-05T15:00:00Z')
+        previous['updated_at'] = '2026-11-05T15:00:00Z'
+        incoming = self.official_profile()
+        incoming['updated_at'] = '2026-11-05T16:00:00Z'
+        result = merge_publication(incoming, previous)
+        self.assertEqual(result['leadership'][0]['name'], 'New Executive')
+
+    def test_official_only_publication_retains_independently_sourced_provider_company_facts(self):
+        from tests.financials.test_company_profiles import ISSUER, COMPANY, NOW
+        from etl.company_profiles import build_profile, merge_official_profile
+        provider = build_profile(ISSUER, {**COMPANY, 'size': '10001+'}, observed_at=NOW)
+        mixed = merge_official_profile(provider, self.official_profile(), now=NOW)
+        for previous in (provider, mixed):
+            with self.subTest(status=previous['coverage']['status']):
+                incoming = self.official_profile()
+                incoming['updated_at'] = '2026-11-05T15:00:00Z'
+                result = merge_publication(incoming, previous)
+                self.assertEqual(result.get('professional_profile_count'), 201335)
+                self.assertEqual(result.get('headquarters'), 'Cupertino, California, United States')
+                self.assertEqual(result.get('linkedin_url'), 'https://linkedin.com/company/apple')
+                self.assertEqual(result.get('employee_size_range'), '10001+')
+                self.assertEqual(result.get('provider_record_id'), 'company-apple')
+                self.assertEqual(result.get('description_source', {}).get('name'), 'People Data Labs')
+                self.assertEqual(result.get('field_sources', {}).get('headquarters', {}).get('observed_at'), NOW)
+                self.assertEqual(result.get('professional_profile_count_source', {}).get('record_id'), 'company-apple')
+                self.assertEqual(result['coverage']['status'], 'official_with_provider_metadata')
+                self.assertEqual({s['name'] for s in result['sources']}, {'Apple', 'People Data Labs'})
+                self.assertIsNone(result.get('employees'))
+                self.assertEqual(result['leadership'][0]['name'], 'Current Executive')
+
+    def test_provider_fallback_cannot_replace_official_facts_or_new_provider_facts(self):
+        from tests.financials.test_company_profiles import ISSUER, COMPANY, NOW
+        from etl.company_profiles import build_profile, merge_official_profile
+        previous = build_profile(ISSUER, COMPANY, observed_at=NOW)
+        incoming = self.official_profile()
+        incoming['headquarters'] = 'Official headquarters'
+        incoming['field_sources'] = {'headquarters': incoming['sources'][0]}
+        result = merge_publication(incoming, previous)
+        self.assertEqual(result['headquarters'], 'Official headquarters')
+        self.assertEqual(result['field_sources']['headquarters']['name'], 'Apple')
+        new_provider = build_profile(ISSUER, {**COMPANY, 'employee_count': 123456},
+                                     observed_at='2026-11-05T15:00:00Z')
+        old_mixed = merge_official_profile(previous, self.official_profile(), now=NOW)
+        result = merge_publication(new_provider, old_mixed)
+        self.assertEqual(result['professional_profile_count'], 123456)
+        self.assertEqual(result['professional_profile_count_source']['observed_at'], '2026-11-05T15:00:00Z')
+
+    def test_duplicate_provider_titles_with_one_current_linkedin_url_are_unambiguous(self):
+        from tests.financials.test_company_profiles import ISSUER, COMPANY, PERSON, NOW
+        from etl.company_profiles import build_profile, merge_official_profile, sanitize_leadership
+        records = [{**PERSON, 'full_name': 'Current Executive', 'job_title': 'CEO'},
+                   {**PERSON, 'full_name': 'Current Executive', 'job_title': 'Chairman and CEO',
+                    'job_last_verified': '2026-11-01'}]
+        candidates = sanitize_leadership(records, 'company-apple', NOW, expected_domain='apple.com')
+        result = merge_official_profile(build_profile(ISSUER, COMPANY, observed_at=NOW),
+                                        self.official_profile(), now=NOW, provider_people=candidates)
+        person = result['leadership'][0]
+        self.assertEqual(person.get('linkedin_url'), 'https://linkedin.com/in/example-executive')
+        self.assertEqual(person['linkedin_source']['provider_verified_at'], '2026-11-01')
+        self.assertEqual(person['role'], 'Chief Executive Officer')
+
+    def test_provider_linkedin_deduplication_rejects_conflicts_and_keeps_identity_guards(self):
+        from tests.financials.test_company_profiles import ISSUER, COMPANY, PERSON, NOW
+        from etl.company_profiles import build_profile, merge_official_profile, sanitize_leadership
+        ceo = {**PERSON, 'full_name': 'Current Executive', 'job_title': 'CEO'}
+        chairman = {**ceo, 'job_title': 'Chairman and CEO'}
+        cases = [
+            [ceo, {**chairman, 'linkedin_url': 'https://linkedin.com/in/a-different-person'}],
+            [{**ceo, 'job_company_id': 'another-company'}, {**chairman, 'job_company_id': 'another-company'}],
+            [{**ceo, 'full_name': 'Another Executive'}, {**chairman, 'full_name': 'Another Executive'}],
+            [{**ceo, 'job_title': 'CFO'}, {**chairman, 'job_title': 'EVP and CFO'}],
+            [{**ceo, 'job_last_verified': '2025-01-01'}, {**chairman, 'job_last_verified': '2025-01-01'}],
+        ]
+        for records in cases:
+            with self.subTest(records=records):
+                candidates = sanitize_leadership(records, 'company-apple', NOW, expected_domain='apple.com')
+                result = merge_official_profile(build_profile(ISSUER, COMPANY, observed_at=NOW),
+                                                self.official_profile(), now=NOW, provider_people=candidates)
+                self.assertIsNone(result['leadership'][0].get('linkedin_url'))
+
     def test_uncertain_paid_transport_is_reserved_and_never_automatically_replayed(self):
         calls = []
         def failed(*args):
@@ -87,6 +202,7 @@ class BulkProfileTests(unittest.TestCase):
 
     def test_publication_rejects_unsourced_tenure_and_portraits_before_writing(self):
         profile = {'ticker': 'AAPL', 'cik': 320193, 'schema_version': 1, 'updated_at': '2026-11-05',
+                   'coverage': {'status': 'official_sources'},
                    'sources': [{'url': 'https://apple.com/leadership'}], 'leadership': [
                        {'name': 'Example Executive', 'role': 'CEO', 'source_url': 'https://apple.com/leadership',
                         'start_date': '2020'}]}
@@ -101,6 +217,13 @@ class BulkProfileTests(unittest.TestCase):
         self.assertIs(validate_profile(profile), profile)
         leader['start_date'] = '2027'
         with self.assertRaisesRegex(ValueError, 'future'):
+            validate_profile(profile)
+
+    def test_sourced_leaders_with_provider_only_coverage_are_rejected_instead_of_silently_lost(self):
+        profile={'schema_version':1,'ticker':'AAPL','cik':320193,'updated_at':'2026-11-05',
+                 'coverage':{'status':'provider_enriched'},'sources':[{'name':'Apple','url':'https://apple.com/leadership'}],
+                 'leadership':[{'name':'Official Executive','role':'CEO','source_url':'https://apple.com/leadership'}]}
+        with self.assertRaisesRegex(ValueError,'official coverage status'):
             validate_profile(profile)
 
 

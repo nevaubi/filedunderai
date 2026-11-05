@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "ticker": "TXRH",
+  "cik": 1289460,
+  "name": "Texas Roadhouse, Inc.",
+  "description": "it all began on february 17, 1993, when after years of dreaming, planning, and hard, hard work, kent taylor opened the first texas roadhouse in clarksville, indiana. kent’s goal was to own not just a family restaurant and not just a steak restaurant, but a place where everyone, of all ages, could come and have a great meal and great fun for a great price.\n\nwe’ve got the great meal part down. in fact, we like to consider our food more than great. we think its legendary. hand-cut steaks, award-winning fall-off-the-bone ribs, fresh-baked bread, and made-from-scratch sides are the standard at texas roadhouse. \n\nwe're more than just a steakhouse. we're a family restaurant. and, we believe our family is every member of every community that has a texas roadhouse.  we love being a part of our communities, which is why you're likely to see our roadies and andy the armadillo out and about! \n\nour legendary benefits include: medical, dental and vision insurance, 401(k) retirement plan, short and long-term disability coverage, life insurance, flexible spending accounts, paid vacation, stock incentive program, tuition reimbursement and best of all…growth!\n\nwe love our workplace, and we love what we do. it’s that love that shows up each and every night to engage, entertain, and excite our guests. and it’s why we’re so happy to invite you to bring your friends and family in for a great meal and a good time!\n\nwe are proud to be an equal opportunity employer.  we are committed to providing equal employment opportunities to all employees and applicants for employment without regard to race, color, religion, age, gender, gender identity, disability, veteran status, sexual orientation, citizenship, national origin, or any other legally-protected status.  we encourage and welcome applicants of all ages to apply.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "XS9Ct4CM7WaU5CrN1xs09wYXKddJ",
+    "observed_at": "2026-11-05T19:44:39Z",
+    "match": {
+      "ticker": "TXRH",
+      "domain": "texasroadhouse.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 9
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+  "website": "https://texasroadhouse.com",
+  "industry": "Restaurants",
+  "headquarters": "Louisville, Kentucky, United States",
+  "linkedin_url": "https://linkedin.com/company/texas-roadhouse",
+  "founded": 1993,
+  "employees": null,
+  "professional_profile_count": 12385,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+    "record_id": "XS9Ct4CM7WaU5CrN1xs09wYXKddJ",
+    "observed_at": "2026-11-05T19:44:39Z",
+    "match": {
+      "ticker": "TXRH",
+      "domain": "texasroadhouse.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "likelihood": 9
+    }
+  },
+  "provider_record_id": "XS9Ct4CM7WaU5CrN1xs09wYXKddJ",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "XS9Ct4CM7WaU5CrN1xs09wYXKddJ",
+      "observed_at": "2026-11-05T19:44:39Z",
+      "match": {
+        "ticker": "TXRH",
+        "domain": "texasroadhouse.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:44:39Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "XS9Ct4CM7WaU5CrN1xs09wYXKddJ",
+      "observed_at": "2026-11-05T19:44:39Z",
+      "match": {
+        "ticker": "TXRH",
+        "domain": "texasroadhouse.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "XS9Ct4CM7WaU5CrN1xs09wYXKddJ",
+      "observed_at": "2026-11-05T19:44:39Z",
+      "match": {
+        "ticker": "TXRH",
+        "domain": "texasroadhouse.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "XS9Ct4CM7WaU5CrN1xs09wYXKddJ",
+      "observed_at": "2026-11-05T19:44:39Z",
+      "match": {
+        "ticker": "TXRH",
+        "domain": "texasroadhouse.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "XS9Ct4CM7WaU5CrN1xs09wYXKddJ",
+      "observed_at": "2026-11-05T19:44:39Z",
+      "match": {
+        "ticker": "TXRH",
+        "domain": "texasroadhouse.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "XS9Ct4CM7WaU5CrN1xs09wYXKddJ",
+      "observed_at": "2026-11-05T19:44:39Z",
+      "match": {
+        "ticker": "TXRH",
+        "domain": "texasroadhouse.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "XS9Ct4CM7WaU5CrN1xs09wYXKddJ",
+      "observed_at": "2026-11-05T19:44:39Z",
+      "match": {
+        "ticker": "TXRH",
+        "domain": "texasroadhouse.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-enrichment-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/enrich",
+      "record_id": "XS9Ct4CM7WaU5CrN1xs09wYXKddJ",
+      "observed_at": "2026-11-05T19:44:39Z",
+      "match": {
+        "ticker": "TXRH",
+        "domain": "texasroadhouse.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "likelihood": 9
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "available",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:44:39Z",
+      "industry": "2026-11-05T19:44:39Z",
+      "headquarters": "2026-11-05T19:44:39Z",
+      "founded": "2026-11-05T19:44:39Z",
+      "professional_profile_count": "2026-11-05T19:44:39Z",
+      "employee_size_range": "2026-11-05T19:44:39Z",
+      "linkedin_url": "2026-11-05T19:44:39Z",
+      "description": "2026-11-05T19:44:39Z"
+    }
+  },
+  "description_provider": "People Data Labs"
+}

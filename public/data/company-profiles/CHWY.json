@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "CHWY",
+  "cik": 1766502,
+  "name": "Chewy, Inc.",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://chewy.com",
+  "industry": "retail",
+  "headquarters": "plantation, florida, united states",
+  "linkedin_url": "https://linkedin.com/company/chewy-com",
+  "founded": 2011,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "4kgyYOI7tJuZnT5KFh44gAsVL1th",
+    "observed_at": "2026-11-05T19:58:22Z",
+    "match": {
+      "ticker": "CHWY",
+      "domain": "chewy.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.2963824437366258
+    }
+  },
+  "provider_record_id": "4kgyYOI7tJuZnT5KFh44gAsVL1th",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "4kgyYOI7tJuZnT5KFh44gAsVL1th",
+      "observed_at": "2026-11-05T19:58:22Z",
+      "match": {
+        "ticker": "CHWY",
+        "domain": "chewy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2963824437366258
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T19:58:22Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "4kgyYOI7tJuZnT5KFh44gAsVL1th",
+      "observed_at": "2026-11-05T19:58:22Z",
+      "match": {
+        "ticker": "CHWY",
+        "domain": "chewy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2963824437366258
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "4kgyYOI7tJuZnT5KFh44gAsVL1th",
+      "observed_at": "2026-11-05T19:58:22Z",
+      "match": {
+        "ticker": "CHWY",
+        "domain": "chewy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2963824437366258
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "4kgyYOI7tJuZnT5KFh44gAsVL1th",
+      "observed_at": "2026-11-05T19:58:22Z",
+      "match": {
+        "ticker": "CHWY",
+        "domain": "chewy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2963824437366258
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "4kgyYOI7tJuZnT5KFh44gAsVL1th",
+      "observed_at": "2026-11-05T19:58:22Z",
+      "match": {
+        "ticker": "CHWY",
+        "domain": "chewy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2963824437366258
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "4kgyYOI7tJuZnT5KFh44gAsVL1th",
+      "observed_at": "2026-11-05T19:58:22Z",
+      "match": {
+        "ticker": "CHWY",
+        "domain": "chewy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2963824437366258
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "4kgyYOI7tJuZnT5KFh44gAsVL1th",
+      "observed_at": "2026-11-05T19:58:22Z",
+      "match": {
+        "ticker": "CHWY",
+        "domain": "chewy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2963824437366258
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "4kgyYOI7tJuZnT5KFh44gAsVL1th",
+      "observed_at": "2026-11-05T19:58:22Z",
+      "match": {
+        "ticker": "CHWY",
+        "domain": "chewy.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2963824437366258
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:58:22Z",
+      "industry": "2026-11-05T19:58:22Z",
+      "headquarters": "2026-11-05T19:58:22Z",
+      "founded": "2026-11-05T19:58:22Z",
+      "employee_size_range": "2026-11-05T19:58:22Z",
+      "linkedin_url": "2026-11-05T19:58:22Z"
+    }
+  }
+}

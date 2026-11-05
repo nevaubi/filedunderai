@@ -25,11 +25,15 @@
       "source_name": "Official biography",
       "observed_at": "2026-11-05T14:47:29Z",
       "group": "Executive leadership",
-      "photo_url": "https://s2.q4cdn.com/299287126/files/images/new-headshots/Andy-Jassy.jpg",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/79a4ca749d9b95e8fded3b04.jpg",
       "photo_source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=be0a9875-4456-4f84-b4d9-ec2e4b97d1d8",
       "photo_credit": "Amazon",
       "start_date_source_url": "https://www.sec.gov/Archives/edgar/data/1018724/000110465926041026/tm261382-1_def14a.htm",
-      "tenure_note": "The official source specifies the start month; no exact start day is recorded."
+      "tenure_note": "The official source specifies the start month; no exact start day is recorded.",
+      "photo_original_url": "https://s2.q4cdn.com/299287126/files/images/new-headshots/Andy-Jassy.jpg",
+      "photo_sha256": "b50d0bdb0c81fcda256070a44db3d67e13f932618120c8ce3518fb2e3585f220",
+      "photo_cached_at": "2026-11-05T19:56:27Z",
+      "photo_status": "cached_and_verified"
     },
     {
       "name": "Brian T. Olsavsky",
@@ -40,11 +44,15 @@
       "source_name": "Official biography",
       "observed_at": "2026-11-05T14:47:29Z",
       "group": "Executive leadership",
-      "photo_url": "https://s2.q4cdn.com/299287126/files/images/board/brianolsavsky-67_240x240.jpg",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/acc159067539f1fac2b7c919.jpg",
       "photo_source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=759d328e-1f4c-489c-8fc8-ceb5122b9ffa",
       "photo_credit": "Amazon",
       "start_date_source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=759d328e-1f4c-489c-8fc8-ceb5122b9ffa",
-      "tenure_note": "The official source specifies the start month; no exact start day is recorded."
+      "tenure_note": "The official source specifies the start month; no exact start day is recorded.",
+      "photo_original_url": "https://s2.q4cdn.com/299287126/files/images/board/brianolsavsky-67_240x240.jpg",
+      "photo_sha256": "f27cd0f5c1967e576bea2fec9db98b823809caa71b6b76acab3037ee761fa8ed",
+      "photo_cached_at": "2026-11-05T19:56:27Z",
+      "photo_status": "cached_and_verified"
     },
     {
       "name": "Matt Garman",
@@ -55,11 +63,15 @@
       "source_name": "Official biography",
       "observed_at": "2026-11-05T14:47:29Z",
       "group": "Executive leadership",
-      "photo_url": "https://s2.q4cdn.com/299287126/files/images/officers/2024/matt-garman-9255_new-1.jpg",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/90d374aa6236b438e4430e49.jpg",
       "photo_source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=80f6622c-efcb-4cce-94a7-591fb3d9a335",
       "photo_credit": "Amazon",
       "start_date_source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=80f6622c-efcb-4cce-94a7-591fb3d9a335",
-      "tenure_note": "The official source specifies the start month; no exact start day is recorded."
+      "tenure_note": "The official source specifies the start month; no exact start day is recorded.",
+      "photo_original_url": "https://s2.q4cdn.com/299287126/files/images/officers/2024/matt-garman-9255_new-1.jpg",
+      "photo_sha256": "9a464cee7bcf45711f77383e0c0b99c805b49651eb8c0898d6350c2e93df9441",
+      "photo_cached_at": "2026-11-05T19:56:30Z",
+      "photo_status": "cached_and_verified"
     },
     {
       "name": "Douglas J. Herrington",
@@ -70,11 +82,15 @@
       "source_name": "Official biography",
       "observed_at": "2026-11-05T14:47:29Z",
       "group": "Executive leadership",
-      "photo_url": "https://s2.q4cdn.com/299287126/files/images/officers/Doug-Herrington.jpg",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/4cbb804177f06adf1b3a82f4.jpg",
       "photo_source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=4d8fda8f-d06c-433d-8693-5b7dba137ffa",
       "photo_credit": "Amazon",
       "start_date_source_url": "https://ir.aboutamazon.com/officers-and-directors/person-details/default.aspx?ItemId=4d8fda8f-d06c-433d-8693-5b7dba137ffa",
-      "tenure_note": "The official source specifies the start month; no exact start day is recorded."
+      "tenure_note": "The official source specifies the start month; no exact start day is recorded.",
+      "photo_original_url": "https://s2.q4cdn.com/299287126/files/images/officers/Doug-Herrington.jpg",
+      "photo_sha256": "c1ebd36da52046d805559956eabee376394aba03a7cd1320f45b2485c3375881",
+      "photo_cached_at": "2026-11-05T19:56:30Z",
+      "photo_status": "cached_and_verified"
     }
   ],
   "images": [
@@ -132,7 +148,7 @@
       "observed_at": "2026-11-05T14:47:29Z"
     }
   ],
-  "updated_at": "2026-11-05T14:47:29Z",
+  "updated_at": "2026-11-05T20:24:21Z",
   "field_sources": {
     "description": {
       "name": "Amazon business overview",
@@ -169,8 +185,7 @@
       "website": "2026-11-05T14:47:29Z",
       "headquarters": "2026-11-05T14:47:29Z",
       "founded": "2026-11-05T14:47:29Z",
-      "leadership": "2026-11-05T14:47:29Z",
-      "images": "2026-11-05T14:47:29Z"
+      "leadership": "2026-11-05T14:47:29Z"
     },
     "portraits": "available_for_all_selected_leaders"
   }

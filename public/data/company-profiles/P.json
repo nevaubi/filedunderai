@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "ticker": "P",
+  "cik": 1474432,
+  "name": "Everpure",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://everpuredata.com",
+  "industry": "internet",
+  "headquarters": null,
+  "linkedin_url": "https://linkedin.com/company/everpure-data",
+  "founded": null,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "1-10",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "LqYcZgMFvmc6I02sBmsF6g94qeOM",
+    "observed_at": "2026-11-05T20:05:59Z",
+    "match": {
+      "ticker": "P",
+      "domain": "everpuredata.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 1.2663930409112638
+    }
+  },
+  "provider_record_id": "LqYcZgMFvmc6I02sBmsF6g94qeOM",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "LqYcZgMFvmc6I02sBmsF6g94qeOM",
+      "observed_at": "2026-11-05T20:05:59Z",
+      "match": {
+        "ticker": "P",
+        "domain": "everpuredata.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2663930409112638
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:05:59Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "LqYcZgMFvmc6I02sBmsF6g94qeOM",
+      "observed_at": "2026-11-05T20:05:59Z",
+      "match": {
+        "ticker": "P",
+        "domain": "everpuredata.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2663930409112638
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "LqYcZgMFvmc6I02sBmsF6g94qeOM",
+      "observed_at": "2026-11-05T20:05:59Z",
+      "match": {
+        "ticker": "P",
+        "domain": "everpuredata.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2663930409112638
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "LqYcZgMFvmc6I02sBmsF6g94qeOM",
+      "observed_at": "2026-11-05T20:05:59Z",
+      "match": {
+        "ticker": "P",
+        "domain": "everpuredata.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2663930409112638
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "LqYcZgMFvmc6I02sBmsF6g94qeOM",
+      "observed_at": "2026-11-05T20:05:59Z",
+      "match": {
+        "ticker": "P",
+        "domain": "everpuredata.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2663930409112638
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "LqYcZgMFvmc6I02sBmsF6g94qeOM",
+      "observed_at": "2026-11-05T20:05:59Z",
+      "match": {
+        "ticker": "P",
+        "domain": "everpuredata.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2663930409112638
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "LqYcZgMFvmc6I02sBmsF6g94qeOM",
+      "observed_at": "2026-11-05T20:05:59Z",
+      "match": {
+        "ticker": "P",
+        "domain": "everpuredata.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2663930409112638
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "LqYcZgMFvmc6I02sBmsF6g94qeOM",
+      "observed_at": "2026-11-05T20:05:59Z",
+      "match": {
+        "ticker": "P",
+        "domain": "everpuredata.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 1.2663930409112638
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:05:59Z",
+      "industry": "2026-11-05T20:05:59Z",
+      "employee_size_range": "2026-11-05T20:05:59Z",
+      "linkedin_url": "2026-11-05T20:05:59Z"
+    }
+  }
+}

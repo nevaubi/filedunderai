@@ -1,0 +1,360 @@
+{
+  "schema_version": 1,
+  "ticker": "MET",
+  "cik": 1099219,
+  "name": "MetLife",
+  "description": "we live in a time of unprecedented change. a time when economies, regulations, and social safety nets are all in flux.\n\ncustomers around the globe have told us they’re overwhelmed by the pace of change and are looking for a trusted partner to help them manage life’s twists and turns.\n\nmetlife is committed to being that partner. that’s why we’re transforming our business: delivering greater value for the people we serve by becoming a simpler, more focused, and future-facing company. we’ll be introducing new ways to meet our customers’ evolving needs, with flexible products; simpler, more intuitive experiences and a range of new services. \n\nmetlife. navigating life together.\n\nfor customer service: https://www.metlife.com/support-and-manage/contact-us/\n\nfor social media notices: https://www.metlife.com/about-us/terms-and-conditions/social-media/\n\nmetlife, inc. (nyse: met), through its subsidiaries and affiliates (“metlife”), is one of the world’s leading financial services companies, providing insurance, annuities, employee benefits and asset management to help its individual and institutional customers navigate their changing world. founded in 1868, metlife has operations in more than 40 markets globally and holds leading positions in the united states, japan, latin america, asia, europe and the middle east.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "NCIzU6ce0aOhT5EsIyISegCtlmrv",
+    "observed_at": "2026-11-05T19:43:20Z",
+    "match": {
+      "ticker": "MET",
+      "domain": "metlife.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://metlife.com",
+  "industry": "Insurance",
+  "headquarters": "New York, New York, United States",
+  "linkedin_url": "https://linkedin.com/company/metlife",
+  "founded": 1868,
+  "employees": null,
+  "professional_profile_count": 39152,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "NCIzU6ce0aOhT5EsIyISegCtlmrv",
+    "observed_at": "2026-11-05T19:43:20Z",
+    "match": {
+      "ticker": "MET",
+      "domain": "metlife.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "NCIzU6ce0aOhT5EsIyISegCtlmrv",
+  "leadership": [
+    {
+      "name": "Michel A. Khalaf",
+      "role": "President and Chief Executive Officer",
+      "profile_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/michel-a-khalaf/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/1b76f39dfeca75ceb210362e.webp",
+      "start_date": null,
+      "source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "photo_credit": "MetLife",
+      "photo_original_url": "https://www.metlife.com/content/dam/metlifecom/us/homepage/metlife-global/executive-leadership-team/landscape/michel-a-khalaf.webp",
+      "photo_sha256": "28e11cdd9ddf95226fc5359e24d47b09cb4e6e7649dbab8b98c3c5c7674f838c",
+      "photo_cached_at": "2026-11-05T20:34:10Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Eric Clurfain",
+      "role": "Regional President, Latin America",
+      "profile_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/eric-clurfain/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/d3c0b5b598c4f71314333a7b.webp",
+      "start_date": null,
+      "source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "photo_credit": "MetLife",
+      "photo_original_url": "https://www.metlife.com/content/dam/metlifecom/us/homepage/metlife-global/executive-leadership-team/landscape/eric-clurfain.webp",
+      "photo_sha256": "8d4365a6f0afa0ccd4746e6f3ed527382be23208ee7469371cd2fde936b52085",
+      "photo_cached_at": "2026-11-05T20:33:56Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Monica M. Curtis",
+      "role": "Executive Vice President, Chief Legal Officer, and Head of Government Relations",
+      "profile_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/monica-m-curtis/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/72798dd83871d5162a36d783.webp",
+      "start_date": null,
+      "source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "photo_credit": "MetLife",
+      "photo_original_url": "https://www.metlife.com/content/dam/metlifecom/us/homepage/metlife-global/executive-leadership-team/landscape/monica-m-curtis.webp",
+      "photo_sha256": "733cb93a0d26a4d15a2bfb472868b3ac5d5d5943892cdc9a349056274893c55a",
+      "photo_cached_at": "2026-11-05T20:34:10Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Marlene Debel",
+      "role": "Executive Vice President, Chief Risk Officer and Head of MetLife Insurance Investments",
+      "profile_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/marlene-debel/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/b3727884f3929f5808faa882.webp",
+      "start_date": null,
+      "source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "photo_credit": "MetLife",
+      "photo_original_url": "https://www.metlife.com/content/dam/metlifecom/us/homepage/metlife-global/executive-leadership-team/landscape/marlene-debel.webp",
+      "photo_sha256": "7f6bce529851b5fa5006da6d486ed52a0bb42dad90e5bab06f9db2a813e8031a",
+      "photo_cached_at": "2026-11-05T20:34:10Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Nuria Garcia",
+      "role": "Regional President, Europe, Middle East & Africa (EMEA), and Head of Global Sustainability",
+      "profile_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/nuria-garcia/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/68926c714cacf4461b4ce22d.webp",
+      "start_date": null,
+      "source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "photo_credit": "MetLife",
+      "photo_original_url": "https://www.metlife.com/content/dam/metlifecom/us/homepage/metlife-global/executive-leadership-team/landscape/nuria-garcia.webp",
+      "photo_sha256": "a0e6967f3d5e0f168fb076074a80680be25a41e8edf4b1341d8de0b0d5211434",
+      "photo_cached_at": "2026-11-05T20:34:26Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "John D. McCallion",
+      "role": "Executive Vice President and Chief Financial Officer, MetLife, Inc., and Head of MetLife Investment Management",
+      "profile_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/john-d-mccallion/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/b8776e05f68147af542860dd.webp",
+      "start_date": null,
+      "source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "photo_credit": "MetLife",
+      "photo_original_url": "https://www.metlife.com/content/dam/metlifecom/us/homepage/metlife-global/executive-leadership-team/landscape/john-d-mccallion.webp",
+      "photo_sha256": "a5bac0e319eab00d4db9a97c35c945400af49fc888f024ef28f9e72108256d9e",
+      "photo_cached_at": "2026-11-05T20:33:56Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Lyndon Oliver",
+      "role": "Regional President, Asia",
+      "profile_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/lyndon-oliver/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/3e184fd857c381a07e4e65bf.webp",
+      "start_date": null,
+      "source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "photo_credit": "MetLife",
+      "photo_original_url": "https://www.metlife.com/content/dam/metlifecom/us/homepage/metlife-global/executive-leadership-team/landscape/lyndon-oliver.webp",
+      "photo_sha256": "e90544ff8046ddf4fe1fbf3c67a50ed54d605b0ad390b3dcf5b30bd0b530ad3a",
+      "photo_cached_at": "2026-11-05T20:34:10Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Bill Pappas",
+      "role": "Executive Vice President and Head of Global Technology and Operations",
+      "profile_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/bill-pappas/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/997d87b53c7f437227584e87.webp",
+      "start_date": null,
+      "source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "photo_credit": "MetLife",
+      "photo_original_url": "https://www.metlife.com/content/dam/metlifecom/us/homepage/metlife-global/executive-leadership-team/landscape/bill-pappas.webp",
+      "photo_sha256": "4073f24fa3febb76dcdfd2b5b141ed6b3ceac2b109a321f112299c41933455c7",
+      "photo_cached_at": "2026-11-05T20:33:56Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Michael Roberts",
+      "role": "Executive Vice President, Chief Marketing and Communications Officer",
+      "profile_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/michael-roberts/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/fb2e355820ca891a2b7e57af.webp",
+      "start_date": null,
+      "source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "photo_credit": "MetLife",
+      "photo_original_url": "https://www.metlife.com/content/dam/metlifecom/us/homepage/metlife-global/executive-leadership-team/landscape/Michael-Roberts-MetLife_CMCO.png",
+      "photo_sha256": "6a48c10fbb48729ee748d674eb673f3dbcb49faafdd5edc105ebb56e30c9fa92",
+      "photo_cached_at": "2026-11-05T20:33:56Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Shurawl Sibblies",
+      "role": "Executive Vice President and Chief Human Resources Officer",
+      "profile_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/shurawl-sibblies/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/43086ccaf5d037e201ea9bf5.webp",
+      "start_date": null,
+      "source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "photo_credit": "MetLife",
+      "photo_original_url": "https://www.metlife.com/content/dam/metlifecom/us/homepage/metlife-global/executive-leadership-team/landscape/shurawl-sibblies.webp",
+      "photo_sha256": "1b28deeed2d902f6529c5f0704b45a86d1a82137ed4f7bc4f3915a09f110cc24",
+      "photo_cached_at": "2026-11-05T20:34:26Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Ramy Tadros",
+      "role": "Regional President, U.S. Business, and Head of MetLife Holdings",
+      "profile_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/ramy-tadros/",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/9b5eefabd46cd9f7c1a27888.webp",
+      "start_date": null,
+      "source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:20:23Z",
+      "group": "Executive leadership",
+      "photo_source_url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "photo_credit": "MetLife",
+      "photo_original_url": "https://www.metlife.com/content/dam/metlifecom/us/homepage/metlife-global/executive-leadership-team/landscape/ramy-tadros.webp",
+      "photo_sha256": "ca9796fdbb865e6380e2ca5449fafca388ad4d05c7c21c0d85fec14943fb2ce1",
+      "photo_cached_at": "2026-11-05T20:34:26Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "NCIzU6ce0aOhT5EsIyISegCtlmrv",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MET",
+        "domain": "metlife.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    {
+      "name": "MetLife official leadership roster",
+      "url": "https://www.metlife.com/global/company/corporate-profile/corporate-governance-leadership/team/",
+      "observed_at": "2026-11-05T20:20:23Z"
+    }
+  ],
+  "updated_at": "2026-11-05T20:36:53Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "NCIzU6ce0aOhT5EsIyISegCtlmrv",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MET",
+        "domain": "metlife.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "NCIzU6ce0aOhT5EsIyISegCtlmrv",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MET",
+        "domain": "metlife.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "NCIzU6ce0aOhT5EsIyISegCtlmrv",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MET",
+        "domain": "metlife.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "NCIzU6ce0aOhT5EsIyISegCtlmrv",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MET",
+        "domain": "metlife.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "NCIzU6ce0aOhT5EsIyISegCtlmrv",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MET",
+        "domain": "metlife.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "NCIzU6ce0aOhT5EsIyISegCtlmrv",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MET",
+        "domain": "metlife.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "NCIzU6ce0aOhT5EsIyISegCtlmrv",
+      "observed_at": "2026-11-05T19:43:20Z",
+      "match": {
+        "ticker": "MET",
+        "domain": "metlife.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "description": "available",
+    "leadership": "official_sources",
+    "images": "unavailable",
+    "leadership_scope": "Current official leadership roster; published regional and subsidiary role scopes are retained. Non-executive directors and memorial entries are excluded.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:20Z",
+      "industry": "2026-11-05T19:43:20Z",
+      "headquarters": "2026-11-05T19:43:20Z",
+      "founded": "2026-11-05T19:43:20Z",
+      "professional_profile_count": "2026-11-05T19:43:20Z",
+      "employee_size_range": "2026-11-05T19:43:20Z",
+      "linkedin_url": "2026-11-05T19:43:20Z",
+      "description": "2026-11-05T19:43:20Z",
+      "leadership": "2026-11-05T20:20:23Z"
+    },
+    "official_updated_at": "2026-11-05T20:20:23Z",
+    "portraits": "available_for_all_selected_leaders"
+  },
+  "description_provider": "People Data Labs"
+}

@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "ticker": "WM",
+  "cik": 823768,
+  "name": "Waste Management",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://wm.com",
+  "industry": "environmental services",
+  "headquarters": "houston, texas, united states",
+  "linkedin_url": "https://linkedin.com/company/waste-management",
+  "founded": 1894,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "94CuP8PiFmdzfheIKiliAweGt9A6",
+    "observed_at": "2026-11-05T20:10:21Z",
+    "match": {
+      "ticker": "WM",
+      "domain": "wm.com",
+      "basis": "ticker_and_verified_domain",
+      "domain_source": {
+        "name": "Official issuer domain verification",
+        "url": "https://www.wm.com/us/en/support/faqs/community-involvement/is-waste-management-publicly-traded",
+        "observed_at": "2026-11-05T20:15:15Z",
+        "reason": "The official WM company FAQ confirms that its publicly traded stock uses ticker WM, corroborating the WM brand on wm.com."
+      },
+      "provider_fuzzy_match": true,
+      "provider_score": 1.1125030593777638
+    }
+  },
+  "provider_record_id": "94CuP8PiFmdzfheIKiliAweGt9A6",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "94CuP8PiFmdzfheIKiliAweGt9A6",
+      "observed_at": "2026-11-05T20:10:21Z",
+      "match": {
+        "ticker": "WM",
+        "domain": "wm.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.wm.com/us/en/support/faqs/community-involvement/is-waste-management-publicly-traded",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official WM company FAQ confirms that its publicly traded stock uses ticker WM, corroborating the WM brand on wm.com."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.1125030593777638
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:10:21Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "94CuP8PiFmdzfheIKiliAweGt9A6",
+      "observed_at": "2026-11-05T20:10:21Z",
+      "match": {
+        "ticker": "WM",
+        "domain": "wm.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.wm.com/us/en/support/faqs/community-involvement/is-waste-management-publicly-traded",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official WM company FAQ confirms that its publicly traded stock uses ticker WM, corroborating the WM brand on wm.com."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.1125030593777638
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "94CuP8PiFmdzfheIKiliAweGt9A6",
+      "observed_at": "2026-11-05T20:10:21Z",
+      "match": {
+        "ticker": "WM",
+        "domain": "wm.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.wm.com/us/en/support/faqs/community-involvement/is-waste-management-publicly-traded",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official WM company FAQ confirms that its publicly traded stock uses ticker WM, corroborating the WM brand on wm.com."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.1125030593777638
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "94CuP8PiFmdzfheIKiliAweGt9A6",
+      "observed_at": "2026-11-05T20:10:21Z",
+      "match": {
+        "ticker": "WM",
+        "domain": "wm.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.wm.com/us/en/support/faqs/community-involvement/is-waste-management-publicly-traded",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official WM company FAQ confirms that its publicly traded stock uses ticker WM, corroborating the WM brand on wm.com."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.1125030593777638
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "94CuP8PiFmdzfheIKiliAweGt9A6",
+      "observed_at": "2026-11-05T20:10:21Z",
+      "match": {
+        "ticker": "WM",
+        "domain": "wm.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.wm.com/us/en/support/faqs/community-involvement/is-waste-management-publicly-traded",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official WM company FAQ confirms that its publicly traded stock uses ticker WM, corroborating the WM brand on wm.com."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.1125030593777638
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "94CuP8PiFmdzfheIKiliAweGt9A6",
+      "observed_at": "2026-11-05T20:10:21Z",
+      "match": {
+        "ticker": "WM",
+        "domain": "wm.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.wm.com/us/en/support/faqs/community-involvement/is-waste-management-publicly-traded",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official WM company FAQ confirms that its publicly traded stock uses ticker WM, corroborating the WM brand on wm.com."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.1125030593777638
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "94CuP8PiFmdzfheIKiliAweGt9A6",
+      "observed_at": "2026-11-05T20:10:21Z",
+      "match": {
+        "ticker": "WM",
+        "domain": "wm.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.wm.com/us/en/support/faqs/community-involvement/is-waste-management-publicly-traded",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official WM company FAQ confirms that its publicly traded stock uses ticker WM, corroborating the WM brand on wm.com."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.1125030593777638
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "94CuP8PiFmdzfheIKiliAweGt9A6",
+      "observed_at": "2026-11-05T20:10:21Z",
+      "match": {
+        "ticker": "WM",
+        "domain": "wm.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.wm.com/us/en/support/faqs/community-involvement/is-waste-management-publicly-traded",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "The official WM company FAQ confirms that its publicly traded stock uses ticker WM, corroborating the WM brand on wm.com."
+        },
+        "provider_fuzzy_match": true,
+        "provider_score": 1.1125030593777638
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:10:21Z",
+      "industry": "2026-11-05T20:10:21Z",
+      "headquarters": "2026-11-05T20:10:21Z",
+      "founded": "2026-11-05T20:10:21Z",
+      "employee_size_range": "2026-11-05T20:10:21Z",
+      "linkedin_url": "2026-11-05T20:10:21Z"
+    }
+  }
+}

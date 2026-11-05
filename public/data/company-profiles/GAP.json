@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "ticker": "GAP",
+  "cik": 39911,
+  "name": "GAP INC",
+  "description": null,
+  "description_source": null,
+  "source_url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+  "website": "https://gapinc.com",
+  "industry": "retail",
+  "headquarters": "san francisco, california, united states",
+  "linkedin_url": "https://linkedin.com/company/gap-inc-",
+  "founded": 1969,
+  "employees": null,
+  "professional_profile_count": null,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+    "record_id": "5lKdsskqdpUoMucZdlhiQgu3udXM",
+    "observed_at": "2026-11-05T20:01:06Z",
+    "match": {
+      "ticker": "GAP",
+      "domain": "gapinc.com",
+      "basis": "ticker_and_exact_issuer_name",
+      "provider_fuzzy_match": true,
+      "provider_score": 0.9925148327883724
+    }
+  },
+  "provider_record_id": "5lKdsskqdpUoMucZdlhiQgu3udXM",
+  "leadership": [],
+  "images": [],
+  "sources": [
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "5lKdsskqdpUoMucZdlhiQgu3udXM",
+      "observed_at": "2026-11-05T20:01:06Z",
+      "match": {
+        "ticker": "GAP",
+        "domain": "gapinc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 0.9925148327883724
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:01:06Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "5lKdsskqdpUoMucZdlhiQgu3udXM",
+      "observed_at": "2026-11-05T20:01:06Z",
+      "match": {
+        "ticker": "GAP",
+        "domain": "gapinc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 0.9925148327883724
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "5lKdsskqdpUoMucZdlhiQgu3udXM",
+      "observed_at": "2026-11-05T20:01:06Z",
+      "match": {
+        "ticker": "GAP",
+        "domain": "gapinc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 0.9925148327883724
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "5lKdsskqdpUoMucZdlhiQgu3udXM",
+      "observed_at": "2026-11-05T20:01:06Z",
+      "match": {
+        "ticker": "GAP",
+        "domain": "gapinc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 0.9925148327883724
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "5lKdsskqdpUoMucZdlhiQgu3udXM",
+      "observed_at": "2026-11-05T20:01:06Z",
+      "match": {
+        "ticker": "GAP",
+        "domain": "gapinc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 0.9925148327883724
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "5lKdsskqdpUoMucZdlhiQgu3udXM",
+      "observed_at": "2026-11-05T20:01:06Z",
+      "match": {
+        "ticker": "GAP",
+        "domain": "gapinc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 0.9925148327883724
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "5lKdsskqdpUoMucZdlhiQgu3udXM",
+      "observed_at": "2026-11-05T20:01:06Z",
+      "match": {
+        "ticker": "GAP",
+        "domain": "gapinc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 0.9925148327883724
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/cleaner-apis-reference",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/clean",
+      "record_id": "5lKdsskqdpUoMucZdlhiQgu3udXM",
+      "observed_at": "2026-11-05T20:01:06Z",
+      "match": {
+        "ticker": "GAP",
+        "domain": "gapinc.com",
+        "basis": "ticker_and_exact_issuer_name",
+        "provider_fuzzy_match": true,
+        "provider_score": 0.9925148327883724
+      }
+    }
+  },
+  "coverage": {
+    "status": "provider_enriched",
+    "description": "unavailable",
+    "leadership": "unavailable",
+    "images": "unavailable",
+    "leadership_scope": "Selected leadership profiles; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T20:01:06Z",
+      "industry": "2026-11-05T20:01:06Z",
+      "headquarters": "2026-11-05T20:01:06Z",
+      "founded": "2026-11-05T20:01:06Z",
+      "employee_size_range": "2026-11-05T20:01:06Z",
+      "linkedin_url": "2026-11-05T20:01:06Z"
+    }
+  }
+}

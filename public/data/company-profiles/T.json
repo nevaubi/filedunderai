@@ -1,0 +1,301 @@
+{
+  "schema_version": 1,
+  "ticker": "T",
+  "cik": 732717,
+  "name": "AT&T",
+  "description": "we understand that our customers want an easier, less complicated life.  \n \nwe’re using our network, labs, products, services, and people to create a world where everything works together seamlessly, and life is better as a result.  how will we continue to drive for this excellence in innovation?\n \nwith you.\n \nour people, and their passion to succeed, are at the heart of what we do. today, we’re poised to connect millions of people with their world, delivering the human benefits of technology in ways that defy the imaginable.\n \nwhat are you dreaming of doing with your career?\n  \nfind stories about our talent, career advice, opportunities, company news, and innovations here on linkedin.\n \nto learn more about joining at&t, visit: http://www.att.jobs\n\nwe provide in some of our posts links to articles or posts from third-party websites unaffiliated with at&t.  in doing so, at&t is not adopting, endorsing or otherwise approving the content of those articles or posts.  at&t is providing this content for your information only.",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "HHytiIBwcryNoWLUOJgsJAmW6mLI",
+    "observed_at": "2026-11-05T19:43:36Z",
+    "match": {
+      "ticker": "T",
+      "domain": "att.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://att.com",
+  "industry": "Telecommunications",
+  "headquarters": "Dallas, Texas, United States",
+  "linkedin_url": "https://linkedin.com/company/at&t",
+  "founded": 1876,
+  "employees": null,
+  "professional_profile_count": 122935,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "HHytiIBwcryNoWLUOJgsJAmW6mLI",
+    "observed_at": "2026-11-05T19:43:36Z",
+    "match": {
+      "ticker": "T",
+      "domain": "att.com",
+      "basis": "ticker_and_exact_issuer_name"
+    }
+  },
+  "provider_record_id": "HHytiIBwcryNoWLUOJgsJAmW6mLI",
+  "leadership": [
+    {
+      "name": "John Stankey",
+      "role": "Chairman and Chief Executive Officer, AT&T",
+      "start_date": null,
+      "source_url": "https://investors.att.com/corporate-governance/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:08:08Z",
+      "group": "Executive leadership",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/5e1f0242138a95f000fc0f92.jpg",
+      "photo_source_url": "https://investors.att.com/corporate-governance/leadership",
+      "photo_credit": "AT&T",
+      "photo_original_url": "https://investors.att.com/~/media/Images/A/ATT-IR-V2/content-images/board/john-stankey-headshot.jpg?h=700&iar=0&w=550",
+      "photo_sha256": "02d2d68fb930603f90a28c153ae272ac39605c51afe1a4b7be80edafa704817a",
+      "photo_cached_at": "2026-11-05T20:12:02Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Pascal Desroches",
+      "role": "Senior Executive Vice President, Chief Financial Officer, AT&T Inc.",
+      "start_date": null,
+      "source_url": "https://investors.att.com/corporate-governance/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:08:08Z",
+      "group": "Senior leadership",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/aadcf7c7f9d37330745331d8.jpg",
+      "photo_source_url": "https://investors.att.com/corporate-governance/leadership",
+      "photo_credit": "AT&T",
+      "photo_original_url": "https://investors.att.com/~/media/Images/A/ATT-IR-V2/content-images/board/pascal-desroches-latest.jpg?h=700&iar=0&w=550",
+      "photo_sha256": "3f78ed40d28c054940332788a64668df964c6c38a999429a1077248b017dd428",
+      "photo_cached_at": "2026-11-05T20:12:18Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Jeff McElfresh",
+      "role": "Chief Operating Officer, AT&T Inc.",
+      "start_date": null,
+      "source_url": "https://investors.att.com/corporate-governance/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:08:08Z",
+      "group": "Senior leadership",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/73ba8c6931087fe5bbc0007e.jpg",
+      "photo_source_url": "https://investors.att.com/corporate-governance/leadership",
+      "photo_credit": "AT&T",
+      "photo_original_url": "https://investors.att.com/~/media/Images/A/ATT-IR-V2/content-images/board/jeff-mcelfresh-latest.jpg?h=700&iar=0&w=550",
+      "photo_sha256": "f0c31275cd188bf94897906e676bf739b0bc3090a54dcacfedbac448c314207f",
+      "photo_cached_at": "2026-11-05T20:12:02Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Jeremy Legg",
+      "role": "Chief Technology Officer, AT&T Services, Inc.",
+      "start_date": null,
+      "source_url": "https://investors.att.com/corporate-governance/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:08:08Z",
+      "group": "Senior leadership",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/f8b71ecc09475aaf241478f5.jpg",
+      "photo_source_url": "https://investors.att.com/corporate-governance/leadership",
+      "photo_credit": "AT&T",
+      "photo_original_url": "https://investors.att.com/~/media/Images/A/ATT-IR-V2/content-images/board/jeremy-legg-latest.jpg?h=700&iar=0&w=550",
+      "photo_sha256": "f5ee81ef9203b492e35236faf34b35c5329e8dabaef3206f623c480153faec9f",
+      "photo_cached_at": "2026-11-05T20:12:02Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Darcie Henry",
+      "role": "Chief Human Resources Officer",
+      "start_date": null,
+      "source_url": "https://investors.att.com/corporate-governance/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:08:08Z",
+      "group": "Senior leadership",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/abfeb915576cb39ca54a911c.jpg",
+      "photo_source_url": "https://investors.att.com/corporate-governance/leadership",
+      "photo_credit": "AT&T",
+      "photo_original_url": "https://investors.att.com/~/media/Images/A/ATT-IR-V2/content-images/board/darcie-henry.jpg?h=700&iar=0&w=550",
+      "photo_sha256": "61f44c3e473a7ad228d50a9045706d2644196b5e47cd1947db37402d807865c8",
+      "photo_cached_at": "2026-11-05T20:12:02Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Kellyn Smith Kenny",
+      "role": "Chief Marketing & Growth Officer, AT&T Inc.",
+      "start_date": null,
+      "source_url": "https://investors.att.com/corporate-governance/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:08:08Z",
+      "group": "Senior leadership",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/e593b96b045132dabd83f761.jpg",
+      "photo_source_url": "https://investors.att.com/corporate-governance/leadership",
+      "photo_credit": "AT&T",
+      "photo_original_url": "https://investors.att.com/~/media/Images/A/ATT-IR-V2/content-images/board/kellyn-smith-kenny-latest.jpg?h=700&iar=0&w=550",
+      "photo_sha256": "31579a9c8f9206f8e4038f805e4510afcd9373b715b09d9f3eaf90511fa84b17",
+      "photo_cached_at": "2026-11-05T20:12:02Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Lori Lee",
+      "role": "Global Marketing Officer & SEVP International",
+      "start_date": null,
+      "source_url": "https://investors.att.com/corporate-governance/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:08:08Z",
+      "group": "Senior leadership",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/12f56ae003b4241f7412d2c5.jpg",
+      "photo_source_url": "https://investors.att.com/corporate-governance/leadership",
+      "photo_credit": "AT&T",
+      "photo_original_url": "https://investors.att.com/~/media/Images/A/ATT-IR-V2/content-images/board/lori-lee-latest.jpg?h=700&iar=0&w=550",
+      "photo_sha256": "02cb93c1e27971bd8234efcc02a1b1125f56fca7b34851138eaebeed07c0db15",
+      "photo_cached_at": "2026-11-05T20:12:18Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "David R. McAtee II",
+      "role": "Senior Executive Vice President and General Counsel, AT&T Inc.",
+      "start_date": null,
+      "source_url": "https://investors.att.com/corporate-governance/leadership",
+      "source_name": "Official leadership roster",
+      "observed_at": "2026-11-05T20:08:08Z",
+      "group": "Senior leadership",
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/5e6b23eb1207b16a2a5ce545.jpg",
+      "photo_source_url": "https://investors.att.com/corporate-governance/leadership",
+      "photo_credit": "AT&T",
+      "photo_original_url": "https://investors.att.com/~/media/Images/A/ATT-IR-V2/content-images/board/david-r-mcatee-latest.jpg?h=700&iar=0&w=550",
+      "photo_sha256": "52be01d2a992833744e741c8854066fc6b759b626d61f7739c73e2746e80270a",
+      "photo_cached_at": "2026-11-05T20:12:03Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "AT&T official leadership roster",
+      "url": "https://investors.att.com/corporate-governance/leadership",
+      "observed_at": "2026-11-05T20:08:08Z"
+    },
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "HHytiIBwcryNoWLUOJgsJAmW6mLI",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "T",
+        "domain": "att.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "HHytiIBwcryNoWLUOJgsJAmW6mLI",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "T",
+        "domain": "att.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "HHytiIBwcryNoWLUOJgsJAmW6mLI",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "T",
+        "domain": "att.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "HHytiIBwcryNoWLUOJgsJAmW6mLI",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "T",
+        "domain": "att.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "HHytiIBwcryNoWLUOJgsJAmW6mLI",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "T",
+        "domain": "att.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "HHytiIBwcryNoWLUOJgsJAmW6mLI",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "T",
+        "domain": "att.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "HHytiIBwcryNoWLUOJgsJAmW6mLI",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "T",
+        "domain": "att.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "HHytiIBwcryNoWLUOJgsJAmW6mLI",
+      "observed_at": "2026-11-05T19:43:36Z",
+      "match": {
+        "ticker": "T",
+        "domain": "att.com",
+        "basis": "ticker_and_exact_issuer_name"
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "official_updated_at": "2026-11-05T20:08:08Z",
+    "leadership": "official_sources",
+    "leadership_scope": "Selected leaders from the current official company roster; titles retain regional and subsidiary qualifiers. This is not a complete officer or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:36Z",
+      "industry": "2026-11-05T19:43:36Z",
+      "headquarters": "2026-11-05T19:43:36Z",
+      "founded": "2026-11-05T19:43:36Z",
+      "professional_profile_count": "2026-11-05T19:43:36Z",
+      "employee_size_range": "2026-11-05T19:43:36Z",
+      "linkedin_url": "2026-11-05T19:43:36Z",
+      "description": "2026-11-05T19:43:36Z",
+      "leadership": "2026-11-05T20:08:08Z"
+    },
+    "portraits": "available_for_all_selected_leaders",
+    "description": "available",
+    "images": "unavailable"
+  },
+  "description_provider": "People Data Labs"
+}

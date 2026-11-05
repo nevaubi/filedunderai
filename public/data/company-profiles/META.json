@@ -1,0 +1,471 @@
+{
+  "schema_version": 1,
+  "ticker": "META",
+  "cik": 1326801,
+  "name": "Meta Platforms",
+  "description": "meta's mission is to build the future of human connection and the technology that makes it possible. \n\nour technologies help people connect, find communities, and grow businesses. when facebook launched in 2004, it changed the way people connect. apps like messenger, instagram and whatsapp further empowered billions around the world. now, meta is moving beyond 2d screens toward immersive experiences like augmented and virtual reality to help build the next evolution in social technology.\n\nto help create a safe and respectful online space, we encourage constructive conversations on this page. please note the following:\n\n• start with an open mind. whether you agree or disagree, engage with empathy.\n• comments violating our community standards will be removed or hidden. please treat everybody with respect.\n• keep it constructive. use your interactions here to learn about and grow your understanding of others.\n• our moderators are here to uphold these guidelines for the benefit of everyone, every day.\n• if you are seeking support for issues related to your facebook account, please reference our help center (https://www.facebook.com/help) or help community (https://www.facebook.com/help/community).\n\nfor a full listing of our jobs, visit https://www.metacareers.com",
+  "description_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "RjhjJnYUCiAfXFyxCHLDQQ5opPrK",
+    "observed_at": "2026-11-05T19:43:29Z",
+    "match": {
+      "ticker": "META",
+      "domain": "meta.com",
+      "basis": "ticker_and_verified_domain",
+      "domain_source": {
+        "name": "Official issuer domain verification",
+        "url": "https://www.meta.com/legal/privacy-policy/",
+        "observed_at": "2026-11-05T20:15:15Z",
+        "reason": "Meta's policy on meta.com names Meta Platforms, Inc. as its legal privacy contact, corroborating the Meta brand and corporate domain."
+      }
+    }
+  },
+  "source_url": "https://docs.peopledatalabs.com/docs/company-search-api",
+  "website": "https://meta.com",
+  "industry": "Computer Software",
+  "headquarters": "Menlo Park, California, United States",
+  "linkedin_url": "https://linkedin.com/company/meta",
+  "founded": 2004,
+  "employees": null,
+  "professional_profile_count": 83336,
+  "employee_size_range": "10001+",
+  "employee_size_range_basis": "Provider-reported size band; not company-reported workforce",
+  "professional_profile_count_basis": "People Data Labs profiles associated with the company; not company-reported headcount",
+  "professional_profile_count_source": {
+    "name": "People Data Labs",
+    "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+    "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+    "record_id": "RjhjJnYUCiAfXFyxCHLDQQ5opPrK",
+    "observed_at": "2026-11-05T19:43:29Z",
+    "match": {
+      "ticker": "META",
+      "domain": "meta.com",
+      "basis": "ticker_and_verified_domain",
+      "domain_source": {
+        "name": "Official issuer domain verification",
+        "url": "https://www.meta.com/legal/privacy-policy/",
+        "observed_at": "2026-11-05T20:15:15Z",
+        "reason": "Meta's policy on meta.com names Meta Platforms, Inc. as its legal privacy contact, corroborating the Meta brand and corporate domain."
+      }
+    }
+  },
+  "provider_record_id": "RjhjJnYUCiAfXFyxCHLDQQ5opPrK",
+  "leadership": [
+    {
+      "name": "Mark Zuckerberg",
+      "role": "Founder, Chairman and Chief Executive Officer",
+      "source_url": "https://www.meta.com/about/leadership/",
+      "source_name": "Official company source",
+      "profile_url": "https://www.meta.com/about/leadership/mark-zuckerberg/",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Executive leadership",
+      "start_date": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/24871a1214a139d477f496e8.webp",
+      "photo_source_url": "https://www.meta.com/about/leadership/",
+      "photo_credit": "Meta",
+      "photo_original_url": "https://lookaside.fbsbx.com/elementpath/media/?media_id=941533421928233&version=1793797267&transcode_extension=webp",
+      "photo_sha256": "9df1ee08d647fab900b30cb34fffa84fadfb00c39b5d245623b4d1b862abc62e",
+      "photo_cached_at": "2026-11-05T20:22:58Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Dina Powell McCormick",
+      "role": "President and Vice Chairman",
+      "source_url": "https://www.meta.com/about/leadership/",
+      "source_name": "Official company source",
+      "profile_url": "https://www.meta.com/about/leadership/dina-powell-mccormick/",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Senior leadership",
+      "start_date": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/909badfd55dbd2b177de07b2.webp",
+      "photo_source_url": "https://www.meta.com/about/leadership/",
+      "photo_credit": "Meta",
+      "photo_original_url": "https://lookaside.fbsbx.com/elementpath/media/?media_id=916823794645585&version=1793797267&transcode_extension=webp",
+      "photo_sha256": "8d7a2cbd98f89e1cb37dd1adf6298811491b3001da337ac079e14809f1640007",
+      "photo_cached_at": "2026-11-05T20:22:45Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Joel Kaplan",
+      "role": "Chief Global Affairs Officer",
+      "source_url": "https://www.meta.com/about/leadership/",
+      "source_name": "Official company source",
+      "profile_url": "https://www.meta.com/about/leadership/joel-kaplan/",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Senior leadership",
+      "start_date": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/ba7758e23b49d053339d0b85.webp",
+      "photo_source_url": "https://www.meta.com/about/leadership/",
+      "photo_credit": "Meta",
+      "photo_original_url": "https://lookaside.fbsbx.com/elementpath/media/?media_id=4051424858481281&version=1793797267&transcode_extension=webp",
+      "photo_sha256": "9fe1a1433bc75d26b447d003bb1bc64f84417e19e726b4e4546fa60cdf317c75",
+      "photo_cached_at": "2026-11-05T20:22:35Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Susan Li",
+      "role": "Chief Financial Officer",
+      "source_url": "https://www.meta.com/about/leadership/",
+      "source_name": "Official company source",
+      "profile_url": "https://www.meta.com/about/leadership/susan-li/",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Senior leadership",
+      "start_date": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/855b9b364e4810b22664cb9a.webp",
+      "photo_source_url": "https://www.meta.com/about/leadership/",
+      "photo_credit": "Meta",
+      "photo_original_url": "https://lookaside.fbsbx.com/elementpath/media/?media_id=1279809946912163&version=1793797267&transcode_extension=webp",
+      "photo_sha256": "3f07925d80435f0e879c7edb89ebd595610fa81e684ad33a70fb41501334b29b",
+      "photo_cached_at": "2026-11-05T20:22:26Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Javier Olivan",
+      "role": "Chief Operating Officer",
+      "source_url": "https://www.meta.com/about/leadership/",
+      "source_name": "Official company source",
+      "profile_url": "https://www.meta.com/about/leadership/javier-olivan/",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Senior leadership",
+      "start_date": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/af4c7cf4a12e56bdba4600e3.webp",
+      "photo_source_url": "https://www.meta.com/about/leadership/",
+      "photo_credit": "Meta",
+      "photo_original_url": "https://lookaside.fbsbx.com/elementpath/media/?media_id=935675929268889&version=1793797267&transcode_extension=webp",
+      "photo_sha256": "9e2e9d1e5e8acef9f553521a0c7edb68cc2a766b7562372828982e155c8ea469",
+      "photo_cached_at": "2026-11-05T20:22:44Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Chris Cox",
+      "role": "Chief Product Officer",
+      "source_url": "https://www.meta.com/about/leadership/",
+      "source_name": "Official company source",
+      "profile_url": "https://www.meta.com/about/leadership/chris-cox/",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Senior leadership",
+      "start_date": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/b0b075a191e6d116fcbff6c0.webp",
+      "photo_source_url": "https://www.meta.com/about/leadership/",
+      "photo_credit": "Meta",
+      "photo_original_url": "https://lookaside.fbsbx.com/elementpath/media/?media_id=1584786542596907&version=1793797267&transcode_extension=webp",
+      "photo_sha256": "2ce09a1b22b36fd79b66940603d6f333509a87557b73b16b3c91f60b3912bbe1",
+      "photo_cached_at": "2026-11-05T20:22:26Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Andrew ‘Boz’ Bosworth",
+      "role": "Chief Technology Officer",
+      "source_url": "https://www.meta.com/about/leadership/",
+      "source_name": "Official company source",
+      "profile_url": "https://www.meta.com/about/leadership/andrew-boz-bosworth/",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Senior leadership",
+      "start_date": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/fecbf093bd0e1c7f2172b5c7.webp",
+      "photo_source_url": "https://www.meta.com/about/leadership/",
+      "photo_credit": "Meta",
+      "photo_original_url": "https://lookaside.fbsbx.com/elementpath/media/?media_id=1741965277180325&version=1793797267&transcode_extension=webp",
+      "photo_sha256": "55d0ffa458fe168ebbf657408dc2c95dfd45d2efb37e457c7f8c387ec0ebb3f0",
+      "photo_cached_at": "2026-11-05T20:22:31Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "C.J. Mahoney",
+      "role": "Chief Legal Officer",
+      "source_url": "https://www.meta.com/about/leadership/",
+      "source_name": "Official company source",
+      "profile_url": "https://www.meta.com/about/leadership/cj-mahoney/",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Senior leadership",
+      "start_date": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/de55b5586683d12566e7e701.webp",
+      "photo_source_url": "https://www.meta.com/about/leadership/",
+      "photo_credit": "Meta",
+      "photo_original_url": "https://lookaside.fbsbx.com/elementpath/media/?media_id=977627607951024&version=1793797267&transcode_extension=webp",
+      "photo_sha256": "3756b12967e438858da1a3f21b21380511fc246ebb04767198814bdb41935141",
+      "photo_cached_at": "2026-11-05T20:22:58Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Janelle Gale",
+      "role": "Chief People Officer",
+      "source_url": "https://www.meta.com/about/leadership/",
+      "source_name": "Official company source",
+      "profile_url": "https://www.meta.com/about/leadership/janelle-gale/",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Senior leadership",
+      "start_date": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/af16c66b3ce5f9880c538d6b.webp",
+      "photo_source_url": "https://www.meta.com/about/leadership/",
+      "photo_credit": "Meta",
+      "photo_original_url": "https://lookaside.fbsbx.com/elementpath/media/?media_id=938713725720043&version=1793797267&transcode_extension=webp",
+      "photo_sha256": "ca6c98bb1cd9db62e995b0b5388efd37f6c9844e5c36b586dfde3ef8f4ee9aa9",
+      "photo_cached_at": "2026-11-05T20:22:44Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Dave Wehner",
+      "role": "Chief Strategy Officer",
+      "source_url": "https://www.meta.com/about/leadership/",
+      "source_name": "Official company source",
+      "profile_url": "https://www.meta.com/about/leadership/david-wehner/",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Senior leadership",
+      "start_date": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/a1289d325b2ec8822e0e0e33.webp",
+      "photo_source_url": "https://www.meta.com/about/leadership/",
+      "photo_credit": "Meta",
+      "photo_original_url": "https://lookaside.fbsbx.com/elementpath/media/?media_id=2331706970900961&version=1793797267&transcode_extension=webp",
+      "photo_sha256": "2a318953f8404adb5a4d74828b051f473adea75b14988ad67e86364a268b827e",
+      "photo_cached_at": "2026-11-05T20:22:35Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Alexandr Wang",
+      "role": "Chief AI Officer",
+      "source_url": "https://www.meta.com/about/leadership/",
+      "source_name": "Official company source",
+      "profile_url": "https://www.meta.com/about/leadership/alexandr-wang/",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Senior leadership",
+      "start_date": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/6d5b4096126f56ad04569e2d.webp",
+      "photo_source_url": "https://www.meta.com/about/leadership/",
+      "photo_credit": "Meta",
+      "photo_original_url": "https://lookaside.fbsbx.com/elementpath/media/?media_id=811689485320624&version=1793797267&transcode_extension=webp",
+      "photo_sha256": "0f95b7e1108cb2b5ebec504e88c9f651844ef05e3867bce57e028d82188bf58a",
+      "photo_cached_at": "2026-11-05T20:22:44Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Alex Schultz",
+      "role": "Chief Data Officer",
+      "source_url": "https://www.meta.com/about/leadership/",
+      "source_name": "Official company source",
+      "profile_url": "https://www.meta.com/about/leadership/alex-schultz/",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Senior leadership",
+      "start_date": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/8c8827a50f0ca485989ec16f.webp",
+      "photo_source_url": "https://www.meta.com/about/leadership/",
+      "photo_credit": "Meta",
+      "photo_original_url": "https://lookaside.fbsbx.com/elementpath/media/?media_id=2501975820219387&version=1793797267&transcode_extension=webp",
+      "photo_sha256": "ebc479384ecc0cd8008eecd0032b8287958f6d295ff9a86c5702b16f42a026d6",
+      "photo_cached_at": "2026-11-05T20:22:35Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Denise Moreno",
+      "role": "Chief Marketing Officer",
+      "source_url": "https://www.meta.com/about/leadership/",
+      "source_name": "Official company source",
+      "profile_url": "https://www.meta.com/about/leadership/denise-moreno/",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Senior leadership",
+      "start_date": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/897a6c093ce07589ab21dbbd.webp",
+      "photo_source_url": "https://www.meta.com/about/leadership/",
+      "photo_credit": "Meta",
+      "photo_original_url": "https://lookaside.fbsbx.com/elementpath/media/?media_id=1033855189582181&version=1793797267&transcode_extension=webp",
+      "photo_sha256": "58ceeeb195ad55c628942fd62165608b71868f53e190eee86f4e3d894d79df3c",
+      "photo_cached_at": "2026-11-05T20:22:17Z",
+      "photo_status": "cached_and_verified"
+    },
+    {
+      "name": "Chirantan ‘CJ’ Desai",
+      "role": "Chief Enterprise Platform Officer",
+      "source_url": "https://www.meta.com/about/leadership/",
+      "source_name": "Official company source",
+      "profile_url": "https://www.meta.com/about/leadership/chirantan-cj-desai/",
+      "observed_at": "2026-11-05T20:14:21Z",
+      "group": "Senior leadership",
+      "start_date": null,
+      "photo_url": "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/company-portraits/0442bdacf558b806b69cef1d.webp",
+      "photo_source_url": "https://www.meta.com/about/leadership/",
+      "photo_credit": "Meta",
+      "photo_original_url": "https://lookaside.fbsbx.com/elementpath/media/?media_id=1580002277481130&version=1793797267&transcode_extension=webp",
+      "photo_sha256": "7564652fdd2f9678c80739f7522439cf55cb33aa147b44dbc527b97a5aadd679",
+      "photo_cached_at": "2026-11-05T20:22:26Z",
+      "photo_status": "cached_and_verified"
+    }
+  ],
+  "images": [],
+  "sources": [
+    {
+      "name": "Meta official leadership roster",
+      "url": "https://www.meta.com/about/leadership/",
+      "observed_at": "2026-11-05T20:14:21Z"
+    },
+    {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "RjhjJnYUCiAfXFyxCHLDQQ5opPrK",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "META",
+        "domain": "meta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.meta.com/legal/privacy-policy/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "Meta's policy on meta.com names Meta Platforms, Inc. as its legal privacy contact, corroborating the Meta brand and corporate domain."
+        }
+      }
+    }
+  ],
+  "updated_at": "2026-11-05T20:24:21Z",
+  "field_sources": {
+    "website": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "RjhjJnYUCiAfXFyxCHLDQQ5opPrK",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "META",
+        "domain": "meta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.meta.com/legal/privacy-policy/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "Meta's policy on meta.com names Meta Platforms, Inc. as its legal privacy contact, corroborating the Meta brand and corporate domain."
+        }
+      }
+    },
+    "industry": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "RjhjJnYUCiAfXFyxCHLDQQ5opPrK",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "META",
+        "domain": "meta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.meta.com/legal/privacy-policy/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "Meta's policy on meta.com names Meta Platforms, Inc. as its legal privacy contact, corroborating the Meta brand and corporate domain."
+        }
+      }
+    },
+    "headquarters": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "RjhjJnYUCiAfXFyxCHLDQQ5opPrK",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "META",
+        "domain": "meta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.meta.com/legal/privacy-policy/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "Meta's policy on meta.com names Meta Platforms, Inc. as its legal privacy contact, corroborating the Meta brand and corporate domain."
+        }
+      }
+    },
+    "founded": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "RjhjJnYUCiAfXFyxCHLDQQ5opPrK",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "META",
+        "domain": "meta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.meta.com/legal/privacy-policy/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "Meta's policy on meta.com names Meta Platforms, Inc. as its legal privacy contact, corroborating the Meta brand and corporate domain."
+        }
+      }
+    },
+    "professional_profile_count": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "RjhjJnYUCiAfXFyxCHLDQQ5opPrK",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "META",
+        "domain": "meta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.meta.com/legal/privacy-policy/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "Meta's policy on meta.com names Meta Platforms, Inc. as its legal privacy contact, corroborating the Meta brand and corporate domain."
+        }
+      }
+    },
+    "employee_size_range": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "RjhjJnYUCiAfXFyxCHLDQQ5opPrK",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "META",
+        "domain": "meta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.meta.com/legal/privacy-policy/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "Meta's policy on meta.com names Meta Platforms, Inc. as its legal privacy contact, corroborating the Meta brand and corporate domain."
+        }
+      }
+    },
+    "linkedin_url": {
+      "name": "People Data Labs",
+      "url": "https://docs.peopledatalabs.com/docs/company-search-api",
+      "endpoint": "https://api.peopledatalabs.com/v5/company/search",
+      "record_id": "RjhjJnYUCiAfXFyxCHLDQQ5opPrK",
+      "observed_at": "2026-11-05T19:43:29Z",
+      "match": {
+        "ticker": "META",
+        "domain": "meta.com",
+        "basis": "ticker_and_verified_domain",
+        "domain_source": {
+          "name": "Official issuer domain verification",
+          "url": "https://www.meta.com/legal/privacy-policy/",
+          "observed_at": "2026-11-05T20:15:15Z",
+          "reason": "Meta's policy on meta.com names Meta Platforms, Inc. as its legal privacy contact, corroborating the Meta brand and corporate domain."
+        }
+      }
+    }
+  },
+  "coverage": {
+    "status": "official_with_provider_metadata",
+    "official_updated_at": "2026-11-05T20:14:21Z",
+    "leadership": "official_sources",
+    "leadership_scope": "First 14 senior leaders from Meta’s current official roster; this is not a complete executive or board roster.",
+    "field_observed_at": {
+      "website": "2026-11-05T19:43:29Z",
+      "industry": "2026-11-05T19:43:29Z",
+      "headquarters": "2026-11-05T19:43:29Z",
+      "founded": "2026-11-05T19:43:29Z",
+      "professional_profile_count": "2026-11-05T19:43:29Z",
+      "employee_size_range": "2026-11-05T19:43:29Z",
+      "linkedin_url": "2026-11-05T19:43:29Z",
+      "description": "2026-11-05T19:43:29Z",
+      "leadership": "2026-11-05T20:14:21Z"
+    },
+    "portraits": "available_for_all_selected_leaders",
+    "description": "available",
+    "images": "unavailable"
+  },
+  "description_provider": "People Data Labs"
+}
