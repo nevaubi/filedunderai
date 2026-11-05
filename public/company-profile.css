@@ -53,6 +53,7 @@ p.cp-description-empty { padding:18px 20px; margin:0; color:var(--muted); }
 .cp-person h4 a:hover { text-decoration:underline; }
 .cp-person-role { font-size:11px; line-height:1.5; color:var(--ink2); margin:0 0 5px; }
 .cp-tenure { display:block; font-size:10px; line-height:1.6; color:var(--muted); }
+.cp-tenure[href] { text-decoration:underline; text-decoration-color:var(--line); text-underline-offset:3px; }
 .cp-person-info > .cp-source-link { display:block; margin-top:4px; font-size:9px; }
 .cp-photo-credit { display:block; margin-top:5px; font-size:9px; line-height:1.5; color:var(--muted); }
 .cp-photo-credit .cp-source-link { font-size:inherit; }
