@@ -57,7 +57,26 @@ def prepare_documents(root, ticker):
             continue
         url = document["source_url"]
         parsed = urlsplit(url)
-        if parsed.scheme != "https" or parsed.username or parsed.password:
+        redirect = None
+        if parsed.username is not None or parsed.password is not None or not parsed.hostname:
+            raise ValueError("Invalid financial source URL")
+        if parsed.scheme == "http":
+            # Some issuer archives publish HTTP links which were actually fetched
+            # over HTTPS after a redirect. Use only that recorded successful
+            # upgrade, preserving its requested URL and the exact body hash.
+            final_url = original.get("final_url")
+            final = urlsplit(final_url or "")
+            if (original.get("status") != "archived" or original.get("http_status") != 200
+                    or final.scheme != "https" or final.username is not None or final.password is not None
+                    or final.hostname != parsed.hostname or final.port not in (None,443)
+                    or parsed.port not in (None,80)
+                    or final.path.rstrip("/") != parsed.path.rstrip("/")
+                    or final.query != parsed.query or final.fragment != parsed.fragment):
+                raise ValueError("Invalid financial source URL: unverified HTTPS redirect")
+            redirect = {"requested_url":url,"final_url":final_url,"original_sha256":sha,
+                        "basis":"Archived HTTP 200 response after same-issuer HTTPS upgrade"}
+            url,parsed = final_url,final
+        if parsed.scheme != "https" or parsed.username is not None or parsed.password is not None:
             raise ValueError("Invalid financial source URL")
         published = None
         if parsed.hostname in ("www.sec.gov","sec.gov"):
@@ -92,9 +111,27 @@ def prepare_documents(root, ticker):
                   "pages":len(text.get("pages") or text.get("sheets") or []),"text_path":text_path,
                   "extracted_at":now_iso() if quality.get("status") == "verified" else None,
                   "fetched_at":original["retrieved_at"]}
-        prepared.append({"record":record,"body":body,"text":encoded(text),"quality":quality,"validation":validation})
+        prepared.append({"record":record,"body":body,"text":encoded(text),"quality":quality,
+                         "validation":validation,"redirect":redirect})
         seen.add(sha)
     return prepared
+
+
+def restore_missing_extraction(sb, item, existing, state):
+    """Recover an interrupted row-before-checkpoint commit only after both readbacks."""
+    if existing["id"] in state["outcomes"]:
+        return
+    ticker = item["record"]["ticker"]
+    if (any(existing.get(key) != item["record"][key]
+            for key in ("id","ticker","url","sha256","storage_path","text_path"))
+            or any(not str(existing.get(key) or "").startswith(ticker + "/")
+                   for key in ("storage_path","text_path"))):
+        raise ValueError("Existing IR document identity differs from the reviewed source")
+    if digest(sb.get_object("ir",existing["storage_path"]) or b"") != item["record"]["sha256"]:
+        raise RuntimeError("Resumed IR original read-back hash mismatch")
+    if digest(sb.get_object("ir",existing["text_path"]) or b"") != digest(item["text"]):
+        raise RuntimeError("Resumed IR extracted-text read-back hash mismatch")
+    state["outcomes"][existing["id"]] = item["quality"]
 
 
 def publish_company(root, ticker):
@@ -114,6 +151,8 @@ def publish_company(root, ticker):
         for item in prepared:
             record = item["record"]
             if record["sha256"] in have:
+                existing = next(row for row in rows if row["sha256"] == record["sha256"])
+                restore_missing_extraction(sb,item,existing,state)
                 continue
             collisions = sb.select("ir_documents",f"select=id,ticker&id=eq.{record['id']}")
             if any(row["ticker"] != ticker for row in collisions):
@@ -146,6 +185,9 @@ def publish_company(root, ticker):
         if published != bundle:
             raise RuntimeError("IR library read-back mismatch")
         result = {"ticker":ticker,"status":"published","added":added,"documents":len(rows),"coverage":coverage}
+        redirects = [item["redirect"] for item in prepared if item["redirect"]]
+        if redirects:
+            result["redirects"] = redirects
         atomic_write(Path(root)/"ir-publication"/f"{ticker}.json",encoded(result))
         return result
 

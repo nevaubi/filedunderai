@@ -31,7 +31,7 @@ Do not feed partial document extractions to the legacy replacement KPI publisher
 5. Review a representative pilot and the complete staged batch. Publish through existing authorized credentials under distributed leases, with immutable source archives and checkpoints. Refresh coverage from grouped counts rather than global REST scans.
 6. Publish expanded public indexes only after their company bundles are available. Activate additions for scheduled maintenance only after successful read-back.
 
-The Vercel connector currently returns a team-scope403 for the existing team. Do not extract credentials through an alternative privileged path, weaken authentication, or change grants. Continue all collection/staging/code work that does not require that access, then surface the concrete access step if it remains necessary.
+The user restored Vercel access and explicitly confirmed the existing Supabase project `apxfeteebnspwyajlxfh`. The authenticated Vercel project `filedunderai` and its production Supabase binding were checked before publication. Continue using this project and its existing grants; no replacement database is part of this work.
 
 ## Acceptance
 
