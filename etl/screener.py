@@ -1345,7 +1345,10 @@ def activity(sb, fundcache, today):
         o, p = {}, {}
         w90, w365 = (ins.get(tk) or {}).get("w90"), (ins.get(tk) or {}).get("w365")
         for sfx, w, days in (("90d", w90, 90), ("1y", w365, 365)):
-            if not w:
+            # The additional cohort proves financial filings only. Stored activity
+            # rows (or their absence) do not establish collection for these windows.
+            # Keep these fields unavailable until a window-coverage gate exists.
+            if not w or tk in STRICT_SOURCE_TICKERS:
                 continue
             rng = [(today - dt.timedelta(days=days)).isoformat(), today.isoformat()]
             o[f"ins_net_{sfx}"] = (w.get("buy_value") or 0) - (w.get("sell_value") or 0)
@@ -1355,7 +1358,7 @@ def activity(sb, fundcache, today):
             p[f"ins_net_{sfx}"] = dict(meta, x=f"Open-market purchases ${w.get('buy_value') or 0:,.0f} − sales ${w.get('sell_value') or 0:,.0f} (Form 4, codes P and S)")
             p[f"ins_net_{sfx}_n"] = dict(meta, x=f"{w.get('buys') or 0} purchases − {w.get('sells') or 0} sales")
             p[f"ins_buyers_{sfx}"] = dict(meta, x=f"{w.get('buyers') or 0} distinct buyers")
-        if tk in by_news or (tk in fundcache):
+        if tk not in STRICT_SOURCE_TICKERS and (tk in by_news or tk in fundcache):
             items = sorted(by_news.get(tk, []), key=lambda n: n.get("published_at") or "", reverse=True)
             o["news_30d"] = len(items)
             p["news_30d"] = {"x": f"News items published since {(today - dt.timedelta(days=30)).isoformat()}", "u": [[n["url"], n["title"][:140], (n.get("published_at") or "")[:10]] for n in items[:12]]}

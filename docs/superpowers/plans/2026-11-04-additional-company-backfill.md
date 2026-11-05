@@ -63,8 +63,8 @@
 
 **Files:** operator batch module/receipt and data artifacts; final verification document.
 
-- [ ] Fetch a representative source pilot, inspect its source proofs and reporting contexts, then continue300 in bounded batches.
-- [ ] Use Tavily/Firecrawl to discover and read official IR sources; retain raw output, URLs, timestamps and explicit failures.
+- [x] Fetch a representative source pilot, inspect its source proofs and reporting contexts, then continue300 in bounded batches.
+- [x] Use Tavily/Firecrawl to discover and read official IR sources; retain raw output, URLs, timestamps and explicit failures.
 - [ ] Independently audit staged counts, identity, all promoted-value proofs and unchanged existing-company fingerprints.
 - [ ] Publish only through authorized credentials, under leases, with source/object read-back and journal checkpoints.
 - [ ] Bootstrap new coverage entries with grouped counts, publish expanded indexes, then activate scheduled registry additions.
@@ -77,4 +77,7 @@
 - Ruling: Period ends after filing dates and quarterly candidates longer than111days are explicitly quarantined with full context and a reason; they are preserved in the immutable source and company quality record, never silently relabeled or promoted. The strict source-proof gate still validates every retained point. The original105-day limit was corrected after the official CAVA filing established its16-week first fiscal quarter (111 days between start/end); the119-day VAL transition and114-day SCI anomaly remain excluded.
 - Ruling: Reconstructed filing-table cells are restricted to verified proof records, including per-cell source pointers, so these tables cannot reintroduce excluded values.
 - All300 company stages passed, containing652,811 selected financial values. Seven pilot companies passed exact relational read-back; shared beneficial-ownership filings already held by another issuer are preserved with explicit skip receipts. Original500 index/screener membership metadata was stamped under the aggregate lease, backed up and read back exactly. Public row counts remain500 until activation.
-- New UI/API membership behavior passed186 JavaScript tests and a27-asset build. Independent core, IR and screener reviews passed after focused fixes. The financial/source suite currently passes162 tests; price-publisher final review is in progress.
+- New UI/API membership behavior passed186 JavaScript tests and a27-asset build. Independent core, IR and screener reviews passed after focused fixes. The financial/source suite passes 193 tests after the final shared-filing and IR resume guards. Price source readbacks are complete; full relational price readbacks are in progress.
+
+- Core publication completed at 2026-11-05T03:00:34Z: all 300 companies, 652,811 fact rows, 74,339 filing rows and 900 SEC document records. Independent exact fingerprints matched all 652,811 fact rows across every stored fact field. The 243 shared filing references retain their existing owners.
+- The activation branch enables the frozen 300-ticker registry. Merge and aggregate publication remain gated on successful price, IR and coverage receipts, a lease spanning production deployment, and the full 800-company aggregate checks described in `docs/verification/2026-11-05-additional-300.md`.

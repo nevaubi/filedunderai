@@ -1149,31 +1149,31 @@ table.cmpx td.c.der::after{content:"";position:absolute;right:3px;top:5px;width:
     }
     // 2. total return and drawdown
     const trHost = el("div", { class: "bd" }), ddHost = el("div", { class: "bd", style: "padding-top:0" });
-    body.append(panel("Total return, rebased to 100", seg([["1Y", "1Y"], ["2Y", "2Y"], ["5Y", "5Y weekly"]], CS.trRange, v => { CS.trRange = v; drawTR(); }), trHost, el("div", { class: "eyebrow", style: "padding:0 16px" }, "Drawdown from running high"), ddHost,
-      el("div", { class: "src" }, "1Y and 2Y: daily closes with each dividend reinvested on its ex-date. 5Y: weekly closes adjusted for splits and dividends. Yahoo Finance chart API. SPY dashed. Click a line for the calculation at that date.")));
+    body.append(panel("Returns, rebased to 100", seg([["1Y", "1Y"], ["2Y", "2Y"], ["5Y", "5Y weekly"]], CS.trRange, v => { CS.trRange = v; drawTR(); }), trHost, el("div", { class: "eyebrow", style: "padding:0 16px" }, "Drawdown from running high"), ddHost,
+      el("div", { class: "src" }, "Series labels distinguish total return, with dividends reinvested, from price return when dividend history is unavailable. 1Y and 2Y use daily closes; 5Y uses weekly closes adjusted for splits and dividends when available. Yahoo Finance chart API. SPY dashed. Click a line for its calculation.")));
     function trSeries(sym) {
       if (CS.trRange === "5Y") {
         const h = HIST[sym]; if (!h?.w?.length) return null;
         const w = h.w, a0 = w[0][2];
         const path = w.map((x, i) => ({ x: new Date(x[0] * 1000), y: x[2] / a0 * 100, i }));
         const cellAt = i => calcCell(sym, `Total return since ${iso(new Date(w[0][0] * 1000))}`, "pct", w[i][2] / a0 - 1, `Adjusted weekly close ${iso(new Date(w[i][0] * 1000))} / adjusted weekly close ${iso(new Date(w[0][0] * 1000))} − 1 (adjusted for splits and dividends)`, [histCell(sym, i, "a"), histCell(sym, 0, "a")], { kind: "PX", end: iso(new Date(w[i][0] * 1000)), custom: 1 });
-        return { path, cellAt };
+        return { path, cellAt, returnKind: "Total return" };
       }
       const b = PX[sym]?.bars; if (!b) return null;
       const i0 = Math.max(0, idxOnOrAfter(sym, new Date(b.at(-1).t - (CS.trRange === "1Y" ? 365 : 730) * DAY)));
       const tr = HIST[sym] ? totalReturn(sym, i0, b.length - 1) : null;
       const path = tr ? tr.path.map(([t, v], k) => ({ x: t, y: v * 100, i: i0 + k })) : b.slice(i0).map((x, k) => ({ x: x.t, y: x.c / b[i0].c * 100, i: i0 + k }));
       const cellAt = i => { const r = HIST[sym] ? totalReturn(sym, i0, i) : null; if (r) { r.cell.label = `Total return since ${iso(b[i0].t)}`; return r.cell; } return calcCell(sym, `Price return since ${iso(b[i0].t)}`, "pct", b[i].c / b[i0].c - 1, `Close ${iso(b[i].t)} / close ${iso(b[i0].t)} − 1 (dividend history not loaded)`, [pxCell(sym, i), pxCell(sym, i0)], { kind: "PX", end: iso(b[i].t), custom: 1 }); };
-      return { path, cellAt };
+      return { path, cellAt, returnKind: tr ? "Total return" : "Price return" };
     }
     function drawTR() {
       const syms = [...tks, "SPY"];
       const S = syms.map(s => [s, trSeries(s)]).filter(x => x[1]);
-      const ser = S.map(([s, r]) => ({ name: s === "SPY" ? "SPY (S&P 500)" : s, sym: s, color: s === "SPY" ? css("--ink") : colorOf(s), dash: s === "SPY" ? "3 3" : null, width: s === "SPY" ? 1.2 : 1.7, pts: r.path.map(p => ({ ...p, cell: null })), cellAt: r.cellAt }));
+      const ser = S.map(([s, r]) => ({ name: `${s === "SPY" ? "SPY (S&P 500)" : s} · ${r.returnKind}`, sym: s, returnKind: r.returnKind, color: s === "SPY" ? css("--ink") : colorOf(s), dash: s === "SPY" ? "3 3" : null, width: s === "SPY" ? 1.2 : 1.7, pts: r.path.map(p => ({ ...p, cell: null })), cellAt: r.cellAt }));
       const click = (c, s, p) => openAny(s.cellAt(p.i));
       xyChart(trHost, ser, { height: 280, base: 100, yfmt: v => v.toFixed(0), tfmt: v => v.toFixed(1), onPoint: click, tol: 10 * DAY });
       const dd = ser.map(s => { let pk = -Infinity; return { ...s, pts: s.pts.map(p => { pk = Math.max(pk, p.y); return { ...p, y: p.y / pk - 1 }; }) }; });
-      xyChart(ddHost, dd, { height: 150, area: true, yfmt: v => fpct(v, 0), tfmt: v => fpct(v), legend: false, onPoint: (c, s, p) => { const d = ser.find(z => z.sym === s.sym); const k = d.pts.findIndex(z => z.i === p.i); let pi = 0; for (let j = 0; j <= k; j++) if (d.pts[j].y >= d.pts[pi].y) pi = j; const a = d.cellAt(d.pts[pi].i), b2 = d.cellAt(p.i); openAny(calcCell(s.sym, "Drawdown from running high", "pct", p.y, `Total-return index at ${iso(p.x)} / its running high at ${iso(d.pts[pi].x)} − 1`, [b2, a], { kind: "PX", end: iso(p.x), custom: 1 })); }, tol: 10 * DAY });
+      xyChart(ddHost, dd, { height: 150, area: true, yfmt: v => fpct(v, 0), tfmt: v => fpct(v), legend: false, onPoint: (c, s, p) => { const d = ser.find(z => z.sym === s.sym); const k = d.pts.findIndex(z => z.i === p.i); let pi = 0; for (let j = 0; j <= k; j++) if (d.pts[j].y >= d.pts[pi].y) pi = j; const a = d.cellAt(d.pts[pi].i), b2 = d.cellAt(p.i); openAny(calcCell(s.sym, "Drawdown from running high", "pct", p.y, `${s.returnKind} index at ${iso(p.x)} / its running high at ${iso(d.pts[pi].x)} − 1`, [b2, a], { kind: "PX", end: iso(p.x), custom: 1 })); }, tol: 10 * DAY });
     }
     // 3. rolling correlation
     const pairsAll = []; tks.forEach((a, i) => tks.slice(i + 1).forEach(b => pairsAll.push([a, b])));
