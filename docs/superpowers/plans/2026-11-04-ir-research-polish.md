@@ -68,4 +68,4 @@
 - [x] Publish truthful IR scope/status and paginated/searchable full history with date ordering; verify access beyond record200.
 - [x] Audit physical storage and metadata; run bounded existing-data extraction/metadata repair when access permits, preserving backups and lease protection.
 - [x] Review all independent changes, resolve findings, run full JavaScript/Python/technical gates and build.
-- [ ] Publish PR, verify required checks, deploy and verify screener/editor/research/IR UI. Save measured geometry, actual screenshots, coverage counts and unresolved limitations.
+- [x] Publish PR, verify required checks, deploy and verify screener/editor/research/IR UI. Save measured geometry, actual screenshots, coverage counts and unresolved limitations.
