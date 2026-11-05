@@ -1,0 +1,77 @@
+{
+ "generated_at": "2026-11-05T22:01:03Z",
+ "counts": {
+  "registered": 1100,
+  "screener_eligible": 1100,
+  "with_metadata": 1100,
+  "with_leadership": 87,
+  "leaders": 901,
+  "portraits": 673,
+  "portrait_sources": 756,
+  "cached_portraits": 663
+ },
+ "published": 372,
+ "unchanged": 0,
+ "sources": {
+  "headquarters_and_industry": "SEC EDGAR submissions (data.sec.gov), all 372",
+  "provider": "Data Legion companies/enrich-base via Firecrawl Alexandria, exact high-confidence ticker match plus issuer-name check"
+ },
+ "provider_lookups": 372,
+ "provider_matches_returned": 315,
+ "provider_matches_used": 306,
+ "rejected_after_review": [
+  {
+   "ticker": "ENSG",
+   "provider_name": "ensign services",
+   "domain": "ensignservices.net"
+  },
+  {
+   "ticker": "ERIE",
+   "provider_name": "erie insurance group",
+   "domain": "erieinsurance.com"
+  },
+  {
+   "ticker": "GPC",
+   "provider_name": "napa auto parts",
+   "domain": "genpt.com"
+  },
+  {
+   "ticker": "HII",
+   "provider_name": "newport news shipbuilding, a division of hii",
+   "domain": "hii.com"
+  },
+  {
+   "ticker": "LNC",
+   "provider_name": "lincoln variable insurance products trust",
+   "domain": "lfg.com"
+  },
+  {
+   "ticker": "MNST",
+   "provider_name": "monster energy",
+   "domain": "monsterenergy.com"
+  },
+  {
+   "ticker": "OMC",
+   "provider_name": "omnicom media",
+   "domain": "omnicommedia.com"
+  },
+  {
+   "ticker": "PG",
+   "provider_name": "p g invest",
+   "domain": "pginvestor.com"
+  },
+  {
+   "ticker": "UBSI",
+   "provider_name": "first united bancshares inc",
+   "domain": "ubsi-inc.com"
+  }
+ ],
+ "not_found": 57,
+ "not_published": [
+  "description (provider descriptions are careers/marketing copy)",
+  "leadership",
+  "portraits"
+ ],
+ "readback": "all changed profiles and directory matched exactly",
+ "backup_prefix": "company-profiles/backups/2026-11-05T22-01-03Z/"
+}
