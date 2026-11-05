@@ -153,7 +153,8 @@
       if (website) dl.append(node('div', {}, node('dt', {}, 'Website'), node('dd', {}, sourceLink(website, new URL(website).hostname.replace(/^www\./, '')))));
       const workforceNote = finite(employees) ? (profile?.employees?.basis === 'reported' ? ' Employee count is company-reported.' : ' Employee count follows its attributed source.') : '';
       facts.append(dl, node('p', { class: 'cp-footnote' }, profile?.updated_at ? 'Company context updated ' + dateLabel(profile.updated_at) + '.' + workforceNote : 'Company identity from SEC filings. Additional context appears when sourced.', finite(employees) ? sourceLink(profile?.employees?.source_url, 'Workforce source') : null));
-      const text = typeof profile?.description === 'string' ? profile.description.trim() : profile?.description?.text;
+      const rawDescription = typeof profile?.description === 'string' ? profile.description : profile?.description?.text;
+      const text = typeof rawDescription === 'string' ? rawDescription.trim() : '';
       if (text) {
         const paragraphs = text.split(/\n\s*\n|\n/).map(x => x.trim()).filter(Boolean);
         const prose = node('div', { class: 'cp-business-prose' });
@@ -166,7 +167,7 @@
       const tenK = company.filings?.find(f => /10-K|20-F|40-F/.test(f.f));
       if (tenK && helpers.filingUrl) aboutLinks.append(sourceLink(helpers.filingUrl(ticker, tenK), 'Business in the annual report'));
       const descSource = profile?.description_source?.url || profile?.description_source || profile?.description?.source_url || profile?.source_url;
-      if (safeUrl(descSource)) aboutLinks.append(sourceLink(descSource, profile?.description_provider || 'Business description source'));
+      if (text && safeUrl(descSource)) aboutLinks.append(sourceLink(descSource, profile?.description_provider || 'Business description source'));
       if (website) aboutLinks.append(sourceLink(website, 'Company website'));
       if (safeUrl(profile?.linkedin_url)) aboutLinks.append(sourceLink(profile.linkedin_url, 'Company LinkedIn'));
       if (safeUrl(profile?.ir_url || summary.ir_url)) aboutLinks.append(sourceLink(profile?.ir_url || summary.ir_url, 'Investor relations'));
@@ -210,7 +211,8 @@
           }
           leadership.append(node('div', { class: 'cp-role-group' }, node('h3', {}, group), grid));
         }
-        leadership.append(node('p', { class: 'cp-footnote' }, (profile.coverage?.leadership_scope ? profile.coverage.leadership_scope + ' ' : '') + 'Tenure uses the sourced role start date. “With company since” indicates employment tenure when a role start is unavailable.' + (profile.updated_at ? ' Profiles checked ' + dateLabel(profile.updated_at) + '.' : ' Observation dates are unavailable.')));
+        const checkedAt = profile.coverage?.official_updated_at || profile.updated_at;
+        leadership.append(node('p', { class: 'cp-footnote' }, (profile.coverage?.leadership_scope ? profile.coverage.leadership_scope + ' ' : '') + 'Tenure uses the sourced role start date. “With company since” indicates employment tenure when a role start is unavailable.' + (checkedAt ? ' Profiles checked ' + dateLabel(checkedAt) + '.' : ' Observation dates are unavailable.')));
       }
       const validImages = (profile?.images || []).filter(image => safeUrl(image.url) && safeUrl(image.source_url)).slice(0, 3);
       const publicationTime = item => Date.parse(item.published_at || item.date || '') || 0;

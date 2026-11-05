@@ -77,6 +77,60 @@ test('a profile for a different ticker cannot populate the selected issuer', () 
   } finally { h.close(); }
 });
 
+test('missing business descriptions never label provider documentation as their source', () => {
+  for (const description of [undefined, null, '', '  \n ', { text: '  \n ' }]) {
+    const h = setup();
+    try {
+      h.api.render(h.w.document.querySelector('main'), {
+        ticker: 'A', company: { name: 'Agilent', filings: [] }, snapshot: {}, helpers: {},
+        enrichment: { ticker: 'A', description, website: 'https://www.agilent.com/',
+          source_url: 'https://docs.peopledatalabs.com/docs/output-response-cleaner-apis' },
+      });
+      const about = h.w.document.querySelector('.cp-description');
+      assert.ok(about.querySelector('.cp-description-empty'));
+      assert.equal(about.querySelector('a[href*="peopledatalabs.com"]'), null);
+      assert.equal(about.querySelector('a[href="https://www.agilent.com/"]').textContent, 'Company website ↗');
+    } finally { h.close(); }
+  }
+});
+
+test('nonempty business descriptions retain their attributed source links', () => {
+  for (const enrichment of [
+    { description: 'Alpha develops software.', description_source: { url: 'https://alpha.example/about' }, source_url: 'https://provider.example/' },
+    { description: { text: '  Alpha develops software.  ' }, source_url: 'https://alpha.example/about' },
+  ]) {
+    const h = setup();
+    try {
+      h.api.render(h.w.document.querySelector('main'), {
+        ticker: 'AAA', company: { name: 'Alpha', filings: [] }, snapshot: {}, helpers: {},
+        enrichment: { ticker: 'AAA', ...enrichment },
+      });
+      const about = h.w.document.querySelector('.cp-description');
+      assert.equal(about.querySelector('.cp-business-prose p').textContent, 'Alpha develops software.');
+      assert.equal(about.querySelector('.cp-about-links a').href, 'https://alpha.example/about');
+      assert.equal(about.querySelector('.cp-about-links a').textContent, 'Business description source ↗');
+    } finally { h.close(); }
+  }
+});
+
+test('leadership checked dates use official observations rather than later metadata updates', () => {
+  for (const [coverage, expected] of [
+    [{ official_updated_at: '2026-10-01T12:00:00Z' }, 'Profiles checked Oct 1, 2026.'],
+    [{}, 'Profiles checked Nov 5, 2026.'],
+  ]) {
+    const h = setup();
+    try {
+      h.api.render(h.w.document.querySelector('main'), {
+        ticker: 'AAA', company: { name: 'Alpha', filings: [] }, snapshot: {}, helpers: {},
+        enrichment: { ticker: 'AAA', updated_at: '2026-11-05T12:00:00Z', coverage,
+          leadership: [{ name: 'Jane Example', role: 'CEO', observed_at: '2026-10-01T12:00:00Z' }] },
+      });
+      assert.ok(h.w.document.querySelector('.cp-leadership > .cp-footnote').textContent.includes(expected));
+      assert.match(h.w.document.querySelector('.cp-facts .cp-footnote').textContent, /Company context updated Nov 5, 2026/);
+    } finally { h.close(); }
+  }
+});
+
 test('reported currency and protocol-relative source links survive overview rendering without relabeling or crashing', () => {
   const h = setup();
   try {

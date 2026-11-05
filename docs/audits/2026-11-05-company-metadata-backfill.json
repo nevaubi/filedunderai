@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-05T20:37:44Z",
+  "generated_at": "2026-11-05T20:43:29Z",
   "site": "https://filedunderai.vercel.app/#companies",
   "baseline": {
     "registered": 1100,
@@ -1471,7 +1471,7 @@
       "failed": 0
     },
     "javascript_tests": {
-      "passed": 258,
+      "passed": 261,
       "failed": 0
     },
     "production_build": "passed",
