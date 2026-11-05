@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-05T20:43:29Z",
+  "generated_at": "2026-11-05T20:55:57Z",
   "site": "https://filedunderai.vercel.app/#companies",
   "baseline": {
     "registered": 1100,
@@ -1453,17 +1453,143 @@
       "URLError": 2
     },
     "successful_cache_validation": "public image bytes matched source SHA-256",
-    "rejected_source_handling": "Known403 and non-image URLs are hidden; original URLs and credits remain. A size limit alone does not mark a source broken."
+    "rejected_source_handling": "Known 403 and non-image URLs are hidden; original URLs and credits remain. A size limit alone does not mark a source broken."
   },
   "publication": {
-    "status": "pending_final_pass",
-    "generated_at": null,
-    "counts": null,
-    "profiles_changed": null,
-    "profiles_unchanged": null,
-    "authenticated_readback": null,
-    "public_readback": null,
-    "previous_versions_backed_up": false
+    "status": "complete",
+    "generated_at": "2026-11-05T20:49:14Z",
+    "counts": {
+      "registered": 1100,
+      "screener_eligible": 800,
+      "with_metadata": 728,
+      "with_leadership": 87,
+      "leaders": 901,
+      "portraits": 673,
+      "portrait_sources": 756,
+      "cached_portraits": 663
+    },
+    "profiles_changed": 22,
+    "profiles_unchanged": 706,
+    "authenticated_readback": "all changed profiles and directory matched exactly",
+    "public_readback": {
+      "status": "passed",
+      "verified_at": "2026-11-05T20:54:43Z",
+      "authentication": "none",
+      "counts": {
+        "registered": 1100,
+        "screener_eligible": 800,
+        "with_metadata": 728,
+        "with_leadership": 87,
+        "leaders": 901,
+        "portraits": 673,
+        "portrait_sources": 756,
+        "cached_portraits": 663
+      },
+      "json_objects": [
+        {
+          "path": "company-directory.json",
+          "result": "exact_match"
+        },
+        {
+          "path": "company-profiles/index.json",
+          "result": "exact_match"
+        },
+        {
+          "path": "company-profiles/AAPL.json",
+          "result": "exact_match"
+        },
+        {
+          "path": "company-profiles/MSFT.json",
+          "result": "exact_match"
+        },
+        {
+          "path": "company-profiles/NVDA.json",
+          "result": "exact_match"
+        },
+        {
+          "path": "company-profiles/GOOGL.json",
+          "result": "exact_match"
+        },
+        {
+          "path": "company-profiles/META.json",
+          "result": "exact_match"
+        },
+        {
+          "path": "company-profiles/BRK-B.json",
+          "result": "exact_match"
+        },
+        {
+          "path": "company-profiles/COF.json",
+          "result": "exact_match"
+        },
+        {
+          "path": "company-profiles/MO.json",
+          "result": "exact_match"
+        },
+        {
+          "path": "company-profiles/BNY.json",
+          "result": "exact_match"
+        },
+        {
+          "path": "company-profiles/CL.json",
+          "result": "exact_match"
+        },
+        {
+          "path": "company-profiles/FDX.json",
+          "result": "exact_match"
+        },
+        {
+          "path": "company-profiles/AMT.json",
+          "result": "exact_match"
+        },
+        {
+          "path": "company-profiles/A.json",
+          "result": "exact_match"
+        },
+        {
+          "path": "company-profiles/ZTS.json",
+          "result": "exact_match"
+        }
+      ],
+      "portrait_checks": [
+        {
+          "ticker": "MSFT",
+          "name": "Satya Nadella",
+          "result": "sha256_match"
+        },
+        {
+          "ticker": "NVDA",
+          "name": "Jensen Huang",
+          "result": "sha256_match"
+        },
+        {
+          "ticker": "GOOGL",
+          "name": "Sundar Pichai",
+          "result": "sha256_match"
+        },
+        {
+          "ticker": "META",
+          "name": "Mark Zuckerberg",
+          "result": "sha256_match"
+        },
+        {
+          "ticker": "CL",
+          "name": "Noel Wallace",
+          "result": "sha256_match"
+        },
+        {
+          "ticker": "FDX",
+          "name": "Raj Subramaniam",
+          "result": "sha256_match"
+        },
+        {
+          "ticker": "BNY",
+          "name": "Robin Vince",
+          "result": "sha256_match"
+        }
+      ]
+    },
+    "previous_versions_backed_up": true
   },
   "validation": {
     "python_financial_tests": {
@@ -1475,7 +1601,24 @@
       "failed": 0
     },
     "production_build": "passed",
-    "profile_identity_and_schema": "all728 profiles passed",
+    "live_render_check": {
+      "status": "passed",
+      "url": "https://filedunderai.vercel.app/#company-cl",
+      "leadership_cards": 29,
+      "cached_portraits": 29,
+      "role_tenure_displayed": true
+    },
+    "preview_render_check": {
+      "status": "passed",
+      "code_commit": "770016487694d7aa1d4cf4e504f60fd1c6c14a73",
+      "deployment_state": "READY",
+      "checks": [
+        "provider size band labeled",
+        "company LinkedIn present",
+        "empty description has no misleading description-source link"
+      ]
+    },
+    "profile_identity_and_schema": "all 728 profiles passed",
     "duplicate_normalized_names_within_company": 0,
     "provider_only_leaders": 0,
     "future_or_stale_person_observations": 0,
