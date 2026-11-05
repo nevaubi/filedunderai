@@ -10,7 +10,7 @@ from . import docs, fundamentals, insiders, macro, news, prices, sec, summaries
 from .common import Run, Supabase, now_iso, sec_get_raw, serialized_aggregates
 from .universe import ADDITIONAL_LIST, BY_TICKER, MARKET_SYMBOLS, SECTOR_ETF, SP100, SP500, UNIVERSE, UNIVERSE_METADATA
 
-PIPELINE_VERSION = 2
+PIPELINE_VERSION = fundamentals.NORMALIZATION_VERSION
 
 IR_URLS = {
     "AAPL": "https://investor.apple.com/", "MSFT": "https://www.microsoft.com/en-us/investor", "NVDA": "https://investor.nvidia.com/",
@@ -447,7 +447,9 @@ def companies_job(sb, tickers=None, workers=4, refresh_news=False, refresh_summa
                     print("fail", tk, err, flush=True)
         sb.put_json("meta/fundamentals.json", fund, cache="no-store")
         run.stats.update({"done": len(done), "failed": failed, "skipped": skipped, "errors": enrichment_errors, "tickers": done})
-        build_index(sb)
+        # Storage overwrites can still read as the previous object. Publish the
+        # same validated snapshot that this run processed and persisted.
+        build_index(sb, fundamentals_snapshot=fund)
         build_feed(sb)
         return done, failed
 
@@ -557,11 +559,12 @@ def _ins_net(entry):
 
 
 @serialized_aggregates
-def build_index(sb, pstats=None):
-    fund = _cache(sb, "meta/fundamentals.json", {}, strict=True)
-    if not fund:
+def build_index(sb, pstats=None, fundamentals_snapshot=None):
+    fund = (_cache(sb, "meta/fundamentals.json", {}, strict=True)
+            if fundamentals_snapshot is None else fundamentals_snapshot)
+    if not isinstance(fund, dict) or not fund:
         raise ValueError("Fundamentals missing; refusing to replace index with an empty bundle")
-    pstats = pstats or load_pricestats(sb)
+    pstats = load_pricestats(sb) if pstats is None else pstats
     ins = (_cache(sb, "meta/insiders.json", {}) or {}).get("companies", {})
     logos = (_cache(sb, "meta/logos.json", {}) or {}).get("tickers", {})
     rows, metrics = [], []
@@ -570,8 +573,11 @@ def build_index(sb, pstats=None):
         if not f:
             continue
         ps = pstats.get(tk) or {}
-        fd = dict(f.get("fund") or {})
-        price, shares = ps.get("price"), f.get("shares")
+        is_normalized = fundamentals.normalized(f)
+        # Legacy aggregate values can contain synthetic EPS and share quarters.
+        # Keep the company discoverable while its bounded normalization runs.
+        fd = dict(f.get("fund") or {}) if is_normalized else {}
+        price = ps.get("price")
         mcap = fundamentals.market_cap(price, f.get("shares_metadata"), ps.get("as_of"))
         rev, eps, fcf = fd.get("revenue_ttm"), fd.get("eps_ttm"), fd.get("fcf_ttm")
         m = {
@@ -582,13 +588,14 @@ def build_index(sb, pstats=None):
             "dividend_yield": None, "buyback_yield": None, "beta_1y": ps.get("beta_1y"), "vol_60d": ps.get("vol_60d"), "high_52w": ps.get("high_52w"), "low_52w": ps.get("low_52w"),
             "latest_quarter": fd.get("latest_quarter"), "latest_quarter_end": fd.get("latest_quarter_end"), "updated_at": now_iso(),
         }
-        if f.get("div_ttm") is not None and mcap:
+        if is_normalized and f.get("div_ttm") is not None and mcap:
             m["dividend_yield"] = f["div_ttm"] / mcap
-        if f.get("bb_ttm") is not None and mcap:
+        if is_normalized and f.get("bb_ttm") is not None and mcap:
             m["buyback_yield"] = f["bb_ttm"] / mcap
         metrics.append({k: (None if isinstance(v, float) and v != v else v) for k, v in m.items()})
         rows.append({**{k: v for k, v in m.items() if k not in ("updated_at",)}, "name": f["name"], "legal_name": f.get("legal_name"), "sector": f["sector"], "sic": f.get("sic"),
-                     "exchange": f.get("exchange"), "fye": f.get("fye"), "latest_filing": f.get("latest_filing"), "has_source_tables": f.get("has_source_tables"), "sp100": tk in SP100, "sp500": tk in SP500, "logo": tk in logos, "insider_net_90d": _ins_net(ins.get(tk)), "spark": ps.get("spark", []), "shares_metadata": f.get("shares_metadata")})
+                     "exchange": f.get("exchange"), "fye": f.get("fye"), "latest_filing": f.get("latest_filing"), "has_source_tables": f.get("has_source_tables"), "sp100": tk in SP100, "sp500": tk in SP500, "logo": tk in logos, "insider_net_90d": _ins_net(ins.get(tk)), "spark": ps.get("spark", []), "shares_metadata": f.get("shares_metadata"),
+                     "pipeline_version": f.get("pipeline_version"), "financial_status": "normalized" if is_normalized else "normalization_pending"})
     if metrics:
         sb.upsert("company_metrics", metrics, "ticker")
     sb.put_json("index.json", {"generated": now_iso(), "universe": UNIVERSE_METADATA, "sectors": SECTOR_ETF, "companies": rows}, cache="max-age=120")

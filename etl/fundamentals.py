@@ -1,5 +1,15 @@
 """Derived fundamentals for screening: TTM sums, latest-quarter margins and growth."""
 import datetime as dt
+import math
+
+
+# Aggregate caches must identify the normalizer that excluded synthetic EPS and shares.
+NORMALIZATION_VERSION = 2
+
+
+def normalized(entry):
+    version = (entry or {}).get("pipeline_version")
+    return type(version) is int and version >= NORMALIZATION_VERSION
 
 
 def _d(s):
@@ -145,12 +155,39 @@ def ttm(statements, label, stmt_order=("income", "cashflow")):
 
 
 def market_cap(price, shares, price_date=None):
-    """Only reported, unambiguous outstanding shares; stale counts remain unknown."""
-    if not price or not shares or not shares.get("val") or shares.get("basis") != "reported_outstanding":
+    """Reported shares available on the close date, at most 400 days old.
+
+    Match the browser's valuation guard. Missing, future, invalid or synthetic
+    counts remain unknown; invalid source metadata must not abort publication.
+    """
+    if not isinstance(shares, dict) or shares.get("basis") != "reported_outstanding" or shares.get("derived"):
         return None
-    if price_date and shares.get("end") and (_d(price_date)-_d(shares["end"])).days > 400:
+    count = shares.get("val")
+    if any(type(value) not in (int, float) or not math.isfinite(value) or value <= 0 for value in (price, count)):
         return None
-    return price * shares["val"]
+
+    def iso_date(value):
+        if not isinstance(value, str) or len(value) != 10:
+            raise ValueError("Expected YYYY-MM-DD")
+        parsed = _d(value)
+        if parsed.isoformat() != value:
+            raise ValueError("Expected YYYY-MM-DD")
+        return parsed
+
+    try:
+        as_of = iso_date(price_date or dt.datetime.now(dt.timezone.utc).date().isoformat())
+        end = iso_date(shares.get("end"))
+        if not 0 <= (as_of - end).days <= 400:
+            return None
+        for field in ("filed", "available_at"):
+            if shares.get(field) and not end <= iso_date(shares[field]) <= as_of:
+                return None
+    except (TypeError, ValueError):
+        return None
+    value = price * count
+    if not math.isfinite(value):
+        return None
+    return value
 
 
 def latest(statements, label, kind="quarterly"):

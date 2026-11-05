@@ -8,6 +8,7 @@ let TICKERS = [];
 const IDX = {};
 let INDEX = null, FEED = null, MACRO = null, MARKET = null;
 const _inflight = {};
+const companySummary = ticker => IDX[ticker] || window.FU_COMPANIES?.get(ticker);
 async function getJSON(path, { fresh = false, signal } = {}) {
   const key = path;
   if (!signal && !fresh && _inflight[key]) return _inflight[key];
@@ -48,11 +49,13 @@ async function ensurePrices(sym, { signal } = {}) {
 }
 async function ensureCompany(tk, { signal } = {}) {
   tk = String(tk || "").toUpperCase();
-  if (!IDX[tk]) throw new Error(`${tk} is not in coverage`);
+  if (!companySummary(tk)) throw new Error(`${tk} is not in coverage`);
   if (D.companies[tk]?.statements) return D.companies[tk];
   const [b] = await Promise.all([getJSON(`companies/${tk}.json`, { signal }), ensurePrices(tk, { signal }), ensurePrices("SPY", { signal })]);
   const p = b.profile || {};
-  D.companies[tk] = { ticker: tk, cik: b.cik, name: p.name, sic: p.sic, sicDescription: p.sicDescription, exchanges: p.exchanges, fiscalYearEnd: p.fiscalYearEnd || "1231", fyeHistory: p.fyeHistory || null, fyTransitions: p.fyTransitions || null, fyNameOffset: p.fyNameOffset || 0, stateOfIncorporation: p.stateOfIncorporation, phone: p.phone, website: p.website, address: p.address, sharesOutstanding: p.sharesOutstanding, filings: (b.filings || []).map(f => ({ ...f })), statements: b.statements, earnings8k: b.earnings8k || [], sector: b.sector, generated: b.generated };
+  D.companies[tk] = { ticker: tk, cik: b.cik, name: p.name, sic: p.sic, sicDescription: p.sicDescription, exchanges: p.exchanges, fiscalYearEnd: p.fiscalYearEnd || "1231", fyeHistory: p.fyeHistory || null, fyTransitions: p.fyTransitions || null, fyNameOffset: p.fyNameOffset || 0, stateOfIncorporation: p.stateOfIncorporation, phone: p.phone, website: p.website, address: p.address, sharesOutstanding: p.sharesOutstanding, filings: (b.filings || []).map(f => ({ ...f })), statements: b.statements, earnings8k: b.earnings8k || [], sector: b.sector, generated: b.generated, pipeline_version: b.pipeline_version, warnings: b.warnings || [] };
+  NAME[tk] = p.name || companySummary(tk)?.name || tk;
+  SHORT[tk] = b.displayName || companySummary(tk)?.name || p.name || tk;
   Object.assign(D.filings, b.filingTables || {});
   Object.assign(E.ix, b.ix || {});
   if (b.release) E.releases[tk] = b.release;
@@ -128,7 +131,7 @@ function retOver(s, days) {
   return end.c / b[i].c - 1;
 }
 function ytd(s) {
-  const b = PX[s]?.bars; if (!b) return null;
+  const b = PX[s]?.bars; if (!b?.length) return null;
   const y = b.at(-1).t.getUTCFullYear();
   const lastPrev = [...b].reverse().find(x => x.t.getUTCFullYear() < y);
   return lastPrev ? b.at(-1).c / lastPrev.c - 1 : null;
@@ -259,12 +262,13 @@ function allMetricLabels() { return METRIC_LABELS; }
 function snapshot(tk) {
   const m = model(tk), c = D.companies[tk], px = last(tk)?.c;
   const sh = c.sharesOutstanding?.val;
-  const mcap = px && sh ? px * sh : null;
+  const mcap = FU_FINANCIAL.marketCap(px, c.sharesOutstanding, last(tk)?.t?.toISOString().slice(0, 10));
   const eps = m.ttm("EPS diluted"), rev = m.ttm("Revenue"), ni = m.ttm("Net income"), ocf = m.ttm("Operating cash flow"), cap = m.ttm("Capex");
-  const fcf = ocf && cap ? { v: ocf.v - cap.v, tk, label: "Free cash flow", unit: "USD", kind: "TTM", calc: { formula: "TTM operating cash flow − TTM capex", inputs: [ocf, cap] } } : null;
+  const alignedCashFlows = ocf && cap && ocf.start === cap.start && ocf.end === cap.end && ocf.unit === cap.unit;
+  const fcf = alignedCashFlows ? { v: ocf.v - cap.calc.inputs.reduce((total, input) => total + Math.abs(input.v), 0), tk, label: "Free cash flow", unit: "USD", kind: "TTM", start: ocf.start, end: ocf.end, calc: { formula: "TTM operating cash flow − absolute capital expenditures", inputs: [ocf, cap] } } : null;
   const lq = m.latestQ();
   return { m, c, px, sh, mcap, eps, rev, ni, fcf, pe: eps && px ? px / eps.v : null, ps: mcap && rev ? mcap / rev.v : null, fcfy: fcf && mcap ? fcf.v / mcap : null,
-    gm: lq && m.ratio("Gross margin", "Q", lq), growth: lq && m.ratio("Revenue growth YoY", "Q", lq), nm: ni && rev ? ni.v / rev.v : null };
+    gm: lq && m.ratio("Gross margin", "Q", lq), growth: lq && m.ratio("Revenue growth YoY", "Q", lq), nm: ni && rev && rev.v && ni.start === rev.start && ni.end === rev.end && ni.unit === rev.unit ? ni.v / rev.v : null };
 }
 
 /* ---------- tooltip ---------- */
@@ -1021,7 +1025,8 @@ function macroSeries(name, n) {
 /* ---------- router & shell ---------- */
 const PAGES = [
   { id: "markets", name: "Markets", icon: "i-home", key: "m" },
-  { id: "screener", name: "Screener", icon: "i-co", key: "c" },
+  { id: "companies", name: "Companies", icon: "i-co", key: "c" },
+  { id: "screener", name: "Screener", icon: "i-cmp", key: "e" },
   { id: "compare", name: "Compare", icon: "i-cmp", key: "o" },
   { id: "feed", name: "Filings feed", icon: "i-feed", key: "f", hidden: true },
   { id: "technicals", name: "Technicals", icon: "i-ta", key: "t" },
@@ -1035,14 +1040,14 @@ const PAGES = [
 ];
 const page = $("#page");
 const WATCH_DEFAULT = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "JPM", "LLY"];
-const watchlist = () => store.get("watch", WATCH_DEFAULT).filter(t => IDX[t]);
+const watchlist = () => store.get("watch", WATCH_DEFAULT).filter(t => IDX[t] || window.FU_COMPANIES?.get(t));
 function toggleWatch(t) { const w = store.get("watch", WATCH_DEFAULT); const i = w.indexOf(t); i >= 0 ? w.splice(i, 1) : w.push(t); store.set("watch", w); renderRail(); toast(i >= 0 ? `Removed ${t} from watchlist` : `Added ${t} to watchlist`); return i < 0; }
 const STATE = { coTab: store.get("coTab", "overview"), finStmt: "income", finKind: "A", finView: "values", finRange: "all", finDense: store.get("dense", false), taSym: "NVDA", taRange: "1Y", taInd: { sma: true, bb: false, vol: true }, cmp: ["AAPL", "MSFT", "NVDA", "GOOGL"], cmpMetric: "Revenue", cmpKind: "Q", scr: (() => { const saved = store.get("scr", null); return saved ? { ...saved, uni: saved.uni || "sp500" } : { sector: "", sort: "market_cap", desc: true, q: "", uni: "all" }; })() };
 function renderRail() {
   const wl = $("#wl"); wl.innerHTML = "";
   const current = location.hash.startsWith("#company-") ? location.hash.slice(9).toUpperCase() : null;
   watchlist().forEach(t => {
-    const c = IDX[t], price = Number.isFinite(c.price) ? "$" + fnum(c.price) : "–";
+    const c = IDX[t] || window.FU_COMPANIES?.get(t), price = Number.isFinite(c.price) ? "$" + fnum(c.price) : "–";
     wl.append(el("a", { href: "#company-" + t.toLowerCase(), "data-t": t, class: t === current ? "on" : "", "aria-current": t === current ? "page" : null, title: `${c.name} · ${price}` },
       el("span", { class: "t" }, miniLogo(t, 18), t), el("span", { class: "price num" }, price), el("span", { class: "p num " + cls(c.chg_1d) }, fsgn(c.chg_1d))));
   });
@@ -1064,7 +1069,7 @@ function renderMarketTape() {
 function buildShell() {
   const nav = $("#nav"), visible = PAGES.filter(p => !p.hidden), used = new Set();
   const sections = [
-    ["Research", ["analyst", "screener", "watchlists", "compare"]],
+    ["Research", ["analyst", "companies", "screener", "watchlists", "compare"]],
     ["Markets", ["markets", "technicals", "sectors", "ideas", "kpis", "macro"]],
     ["Workspace", ["theses", "research", "workbench"]],
   ];
@@ -1095,14 +1100,15 @@ function loadingView(msg = "Loading") { page.innerHTML = ""; page.append(el("div
 let ROUTE_SEQ = 0;
 async function route() {
   closeSource(); hideTip();
+  window.FU_COMPANY_CLEANUP?.(); window.FU_COMPANY_CLEANUP = null;
+  page.classList.remove("companies-page");
   const seq = ++ROUTE_SEQ;
   const h = (location.hash || "#markets").slice(1);
   let pid = h, arg = null;
   if (h.startsWith("company-")) { pid = "company"; arg = h.slice(8).toUpperCase(); }
   else { const i = h.indexOf("-"); if (i > 0 && window.FU_PAGES && window.FU_PAGES[h.slice(0, i)]) { pid = h.slice(0, i); arg = decodeURIComponent(h.slice(i + 1)); } }
-  if (pid === "companies") pid = "screener";
   document.querySelectorAll("[data-p]").forEach(a => {
-    const current = a.dataset.p === pid || (pid === "company" && a.dataset.p === "screener");
+    const current = a.dataset.p === pid || (pid === "company" && a.dataset.p === "companies");
     a.classList.toggle("on", current);
     if (current) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   });
@@ -1147,14 +1153,15 @@ function setupPalette() {
 function paletteItems(v) {
   v = v.trim().toLowerCase(); const out = [];
   const add = (g, label, sub, ic, go) => out.push({ g, label, sub, ic, go });
-  const parts = v.split(/\s+/); const tk = TICKERS.find(t => parts[0] === t.toLowerCase() || parts[0] === (SHORT[t] || "").toLowerCase());
+  const available = window.FU_COMPANIES?.list() || INDEX?.companies || [];
+  const parts = v.split(/\s+/); const tk = available.find(c => parts[0] === c.ticker.toLowerCase() || parts[0] === (c.name || "").toLowerCase())?.ticker;
   if (tk && parts.length > 1) {
     const rest = parts.slice(1).join(" ");
     allMetricLabels().filter(m => m.toLowerCase().includes(rest)).slice(0, 6).forEach(mt => add("Metrics", `${tk} ${mt}`, "latest quarter, opens the source", tk[0], async () => { await ensureCompany(tk); const m = model(tk); const cell = m.metric(mt, "Q", m.latestQ()) || m.metric(mt, "A", m.latestA()); STATE.coTab = "financials"; if (location.hash !== "#company-" + tk.toLowerCase()) { location.hash = "company-" + tk.toLowerCase(); await new Promise(r => setTimeout(r, 400)); } if (cell) openSource(cell, "filing"); else toast(`${tk} doesn't report ${mt}`); }));
     [["financials", "Financials"], ["segments", "Segments & KPIs"], ["news", "News & narratives"], ["earnings", "Earnings & IR"], ["filings", "Filings"]].filter(([, n]) => n.toLowerCase().includes(rest)).forEach(([id, n]) => add("Companies", `${tk} · ${n}`, SHORT[tk], tk[0], () => { STATE.coTab = id; location.hash === "#company-" + tk.toLowerCase() ? route() : location.hash = "company-" + tk.toLowerCase(); }));
   }
-  const matches = TICKERS.filter(t => { const c = IDX[t]; return !v || t.toLowerCase().startsWith(v) || (c.name || "").toLowerCase().includes(v) || (c.legal_name || "").toLowerCase().includes(v); });
-  (v ? matches : watchlist()).slice(0, v ? 10 : 8).forEach(t => { const c = IDX[t]; add("Companies", `${t} · ${c.name}`, `${fnum(c.price)} · ${fsgn(c.chg_1d, 2)}`, miniLogo(t, 20), () => location.hash = "company-" + t.toLowerCase()); });
+  const matches = window.FU_COMPANIES ? window.FU_COMPANIES.query({ q: v }).map(c => c.ticker) : TICKERS.filter(t => { const c = IDX[t]; return !v || t.toLowerCase().startsWith(v) || (c.name || "").toLowerCase().includes(v) || (c.legal_name || "").toLowerCase().includes(v); });
+  (v ? matches : watchlist()).slice(0, v ? 10 : 8).forEach(t => { const c = companySummary(t); add("Companies", `${t} · ${c.name}`, Number.isFinite(c.price) ? `${fnum(c.price)} · ${fsgn(c.chg_1d, 2)}` : `${c.sector || "Company profile"}`, miniLogo(t, 20), () => { STATE.coTab = "overview"; location.hash = "company-" + t.toLowerCase(); }); });
   if (v) { const sec = [...new Set(Object.values(IDX).map(c => c.sector))].filter(s => s.toLowerCase().includes(v)); sec.forEach(s => add("Screener", `${s} sector`, "screener", "▤", () => { STATE.scr.sector = s; store.set("scr", STATE.scr); location.hash === "#screener" ? route() : location.hash = "screener"; })); }
   for (const p of PAGES) if (!p.hidden && (!v || p.name.toLowerCase().includes(v))) add("Pages", p.name, `g ${p.key}`, "→", () => location.hash = p.id);
   if (v) for (const s of Object.keys(SYMNAME)) if (s.toLowerCase().replace("^", "").startsWith(v) || SYMNAME[s].toLowerCase().includes(v)) add("Charts", `${s.replace("^", "")} · ${SYMNAME[s]}`, "technicals", "↗", () => { STATE.taSym = s; location.hash === "#technicals" ? route() : location.hash = "technicals"; });
@@ -1191,7 +1198,7 @@ function setupKeys() {
     if (e.key === "g") { g = Date.now(); return; }
     if (Date.now() - g < 900) { const p = PAGES.find(p => p.key === e.key && !p.hidden); if (p) { location.hash = p.id; g = 0; } return; }
     if (/^[1-6]$/.test(e.key) && location.hash.startsWith("#company-")) { const b = document.querySelectorAll(".tabs button")[+e.key - 1]; b?.click(); }
-    if (e.key === "s" && location.hash.startsWith("#company-")) { const t = location.hash.slice(9).toUpperCase(); if (IDX[t]) { const on = toggleWatch(t); document.querySelector("#star")?.classList.toggle("pri", on); } }
+    if (e.key === "s" && location.hash.startsWith("#company-")) { const t = location.hash.slice(9).toUpperCase(); if (companySummary(t)) { const on = toggleWatch(t); document.querySelector("#star")?.classList.toggle("pri", on); } }
   });
 }
 function seg(options, value, onChange) {
@@ -1258,7 +1265,7 @@ function pMarkets() {
   const g = el("div", { class: "grid g64" });
   const wl = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Watchlist"), el("th", { class: "r" }, "Price"), el("th", { class: "r" }, "1D"), el("th", { class: "r" }, "YTD"), el("th", { class: "r" }, "Mkt cap"), el("th", { class: "r" }, "P/E"), el("th", { class: "r" }, "Rev growth"), el("th", {}, "3M"))));
   const tb = el("tbody");
-  watchlist().forEach(t => { const c = IDX[t]; tb.append(el("tr", { class: "click", onclick: () => location.hash = "company-" + t.toLowerCase() },
+  watchlist().forEach(t => { const c = companySummary(t); tb.append(el("tr", { class: "click", onclick: () => location.hash = "company-" + t.toLowerCase() },
     el("td", {}, el("span", { class: "tkc" }, miniLogo(t, 20), el("b", {}, t), el("span", { class: "muted" }, c.name))),
     el("td", { class: "r num" }, fnum(c.price)), el("td", { class: "r num " + cls(c.chg_1d) }, fsgn(c.chg_1d, 2)), el("td", { class: "r num " + cls(c.ret_ytd) }, fsgn(c.ret_ytd)),
     el("td", { class: "r num" }, fmtMoney(c.market_cap)), el("td", { class: "r num" }, c.pe_ttm ? c.pe_ttm.toFixed(1) : "–"), el("td", { class: "r num " + cls(c.rev_growth_lq) }, c.rev_growth_lq != null ? fsgn(c.rev_growth_lq) : "–"),
@@ -1439,12 +1446,15 @@ function miniLogo(t, size = 18) {
 
 pCompany.prep = null;
 async function pCompany(tk) {
-  if (!IDX[tk]) { page.append(el("div", { class: "empty" }, el("h2", {}, `${tk} isn't covered yet`), el("p", { class: "muted" }, "Find available companies in the screener."), el("a", { class: "btn", href: "#screener" }, "Open the screener"))); return; }
-  await ensureCompany(tk);
+  const summary = IDX[tk] || window.FU_COMPANIES?.get(tk);
+  if (!summary) { page.append(el("div", { class: "empty" }, el("h2", {}, `${tk} isn't covered yet`), el("p", { class: "muted" }, "Find available companies in the Companies directory."), el("a", { class: "btn", href: "#companies" }, "Explore companies"))); return; }
+  const requestedRoute = typeof ROUTE_SEQ === "number" ? ROUTE_SEQ : null;
+  await Promise.all([ensureCompany(tk), window.FU_COMPANY_PROFILE?.loadHistory?.(tk, { dataBase: typeof PUB === "string" ? PUB : "" }), window.FU_COMPANY_PROFILE?.loadHistory?.("SPY", { dataBase: typeof PUB === "string" ? PUB : "" })]);
+  if (requestedRoute != null && requestedRoute !== ROUTE_SEQ) return;
   page.innerHTML = "";
   const s = snapshot(tk), c = s.c, a = c.address || {};
-  const st = priceStats(tk), filings = c.filings || [];
-  const officialName = c.name || IDX[tk].name || tk;
+  const st = priceStats(tk) || {}, filings = c.filings || [];
+  const officialName = c.name || summary.name || tk;
   const displayName = SHORT[tk] || officialName;
   const exchanges = [...new Set((c.exchanges || []).filter(Boolean))].join(", ");
   const titleCase = value => String(value).replace(/\b\w+/g, w => w.length > 2 && w === w.toUpperCase() && !/^\d/.test(w) ? w[0] + w.slice(1).toLowerCase() : w);
@@ -1456,7 +1466,7 @@ async function pCompany(tk) {
     logoTile(tk, 64),
     el("div", { class: "co-identity" },
       el("div", { class: "co-title-row" }, el("h1", {}, displayName), el("span", { class: "co-ticker" }, [exchanges, tk].filter(Boolean).join(": "))),
-      el("div", { class: "co-meta co-registrant" }, el("span", {}, officialName), IDX[tk].sector ? el("span", {}, IDX[tk].sector) : null),
+      el("div", { class: "co-meta co-registrant" }, el("span", {}, officialName), summary.sector ? el("span", {}, summary.sector) : null),
       el("div", { class: "co-meta co-industry" }, c.sicDescription ? el("span", {}, c.sicDescription) : null, [a.city, a.stateOrCountry].some(Boolean) ? el("span", {}, [a.city, a.stateOrCountry].filter(Boolean).map(titleCase).join(", ")) : null)),
     el("div", { class: "px co-quote" }, el("div", { class: "big num" }, s.px == null ? "–" : "$" + fnum(s.px)), el("div", { class: "num co-change " + cls(st.chg1d) }, fsgn(st.chg1d, 2) + " last session"), el("div", { class: "co-price-date" }, st.date ? "Close " + fdate(st.date) : "Close date unavailable")),
     el("div", { class: "co-actions" },
@@ -1468,7 +1478,7 @@ async function pCompany(tk) {
   const profileItem = (label, value) => el("div", {}, el("dt", {}, label), el("dd", {}, value || "Unavailable"));
   const profile = el("details", { class: "co-profile" }, el("summary", {}, "Company details"),
     el("dl", {}, profileItem("Registrant", officialName), profileItem("Address", address), profileItem("Phone", c.phone), profileItem("Fiscal year end", fiscalYearEnd), profileItem("Incorporation", c.stateOfIncorporation), profileItem("CIK", c.cik ? String(c.cik).padStart(10, "0") : null), profileItem("Industry", [c.sicDescription, c.sic ? `SIC ${c.sic}` : null].filter(Boolean).join(" · ")), profileItem("Website", WEB[tk] ? el("a", { href: "https://" + WEB[tk], target: "_blank", rel: "noopener" }, WEB[tk] + " ↗") : null)),
-    el("div", { class: "co-history" }, sparkSVG((PX[tk + "@5m"]?.bars || []).map(b => b.c), st.chg1d >= 0 ? css("--up") : css("--down"), 180, 34), el("span", {}, "Last 5 sessions, 5-minute bars")));
+    el("div", { class: "co-history" }, "Company identity from SEC filings."));
   head.querySelector(".co-identity").append(profile);
   page.append(crumbs, head);
   const rangeSpan = st.hi52 - st.lo52;
@@ -1484,7 +1494,7 @@ async function pCompany(tk) {
   extra.forEach(t => tabsDef.splice(Math.max(0, tabsDef.findIndex(x => x[0] === t.after) + 1) || tabsDef.length, 0, [t.id, t.name]));
   const tabs = el("div", { class: "tabs co-tabs", role: "tablist", "aria-label": "Company research" });
   const body = el("div", { class: "co-body" });
-  const show = id => { if (!tabsDef.find(t => t[0] === id)) id = "overview"; STATE.coTab = id; store.set("coTab", id); $("#crumb-tab").textContent = tabsDef.find(t => t[0] === id)[1]; tabs.querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.id === id); b.setAttribute("aria-selected", b.dataset.id === id); }); body.innerHTML = ""; if (id === "overview") body.append(metrics); ({ overview: coOverview, financials: coFinancials, segments: coSegments, news: coNews, filings: coFilings, earnings: coEarnings, insiders: coInsiders, ...Object.fromEntries(extra.map(t => [t.id, t.render])) })[id](body, tk); };
+  const show = id => { if (!tabsDef.find(t => t[0] === id)) id = "overview"; window.FU_COMPANY_CLEANUP?.(); window.FU_COMPANY_CLEANUP = null; STATE.coTab = id; store.set("coTab", id); $("#crumb-tab").textContent = tabsDef.find(t => t[0] === id)[1]; tabs.querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.id === id); b.setAttribute("aria-selected", b.dataset.id === id); }); body.innerHTML = ""; if (id === "overview") body.append(metrics); ({ overview: coOverview, financials: coFinancials, segments: coSegments, news: coNews, filings: coFilings, earnings: coEarnings, insiders: coInsiders, ...Object.fromEntries(extra.map(t => [t.id, t.render])) })[id](body, tk); };
   tabsDef.forEach(([id, n], i) => tabs.append(el("button", { "data-id": id, role: "tab", title: `${n} (${i + 1})`, onclick: () => show(id) }, n)));
   page.append(tabs, body);
   show(STATE.coTab);
@@ -1530,6 +1540,10 @@ function signals(tk) {
   return out;
 }
 function coOverview(body, tk) {
+  if (window.FU_COMPANY_PROFILE) {
+    window.FU_COMPANY_CLEANUP = window.FU_COMPANY_PROFILE.render(body, { ticker: tk, company: D.companies[tk], summary: companySummary(tk), snapshot: snapshot(tk), model: model(tk), prices: window.FU_COMPANY_PROFILE.history(tk, PX[tk]), benchmarkPrices: window.FU_COMPANY_PROFILE.history("SPY", PX.SPY), news: E.news[tk]?.news || [], signals: signals(tk), related: window.FU_COMPANIES?.related(tk) || [], helpers: { el, fmtMoney, fnum, fpct, fsgn, fdate, plabel, openSource, cellChip, miniLogo, filingUrl, logoTile }, dataBase: PUB, onTab: id => body.parentElement.querySelector(`.co-tabs button[data-id="${id}"]`)?.click(), onCompany: () => { STATE.coTab = "overview"; } });
+    return;
+  }
   const m = model(tk);
   const g = el("div", { class: "grid g64" });
   const pxHost = el("div", { class: "bd" });
@@ -2746,6 +2760,10 @@ async function boot() {
     const soft = p => Promise.race([p.catch(() => null), new Promise(r => setTimeout(() => r(null), 4000))]);
     const [ix, mk, mc, fd] = await Promise.all([getJSON("index.json"), getJSON("market.json"), soft(getJSON("macro.json")), soft(getJSON("feed.json"))]);
     applyIndex(ix); applyMarket(mk);
+    if (window.FU_COMPANIES) {
+      await window.FU_COMPANIES.load(ix.companies).catch(() => window.FU_COMPANIES.apply({ companies: [] }, ix.companies));
+      window.FU_COMPANIES.list().forEach(c => { NAME[c.ticker] ||= c.legal_name || c.name; SHORT[c.ticker] ||= c.name; if (c.website) WEB[c.ticker] ||= c.website.replace(/^https?:\/\//, "").replace(/\/$/, ""); });
+    }
     if (mc) applyMacro(mc); else getJSON("macro.json").then(applyMacro).catch(() => {});
     if (fd) FEED = fd; else getJSON("feed.json").then(f => { FEED = f; }).catch(() => {});
   } catch (e) {

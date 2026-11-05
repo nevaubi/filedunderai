@@ -36,7 +36,7 @@ EXTRA_SYMS = ["DX-Y.NYB"]  # not carried by the prices job
 HIST_SYMS = list(dict.fromkeys(MARKET_SYMBOLS + EXTRA_SYMS + TICKERS))
 HIST_YEARS = 6.3
 CLOSES_PATH, FUND_PATH, KPI_PATH = "screener/closes.json.gz", "screener/fund.json.gz", "screener/kpi.json.gz"
-FUND_VERSION = 5
+FUND_VERSION = 6
 YAHOO = "https://query2.finance.yahoo.com/v8/finance/chart/"
 
 # statement lines read from the company bundles (label as stored by etl/sec.py)
@@ -419,6 +419,8 @@ def _rec(r, concept):
 def extract_company(sb, tk, since):
     """Quarterly statement records since `since` for the screener labels, plus extra concepts from companyfacts."""
     b = sb.get_json(f"companies/{tk}.json") or {}
+    if not fundamentals.normalized(b):
+        raise ValueError(f"{tk}: company bundle is not normalized; withholding financial cache")
     st = b.get("statements") or {}
     q, history = {}, {}
     for stmt in ("income", "balance", "cashflow"):
@@ -432,7 +434,7 @@ def extract_company(sb, tk, since):
             history[lab] = [_rec(r, row["concept"]) for r in (row.get("filing_history") or {}).get("quarterly", []) if r["end"] >= since]
     prof = b.get("profile") or {}
     shares = prof.get("sharesOutstanding") or {}
-    out = {"q": q, "filing_history": history, "fye": prof.get("fiscalYearEnd"), "shares": dict(shares, v=shares.get("val"))}
+    out = {"pipeline_version": b["pipeline_version"], "q": q, "filing_history": history, "fye": prof.get("fiscalYearEnd"), "shares": dict(shares, v=shares.get("val"))}
     cik = BY_TICKER[tk]["cik"]
     strict = tk in STRICT_SOURCE_TICKERS
     cf_raw = None
@@ -479,11 +481,19 @@ def update_fund(sb, fundmeta, closes, full=False, workers=6, log=print, deadline
     if cache.get("_v") != FUND_VERSION:
         cache = {"_v": FUND_VERSION}
     since = (dt.date.today() - dt.timedelta(days=int(365.25 * 7.3))).isoformat()
-    todo = []
+    todo, invalidated = [], False
     for tk in TICKERS:
         fm = fundmeta.get(tk) or {}
-        key = f"{fm.get('material_accession')}|{(fm.get('fund') or {}).get('latest_quarter_end')}|{fm.get('shares')}"
-        if (cache.get(tk) or {}).get("key") != key and fm:
+        if not fundamentals.normalized(fm):
+            invalidated = cache.pop(tk, None) is not None or invalidated
+            continue
+        # Same-filing normalization and corrected share dates must invalidate
+        # the cache even when the accession, quarter and share value did not change.
+        key = json.dumps([fm["pipeline_version"], fm.get("material_accession"),
+                          (fm.get("fund") or {}).get("latest_quarter_end"),
+                          fm.get("shares_metadata")], sort_keys=True, separators=(",", ":"))
+        if (cache.get(tk) or {}).get("key") != key or not fundamentals.normalized(cache.get(tk)):
+            invalidated = cache.pop(tk, None) is not None or invalidated
             todo.append((tk, key))
     log(f"fund cache: {len(todo)} companies to (re)extract")
 
@@ -506,7 +516,7 @@ def update_fund(sb, fundmeta, closes, full=False, workers=6, log=print, deadline
                 done += 1
             elif err != "deadline":
                 log("fund extract failed", tk, err)
-    if todo:
+    if todo or invalidated:
         put_gz(sb, FUND_PATH, cache)
     log(f"fund cache: extracted {done}")
     return cache
@@ -1438,6 +1448,14 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
             prov.f.update(pp)
             price = out.get("price")
             price_date = pp["price"]["p"][-1][0] if price is not None else None
+            # Per-share earnings valuation does not require a reported share count.
+            if inp and price is not None and math.isfinite(price) and price > 0 and inp["eps"] is not None:
+                eps = inp["eps"]
+                if eps > 0:
+                    out["pe"] = price / eps
+                    prov.put("pe", f"Close {price} on {price_date} / diluted EPS of the last four quarters ({eps:.2f}, split-adjusted)", inp["recs"]["eps"], p=[[price_date, price]])
+                out["earn_yield"] = eps / price
+                prov.put("earn_yield", f"Diluted EPS of the last four quarters ({eps:.2f}) / close {price}", inp["recs"]["eps"], p=[[price_date, price]])
             sh = dict((fundc.get(tk) or {}).get("shares") or {})
             mcap = fundamentals.market_cap(price, dict(sh, val=sh.get("v")), price_date)
             if mcap is not None:
@@ -1460,14 +1478,6 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
                         ev = mcap + inp["debt"] - inp["cash"]
                         out["ev"] = ev
                         prov.put("ev", "Market cap + total debt − cash and current marketable securities", srefs + R["debt"] + R["cash"], p=[[price_date, price]])
-                    eps = None
-                    if inp["eps"] is not None:
-                        eps = inp["eps"]
-                        if eps > 0:
-                            out["pe"] = price / eps
-                            prov.put("pe", f"Close {price} on {price_date} / diluted EPS of the last four quarters ({eps:.2f}, split-adjusted)", R["eps"], p=[[price_date, price]])
-                        out["earn_yield"] = eps / price
-                        prov.put("earn_yield", f"Diluted EPS of the last four quarters ({eps:.2f}) / close {price}", R["eps"], p=[[price_date, price]])
                     pairs = [("ev_ebit", ev, inp["oi"], R["oi"], "Enterprise value / operating income (trailing four quarters)"),
                              ("ev_sales", ev, inp["rev"], R["rev"], "Enterprise value / revenue (trailing four quarters)"),
                              ("ev_fcf", ev, inp["fcf"], R["fcf"], "Enterprise value / free cash flow (trailing four quarters)"),
