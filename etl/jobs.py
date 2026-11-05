@@ -872,11 +872,30 @@ def ir_rotation_job(sb, per_run=8, time_budget=240):
 @serialized_aggregates
 def _ir_rotation_job(sb, per_run, time_budget, started):
     """Resume failed/skipped companies fairly alongside recent earnings and the rolling universe."""
+    import copy
     state = _cache(sb, "meta/ir_rotation.json", {"cursor": 0, "done_hot": {}, "retry": []}, strict=True)
     if not isinstance(state, dict) or not isinstance(state.get("done_hot"), dict) or not isinstance(state.get("retry", []), list):
         raise ValueError("Invalid IR rotation checkpoint; refusing replacement")
-    recent = sb.select("filings", "select=ticker,items,filed&form=eq.8-K&filed=gte." + (dt.date.today() - dt.timedelta(days=4)).isoformat())
     tickers = [t for t, *_ in UNIVERSE]
+    pending = copy.deepcopy(state.get("coverage_updates", {}))
+    if (not isinstance(pending, dict) or not set(pending).issubset(tickers)
+            or (state.get("coverage_pending") and "coverage_updates" not in state)):
+        raise ValueError("Invalid or legacy pending IR coverage; reconcile the coverage checkpoint explicitly")
+    def coverage_time(value):
+        try:
+            if not isinstance(value, dict) or value.get("status") not in ("complete", "partial", "unverified"):
+                raise ValueError("invalid coverage")
+            stamp = dt.datetime.fromisoformat(value["updated_at"].replace("Z", "+00:00"))
+            if stamp.tzinfo is None:
+                raise ValueError("coverage timestamp requires a timezone")
+            return stamp
+        except (KeyError, TypeError, AttributeError, ValueError) as error:
+            raise ValueError("Invalid pending IR coverage timestamp or status") from error
+    for value in pending.values():
+        coverage_time(value)
+    if len(json.dumps(pending, separators=(",", ":"), allow_nan=False).encode()) > 4 * 1024 * 1024:
+        raise ValueError("Pending IR coverage exceeds checkpoint size limit")
+    recent = sb.select("filings", "select=ticker,items,filed&form=eq.8-K&filed=gte." + (dt.date.today() - dt.timedelta(days=4)).isoformat())
     if not tickers or per_run <= 0:
         return {}, {}
     retry = [t for t in dict.fromkeys(state.get("retry", [])) if t in tickers]
@@ -888,6 +907,15 @@ def _ir_rotation_job(sb, per_run, time_budget, started):
     selected = picked_retry + hot + rest
     remaining = max(0, time_budget - (time.monotonic() - started)) if time_budget is not None else None
     done, failed = ir_job(sb, selected, workers=4, time_budget=remaining)
+    for tk, result in done.items():
+        if tk not in tickers:
+            raise ValueError("IR coverage result outside the current universe")
+        value = result.get("coverage")
+        incoming_time = coverage_time(value)
+        if tk not in pending or incoming_time >= coverage_time(pending[tk]):
+            pending[tk] = copy.deepcopy(value)
+    if len(json.dumps(pending, separators=(",", ":"), allow_nan=False).encode()) > 4 * 1024 * 1024:
+        raise ValueError("Pending IR coverage exceeds checkpoint size limit")
     for tk in hot:
         if tk in done and tk not in failed:
             state["done_hot"][tk] = dt.date.today().isoformat()
@@ -896,15 +924,21 @@ def _ir_rotation_job(sb, per_run, time_budget, started):
         state["cursor"] = (tickers.index(rest[-1]) + 1) % len(tickers)
     state["updated_at"] = now_iso()
     state["coverage_pending"] = True
+    state["coverage_updates"] = pending
     sb.put_json("meta/ir_rotation.json", state, cache="no-store")
     if time_budget is not None and time.monotonic() - started >= time_budget:
         failed["coverage_index"] = "skipped: time budget"
         return done, failed
     try:
         from .kpitools import build_index
-        build_index(sb, coverage_updates={tk: result.get("coverage") for tk, result in done.items()})
-        state["coverage_pending"] = False
-        sb.put_json("meta/ir_rotation.json", state, cache="no-store")
+        # Bound replay work while retaining older dirty companies until acknowledged.
+        replay = dict(list(pending.items())[:min(32, max(8, per_run * 2))])
+        build_index(sb, coverage_updates=copy.deepcopy(replay))
+        remaining_updates = {tk: value for tk, value in pending.items() if tk not in replay}
+        acknowledged = {**state, "coverage_pending": bool(remaining_updates), "coverage_updates": remaining_updates}
+        sb.put_json("meta/ir_rotation.json", acknowledged, cache="no-store")
+        if remaining_updates:
+            failed["coverage_index"] = f"deferred: {len(remaining_updates)} pending company coverage updates"
     except Exception as e:
         failed["coverage_index"] = str(e)[:300]
         print("coverage index failed", e)
