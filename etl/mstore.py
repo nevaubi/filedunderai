@@ -132,18 +132,15 @@ def db_ready(sb):
     return _DB["ok"]
 
 
-def _published_collection(sb, path, kind, catalog_field):
-    """Read existing state strictly; only a genuinely new store may be empty."""
+def _published_collection(sb, path, kind, catalog_field=None):
+    """Require initialized state; explicit empty collections are valid, absent inputs are not."""
     value = sb.get_json(path)
-    if value is not None and not isinstance(value, kind):
-        raise ValueError(f"Invalid {path}: expected {kind.__name__}")
-    if not value:
-        catalog = sb.get_json("macro/catalog.json")
-        if catalog is not None and not isinstance(catalog, dict):
-            raise ValueError("Invalid macro/catalog.json")
-        if catalog and catalog.get(catalog_field):
+    if not isinstance(value, kind):
+        raise ValueError(f"Missing or invalid {path}: expected initialized {kind.__name__}")
+    if catalog_field and not value:
+        catalog = _published_collection(sb, "macro/catalog.json", dict)
+        if catalog.get(catalog_field):
             raise ValueError(f"Missing or empty {path} while its published catalog still has {catalog_field}")
-        return kind()
     return value
 
 
@@ -208,7 +205,8 @@ def save(sb, series, reg, partial=False, log=print, prev_reg=None):
     """Upserts metadata, ingests changed observations as new vintages, writes per-series bundles and snapshots.
 
     partial=True means `obs` only covers a recent window: the bundle merges it into the previously published history.
-    `reg` is the registry dict from load_registry(); it is updated in place and written by publish_catalog().
+    `reg` collects only entries touched by this call; publish_catalog() merges them into fresh stored metadata.
+    `prev_reg` supplies previously published metadata used to protect existing history and compute changes.
     Returns {series_id: number of new or revised observations}.
     """
     out = {}
@@ -289,16 +287,25 @@ def save(sb, series, reg, partial=False, log=print, prev_reg=None):
 
 @serialized_aggregates
 def save_releases(sb, rows, log=print):
-    """Release calendar rows: {release, release_date, release_time, provider, title, source_url}. Keeps other publishers' rows."""
-    cur = _published_collection(sb, "macro/releases.json", list, "calendar")
-    mine = {r["release"] for r in rows}
-    keep = [r for r in cur if r["release"] not in mine]
+    """Merge a partial schedule by (release, release_date), retaining every absent pair."""
+    _validate_releases(rows)
+    unique = {}
+    for row in rows:
+        key = (row["release"], row["release_date"])
+        if key in unique and unique[key] != row:
+            raise ValueError(f"Conflicting macro release calendar rows: {key[0]} on {key[1]}")
+        unique[key] = row
     stamp = now_iso()
-    rows = [dict(r, retrieved_at=stamp) for r in rows]
-    sb.put_json("macro/releases.json", sorted(keep + rows, key=lambda r: (r["release_date"], r["release"])), cache="max-age=300")
-    if db_ready(sb) and rows:
+    # Only identical incoming pairs collapse, including in the relational upsert.
+    rows = [dict(r, retrieved_at=stamp) for r in unique.values()]
+    _, releases, _ = _prepare_catalog(sb, {}, release_rows=rows)
+    use_db = db_ready(sb)
+    _check_lease(sb)
+    sb.put_json("macro/releases.json", releases, cache="max-age=300")
+    if use_db and rows:
+        _check_lease(sb)
         sb.upsert("macro_releases", rows, "release,release_date")
-    log(f"calendar: {len(rows)} dates for {len(mine)} releases")
+    log(f"calendar: {len(rows)} dates for {len({r['release'] for r in rows})} releases")
     return len(rows)
 
 
@@ -356,14 +363,49 @@ def what_changed(series, days=7):
     return out
 
 
-@serialized_aggregates
-def publish_catalog(sb, reg, log=print):
-    """Writes macro/registry.json and macro/catalog.json: series with metadata and statistics, upcoming releases, this week's moves."""
-    if not isinstance(reg, dict):
-        raise ValueError("Macro registry must be a dict")
+def _validate_registry(reg):
+    for sid, meta in reg.items():
+        if not isinstance(sid, str) or not sid or not isinstance(meta, dict):
+            raise ValueError("Invalid macro registry entry")
+        if meta.get("stats") is not None and not isinstance(meta["stats"], dict):
+            raise ValueError(f"Invalid macro registry statistics: {sid}")
+
+
+def _validate_releases(rows):
+    if not isinstance(rows, list):
+        raise ValueError("Macro release calendar must be a list")
+    for row in rows:
+        if not isinstance(row, dict) or not isinstance(row.get("release"), str) or not row["release"]:
+            raise ValueError("Invalid macro release calendar row")
+        date = row.get("release_date")
+        try:
+            valid = isinstance(date, str) and dt.date.fromisoformat(date).isoformat() == date
+        except ValueError:
+            valid = False
+        if not valid:
+            raise ValueError("Invalid macro release calendar date")
+
+
+def _prepare_catalog(sb, touched, release_rows=None):
+    """Read required inputs and prepare complete outputs before aggregate writes, under the caller's lease."""
+    if not isinstance(touched, dict):
+        raise ValueError("Macro registry delta must be a dict")
+    reg = load_registry(sb)
+    rel = _published_collection(sb, "macro/releases.json", list, "calendar")
+    prior_catalog = _published_collection(sb, "macro/catalog.json", dict)
+    for field, kind in (("series", dict), ("calendar", list), ("changes", list), ("sections", list)):
+        if field in prior_catalog and not isinstance(prior_catalog[field], kind):
+            raise ValueError(f"Invalid macro/catalog.json {field}")
+    _validate_registry(reg)
+    _validate_registry(touched)
+    _validate_releases(rel)
+    reg = dict(reg, **touched)
+    if release_rows is not None:
+        incoming = {(r["release"], r["release_date"]) for r in release_rows}
+        rel = sorted([r for r in rel if (r["release"], r["release_date"]) not in incoming] + release_rows,
+                     key=lambda r: (r["release_date"], r["release"]))
     t0 = today()
     horizon = (dt.date.fromisoformat(t0) + dt.timedelta(days=45)).isoformat()
-    rel = _published_collection(sb, "macro/releases.json", list, "calendar")
     cal = [r for r in rel if r["release_date"] >= t0]
     by_release = {}
     for sid, m in reg.items():
@@ -378,12 +420,28 @@ def publish_catalog(sb, reg, log=print):
         series[sid] = dict(m, next_release=[c["release_date"], c.get("release_time")] if c else None)
     calendar = [dict(c, series=by_release.get(c["release"], [])[:60]) for c in cal if c["release_date"] <= horizon and by_release.get(c["release"])]
     changes = what_changed([dict(m, id=sid) for sid, m in reg.items()])
-    # Resolve all existing inputs before either global object can be replaced.
+    catalog = {"generated": now_iso(), "sections": SECTIONS, "series": series, "calendar": calendar, "changes": changes}
+    # Detect malformed output before the first write, including serialization failures.
+    for value in (reg, rel, catalog):
+        json.dumps(value, separators=(",", ":"), default=str, allow_nan=False)
+    return reg, rel, catalog
+
+
+@serialized_aggregates
+def publish_catalog(sb, touched, log=print):
+    """Merge touched metadata into fresh stored state and publish a complete catalog.
+
+    Callers must pass only entries they changed. Full registries are accepted as additive
+    updates: omitted entries remain, but every supplied entry is considered touched.
+    Required inputs and output preparation precede writes; the writes are not transactional.
+    """
+    reg, _, catalog = _prepare_catalog(sb, touched)
     _check_lease(sb)
     sb.put_json("macro/registry.json", reg, cache="no-store")
-    sb.put_json("macro/catalog.json", {"generated": now_iso(), "sections": SECTIONS, "series": series, "calendar": calendar, "changes": changes}, cache="max-age=300")
-    log(f"catalog: {len(series)} series, {len(calendar)} upcoming release dates, {len(changes)} weekly moves")
-    return len(series)
+    _check_lease(sb)
+    sb.put_json("macro/catalog.json", catalog, cache="max-age=300")
+    log(f"catalog: {len(catalog['series'])} series, {len(catalog['calendar'])} upcoming release dates, {len(catalog['changes'])} weekly moves")
+    return len(catalog["series"])
 
 
 def snapshot_rows(cols, rows, keys, url, note=None):

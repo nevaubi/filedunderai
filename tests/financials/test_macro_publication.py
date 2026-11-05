@@ -11,7 +11,7 @@ class LeaseState:
         self.lock = threading.Lock()
         self.owner = None
         self.acquisitions = []
-        self.data = {"macro/registry.json": {}, "macro/releases.json": []}
+        self.data = {"macro/registry.json": {}, "macro/releases.json": [], "macro/catalog.json": {}}
 
 
 class Store:
@@ -235,12 +235,145 @@ class MacroPublicationTests(unittest.TestCase):
             mstore.publish_catalog(sb, {}, log=lambda *_: None)
         self.assertEqual(sb.writes, [])
 
-    def test_new_store_can_initialize_without_existing_metadata(self):
+    def test_absent_initialized_inputs_cannot_become_empty_publication(self):
+        calls = [mstore.load_registry,
+                 lambda sb: macrojobs._publish(sb, {}, log=lambda *_: None),
+                 lambda sb: mstore.publish_catalog(sb, {}, log=lambda *_: None),
+                 lambda sb: mstore.save_releases(sb, [], log=lambda *_: None)]
+        for call in calls:
+            with self.subTest(call=call):
+                sb = Store()
+                sb.shared.data.clear()
+                with self.assertRaises(ValueError):
+                    call(sb)
+                self.assertEqual(sb.writes, [])
+                self.assertEqual(sb.db_writes, [])
+
+    def test_explicit_empty_initialized_collections_remain_valid(self):
         sb = Store()
-        sb.shared.data.clear()
-        self.assertEqual(mstore.load_registry(sb), {})
         self.assertEqual(mstore.publish_catalog(sb, {}, log=lambda *_: None), 0)
         self.assertEqual(sb.shared.data["macro/catalog.json"]["calendar"], [])
+        self.assertEqual(mstore.save_releases(sb, [], log=lambda *_: None), 0)
+
+    def test_every_required_input_failure_prevents_aggregate_writes(self):
+        calls = [lambda sb: mstore.publish_catalog(sb, {}, log=lambda *_: None),
+                 lambda sb: mstore.save_releases(sb, [{"release": "NEW", "release_date": "2099-01-01"}], log=lambda *_: None)]
+        for call in calls:
+            for path in ("macro/registry.json", "macro/releases.json", "macro/catalog.json"):
+                for failure in ("missing", "wrong_type", "unreadable"):
+                    with self.subTest(call=call, path=path, failure=failure):
+                        sb = Store()
+                        sb.shared.data["macro/registry.json"] = {"PEER": {"id": "PEER", "title": "Unchanged"}}
+                        if failure == "missing":
+                            sb.shared.data.pop(path)
+                        elif failure == "wrong_type":
+                            sb.shared.data[path] = {} if path.endswith("releases.json") else []
+                        else:
+                            def fail_read(name):
+                                if name == path:
+                                    raise RuntimeError("required input unavailable")
+                            sb.on_read = fail_read
+                        with self.assertRaises((ValueError, RuntimeError)):
+                            call(sb)
+                        self.assertEqual(sb.writes, [])
+                        self.assertEqual(sb.db_writes, [])
+
+    def test_direct_publishers_merge_deltas_and_preserve_additions_from_stale_full_snapshots(self):
+        shared = LeaseState()
+        prior = {"OLD": {"id": "OLD", "title": "Unchanged", "extra": [1, 2]}}
+        shared.data["macro/registry.json"] = copy.deepcopy(prior)
+        first = dict(prior, FIRST={"id": "FIRST", "title": "First"})
+        stale_second = dict(prior, SECOND={"id": "SECOND", "title": "Second"})
+        mstore.publish_catalog(Store(shared), first, log=lambda *_: None)
+        mstore.publish_catalog(Store(shared), stale_second, log=lambda *_: None)
+        self.assertEqual(set(shared.data["macro/registry.json"]), {"OLD", "FIRST", "SECOND"})
+        macrojobs._publish(Store(shared), {"THIRD": {"id": "THIRD", "title": "Third"}}, log=lambda *_: None)
+        self.assertEqual(set(shared.data["macro/catalog.json"]["series"]), {"OLD", "FIRST", "SECOND", "THIRD"})
+        self.assertEqual(shared.data["macro/registry.json"]["OLD"], prior["OLD"])
+
+    def test_legacy_routes_do_not_publish_registry_before_calendar_validation(self):
+        rows = [{"series": "FRED:CPIAUCSL", "d": "2026-10-01", "value": 100}]
+
+        class LegacyStore(Store):
+            def select(self, table, query=""):
+                return copy.deepcopy(rows) if table == "macro_observations" else super().select(table, query)
+
+            def rpc(self, name, args):
+                if name == "macro_ingest":
+                    return [{"d": row["d"]} for row in args["p_rows"]]
+                return super().rpc(name, args)
+
+        for call in (lambda sb: macrojobs.migrate_legacy(sb, log=lambda *_: None),
+                     lambda sb: macrojobs.legacy_store(sb, rows, log=lambda *_: None)):
+            with self.subTest(call=call):
+                sb = LegacyStore()
+                def fail_calendar(path):
+                    if path == "macro/releases.json":
+                        raise RuntimeError("calendar unavailable")
+                sb.on_read = fail_calendar
+                with self.assertRaisesRegex(RuntimeError, "calendar unavailable"):
+                    call(sb)
+                self.assertFalse(set(sb.writes) & {"macro/registry.json", "macro/catalog.json", "macro/releases.json"})
+                self.assertEqual(sb.shared.data["macro/registry.json"], {})
+
+    def test_partial_calendar_preserves_prior_dates_and_replaces_only_matching_pair(self):
+        sb = Store()
+        earlier = {"release": "BLS:CPI", "release_date": "2099-01-10", "custom": [1, 2]}
+        later = {"release": "BLS:CPI", "release_date": "2099-02-10", "release_time": "8:00"}
+        peer = {"release": "FRB:H.15", "release_date": "2099-01-11", "title": "Unchanged"}
+        sb.shared.data["macro/releases.json"] = copy.deepcopy([earlier, later, peer])
+        incoming = dict(later, release_time="8:30")
+        mstore.save_releases(sb, [incoming], log=lambda *_: None)
+        result = {(r["release"], r["release_date"]): r for r in sb.shared.data["macro/releases.json"]}
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result["BLS:CPI", "2099-01-10"], earlier)
+        self.assertEqual(result["FRB:H.15", "2099-01-11"], peer)
+        self.assertEqual(result["BLS:CPI", "2099-02-10"]["release_time"], "8:30")
+        self.assertEqual(incoming, dict(later, release_time="8:30"))
+
+    def test_catalog_preparation_failure_precedes_calendar_replacement(self):
+        sb = Store()
+        sb.shared.data["macro/registry.json"] = {"BAD": {"id": "BAD", "stats": ["invalid"]}}
+        with self.assertRaises((ValueError, AttributeError)):
+            mstore.save_releases(sb, [{"release": "NEW", "release_date": "2099-01-01"}], log=lambda *_: None)
+        self.assertEqual(sb.writes, [])
+        self.assertEqual(sb.db_writes, [])
+
+    def test_duplicate_calendar_pairs_must_be_identical_before_collapse(self):
+        row = {"release": "BLS:CPI", "release_date": "2099-02-10", "release_time": "8:30"}
+        sb = Store()
+        incoming = [copy.deepcopy(row), copy.deepcopy(row)]
+        self.assertEqual(mstore.save_releases(sb, incoming, log=lambda *_: None), 1)
+        self.assertEqual(len(sb.shared.data["macro/releases.json"]), 1)
+        self.assertEqual(len(sb.db_writes), 1)
+        self.assertEqual(len(sb.db_writes[0][1]), 1)
+        self.assertEqual(incoming, [row, row])
+
+        sb = Store()
+        before = copy.deepcopy(sb.shared.data)
+        with self.assertRaisesRegex(ValueError, "Conflicting.*release"):
+            mstore.save_releases(sb, [row, dict(row, release_time="9:00")], log=lambda *_: None)
+        self.assertEqual(sb.writes, [])
+        self.assertEqual(sb.db_writes, [])
+        self.assertEqual(sb.shared.data, before)
+
+    def test_malformed_collection_contents_fail_before_any_aggregate_write(self):
+        cases = [("macro/registry.json", {"BAD": []}),
+                 ("macro/registry.json", {"BAD": {"stats": []}}),
+                 ("macro/releases.json", [{"release": "BAD", "release_date": "not-a-date"}]),
+                 ("macro/releases.json", [{"release_date": "2099-01-01"}]),
+                 ("macro/catalog.json", {"series": []}),
+                 ("macro/catalog.json", {"calendar": {}})]
+        for path, value in cases:
+            for call in (lambda sb: mstore.publish_catalog(sb, {}, log=lambda *_: None),
+                         lambda sb: mstore.save_releases(sb, [], log=lambda *_: None)):
+                with self.subTest(path=path, value=value, call=call):
+                    sb = Store()
+                    sb.shared.data[path] = value
+                    with self.assertRaises(ValueError):
+                        call(sb)
+                    self.assertEqual(sb.writes, [])
+                    self.assertEqual(sb.db_writes, [])
 
     def test_calendar_refresh_preserves_other_publishers_exactly(self):
         sb = Store()

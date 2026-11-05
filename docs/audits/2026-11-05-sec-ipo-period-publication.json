@@ -1,0 +1,812 @@
+{
+  "version": 1,
+  "purpose": "Offline source review only; regenerate and reseal publication stage separately",
+  "reviewed_at": "2026-11-05T18:38:05.280510+00:00",
+  "production_writes": 0,
+  "base_commit": "3e3c056c5cde6f39846d67f7d1b3cd1971b648c6",
+  "collector_sha256": "abd7b205cb0ea7e0ab50209e8a819e4fb3ae3523379047cc4976d8f1a614678f",
+  "source": {
+    "url": "https://www.sec.gov/files/sec-stats-ipos-20260922.xlsx",
+    "page": "https://www.sec.gov/data-research/statistics-data-visualizations/initial-public-offerings-ipos",
+    "path": "/workspace/scratch/337d54e0db86/audit4-authoritative-xlsx/originals/AUTH-8B6F898714FD.xlsx",
+    "sha256": "8499e48223bb72d93cd5919a4f3b2f84776d020b120e3133d992841da5ba5450",
+    "bytes": 42234,
+    "publication_evidence": {
+      "date": "2026-09-22",
+      "source_url": "https://www.sec.gov/data-research/statistics-data-visualizations/initial-public-offerings-ipos",
+      "section": "Citation",
+      "field": "Publication Date",
+      "workbook_url": "https://www.sec.gov/files/sec-stats-ipos-20260922.xlsx",
+      "workbook_sha256": "8499e48223bb72d93cd5919a4f3b2f84776d020b120e3133d992841da5ba5450"
+    }
+  },
+  "comparison": {
+    "same_series_ids": true,
+    "same_observation_dates_and_display_values": true,
+    "same_raw_source_cells_and_snapshot_rows": true,
+    "numeric_observations_compared": 3080,
+    "source_cell_records_compared": 3168
+  },
+  "stage_requirements": {
+    "regenerate_and_reseal": true,
+    "published": "2026-09-22",
+    "vintage": "2026-09-22",
+    "preserve_old_stage": true,
+    "preserve_old_candidates": true
+  },
+  "series_summary": [
+    {
+      "id": "SEC_IPO:AVERAGE_PROCEEDS_CORPORATE:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "182.3"
+      ],
+      "last": [
+        "2025-12-31",
+        "190.7"
+      ],
+      "source_column": "Q",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:AVERAGE_PROCEEDS_CORPORATE:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "185.1"
+      ],
+      "last": [
+        "2026-06-30",
+        "2014.1"
+      ],
+      "source_column": "Q",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:AVERAGE_PROCEEDS_FUND:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 25,
+      "first": [
+        "2000-12-31",
+        "375.9"
+      ],
+      "last": [
+        "2025-12-31",
+        "29.2"
+      ],
+      "source_column": "S",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:AVERAGE_PROCEEDS_FUND:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 90,
+      "first": [
+        "2000-03-31",
+        "330.0"
+      ],
+      "last": [
+        "2026-06-30",
+        "2025.8"
+      ],
+      "source_column": "S",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:AVERAGE_PROCEEDS_NON_US:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "282.1"
+      ],
+      "last": [
+        "2025-12-31",
+        "61.7"
+      ],
+      "source_column": "P",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:AVERAGE_PROCEEDS_NON_US:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 104,
+      "first": [
+        "2000-03-31",
+        "348.4"
+      ],
+      "last": [
+        "2026-06-30",
+        "486.8"
+      ],
+      "source_column": "P",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:AVERAGE_PROCEEDS_SPAC:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 23,
+      "first": [
+        "2003-12-31",
+        "21.0"
+      ],
+      "last": [
+        "2025-12-31",
+        "186.5"
+      ],
+      "source_column": "R",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:AVERAGE_PROCEEDS_SPAC:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 84,
+      "first": [
+        "2003-09-30",
+        "21.0"
+      ],
+      "last": [
+        "2026-06-30",
+        "160.0"
+      ],
+      "source_column": "R",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:AVERAGE_PROCEEDS_TOTAL:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "183.6"
+      ],
+      "last": [
+        "2025-12-31",
+        "187.4"
+      ],
+      "source_column": "N",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:AVERAGE_PROCEEDS_TOTAL:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "186.1"
+      ],
+      "last": [
+        "2026-06-30",
+        "1061.6"
+      ],
+      "source_column": "N",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:AVERAGE_PROCEEDS_US:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "159.3"
+      ],
+      "last": [
+        "2025-12-31",
+        "267.5"
+      ],
+      "source_column": "O",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:AVERAGE_PROCEEDS_US:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "146.9"
+      ],
+      "last": [
+        "2026-06-30",
+        "1132.7"
+      ],
+      "source_column": "O",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:COUNT_CORPORATE:A",
+      "units": "Offerings",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "456"
+      ],
+      "last": [
+        "2025-12-31",
+        "227"
+      ],
+      "source_column": "E",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:COUNT_CORPORATE:Q",
+      "units": "Offerings",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "143"
+      ],
+      "last": [
+        "2026-06-30",
+        "52"
+      ],
+      "source_column": "E",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:COUNT_FUND:A",
+      "units": "Offerings",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "3"
+      ],
+      "last": [
+        "2025-12-31",
+        "4"
+      ],
+      "source_column": "G",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:COUNT_FUND:Q",
+      "units": "Offerings",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "1"
+      ],
+      "last": [
+        "2026-06-30",
+        "1"
+      ],
+      "source_column": "G",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:COUNT_NON_US:A",
+      "units": "Offerings",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "91"
+      ],
+      "last": [
+        "2025-12-31",
+        "146"
+      ],
+      "source_column": "D",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:COUNT_NON_US:Q",
+      "units": "Offerings",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "28"
+      ],
+      "last": [
+        "2026-06-30",
+        "12"
+      ],
+      "source_column": "D",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:COUNT_SPAC:A",
+      "units": "Offerings",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "0"
+      ],
+      "last": [
+        "2025-12-31",
+        "144"
+      ],
+      "source_column": "F",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:COUNT_SPAC:Q",
+      "units": "Offerings",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "0"
+      ],
+      "last": [
+        "2026-06-30",
+        "56"
+      ],
+      "source_column": "F",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:COUNT_TOTAL:A",
+      "units": "Offerings",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "459"
+      ],
+      "last": [
+        "2025-12-31",
+        "375"
+      ],
+      "source_column": "B",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:COUNT_TOTAL:Q",
+      "units": "Offerings",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "144"
+      ],
+      "last": [
+        "2026-06-30",
+        "109"
+      ],
+      "source_column": "B",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:COUNT_US:A",
+      "units": "Offerings",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "368"
+      ],
+      "last": [
+        "2025-12-31",
+        "229"
+      ],
+      "source_column": "C",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:COUNT_US:Q",
+      "units": "Offerings",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "116"
+      ],
+      "last": [
+        "2026-06-30",
+        "97"
+      ],
+      "source_column": "C",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:MEDIAN_PROCEEDS_CORPORATE:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "77.9"
+      ],
+      "last": [
+        "2025-12-31",
+        "15.0"
+      ],
+      "source_column": "W",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:MEDIAN_PROCEEDS_CORPORATE:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "90.0"
+      ],
+      "last": [
+        "2026-06-30",
+        "279.5"
+      ],
+      "source_column": "W",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:MEDIAN_PROCEEDS_FUND:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 25,
+      "first": [
+        "2000-12-31",
+        "330.0"
+      ],
+      "last": [
+        "2025-12-31",
+        "28.1"
+      ],
+      "source_column": "Y",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:MEDIAN_PROCEEDS_FUND:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 90,
+      "first": [
+        "2000-03-31",
+        "330.0"
+      ],
+      "last": [
+        "2026-06-30",
+        "2025.8"
+      ],
+      "source_column": "Y",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:MEDIAN_PROCEEDS_NON_US:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "104.4"
+      ],
+      "last": [
+        "2025-12-31",
+        "9.9"
+      ],
+      "source_column": "V",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:MEDIAN_PROCEEDS_NON_US:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 104,
+      "first": [
+        "2000-03-31",
+        "123.0"
+      ],
+      "last": [
+        "2026-06-30",
+        "100.0"
+      ],
+      "source_column": "V",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:MEDIAN_PROCEEDS_SPAC:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 23,
+      "first": [
+        "2003-12-31",
+        "21.0"
+      ],
+      "last": [
+        "2025-12-31",
+        "200.0"
+      ],
+      "source_column": "X",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:MEDIAN_PROCEEDS_SPAC:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 84,
+      "first": [
+        "2003-09-30",
+        "21.0"
+      ],
+      "last": [
+        "2026-06-30",
+        "150.0"
+      ],
+      "source_column": "X",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:MEDIAN_PROCEEDS_TOTAL:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "78.0"
+      ],
+      "last": [
+        "2025-12-31",
+        "100.5"
+      ],
+      "source_column": "T",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:MEDIAN_PROCEEDS_TOTAL:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "90.0"
+      ],
+      "last": [
+        "2026-06-30",
+        "175.0"
+      ],
+      "source_column": "T",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:MEDIAN_PROCEEDS_US:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "75.0"
+      ],
+      "last": [
+        "2025-12-31",
+        "200.0"
+      ],
+      "source_column": "U",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:MEDIAN_PROCEEDS_US:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "81.8"
+      ],
+      "last": [
+        "2026-06-30",
+        "186.7"
+      ],
+      "source_column": "U",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:TOTAL_PROCEEDS_CORPORATE:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "83148.8"
+      ],
+      "last": [
+        "2025-12-31",
+        "43290.8"
+      ],
+      "source_column": "K",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:TOTAL_PROCEEDS_CORPORATE:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "26469.2"
+      ],
+      "last": [
+        "2026-06-30",
+        "104734.1"
+      ],
+      "source_column": "K",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:TOTAL_PROCEEDS_FUND:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "1127.6"
+      ],
+      "last": [
+        "2025-12-31",
+        "116.7"
+      ],
+      "source_column": "M",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:TOTAL_PROCEEDS_FUND:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "330.0"
+      ],
+      "last": [
+        "2026-06-30",
+        "2025.8"
+      ],
+      "source_column": "M",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:TOTAL_PROCEEDS_NON_US:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "25666.7"
+      ],
+      "last": [
+        "2025-12-31",
+        "9004.0"
+      ],
+      "source_column": "J",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:TOTAL_PROCEEDS_NON_US:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "9754.7"
+      ],
+      "last": [
+        "2026-06-30",
+        "5841.5"
+      ],
+      "source_column": "J",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:TOTAL_PROCEEDS_SPAC:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "0.0"
+      ],
+      "last": [
+        "2025-12-31",
+        "26858.7"
+      ],
+      "source_column": "L",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:TOTAL_PROCEEDS_SPAC:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "0.0"
+      ],
+      "last": [
+        "2026-06-30",
+        "8958.0"
+      ],
+      "source_column": "L",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:TOTAL_PROCEEDS_TOTAL:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "84276.4"
+      ],
+      "last": [
+        "2025-12-31",
+        "70266.1"
+      ],
+      "source_column": "H",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:TOTAL_PROCEEDS_TOTAL:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "26799.2"
+      ],
+      "last": [
+        "2026-06-30",
+        "115718.0"
+      ],
+      "source_column": "H",
+      "source_cell_records": 106
+    },
+    {
+      "id": "SEC_IPO:TOTAL_PROCEEDS_US:A",
+      "units": "US$ millions",
+      "frequency": "A",
+      "observations": 26,
+      "first": [
+        "2000-12-31",
+        "58609.7"
+      ],
+      "last": [
+        "2025-12-31",
+        "61262.1"
+      ],
+      "source_column": "I",
+      "source_cell_records": 26
+    },
+    {
+      "id": "SEC_IPO:TOTAL_PROCEEDS_US:Q",
+      "units": "US$ millions",
+      "frequency": "Q",
+      "observations": 106,
+      "first": [
+        "2000-03-31",
+        "17044.5"
+      ],
+      "last": [
+        "2026-06-30",
+        "109876.5"
+      ],
+      "source_column": "I",
+      "source_cell_records": 106
+    }
+  ],
+  "complete_review_artifact": {
+    "path": "/workspace/scratch/abca14958d0d/sec-ipo-source-review-20260922-published.json",
+    "sha256": "1ea6ba6a9a6be94e6ced6ebe159e11a9b9ca8ed9f187fa3f3fbfcc62947841ce",
+    "bytes": 1623684
+  }
+}
