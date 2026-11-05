@@ -3,9 +3,19 @@
 (function (root) {
   const OPS = [">", ">=", "<", "<=", "between", "=", "!=", "top", "bottom", "true", "false", "exists"];
   const GROUPS = ["sector", "industry", "mcap_bucket", "corr_cluster"];
-  const INDEXES = ["sp500", "sp100"];
+  const INDEXES = ["all", "sp500", "sp100"];
+  const INDEX_LABELS = { all: "All tracked", sp500: "S&P 500", sp100: "S&P 100" };
   const num = v => (typeof v === "number" && isFinite(v)) ? v : (typeof v === "string" && v.trim() !== "" && isFinite(+v) ? +v : null);
   const uniq = a => [...new Set(a)];
+
+  // New bundles carry explicit membership on every row. Only a declared legacy
+  // SP500 bundle can imply missing SP500 flags; row counts never prove membership.
+  function inIndex(row, choice = "all", universe = null) {
+    if (choice === "all") return true;
+    if (choice !== "sp500" && choice !== "sp100") return false;
+    if (choice === "sp500" && !Object.prototype.hasOwnProperty.call(row, "sp500")) return universe?.id === "sp500";
+    return row[choice] === true || row[choice] === 1;
+  }
 
   // catalogue: { fields: [{id, u, q:[p5,p50,p95]}], sectors: [..], industries: [..], tickers: [..] }
   function index(cat) {
@@ -30,7 +40,7 @@
     const ix = index(cat);
     const errors = [], warnings = [];
     const s = input && typeof input === "object" ? input : {};
-    const out = { filters: [], sectors: [], exclude_sectors: [], industries: [], exclude_industries: [], index: "sp500", tickers: [], exclude_tickers: [],
+    const out = { filters: [], sectors: [], exclude_sectors: [], industries: [], exclude_industries: [], index: "all", tickers: [], exclude_tickers: [],
       similar_to: null, sort: null, columns: [], group_by: null, limit: null, explanation: "", assumptions: [] };
     const field = (id, where) => {
       if (typeof id !== "string" || !ix.f.has(id)) { errors.push(`Unknown field "${id}"${where ? " in " + where : ""}`); return null; }
@@ -78,7 +88,7 @@
     for (const [k, map, kind] of [["sectors", ix.sectors, "sector"], ["exclude_sectors", ix.sectors, "sector"], ["industries", ix.industries, "industry"], ["exclude_industries", ix.industries, "industry"]]) {
       out[k] = uniq((Array.isArray(s[k]) ? s[k] : s[k] ? [s[k]] : []).map(x => matchName(map, x, errors, kind)).filter(Boolean));
     }
-    if (s.index != null) { const v = String(s.index).toLowerCase().replace(/[^a-z0-9]/g, ""); if (INDEXES.includes(v)) out.index = v; else errors.push(`Unknown index "${s.index}" (use sp500 or sp100)`); }
+    if (s.index != null) { const v = String(s.index).toLowerCase().replace(/[^a-z0-9]/g, ""); if (INDEXES.includes(v)) out.index = v; else errors.push(`Unknown index "${s.index}" (use all, sp500 or sp100)`); }
     for (const k of ["tickers", "exclude_tickers"]) {
       out[k] = uniq((Array.isArray(s[k]) ? s[k] : []).map(t => String(t).toUpperCase().replace(".", "-")).filter(t => { if (ix.tickers.has(t)) return true; errors.push(`Unknown ticker "${t}"`); return false; }));
     }
@@ -110,5 +120,5 @@
   }
 
   const empty = () => validate({}, { fields: [], sectors: [], industries: [], tickers: [] }).spec;
-  root.FU_SCREENSPEC = { OPS, GROUPS, validate, empty };
+  root.FU_SCREENSPEC = { OPS, GROUPS, INDEXES, INDEX_LABELS, inIndex, validate, empty };
 })(typeof window !== "undefined" ? window : globalThis);

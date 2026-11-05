@@ -57,12 +57,12 @@ window.FU_PAGES = window.FU_PAGES || {};
     SCR.data = d;
     d.fields.forEach(f => { SCR.fields[f.id] = f; });
     SCR.groups = d.groups;
-    const idx = Object.fromEntries(d.cols.map((c, i) => [c, i]));
     SCR.rows = d.rows.map(r => {
       const o = {};
       d.cols.forEach((c, i) => { o[c] = r[i]; });
       d.fields.forEach(f => { if (f.u === "bool" && o[f.id] != null) o[f.id] = !!o[f.id]; });
-      o.sp100 = !!r[idx.sp100];
+      o.sp500 = SPECLIB.inIndex(o, "sp500", d.universe);
+      o.sp100 = SPECLIB.inIndex(o, "sp100", d.universe);
       return o;
     });
     SCR.rows.forEach(r => { SCR.byTk[r.ticker] = r; });
@@ -82,7 +82,7 @@ window.FU_PAGES = window.FU_PAGES || {};
       spec: { filters: [{ field: "pe", op: "bottom", pct: 25, scope: "sector" }, { field: "om_chg3", op: ">", value: 0 }, { field: "om", op: ">", value: 0 }], sort: { field: "pe_p5", dir: "asc" }, columns: ["pe", "pe_p5", "om", "om_chg3", "rev_g_ttm", "fcf_yield"] } },
     { id: "fcf", n: "High FCF yield, low debt", why: "Free cash flow yield above 6% with net debt under 1.5× EBITDA. Cash the company can return or reinvest, without a balance sheet that absorbs it.",
       spec: { filters: [{ field: "fcf_yield", op: ">", value: 0.06 }, { field: "nd_ebitda", op: "<", value: 1.5 }], sort: { field: "fcf_yield", dir: "desc" }, columns: ["fcf_yield", "nd_ebitda", "fcfm", "fcf_g_ttm", "ev_fcf", "sh_yield"] } },
-    { id: "momentum", n: "Momentum leaders above the 200-day", why: "Top fifth of the index on three-month return, trading above the 200-day average and within 10% of the 52-week high. Trend persistence is one of the better documented return patterns.",
+    { id: "momentum", n: "Momentum leaders above the 200-day", why: "Top fifth of tracked companies on three-month return, trading above the 200-day average and within 10% of the 52-week high. Trend persistence is one of the better documented return patterns.",
       spec: { filters: [{ field: "mom_rank_3m", op: ">", value: 0.8 }, { field: "above_sma200", op: "true" }, { field: "dist_hi52", op: ">", value: -0.1 }], sort: { field: "ret_6m", dir: "desc" }, columns: ["ret_3m", "ret_6m", "mom_rank_3m", "dist_hi52", "dist_sma200", "rs_sec_6m", "rsi14"] } },
     { id: "insiders", n: "Insider cluster buying", why: "Two or more insiders bought shares on the open market in the last 90 days, and purchases exceed sales. Open-market buying by several insiders at once is rarer and more informative than routine selling.",
       spec: { filters: [{ field: "ins_buyers_90d", op: ">=", value: 2 }, { field: "ins_net_90d", op: ">", value: 0 }], sort: { field: "ins_net_90d", dir: "desc" }, columns: ["ins_buyers_90d", "ins_net_90d", "ins_net_1y", "ret_3m", "pe"] } },
@@ -90,7 +90,7 @@ window.FU_PAGES = window.FU_PAGES || {};
       spec: { filters: [{ field: "c_tnx", op: "top", pct: 10, scope: "all" }], sort: { field: "c_tnx", dir: "desc" }, columns: ["c_tnx", "cm_10y", "c_spy", "beta", "pb", "ret_3m"] } },
     { id: "ratedown", n: "Rate-sensitive (bond proxies)", why: "Bottom 10% by correlation with 10-year yield changes: names that have traded down when yields rise, typically utilities, REITs and long-duration growth.",
       spec: { filters: [{ field: "c_tnx", op: "bottom", pct: 10, scope: "all" }], sort: { field: "c_tnx", dir: "asc" }, columns: ["c_tnx", "cm_10y", "div_yield", "nd_ebitda", "beta", "ret_3m"] } },
-    { id: "dollar", n: "Dollar-hurt multinationals", why: "Large companies in the fifth of the index whose returns have moved most against the dollar index. A stronger dollar shrinks foreign sales when translated, so these tend to lag when the dollar rallies.",
+    { id: "dollar", n: "Dollar-hurt multinationals", why: "Large companies in the fifth of tracked names whose returns have moved most against the dollar index. A stronger dollar shrinks foreign sales when translated, so these tend to lag when the dollar rallies.",
       spec: { filters: [{ field: "c_dxy", op: "bottom", pct: 20, scope: "all" }, { field: "mcap", op: ">", value: 50e9 }], exclude_sectors: ["Utilities", "Real Estate"], sort: { field: "c_dxy", dir: "asc" }, columns: ["c_dxy", "mcap", "c_spy", "rev_g_ttm", "om"] } },
     { id: "divgrow", n: "Dividend growers", why: "Pays a dividend above 1.5% with five-year EPS growth above 5% and positive free cash flow yield above the dividend's typical cover. Dividends are paid from earnings growth, not leverage.",
       spec: { filters: [{ field: "div_yield", op: ">", value: 0.015 }, { field: "eps_cagr5", op: ">", value: 0.05 }, { field: "fcf_yield", op: ">", value: 0.03 }, { field: "nd_ebitda", op: "<", value: 3 }], sort: { field: "div_yield", dir: "desc" }, columns: ["div_yield", "eps_cagr5", "fcf_yield", "sh_yield", "nd_ebitda", "pio_f"] } },
@@ -104,9 +104,9 @@ window.FU_PAGES = window.FU_PAGES || {};
       spec: { filters: [{ field: "sh_yield", op: ">", value: 0.06 }, { field: "shr_chg1", op: "<", value: 0 }], sort: { field: "sh_yield", dir: "desc" }, columns: ["sh_yield", "div_yield", "bb_yield", "shr_chg1", "shr_chg3", "fcf_yield"] } },
     { id: "oversold", n: "Oversold quality", why: "RSI below 35 on companies with ROIC above 12% and a Piotroski score of 6 or more: short-term weakness in businesses whose fundamentals pass.",
       spec: { filters: [{ field: "rsi14", op: "<", value: 35 }, { field: "roic", op: ">", value: 0.12 }, { field: "pio_f", op: ">=", value: 6 }], sort: { field: "rsi14", dir: "asc" }, columns: ["rsi14", "ret_1m", "dist_sma50", "roic", "pio_f", "pe_p5"] } },
-    { id: "lowvol", n: "Low-volatility defensives", why: "Lowest fifth of the index on one-year volatility, beta under 0.8 and a dividend. These have historically fallen less in drawdowns.",
+    { id: "lowvol", n: "Low-volatility defensives", why: "Lowest fifth of tracked companies on one-year volatility, beta under 0.8 and a dividend. These have historically fallen less in drawdowns.",
       spec: { filters: [{ field: "vol_1y", op: "bottom", pct: 20, scope: "all" }, { field: "beta", op: "<", value: 0.8 }, { field: "div_yield", op: ">", value: 0 }], sort: { field: "vol_1y", dir: "asc" }, columns: ["vol_1y", "beta", "mdd_1y", "div_yield", "c_spy"] } },
-    { id: "oil", n: "Oil-linked", why: "Top 10% of the index by correlation of daily returns with WTI crude over the last year: the names an oil move will carry.",
+    { id: "oil", n: "Oil-linked", why: "Top 10% of tracked companies by correlation of daily returns with WTI crude over the last year: the names an oil move will carry.",
       spec: { filters: [{ field: "c_oil", op: "top", pct: 10, scope: "all" }], sort: { field: "c_oil", dir: "desc" }, columns: ["c_oil", "c_spy", "c_dxy", "fcf_yield", "ret_3m"] } },
     { id: "cheaphist", n: "Cheap vs own history", why: "P/E and EV/Sales both in the bottom fifth of their own five-year monthly range: multiples compressed relative to what the market has paid for this company before.",
       spec: { filters: [{ field: "pe_p5", op: "<", value: 0.2 }, { field: "ev_sales_p5", op: "<", value: 0.2 }], sort: { field: "pe_p5", dir: "asc" }, columns: ["pe", "pe_p5", "ev_sales", "ev_sales_p5", "rev_g_ttm", "om_chg3"] } },
@@ -129,9 +129,12 @@ window.FU_PAGES = window.FU_PAGES || {};
 
   /* ---------- state ---------- */
   const blank = () => ({ ...SPECLIB.empty() });
+  // Older compact saved/shared screens omitted their default SP500 selection.
+  // New saved screens always include an explicit index, including All tracked.
+  const storedSpec = spec => ({ ...spec, index: spec?.index ?? "sp500" });
   function loadState() {
     const s = store.get(KEY, null) || {};
-    return { spec: s.spec || blank(), cols: s.cols || COLSETS.Overview.slice(), colset: s.colset || "Overview", q: s.q || "", preset: s.preset || null, openGroups: s.openGroups || ["val"], filtersOpen: s.filtersOpen ?? false, chatOpen: s.chatOpen ?? false, shown: 150 };
+    return { spec: s.spec ? { ...blank(), ...storedSpec(s.spec) } : blank(), cols: s.cols || COLSETS.Overview.slice(), colset: s.colset || "Overview", q: s.q || "", preset: s.preset || null, openGroups: s.openGroups || ["val"], filtersOpen: s.filtersOpen ?? false, chatOpen: s.chatOpen ?? false, shown: 150 };
   }
   let ST = null;
   const save = () => store.set(KEY, { spec: ST.spec, cols: ST.cols, colset: ST.colset, q: ST.q, preset: ST.preset, openGroups: ST.openGroups, filtersOpen: ST.filtersOpen, chatOpen: ST.chatOpen });
@@ -139,7 +142,7 @@ window.FU_PAGES = window.FU_PAGES || {};
 
   /* ---------- engine ---------- */
   function universe(spec) {
-    return SCR.rows.filter(r => (spec.index !== "sp100" || r.sp100)
+    return SCR.rows.filter(r => SPECLIB.inIndex(r, spec.index, SCR.data.universe)
       && (!spec.sectors.length || spec.sectors.includes(r.sector)) && !spec.exclude_sectors.includes(r.sector)
       && (!spec.industries.length || spec.industries.includes(r.industry)) && !spec.exclude_industries.includes(r.industry)
       && (!spec.tickers.length || spec.tickers.includes(r.ticker)) && !spec.exclude_tickers.includes(r.ticker));
@@ -243,7 +246,7 @@ window.FU_PAGES = window.FU_PAGES || {};
       b[key].filter(x => !a[key].includes(x)).forEach(x => out.push(["+", `${lab}: ${x}`]));
       a[key].filter(x => !b[key].includes(x)).forEach(x => out.push(["−", `${lab}: ${x}`]));
     }
-    if (a.index !== b.index) out.push(["~", `Index: ${b.index === "sp100" ? "S&P 100" : "S&P 500"}`]);
+    if (a.index !== b.index) out.push(["~", `Universe: ${SPECLIB.INDEX_LABELS[b.index]}`]);
     if (JSON.stringify(a.similar_to) !== JSON.stringify(b.similar_to)) out.push([b.similar_to ? "+" : "−", b.similar_to ? `Similar to ${b.similar_to.ticker} (${b.similar_to.n} nearest)` : `Similar to ${a.similar_to.ticker}`]);
     if (JSON.stringify(a.sort) !== JSON.stringify(b.sort) && b.sort) out.push(["~", `Sort: ${b.sort.field === "similarity" ? "similarity" : fieldOf(b.sort.field)?.n || b.sort.field} ${b.sort.dir === "asc" ? "ascending" : "descending"}`]);
     if (a.group_by !== b.group_by) out.push(["~", `Group: ${b.group_by ? groupLabel(b.group_by) : "none"}`]);
@@ -258,14 +261,14 @@ window.FU_PAGES = window.FU_PAGES || {};
     await load();
     ST = loadState();
     if (PENDING) {
-      const v = validate(PENDING); PENDING = null;
+      const v = validate(storedSpec(PENDING)); PENDING = null;
       ST.spec = v.spec; ST.preset = null; if (v.spec.columns.length) { ST.cols = v.spec.columns.slice(); ST.colset = "Custom"; }
       if (v.errors.length) toast("Some parts of the shared screen were not recognized");
       save();
     }
     injectStyle();
     const d = SCR.data;
-    page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Screener"), el("h1", {}, "S&P 500"),
+    page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Screener"), el("h1", {}, "Tracked companies"),
       el("div", { class: "sub" }, `${SCR.rows.length} companies · ${d.fields.length} fields · Prices as of ${fdate(d.asof.prices)}`))));
     const grid = el("div", { class: "sx-grid" + (ST.chatOpen ? "" : " nochat") });
     const main = el("div", { class: "sx-main" });
@@ -320,7 +323,7 @@ window.FU_PAGES = window.FU_PAGES || {};
   function compact(spec, withCols) {
     const s = {};
     for (const [k, v] of Object.entries(spec)) {
-      if (v == null || v === "" || (Array.isArray(v) && !v.length) || (k === "index" && v === "sp500") || k === "explanation" || k === "assumptions") continue;
+      if (v == null || v === "" || (Array.isArray(v) && !v.length) || k === "explanation" || k === "assumptions") continue;
       if (k === "columns" && !withCols) continue;
       s[k] = v;
     }
@@ -356,7 +359,7 @@ window.FU_PAGES = window.FU_PAGES || {};
     s.filters.forEach((f, i) => U.chips.append(chip(filterText(f), e => editFilter(i, e.currentTarget), () => { s.filters.splice(i, 1); setSpec(s, { columns: false, keepPreset: true }); }, fieldOf(f.field)?.d)));
     const lists = [["sectors", "Sector"], ["exclude_sectors", "Not sector"], ["industries", "Industry"], ["exclude_industries", "Not industry"], ["tickers", "Only"], ["exclude_tickers", "Not"]];
     lists.forEach(([k, lab]) => s[k].forEach(x => U.chips.append(chip(`${lab}: ${x}`, null, () => { s[k] = s[k].filter(y => y !== x); setSpec(s, { columns: false, keepPreset: true }); }))));
-    if (s.index === "sp100") U.chips.append(chip("S&P 100 only", null, () => { s.index = "sp500"; setSpec(s, { columns: false, keepPreset: true }); }));
+    if (s.index !== "all") U.chips.append(chip(`${SPECLIB.INDEX_LABELS[s.index]} only`, null, () => { s.index = "all"; setSpec(s, { columns: false, keepPreset: true }); }));
     if (s.similar_to) U.chips.append(chip(`Similar to ${s.similar_to.ticker} · ${s.similar_to.n} nearest`, null, () => { s.similar_to = null; if (s.sort?.field === "similarity") s.sort = null; setSpec(s, { columns: false, keepPreset: true }); }, "Nearest neighbours on standardized valuation, growth, quality, risk and correlation fields"));
     if (s.limit) U.chips.append(chip(`First ${s.limit}`, null, () => { s.limit = null; setSpec(s, { columns: false, keepPreset: true }); }));
     U.chips.hidden = !U.chips.childElementCount;
@@ -420,7 +423,7 @@ window.FU_PAGES = window.FU_PAGES || {};
     const fd = fieldOf(f.field);
     const box = el("div", { class: "sx-ed" });
     box.append(el("div", { class: "eyebrow" }, (SCR.groups.find(g => g.id === fd.g) || {}).n || ""), el("b", {}, fd.n), el("div", { class: "faint", style: "font-size:12px" }, fd.d));
-    if (fd.q) box.append(el("div", { class: "faint mono", style: "font-size:11.5px" }, `S&P 500: 5th pct ${fmtV(fd.id, fd.q[0])} · median ${fmtV(fd.id, fd.q[1])} · 95th pct ${fmtV(fd.id, fd.q[2])} · ${fd.cov} reporting`));
+    if (fd.q) box.append(el("div", { class: "faint mono", style: "font-size:11.5px" }, `All tracked: 5th pct ${fmtV(fd.id, fd.q[0])} · median ${fmtV(fd.id, fd.q[1])} · 95th pct ${fmtV(fd.id, fd.q[2])} · ${fd.cov} reporting`));
     if (fd.u === "bool") {
       const sel = el("select", { class: "btn" }, el("option", { value: "true" }, "Yes"), el("option", { value: "false" }, "No"));
       sel.value = f.op === "false" ? "false" : "true";
@@ -509,7 +512,7 @@ window.FU_PAGES = window.FU_PAGES || {};
     if (!ST.filtersOpen) return;
     const s = ST.spec;
     // universe: index, sectors, industries, excluded tickers
-    const idx = seg([["sp500", "S&P 500"], ["sp100", "S&P 100"]], s.index, v => { s.index = v; setSpec(s, { columns: false, keepPreset: true }); });
+    const idx = seg(SPECLIB.INDEXES.map(id => [id, SPECLIB.INDEX_LABELS[id]]), s.index, v => { s.index = v; setSpec(s, { columns: false, keepPreset: true }); });
     const sectors = el("div", { class: "picker sx-sectors" }, SCR.catalogue.sectors.map(sec => {
       const st = s.sectors.includes(sec) ? "on" : s.exclude_sectors.includes(sec) ? "off" : "";
       return el("button", { class: st, title: "Click to include, again to exclude, again to clear", onclick: () => {
@@ -527,7 +530,7 @@ window.FU_PAGES = window.FU_PAGES || {};
     const fsearch = el("input", { type: "search", placeholder: `Search ${SCR.data.fields.length} fields`, "aria-label": "Search fields" });
     const groupsBox = el("div", { class: "sx-groups" });
     U.filters.append(el("div", { class: "sx-uni" },
-      el("div", { class: "sx-row" }, el("span", { class: "eyebrow" }, "Index"), idx),
+      el("div", { class: "sx-row" }, el("span", { class: "eyebrow" }, "Universe"), idx),
       el("div", { class: "sx-row" }, el("span", { class: "eyebrow" }, "Sectors"), sectors),
       el("div", { class: "sx-row" }, el("span", { class: "eyebrow" }, "Industry"), el("div", { class: "sx-inline" }, indMode, indIn, dl, el("button", { class: "btn", onclick: indAdd }, "Add"))),
       el("div", { class: "sx-row" }, el("span", { class: "eyebrow" }, "Exclude"), exIn),
@@ -731,12 +734,12 @@ window.FU_PAGES = window.FU_PAGES || {};
     const U = SCR.ui, rows = res.rows;
     const statisticsOpen = !!U.summary.querySelector("details")?.open;
     U.summary.innerHTML = "";
-    const uniTxt = res.uni.length === SCR.rows.length ? "S&P 500" : `${res.uni.length} in the selected universe`;
+    const uniTxt = `${SPECLIB.INDEX_LABELS[ST.spec.index]}${res.uni.length === SCR.rows.length ? "" : ` · ${res.uni.length} in the selected universe`}`;
     const head = el("div", { class: "sx-count" }, el("b", { class: "num" }, rows.length), el("span", { class: "muted" }, ` of ${SCR.rows.length} companies · ${uniTxt}`));
     const stats = el("div", { class: "sx-stats" }, SUMMARY.map(id => {
       const a = median(rows.map(r => r[id])), b = SCR.median[id];
-      return el("div", { class: "sx-stat", title: `Median of the results vs median of the S&P 500. ${fieldOf(id)?.d || ""}` }, el("span", { class: "faint" }, fieldOf(id)?.n || id),
-        el("b", { class: "num" }, fmtV(id, a)), el("span", { class: "faint num", style: "font-size:11px" }, "index " + fmtV(id, b)));
+      return el("div", { class: "sx-stat", title: `Median of the results vs median of all tracked companies. ${fieldOf(id)?.d || ""}` }, el("span", { class: "faint" }, fieldOf(id)?.n || id),
+        el("b", { class: "num" }, fmtV(id, a)), el("span", { class: "faint num", style: "font-size:11px" }, "all tracked " + fmtV(id, b)));
     }));
     const cnt = new Map(); rows.forEach(r => cnt.set(r.sector, (cnt.get(r.sector) || 0) + 1));
     const secs = [...cnt.entries()].sort((a, b) => b[1] - a[1]);
@@ -775,7 +778,7 @@ window.FU_PAGES = window.FU_PAGES || {};
       list.innerHTML = "";
       const cur = store.get(KEY + ":saved", []);
       if (!cur.length) list.append(el("div", { class: "faint", style: "padding:8px" }, "No saved screens yet."));
-      cur.forEach((s, i) => list.append(el("div", { class: "sx-saved" }, el("button", { class: "t", onclick: () => { ST.preset = null; setSpec(s.spec); if (s.cols) { ST.cols = s.cols; ST.colset = "Custom"; save(); renderResults(); } p.close(); toast(`Loaded "${s.name}"`); } }, el("b", {}, s.name), el("span", { class: "faint", style: "font-size:11px" }, ` ${(s.spec.filters || []).length} filters · ${new Date(s.at).toLocaleDateString("en-US")}`)),
+      cur.forEach((s, i) => list.append(el("div", { class: "sx-saved" }, el("button", { class: "t", onclick: () => { ST.preset = null; setSpec(storedSpec(s.spec)); if (s.cols) { ST.cols = s.cols; ST.colset = "Custom"; save(); renderResults(); } p.close(); toast(`Loaded "${s.name}"`); } }, el("b", {}, s.name), el("span", { class: "faint", style: "font-size:11px" }, ` ${(s.spec.filters || []).length} filters · ${new Date(s.at).toLocaleDateString("en-US")}`)),
         el("button", { class: "iconbtn", "aria-label": "Delete " + s.name, onclick: () => { const c = store.get(KEY + ":saved", []); c.splice(i, 1); store.set(KEY + ":saved", c); draw(); } }, svgUse("i-x")))));
     };
     const doSave = () => { const n = name.value.trim(); if (!n) return toast("Enter a name"); const c = store.get(KEY + ":saved", []).filter(x => x.name !== n); c.unshift({ name: n, spec: compact(ST.spec, false), cols: ST.cols, at: Date.now() }); store.set(KEY + ":saved", c.slice(0, 50)); name.value = ""; draw(); toast(`Saved "${n}"`); };

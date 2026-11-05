@@ -1226,7 +1226,7 @@ def _sector_of_industry(ind):
 
 # ---------------------------------------------------------------- weekly notes
 NOTE_PROMPT = """You write short weekly sector notes for a professional equity research site. Use only the facts below.
-Sector: {name} ({n} S&P 500 companies). Week of {week}.
+Sector: {name} ({n} tracked companies). Week of {week}.
 
 Facts (id: description = value):
 {facts}

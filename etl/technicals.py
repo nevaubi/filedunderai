@@ -524,11 +524,11 @@ def merge(sb, parts=4, log=print):
     gen = now_iso()
     as_of = max((s["d"] for s in states.values()), default=None)
     sb.put_json("tech/signals.json", {
-        "generated": gen, "as_of": as_of, "horizons": list(HORIZONS), "universe": "Current S&P 500 constituents covered by Filed Under",
+        "generated": gen, "as_of": as_of, "horizons": list(HORIZONS), "universe": "Current companies tracked by Filed Under",
         "method": ("Forward total returns (dividends reinvested) from the signal day's close. Base rate: every trading day of the same names from their 253rd bar. "
                    "Intervals are 95% with standard errors clustered by calendar month of the signal, because signals across names fire together. "
                    "Base-rate median is read from a 0.1 percentage-point histogram."),
-        "caveats": ["Survivorship bias: only today's index members are included, so names that fell out of the index (often after losses) are missing.",
+        "caveats": ["Selection and survivorship bias: only currently tracked companies are included; previously delisted or untracked companies are absent.",
                     "Forward windows of signals less than one horizon apart overlap, which the month clustering only partly absorbs.",
                     "Past frequencies, not forecasts."],
         "source": SOURCE, "base": base, "signals": signals}, cache="max-age=900")
@@ -540,9 +540,9 @@ def merge(sb, parts=4, log=print):
             agg[d] = [x + y for x, y in zip(agg[d], f)]
     days = [d for d in days if agg[d][0] >= 50]
     col = lambda j: [agg[d][j] for d in days]  # noqa: E731
-    sb.put_json("tech/breadth.json", {"generated": gen, "source": "Computed by Filed Under from the daily history files (tech/bars) of current S&P 500 constituents",
+    sb.put_json("tech/breadth.json", {"generated": gen, "source": "Computed by Filed Under from the daily history files (tech/bars) of currently tracked companies",
                                       "cols": ["n50", "above50", "n200", "above200", "n52", "new_high", "new_low", "adv", "dec"], "d": days, **{k: col(j) for j, k in enumerate(["n50", "above50", "n200", "above200", "n52", "new_high", "new_low", "adv", "dec"])},
-                                      "caveat": "Current constituents only: early years cover fewer names and exclude companies that left the index."}, cache="max-age=900")
+                                      "caveat": "Current tracked companies only: early years cover fewer names and omit companies outside current coverage."}, cache="max-age=900")
     rows = []
     for tk, s in states.items():
         u = BY_TICKER.get(tk) or {}

@@ -27,9 +27,10 @@ from operator import mul
 from . import sec, fundamentals
 from .common import HTTPError, Run, get_json, now_iso, request, serialized_aggregates
 from .prices import path_key
-from .universe import BY_TICKER, MARKET_SYMBOLS, SECTOR_ETF, SP100, UNIVERSE
+from .universe import ADDITIONAL_LIST, BY_TICKER, MARKET_SYMBOLS, SECTOR_ETF, SP100, SP500, UNIVERSE, UNIVERSE_METADATA
 
 TICKERS = [t for t, *_ in UNIVERSE]
+STRICT_SOURCE_TICKERS = {t for t, *_ in ADDITIONAL_LIST}
 FACTOR_SYMS = ["SPY", "QQQ", "^TNX", "CL=F", "GC=F", "DX-Y.NYB", "BTC-USD"]
 EXTRA_SYMS = ["DX-Y.NYB"]  # not carried by the prices job
 HIST_SYMS = list(dict.fromkeys(MARKET_SYMBOLS + EXTRA_SYMS + TICKERS))
@@ -167,7 +168,7 @@ for fid, n, u, d in [
         ("rs_spy_6m", "Relative strength vs SPY 6M", "pct", "(1 + 6-month return) / (1 + SPY 6-month return) − 1."),
         ("rs_sec_3m", "Relative strength vs sector 3M", "pct", "(1 + 3-month return) / (1 + sector ETF 3-month return) − 1."),
         ("rs_sec_6m", "Relative strength vs sector 6M", "pct", "(1 + 6-month return) / (1 + sector ETF 6-month return) − 1."),
-        ("mom_rank_3m", "3-month momentum rank", "pctl", "Percentile of the 3-month return across the S&P 500 (1 = strongest).")]:
+        ("mom_rank_3m", "3-month momentum rank", "pctl", "Percentile of the 3-month return across tracked companies (1 = strongest).")]:
     fld(fid, "px", n, u, d, PX)
 CORR_D = [("c_spy", "SPY", "S&P 500 ETF"), ("c_qqq", "QQQ", "Nasdaq 100 ETF"), ("c_sector", None, "the company's sector SPDR ETF"),
           ("c_tnx", "^TNX", "the 10-year Treasury yield (daily change in yield)"), ("c_oil", "CL=F", "WTI crude oil futures"),
@@ -245,7 +246,7 @@ for cid in STD_FIELDS:
         ("Latest value minus the value a year earlier, in percentage points." if t["unit"] == "%" else "Latest value over the value a year earlier − 1.") + " Standardized series.",
         "Company IR documents (kpistd/t/{T}.json)")
 FIELD_IDS = [f["id"] for f in F]
-ID_COLS = ["ticker", "name", "sector", "industry", "sp100", "cik"]
+ID_COLS = ["ticker", "name", "sector", "industry", "sp100", "sp500", "cik"]
 
 
 # ------------------------------------------------------------------ small helpers
@@ -433,17 +434,38 @@ def extract_company(sb, tk, since):
     shares = prof.get("sharesOutstanding") or {}
     out = {"q": q, "filing_history": history, "fye": prof.get("fiscalYearEnd"), "shares": dict(shares, v=shares.get("val"))}
     cik = BY_TICKER[tk]["cik"]
-    try:
-        cf = gz_json(sb, f"sec/companyfacts/CIK{cik:010d}.json.gz")
-    except Exception:
-        cf = None
+    strict = tk in STRICT_SOURCE_TICKERS
+    cf_raw = None
+    if strict:
+        # Additional-company values must use the same archived snapshot that
+        # passed the company proof; missing or changed sources fail closed.
+        cf_raw = gzip.decompress(sb.get_object("raw", f"sec/companyfacts/CIK{cik:010d}.json.gz"))
+        cf = json.loads(cf_raw)
+    else:
+        try:
+            cf = gz_json(sb, f"sec/companyfacts/CIK{cik:010d}.json.gz")
+        except Exception:
+            cf = None
     if cf:
         facts = cf.get("facts") or {}
         want = {n for _l, names in EXTRA_FLOW + EXTRA_BAL for n in names}
         # only the concepts used here, and only those with reported units (a few filers carry empty unit maps)
         facts = {"us-gaap": {n: v for n, v in (facts.get("us-gaap") or {}).items() if n in want and (v.get("units") or {})}, "dei": facts.get("dei") or {}}
-        for stmt, concepts, instant in (("_scr_flow",EXTRA_FLOW,False),("_scr_bal",EXTRA_BAL,True)):
-            for row in sec.build_series(facts, stmt, concepts=concepts, instant=instant):
+        extra = {stmt:sec.build_series(facts, stmt, concepts=concepts, instant=instant)
+                 for stmt,concepts,instant in (("income",EXTRA_FLOW,False),("balance",EXTRA_BAL,True))}
+        if strict:
+            from .source_quality import partition_supported_periods
+            from .source_provenance import validate_statement_provenance
+            extra, excluded = partition_supported_periods(extra)
+            sha = b["provenance"]["snapshot_sha256"]
+            proof = validate_statement_provenance(cf_raw,extra,cik,sha,
+                                                  taxonomy={"income":EXTRA_FLOW,"balance":EXTRA_BAL})
+            proof_path = f"sources/screener/{tk}/{sha}.json"
+            sb.put_json(proof_path,proof,cache="max-age=31536000,immutable")
+            out["source_provenance"] = {"status":"verified","snapshot_sha256":sha,"proof_path":proof_path,
+                                         "counts":proof["counts"],"quarantined_points":excluded}
+        for rows in extra.values():
+            for row in rows:
                 q[row["label"]] = [_rec(r, row["concept"]) for r in row["quarterly"] if r["end"] >= since]
                 history[row["label"]] = [_rec(r, row["concept"]) for r in row["filing_history"]["quarterly"] if r["end"] >= since]
         # The same cover-page definition is used by company index and screener.
@@ -939,8 +961,13 @@ def sma_at(c, n, i):
 
 def price_block(tk, dates, c, spy, sect, ranks):
     out, prov = {}, {}
-    if not c or c[-1] is None:
+    end = next((i + 1 for i in range(len(c) - 1, -1, -1) if c[i] is not None), 0)
+    if not end:
         return out, prov
+    # A missing latest provider bar does not erase the last reported close.
+    # Trim the calculation window, preserving the real date and missing source.
+    dates, c = dates[:end], c[:end]
+    spy, sect = (spy[:end] if spy else None), (sect[:end] if sect else None)
     last = dates[-1]
     p = c[-1]
     out["price"] = p
@@ -1050,7 +1077,7 @@ def price_block(tk, dates, c, spy, sect, ranks):
             prov[fid] = {"x": f"(1 + return) / (1 + {nm} return) − 1 over {days} days", "p": [[dates[j], c[j]], [last, p]], "r": [dates[j], last]}
     if tk in ranks:
         out["mom_rank_3m"] = ranks[tk]
-        prov["mom_rank_3m"] = {"x": "Percentile of the 3-month return among S&P 500 members", "p": (prov.get("ret_3m") or {}).get("p")}
+        prov["mom_rank_3m"] = {"x": "Percentile of the 3-month return among tracked companies", "p": (prov.get("ret_3m") or {}).get("p")}
     return out, prov
 
 
@@ -1380,7 +1407,8 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
         r3 = {}
         for tk in TICKERS:
             if S.get(tk):
-                r, _j = ret_since(dates, S[tk], 91)
+                end = next((i + 1 for i in range(len(S[tk]) - 1, -1, -1) if S[tk][i] is not None), 0)
+                r, _j = ret_since(dates[:end], S[tk][:end], 91) if end else (None,None)
                 if r is not None:
                     r3[tk] = r
         order = sorted(r3, key=lambda t: r3[t])
@@ -1406,8 +1434,9 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
             out.update(po)
             prov.f.update(pp)
             price = out.get("price")
+            price_date = pp["price"]["p"][-1][0] if price is not None else None
             sh = dict((fundc.get(tk) or {}).get("shares") or {})
-            mcap = fundamentals.market_cap(price, dict(sh, val=sh.get("v")), dates[-1])
+            mcap = fundamentals.market_cap(price, dict(sh, val=sh.get("v")), price_date)
             if mcap is not None:
                 out["mcap"] = mcap
                 share_ref = None
@@ -1419,7 +1448,7 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
                         share_ref = ("Shares outstanding (cover page)", [sh.get("end"), "", sh["v"], sh["accn"], sh.get("filed") or "", sh.get("form") or "", "EntityCommonStockSharesOutstanding", 0])
                     classes = f" (share classes {' + '.join(f'{x:,.0f}' for x in sh['parts'])})" if len(sh.get("parts") or []) > 1 else ""
                     basis = f"shares outstanding{classes} (cover page, as of {sh.get('end')})"
-                prov.put("mcap", f"Close {price} on {dates[-1]} × {sh['v']:,.0f} {basis}", [share_ref] if share_ref else [], p=[[dates[-1], price]])
+                prov.put("mcap", f"Close {price} on {price_date} × {sh['v']:,.0f} {basis}", [share_ref] if share_ref else [], p=[[price_date, price]])
                 if inp:
                     R = inp["recs"]
                     srefs = [share_ref] if share_ref else []
@@ -1427,15 +1456,15 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
                     if not inp["fin"] and inp["debt"] is not None and inp["cash"] is not None:
                         ev = mcap + inp["debt"] - inp["cash"]
                         out["ev"] = ev
-                        prov.put("ev", "Market cap + total debt − cash and current marketable securities", srefs + R["debt"] + R["cash"], p=[[dates[-1], price]])
+                        prov.put("ev", "Market cap + total debt − cash and current marketable securities", srefs + R["debt"] + R["cash"], p=[[price_date, price]])
                     eps = None
                     if inp["eps"] is not None:
                         eps = inp["eps"]
                         if eps > 0:
                             out["pe"] = price / eps
-                            prov.put("pe", f"Close {price} on {dates[-1]} / diluted EPS of the last four quarters ({eps:.2f}, split-adjusted)", R["eps"], p=[[dates[-1], price]])
+                            prov.put("pe", f"Close {price} on {price_date} / diluted EPS of the last four quarters ({eps:.2f}, split-adjusted)", R["eps"], p=[[price_date, price]])
                         out["earn_yield"] = eps / price
-                        prov.put("earn_yield", f"Diluted EPS of the last four quarters ({eps:.2f}) / close {price}", R["eps"], p=[[dates[-1], price]])
+                        prov.put("earn_yield", f"Diluted EPS of the last four quarters ({eps:.2f}) / close {price}", R["eps"], p=[[price_date, price]])
                     pairs = [("ev_ebit", ev, inp["oi"], R["oi"], "Enterprise value / operating income (trailing four quarters)"),
                              ("ev_sales", ev, inp["rev"], R["rev"], "Enterprise value / revenue (trailing four quarters)"),
                              ("ev_fcf", ev, inp["fcf"], R["fcf"], "Enterprise value / free cash flow (trailing four quarters)"),
@@ -1444,22 +1473,22 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
                     for fid, a, b, recs, x in pairs:
                         if a is not None and b and b > 0:
                             out[fid] = a / b
-                            prov.put(fid, x, srefs + recs + (R["debt"] + R["cash"] if a is ev else []), p=[[dates[-1], price]])
+                            prov.put(fid, x, srefs + recs + (R["debt"] + R["cash"] if a is ev else []), p=[[price_date, price]])
                     for fid, num, recs, x in (("fcf_yield", inp["fcf"], R["fcf"], "Free cash flow (trailing four quarters) / market cap"),
                                               ("div_yield", inp["div"], R["div"], "Dividends paid (trailing four quarters) / market cap"),
                                               ("bb_yield", inp["bb"], R["bb"], "Share repurchases (trailing four quarters) / market cap")):
                         if num is not None:
                             out[fid] = num / mcap
-                            prov.put(fid, x, srefs + recs, p=[[dates[-1], price]])
+                            prov.put(fid, x, srefs + recs, p=[[price_date, price]])
                     if inp["div"] is not None and inp["bb"] is not None:
                         out["sh_yield"] = (inp["div"] + inp["bb"]) / mcap
-                        prov.put("sh_yield", "(Dividends paid + share repurchases, trailing four quarters) / market cap", srefs + R["div"] + R["bb"], p=[[dates[-1], price]])
+                        prov.put("sh_yield", "(Dividends paid + share repurchases, trailing four quarters) / market cap", srefs + R["div"] + R["bb"], p=[[price_date, price]])
                     if not inp["fin"] and inp["ta"] and inp["tl"] and None not in (inp["tca"], inp["tcl"], inp["re"], inp["oi"], inp["rev"]):
                         ta = inp["ta"]
                         z = 1.2 * (inp["tca"] - inp["tcl"]) / ta + 1.4 * inp["re"] / ta + 3.3 * inp["oi"] / ta + 0.6 * mcap / inp["tl"] + 1.0 * inp["rev"] / ta
                         out["altman_z"] = z
                         prov.put("altman_z", "1.2·(current assets − current liabilities)/assets + 1.4·retained earnings/assets + 3.3·EBIT/assets + 0.6·market cap/total liabilities + 1.0·revenue/assets",
-                                 R["wc"] + R["re"] + R["oi"] + R["rev"] + R["ta"] + R["tl"] + srefs, p=[[dates[-1], price]])
+                                 R["wc"] + R["re"] + R["oi"] + R["rev"] + R["ta"] + R["tl"] + srefs, p=[[price_date, price]])
                     vh = valuation_history(fx, inp, dates, c)
                     for k, (rank, n, lo, med, hi) in vh.items():
                         out[k + "_p5"] = rank
@@ -1530,7 +1559,7 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
         for t, lst in peers.items():
             lst.sort(reverse=True)
             peer_out[t] = [[b for _r, b in lst[:5]], [b for _r, b in lst[-5:][::-1]], [round(r, 3) for r, _b in lst[:5]], [round(r, 3) for r, _b in lst[-5:][::-1]]]
-            provs[t].f["peers"] = {"x": "Highest and lowest correlations of 1-year daily returns among S&P 500 members", "r": [dates[-L], dates[-1]], "n": L}
+            provs[t].f["peers"] = {"x": "Highest and lowest correlations of 1-year daily returns among tracked companies", "r": [dates[-L], dates[-1]], "n": L}
         sb.put_json("screener/corr.json", {"generated": now_iso(), "tickers": tick, "n": L, "from": dates[-L] if L else None, "to": dates[-1],
                                            "m": base64.b64encode(bytes(mat)).decode()}, cache="max-age=3600")
 
@@ -1560,7 +1589,7 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
                 continue
             fm = fundmeta.get(tk) or {}
             v = values[tk]
-            row = [tk, name, sector, fm.get("sic") or "", 1 if tk in SP100 else 0, _cik, latest_q[tk][0], latest_q[tk][1]]
+            row = [tk, name, sector, fm.get("sic") or "", 1 if tk in SP100 else 0, 1 if tk in SP500 else 0, _cik, latest_q[tk][0], latest_q[tk][1]]
             for fid in FIELD_IDS:
                 x = v.get(fid)
                 if isinstance(x, bool):
@@ -1570,7 +1599,7 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
                 else:
                     row.append(sig(x))
             out_rows.append(row)
-        doc = {"generated": now_iso(), "asof": {"prices": dates[-1], "facts": max((x[1] or "") for x in latest_q.values())},
+        doc = {"generated": now_iso(), "universe": UNIVERSE_METADATA, "asof": {"prices": dates[-1], "facts": max((x[1] or "") for x in latest_q.values())},
                "groups": [{"id": g, "n": n} for g, n in GROUPS], "fields": fields, "cols": cols, "rows": out_rows, "peers": peer_out,
                "sector_etf": SECTOR_ETF, "kpi_families": [[k, n] for k, n, _ in KPI_FAM]}
         size = sb.put_json("screener.json", doc, cache="max-age=300")
@@ -1579,6 +1608,8 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
         def put_src(tk):
             p = provs[tk]
             body = {"tk": tk, "generated": doc["generated"], "asof": dates[-1], "refs": p.refs, "f": p.f}
+            if (fundc.get(tk) or {}).get("source_provenance"):
+                body["source_provenance"] = fundc[tk]["source_provenance"]
             sb.put_json(f"screener/src/{tk}.json", body, cache="max-age=300")
             return len(json.dumps(body))
         with ThreadPoolExecutor(12) as ex:

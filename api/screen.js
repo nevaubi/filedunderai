@@ -17,11 +17,13 @@ async function catalogue() {
   if (!r.ok) throw new Error(`screener.json ${r.status}`);
   const d = await r.json();
   const col = Object.fromEntries(d.cols.map((c, i) => [c, i]));
+  const rows = d.rows.map(r => Object.fromEntries(d.cols.map((name, i) => [name, r[i]])));
   const count = (i) => { const m = new Map(); d.rows.forEach(r => m.set(r[i], (m.get(r[i]) || 0) + 1)); return [...m.entries()].filter(([k]) => k).sort((a, b) => b[1] - a[1]); };
   CAT = {
     fields: d.fields, groups: d.groups, sectors: count(col.sector).map(x => x[0]), sectorCounts: count(col.sector),
     industries: count(col.industry).map(x => x[0]), industryCounts: count(col.industry), tickers: d.rows.map(r => r[col.ticker]),
     names: d.rows.map(r => [r[col.ticker], r[col.name]]), asof: d.asof,
+    indexCounts: Object.fromEntries(SPEC.INDEXES.map(id => [id, rows.filter(row => SPEC.inIndex(row, id, d.universe)).length])),
   };
   CAT_AT = Date.now();
   return CAT;
@@ -38,13 +40,14 @@ function systemPrompt(cat) {
   cat.fields.forEach(f => { if (!byGroup.has(f.g)) byGroup.set(f.g, []); byGroup.get(f.g).push(f); });
   const groupName = Object.fromEntries((cat.groups || []).map(g => [g.id, g.n]));
   const fieldText = [...byGroup.entries()].map(([g, list]) => `## ${groupName[g] || g}\n` + list.map(f => `${f.id} | ${f.n} | ${f.u} | ${f.d.replace(/\s+/g, " ").slice(0, 170)}${fmtQ(f)}`).join("\n")).join("\n\n");
-  return `You build stock screens for an S&P 500 screener. You do not answer with numbers about companies and you never state facts about companies; you only translate the user's request into a screen spec that the screener applies to its own data.
+  const countText = id => `${cat.indexCounts[id]} ${cat.indexCounts[id] === 1 ? "company" : "companies"}`;
+  return `You build stock screens for Filed Under's tracked US equities. You do not answer with numbers about companies and you never state facts about companies; you only translate the user's request into a screen spec that the screener applies to its own data.
 
 Return one JSON object, nothing else:
 {
   "filters": [ {"field": "<field id>", "op": ">"|">="|"<"|"<="|"between"|"="|"!="|"top"|"bottom"|"true"|"false"|"exists", "value": <number or [low, high]>, "pct": <0-100, only for top/bottom>, "scope": "all"|"sector"|"industry" (only for top/bottom)} ],
   "sectors": [<sector names to keep>], "exclude_sectors": [...], "industries": [<industry names to keep>], "exclude_industries": [...],
-  "index": "sp500"|"sp100", "tickers": [<only these tickers>], "exclude_tickers": [...],
+  "index": "all"|"sp500"|"sp100", "tickers": [<only these tickers>], "exclude_tickers": [...],
   "similar_to": null | {"ticker": "NVDA", "n": 25},
   "sort": {"field": "<field id>" | "similarity", "dir": "desc"|"asc"},
   "columns": [<field ids to show, 4 to 10, most relevant first>],
@@ -57,7 +60,8 @@ Return one JSON object, nothing else:
 Units: pct fields are fractions (15% is 0.15, 2 percentage points is 0.02). usd fields are absolute dollars (market cap $10B is 10000000000). pctl fields run 0 to 1. bool fields use op "true" or "false" with no value. "top"/"bottom" keep the highest/lowest pct percent of that field, across all companies (scope "all") or within each sector (scope "sector").
 
 Conventions (use them unless the user says otherwise, and list the ones you used in assumptions):
-- "small caps" in this S&P 500 universe: mcap < 20e9. "mid caps": mcap between 20e9 and 60e9. "large caps": mcap > 60e9. "mega caps": mcap > 300e9.
+- Default index is "all" (all tracked companies). Use "sp500" or "sp100" only when the user requests that index. Tracked companies can be outside both indexes; never treat "sp500" as all tracked.
+- Market-cap buckets in this screener: "small caps": mcap < 20e9. "mid caps": mcap between 20e9 and 60e9. "large caps": mcap > 60e9. "mega caps": mcap > 300e9.
 - "profitable": nm > 0. "unprofitable"/"losing money": nm < 0. "cash generative"/"positive free cash flow": fcf_yield > 0.
 - "growing": rev_g_ttm > 0. "fast growing"/"high growth": rev_g_ttm > 0.15. "accelerating revenue": rev_accel > 0. "accelerating earnings": eps_accel > 0. "decelerating": the _accel field < 0.
 - "cheap"/"undervalued"/"value": pe bottom 30% within sector (op "bottom", pct 30, scope "sector") unless a multiple is named. "cheap vs its own history": pe_p5 < 0.3 (or the named multiple's _p5). "expensive": pe top 30% within sector.
@@ -81,11 +85,11 @@ Conventions (use them unless the user says otherwise, and list the ones you used
 Follow-ups: when a current screen is given, return the full updated spec: keep every existing filter and setting unless the user changes or removes it, and apply the change ("now only above the 200-day" adds above_sma200 true; "drop banks" adds exclude_industries; "sort by FCF yield" changes only sort).
 
 Sectors: ${cat.sectorCounts.map(([s, n]) => `${s} (${n})`).join("; ")}
-Index: sp500 (all) or sp100.
+Universe choices: all (all tracked; ${countText("all")}), sp500 (S&P 500 members; ${countText("sp500")}), sp100 (S&P 100 members; ${countText("sp100")}). Membership counts refer to the tracked companies in this data.
 Industries (SEC SIC descriptions, count): ${cat.industryCounts.map(([s, n]) => `${s} (${n})`).join("; ")}
 Data as of: prices ${cat.asof?.prices}, latest quarter ${cat.asof?.facts}.
 
-Fields (id | name | unit | definition | distribution across the S&P 500):
+Fields (id | name | unit | definition | distribution across all tracked companies):
 ${fieldText}`;
 }
 
