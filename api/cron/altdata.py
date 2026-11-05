@@ -1,0 +1,19 @@
+import os
+import sys
+from http.server import BaseHTTPRequestHandler
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _common import serve  # noqa: E402
+
+
+def run(sb, query):
+    from etl import altdata
+    step = query.get("step", "refresh")
+    if step not in ("market", "refresh"):
+        raise ValueError("step must be market or refresh")
+    return altdata.rotation_job(sb, step=step, time_budget=240)
+
+
+class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        serve(self, run)
