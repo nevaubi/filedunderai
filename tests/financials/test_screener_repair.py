@@ -9,7 +9,7 @@ import urllib.request
 from pathlib import Path
 from unittest.mock import patch
 
-from etl import screener
+from etl import fundamentals, screener
 
 
 def body(value):
@@ -104,7 +104,7 @@ class StoredScreenerRepairTests(unittest.TestCase):
                 'normalized_metadata_sha256': {t: sha(body(fund[t])) for t in self.tickers},
                 'inputs': [], 'outputs': [], 'code_sha256': {p: sha((Path(__file__).resolve().parents[2] / p).read_bytes()) for p in
                     ('etl/screener.py', 'etl/jobs.py', 'etl/fundamentals.py', 'etl/sec.py', 'etl/source_provenance.py',
-                     'etl/source_quality.py', 'etl/universe.py', 'etl/common.py', 'etl/repair_screener.py',
+                     'etl/source_quality.py', 'etl/universe.py', 'etl/common.py', 'etl/kpi_taxonomy.py', 'etl/repair_screener.py',
                      'etl/additional_companies.json', 'etl/additional_companies_mdy-spsm-2026-11-04.json')},
                 'validation': {'exact_price_matches': 2, 'price_mismatches': [],
                     'missing_normalized_cache': [], 'unexpected_legacy_cache': [],
@@ -124,7 +124,14 @@ class StoredScreenerRepairTests(unittest.TestCase):
             p.parent.mkdir(parents=True, exist_ok=True)
             p.write_bytes(raw)
             plan['inputs'].append({'bucket': bucket, 'path': path, 'exists': True, 'sha256': sha(raw)})
-        outputs = [('public-data', 'index.json', body(index)), ('public-data', 'screener.json', body(screen)),
+        corrected = {t: {**fund[t], 'fund': fundamentals.compute({}, {}, None, ticker=t), 'div_ttm': None, 'bb_ttm': None} for t in self.tickers}
+        plan['fundamental_changes'] = {t: {'fund.' + key: {'before': None, 'after': value, 'before_present': False, 'after_present': True}
+            for key, value in corrected[t]['fund'].items()} for t in self.tickers}
+        for t in self.tickers:
+            for field in ('div_ttm', 'bb_ttm'):
+                plan['fundamental_changes'][t][field] = {'before': None, 'after': None, 'before_present': False, 'after_present': True}
+        outputs = [('public-data', 'meta/fundamentals.json', body(corrected)),
+                   ('public-data', 'index.json', body(index)), ('public-data', 'screener.json', body(screen)),
                    ('public-data', 'screener/corr.json', body({'tickers': self.tickers})),
                    ('raw', 'screener/fund.json.gz', gzip.compress(body({'_v': 6, **fund}))),
                    ('relations', 'company_metrics.json', body(index['companies']))]
@@ -288,6 +295,51 @@ class StoredScreenerRepairTests(unittest.TestCase):
     def test_missing_source_quality_signature_is_rejected_without_writes(self):
         self.plan['code_sha256'].pop('etl/source_quality.py', None)
         with self.assertRaisesRegex(ValueError, 'code signatures'):
+            self.apply()
+        self.assertEqual(self.sb.writes, [])
+
+    def test_corrected_metadata_cannot_change_company_identity(self):
+        name = 'meta/fundamentals.json'
+        p = self.root / 'outputs/public-data' / name
+        doc = json.loads(p.read_bytes())
+        doc['AAPL']['name'] = 'Unreviewed company rename'
+        raw = body(doc)
+        p.write_bytes(raw)
+        next(e for e in self.plan['outputs'] if e['path'] == name).update(sha256=sha(raw), bytes=len(raw))
+        with self.assertRaisesRegex(ValueError, 'fundamentals|metadata'):
+            self.apply()
+        self.assertEqual(self.sb.writes, [])
+
+    def test_rollback_restores_original_fundamental_metadata(self):
+        before = self.sb.objects['public-data', 'meta/fundamentals.json']
+        result = self.apply()
+        self.assertNotEqual(self.sb.objects['public-data', 'meta/fundamentals.json'], before)
+        self.repair.rollback_candidate(self.sb, result['backup_path'], result['backup_sha256'], self.root / 'rollback.json', workers=2)
+        self.assertEqual(self.sb.objects['public-data', 'meta/fundamentals.json'], before)
+
+    def test_recomputation_updates_distribution_inputs_without_changing_identity(self):
+        original = {t: {'pipeline_version': 2, 'name': t, 'fund': {}, 'div_ttm': 100, 'bb_ttm': 200,
+                         'shares_metadata': {'val': 300}} for t in self.tickers}
+        corrected, changes = self.repair.recompute_fund_snapshot(original,
+            lambda t: {'ticker': t, 'pipeline_version': 2, 'statements': {}, 'profile': {}}, workers=2)
+        for t in self.tickers:
+            self.assertIsNone(corrected[t]['div_ttm'])
+            self.assertIsNone(corrected[t]['bb_ttm'])
+            self.assertEqual(corrected[t]['name'], t)
+            self.assertEqual(corrected[t]['shares_metadata'], {'val': 300})
+            self.assertEqual(changes[t]['div_ttm']['before'], 100)
+            self.assertEqual(changes[t]['bb_ttm']['before'], 200)
+            self.assertEqual(original[t]['div_ttm'], 100)
+
+    def test_shared_current_financial_ratio_mismatch_blocks_publication(self):
+        name = 'index.json'
+        p = self.root / 'outputs/public-data' / name
+        doc = json.loads(p.read_bytes())
+        doc['companies'][0]['ps_ttm'] = 1.5
+        raw = body(doc)
+        p.write_bytes(raw)
+        next(e for e in self.plan['outputs'] if e['path'] == name).update(sha256=sha(raw), bytes=len(raw))
+        with self.assertRaisesRegex(ValueError, 'shared financial'):
             self.apply()
         self.assertEqual(self.sb.writes, [])
 

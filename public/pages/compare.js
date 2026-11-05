@@ -188,6 +188,8 @@ table.cmpx td.c.der::after{content:"";position:absolute;right:3px;top:5px;width:
     return a && a.v > 0 ? a : null;
   }
   function ttmAt(m, tk, label, end, filedBy) {
+    const basis = typeof companySummary === 'function' ? companySummary(tk)?.valuation_basis : null;
+    if (label === 'EPS diluted' && basis?.status === 'held' && basis.affected_fields?.includes('eps_ttm') && (!basis.effective_date || end >= basis.effective_date)) return null;
     let s = m.series(label, "Q").filter(x => x.end <= end || Math.abs(dayDiff(x.end, end)) <= 12);
     if (filedBy) s = s.filter(x => (x.cell.rec?.filed || "") <= filedBy);
     const q = s.slice(-4);

@@ -1,4 +1,5 @@
 """Derived fundamentals for screening: TTM sums, latest-quarter margins and growth."""
+import copy
 import datetime as dt
 import math
 
@@ -6,10 +7,46 @@ import math
 # Aggregate caches must identify the normalizer that excluded synthetic EPS and shares.
 NORMALIZATION_VERSION = 2
 
+# A provider's price-adjustment event is not proof of a financial share basis.
+# These sourced holds require review of consistent recast quarters before release.
+VALUATION_BASIS_HOLDS = {
+    "HON": {
+        "status": "held", "code": "corporate_action_recast_required",
+        "affected_fields": ["eps_ttm", "pe_ttm", "earnings_yield"],
+        "effective_date": "2026-06-29",
+        "reason": "EPS spans Honeywell's spin-off and one-for-two reverse stock split. A consistent recast four-quarter series is required.",
+        "sources": [
+            {"title": "Honeywell completion of spin-off and one-for-two reverse stock split",
+             "url": "https://www.sec.gov/Archives/edgar/data/773840/000077384026000084/exhibit991-pressrelease629.htm"},
+            {"title": "Honeywell second-quarter 2026 filing and retrospective share adjustment",
+             "url": "https://www.sec.gov/Archives/edgar/data/773840/000077384026000124/hon-20260630.htm"},
+        ],
+    },
+}
+
 
 def normalized(entry):
     version = (entry or {}).get("pipeline_version")
     return type(version) is int and version >= NORMALIZATION_VERSION
+
+
+def valuation_hold(ticker=None, declared=None, as_of=None):
+    """Explicit, sourced current-valuation hold; historical observations stay intact."""
+    basis = declared if isinstance(declared, dict) and declared.get("status") == "held" else VALUATION_BASIS_HOLDS.get(ticker)
+    if not basis:
+        return None
+    if basis.get("effective_date"):
+        try:
+            if _d(as_of or dt.datetime.now(dt.timezone.utc).date().isoformat()) < _d(basis["effective_date"]):
+                return None
+        except (TypeError, ValueError):
+            pass  # Unknown date cannot clear an otherwise explicit hold.
+    return copy.deepcopy(basis)
+
+
+def basis_blocks(basis, field):
+    return bool(basis and basis.get("status") == "held" and
+                field in (basis.get("affected_fields") or ("eps_ttm", "pe_ttm", "earnings_yield")))
 
 
 def _d(s):
@@ -136,22 +173,48 @@ def consecutive_quarters(q):
     return all((_d(b["start"])-_d(a["end"])).days == 1 for a,b in zip(q,q[1:]))
 
 
-def ttm_records(statements, label, stmt_order=("income", "cashflow")):
+def current_period_end(statements):
+    """Latest reported income quarter is the common current calculation window."""
+    income = [p["end"] for label in ("Revenue", "Net income")
+              for p in series(statements, label, "quarterly", ("income",))]
+    if income:
+        return max(income)
+    flows = [p["end"] for stmt in ("income", "cashflow") for row in statements.get(stmt, [])
+             if row["label"] not in NON_SUMMABLE for p in row.get("quarterly", [])]
+    return max(flows) if flows else None
+
+
+def ttm_records(statements, label, stmt_order=("income", "cashflow"), end=None):
     if label in NON_SUMMABLE:
         return []
     # A balance cannot become a flow by passing a different statement order.
     for row in statements.get("balance", []):
         if row["label"] == label:
             return []
-    q = sorted(series(statements, label, "quarterly", stmt_order), key=lambda r:r["end"])[-4:]
+    q = sorted((r for r in series(statements, label, "quarterly", stmt_order)
+                if end is None or r["end"] <= end), key=lambda r:r["end"])[-4:]
+    if end is not None and (not q or q[-1]["end"] != end):
+        return []
     if label in ("EPS diluted", "EPS basic") and any(r.get("derived") for r in q):
         return []
     return q if consecutive_quarters(q) else []
 
 
-def ttm(statements, label, stmt_order=("income", "cashflow")):
-    q = ttm_records(statements, label, stmt_order)
+def ttm(statements, label, stmt_order=("income", "cashflow"), end=None):
+    q = ttm_records(statements, label, stmt_order, end=end)
     return sum(x["v"] for x in q) if q else None
+
+
+def current_ttm_value(fund, field, basis=None):
+    """A cached current scalar must carry the contiguous reporting periods it covers."""
+    value = fund.get(field)
+    if type(value) not in (int, float) or not math.isfinite(value) or basis_blocks(basis or fund.get("valuation_basis"), field):
+        return None
+    try:
+        records = [{"start": start, "end": end} for start, end in (fund.get("ttm_periods") or {}).get(field, [])]
+        return value if consecutive_quarters(records) and max(r["end"] for r in records) == fund.get("latest_quarter_end") else None
+    except (TypeError, ValueError, KeyError):
+        return None
 
 
 def market_cap(price, shares, price_date=None):
@@ -202,24 +265,31 @@ def at(statements, label, end, kind="quarterly", tol=12):
     return None
 
 
-def compute(statements, profile, px):
+def compute(statements, profile, px, ticker=None):
     fye = profile.get("fiscalYearEnd") or "1231"
-    rev_q = series(statements, "Revenue", "quarterly")
-    lq = rev_q[-1]["end"] if rev_q else None
+    lq = current_period_end(statements)
     lq_label = fy_label(fye, lq, "Q") if lq else None
     if lq_label and profile.get("fyNameOffset"):
         lq_label = _shift_fy(lq_label, profile["fyNameOffset"])
     out = {"latest_quarter": lq_label, "latest_quarter_end": lq}
-    rev, ni = ttm(statements, "Revenue"), ttm(statements, "Net income")
-    eps = ttm(statements, "EPS diluted")
-    ocf, capex = ttm(statements, "Operating cash flow", ("cashflow",)), ttm(statements, "Capex", ("cashflow",))
-    div, bb = ttm(statements, "Dividends paid", ("cashflow",)), ttm(statements, "Buybacks", ("cashflow",))
-    ocf_q, capex_q = ttm_records(statements, "Operating cash flow", ("cashflow",)), ttm_records(statements, "Capex", ("cashflow",))
+    rev, ni = ttm(statements, "Revenue", end=lq), ttm(statements, "Net income", end=lq)
+    eps = ttm(statements, "EPS diluted", end=lq)
+    basis = valuation_hold(ticker, profile.get("valuation_basis"), (px or {}).get("as_of"))
+    if basis_blocks(basis, "eps_ttm"):
+        eps = None
+    out["valuation_basis"] = basis
+    ocf, capex = ttm(statements, "Operating cash flow", ("cashflow",), end=lq), ttm(statements, "Capex", ("cashflow",), end=lq)
+    div, bb = ttm(statements, "Dividends paid", ("cashflow",), end=lq), ttm(statements, "Buybacks", ("cashflow",), end=lq)
+    ocf_q, capex_q = ttm_records(statements, "Operating cash flow", ("cashflow",), end=lq), ttm_records(statements, "Capex", ("cashflow",), end=lq)
     aligned = [(r["start"], r["end"]) for r in ocf_q] == [(r["start"], r["end"]) for r in capex_q]
     fcf = ocf - sum(abs(r["v"]) for r in capex_q) if ocf is not None and capex is not None and aligned else None
     out.update({"revenue_ttm": rev, "net_income_ttm": ni, "eps_ttm": eps, "fcf_ttm": fcf})
-    rev_periods = [(r["start"],r["end"]) for r in ttm_records(statements,"Revenue")]
-    ni_periods = [(r["start"],r["end"]) for r in ttm_records(statements,"Net income")]
+    periods = lambda records: [[r["start"], r["end"]] for r in records]
+    rev_periods = periods(ttm_records(statements, "Revenue", end=lq))
+    ni_periods = periods(ttm_records(statements, "Net income", end=lq))
+    out["ttm_periods"] = {"revenue_ttm": rev_periods, "net_income_ttm": ni_periods,
+                          "eps_ttm": periods(ttm_records(statements, "EPS diluted", end=lq)),
+                          "fcf_ttm": periods(ocf_q) if fcf is not None else []}
     out["net_margin_ttm"] = ni / rev if rev and ni is not None and rev_periods == ni_periods else None
     if lq:
         r = at(statements, "Revenue", lq)

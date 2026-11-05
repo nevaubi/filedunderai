@@ -120,6 +120,13 @@
         tbody.append(node('tr', {}, node('th', { scope: 'row' }, label), node('td', { class: 'num' }, valid ? node('button', { class: 'cp-fin-value', 'data-metric': label, onclick: () => helpers.openSource?.(cell), title: 'Open the source for ' + label + ' (' + (unit || 'unit unavailable') + ')', 'aria-label': label + ': ' + value + '. Open source.' }, value, node('span', { 'aria-hidden': 'true' }, ' ↗')) : node('span', { title: 'A supported value is not available for this period' }, '—')), node('td', {}, periodLabel)));
       }
       table.append(tbody); financials.append(node('div', { class: 'cp-fin-scroll' }, table), node('p', { class: 'cp-footnote' }, 'Amounts retain the reported currency. TTM uses four consecutive reported quarters. Select a value to inspect its filing or calculation.'));
+      const valuationBasis = summary.valuation_basis;
+      if (valuationBasis?.status === 'held' && typeof valuationBasis.reason === 'string' && valuationBasis.reason.trim()) {
+        const sources = (Array.isArray(valuationBasis.sources) ? valuationBasis.sources : []).slice(0, 3);
+        financials.append(node('aside', { class: 'cp-valuation-note', role: 'note' },
+          node('strong', {}, 'Valuation availability'), node('p', {}, valuationBasis.reason),
+          node('div', {}, sources.map(source => sourceLink(source?.url, source?.title || 'Company filing')))));
+      }
       const signals = (options.signals || []).slice(0, 2);
       if (signals.length) financials.append(node('div', { class: 'cp-fin-insights' }, signals.map(s => node('p', {}, node('span', { class: 'cp-insight-dot ' + (s.tone || '') }), s.text))));
     }
@@ -200,7 +207,12 @@
       }
       const validImages = (profile?.images || []).filter(image => safeUrl(image.url) && safeUrl(image.source_url)).slice(0, 3);
       const publicationTime = item => Date.parse(item.published_at || item.date || '') || 0;
-      const news = (options.news || []).filter(item => safeUrl(item.url) && item.title).sort((a, b) => publicationTime(b) - publicationTime(a)).slice(0, 4);
+      const news = (options.news || []).filter(item => {
+        const url = safeUrl(item.url); if (!url || !item.title) return false;
+        const parsed = new URL(url);
+        // Quote landing pages have crawl dates, not article publication dates.
+        return !(parsed.hostname === 'finance.yahoo.com' && /^\/quote(?:\/|$)/.test(parsed.pathname));
+      }).sort((a, b) => publicationTime(b) - publicationTime(a)).slice(0, 4);
       const context = node('div', { class: 'cp-context-grid' });
       validImages.forEach(image => {
         const picture = node('img', { src: safeUrl(image.url), alt: image.caption || image.title || name, loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer' });

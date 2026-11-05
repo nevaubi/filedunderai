@@ -37,6 +37,8 @@ p.cp-description-empty { padding:18px 20px; margin:0; color:var(--muted); }
 .cp-fin-value:hover { color:var(--accent); text-decoration:underline; }
 .cp-fin-value:focus-visible,.cp-text-button:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
 .cp-fin-insights { border-top:1px solid var(--line); background:#fbfcfc; padding:4px 18px; }
+.cp-valuation-note { padding:12px 18px; border-top:1px solid var(--line); background:#fafbfb; font-size:11px; line-height:1.65; color:var(--ink2); }
+.cp-valuation-note strong { font-size:11px; font-weight:600; }.cp-valuation-note p { margin:5px 0 7px; }.cp-valuation-note > div { display:flex; flex-wrap:wrap; gap:6px 14px; }
 .cp-fin-insights p { display:flex; gap:9px; font-size:11px; line-height:1.7; color:var(--ink2); margin:10px 0; }
 .cp-insight-dot { flex:0 0 5px; width:5px; height:5px; margin-top:6px; border-radius:50%; background:var(--muted); }
 .cp-insight-dot.up { background:var(--up); }.cp-insight-dot.down { background:var(--down); }

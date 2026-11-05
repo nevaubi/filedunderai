@@ -40,6 +40,16 @@ active companies and 434 withheld legacy financial entries. Existing technical,
 activity and KPI columns remain in the screener. Null financial values are not
 filled from the old cache.
 
+The normalized active entries' derived `fund` summaries and the two top-level
+`div_ttm`/`bb_ttm` distribution inputs are also recomputed against the same current
+quarter from their sealed company statement bundles. The metadata snapshot retains every
+other identity, coverage, share-count and version field, including all staged
+and legacy entries. `fundamental_changes` records the exact before/after value
+and field presence for each change. The current reporting window must have four
+consecutive reported EPS quarters; Honeywell's mixed corporate-action basis
+remains explicitly held until recast evidence is established. Reported
+historical statements are preserved.
+
 Review `manifest.json`, the proposed public entry points and provenance before
 publication. The manifest must report `ready_for_publication_review: true`:
 
@@ -47,7 +57,10 @@ publication. The manifest must report `ready_for_publication_review: true`:
 - Exact close/date parity across stored history, current index and merged price
   statistics; serialized candidate source prices must match its index.
 - Financial cache membership equals the normalized active cohort.
-- Market capitalization and P/E agree with the index after screener rounding.
+- Market capitalization, P/E, P/S, FCF/dividend/buyback yields, latest-quarter
+  revenue growth and trailing net margin agree with the index after screener
+  rounding. Gross and operating margins use different documented windows in
+  the two products and are not compared as equivalent fields.
 - Every referenced proof is present, verified and assigned to the same issuer.
 - Calculation code hashes match at preparation start and finish.
 
@@ -81,8 +94,8 @@ python -m etl.repair_screener --env-json /private/backend-env.json apply \
 Apply takes the existing renewable `financial-aggregates` lease and fails if it
 is busy. Under that lease it validates current normalized metadata, each used
 company/source archive, stored close history, price-stat inputs and index price
-parity. Changes to legacy financial values that the guarded index does not use
-do not invalidate the candidate. It rechecks the mutable aggregate snapshots
+parity. The complete original fundamentals object must still match byte-for-byte,
+because the corrected snapshot replaces that whole object. It rechecks the mutable aggregate snapshots
 after making the backup and immediately before publication.
 
 All overwritten object bytes and their prior absence, complete prior
@@ -100,6 +113,7 @@ The intended writes are limited to:
 | `public-data/screener/src/{ticker}.json` | Per-field provenance for the active universe |
 | `raw/screener/fund.json.gz` | Version 6 normalized financial cache |
 | `raw/screener/kpi.json.gz` | Stored KPI cache, when its recomputation produced a change |
+| `public-data/meta/fundamentals.json` | Source-recomputed normalized `fund`, `div_ttm` and `bb_ttm`; every other field preserved |
 | `public-data/screener/corr.json` | Correlation matrix |
 | `company_metrics` | Upsert the active companies only |
 | `public-data/index.json` | Guarded index using the pinned fundamentals/price statistics |

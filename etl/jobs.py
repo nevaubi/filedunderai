@@ -333,11 +333,12 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
 def company_fundamental(tk, statements, prof, filings, warnings, fact_cleanup, ix=None, release=None):
     """Deterministic public-index inputs, also reconstructed at backfill promotion."""
     u = BY_TICKER[tk]
-    fund = fundamentals.compute(statements, prof, None)
+    fund = fundamentals.compute(statements, prof, None, ticker=tk)
     return {"pipeline_version": PIPELINE_VERSION, "ticker": tk, "warnings": warnings, "fact_cleanup": fact_cleanup, "name": u["name"], "legal_name": prof["name"], "sector": u["sector"], "sic": prof["sicDescription"], "exchange": (prof["exchanges"] or [None])[0],
             "fye": prof["fiscalYearEnd"], "shares": (prof["sharesOutstanding"] or {}).get("val"), "shares_metadata": prof["sharesOutstanding"], "latest_filing": filings[0]["d"] if filings else None,
             "latest_accession": filings[0]["a"] if filings else None, "material_accession": material_accession(filings), "fund": fund, "has_source_tables": bool(ix), "has_release": bool(release),
-            "div_ttm": fundamentals.ttm(statements, "Dividends paid", ("cashflow",)), "bb_ttm": fundamentals.ttm(statements, "Buybacks", ("cashflow",))}
+            "div_ttm": fundamentals.ttm(statements, "Dividends paid", ("cashflow",), end=fund["latest_quarter_end"]),
+            "bb_ttm": fundamentals.ttm(statements, "Buybacks", ("cashflow",), end=fund["latest_quarter_end"])}
 
 
 def _ts(s):
@@ -587,7 +588,8 @@ def build_index(sb, pstats=None, fundamentals_snapshot=None, return_snapshot=Fal
         fd = dict(f.get("fund") or {}) if is_normalized else {}
         price = ps.get("price")
         mcap = fundamentals.market_cap(price, f.get("shares_metadata"), ps.get("as_of"))
-        rev, eps, fcf = fd.get("revenue_ttm"), fd.get("eps_ttm"), fd.get("fcf_ttm")
+        basis = fundamentals.valuation_hold(tk, fd.get("valuation_basis"), ps.get("as_of"))
+        rev, eps, fcf = fd.get("revenue_ttm"), fundamentals.current_ttm_value(fd, "eps_ttm", basis), fd.get("fcf_ttm")
         m = {
             "ticker": tk, "as_of": ps.get("as_of"), "price": price, "chg_1d": ps.get("chg_1d"), "ret_1m": ps.get("ret_1m"), "ret_ytd": ps.get("ret_ytd"), "ret_1y": ps.get("ret_1y"),
             "market_cap": mcap, "pe_ttm": price / eps if price and eps and eps > 0 else None, "ps_ttm": mcap / rev if mcap and rev else None, "eps_ttm": eps,
@@ -603,7 +605,8 @@ def build_index(sb, pstats=None, fundamentals_snapshot=None, return_snapshot=Fal
         metrics.append({k: (None if isinstance(v, float) and v != v else v) for k, v in m.items()})
         rows.append({**{k: v for k, v in m.items() if k not in ("updated_at",)}, "name": f["name"], "legal_name": f.get("legal_name"), "sector": f["sector"], "sic": f.get("sic"),
                      "exchange": f.get("exchange"), "fye": f.get("fye"), "latest_filing": f.get("latest_filing"), "has_source_tables": f.get("has_source_tables"), "sp100": tk in SP100, "sp500": tk in SP500, "logo": tk in logos, "insider_net_90d": _ins_net(ins.get(tk)), "spark": ps.get("spark", []), "shares_metadata": f.get("shares_metadata"),
-                     "pipeline_version": f.get("pipeline_version"), "financial_status": "normalized" if is_normalized else "normalization_pending"})
+                     "pipeline_version": f.get("pipeline_version"), "financial_status": "normalized" if is_normalized else "normalization_pending",
+                     "valuation_basis": basis})
     if metrics:
         sb.upsert("company_metrics", metrics, "ticker")
     snapshot = {"generated": now_iso(), "universe": UNIVERSE_METADATA, "sectors": SECTOR_ETF, "companies": rows}

@@ -27,6 +27,13 @@ class ScreenerActivityCoverageTests(unittest.TestCase):
             self.assertEqual(out["AAPL"][key], 0)
             self.assertIn(key, provenance["AAPL"])
 
+    def test_legacy_financial_exclusion_does_not_erase_known_news_window(self):
+        with patch.object(screener, "TICKERS", ["AAPL", "OKTA"]):
+            out, provenance = screener.activity(ActivityStore(), {}, dt.date(2026, 11, 5))
+        self.assertEqual(out["AAPL"].get("news_30d"), 0)
+        self.assertIn("news_30d", provenance["AAPL"])
+        self.assertNotIn("news_30d", out["OKTA"])
+
     def test_stored_rows_do_not_establish_new_company_window_coverage(self):
         news = [{"ticker":"OKTA", "url":"https://example.test/okta", "title":"Reported event", "published_at":"2026-11-01"}]
         transactions = [{"ticker":"OKTA", "owner":"Officer", "code":"P", "shares":10,

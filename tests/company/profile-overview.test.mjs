@@ -118,9 +118,27 @@ test('recent company context selects the newest published articles without reord
       { title: 'Older report', url: 'https://alpha.example/older', date: '2026-10-01' },
       { title: 'Undated report', url: 'https://alpha.example/undated', date: 'invalid' },
       { title: 'Latest report', url: 'https://alpha.example/latest', published_at: '2026-11-04T12:00:00Z' },
+      { title: 'Stock price, quote and history', url: 'https://finance.yahoo.com/quote/AAA/', date: '2026-11-05' },
     ];
     h.api.render(h.w.document.querySelector('main'), { ticker: 'AAA', company: { name: 'Alpha', filings: [] }, snapshot: {}, enrichment: null, news, helpers: {} });
     assert.deepEqual(Array.from(h.w.document.querySelectorAll('.cp-context-card h3'), e => e.textContent), ['Latest report', 'Older report', 'Undated report']);
     assert.equal(news[0].title, 'Older report');
+  } finally { h.close(); }
+});
+
+test('a held valuation explains its basis and links only safe primary evidence', () => {
+  const h = setup();
+  try {
+    h.api.render(h.w.document.querySelector('main'), {
+      ticker: 'AAA', company: { name: 'Alpha', filings: [] }, snapshot: {}, enrichment: null,
+      summary: { valuation_basis: { status: 'held', affected_fields: ['eps_ttm', 'pe_ttm'],
+        reason: 'Reported EPS spans a reverse split; a consistent recast series is required.',
+        sources: [{ title: 'Company filing', url: 'https://www.sec.gov/Archives/example.htm' }, { title: 'Unsafe source', url: 'javascript:alert(1)' }],
+      } }, helpers: {},
+    });
+    const financials = h.w.document.querySelector('.cp-financials');
+    assert.match(financials.textContent, /Reported EPS spans a reverse split/);
+    assert.equal(financials.querySelector('.cp-valuation-note a').href, 'https://www.sec.gov/Archives/example.htm');
+    assert.equal(financials.querySelectorAll('.cp-valuation-note a').length, 1);
   } finally { h.close(); }
 });
