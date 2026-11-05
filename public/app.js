@@ -8,7 +8,13 @@ let TICKERS = [];
 const IDX = {};
 let INDEX = null, FEED = null, MACRO = null, MARKET = null;
 const _inflight = {};
-const companySummary = ticker => IDX[ticker] || window.FU_COMPANIES?.get(ticker);
+function companySummary(ticker) {
+  const summary = IDX[ticker] || window.FU_COMPANIES?.get(ticker);
+  if (!summary || IDX[ticker]) return summary;
+  const bars = PX[ticker]?.bars, latest = bars?.at(-1), prior = bars?.at(-2);
+  if (!latest || !Number.isFinite(latest.c) || latest.c <= 0 || !Number.isFinite(+latest.t)) return summary;
+  return { ...summary, price: latest.c, price_date: new Date(latest.t).toISOString().slice(0, 10), chg_1d: Number.isFinite(prior?.c) && prior.c > 0 ? latest.c / prior.c - 1 : null };
+}
 async function getJSON(path, { fresh = false, signal } = {}) {
   const key = path;
   if (!signal && !fresh && _inflight[key]) return _inflight[key];
@@ -1041,13 +1047,19 @@ const PAGES = [
 const page = $("#page");
 const WATCH_DEFAULT = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "JPM", "LLY"];
 const watchlist = () => store.get("watch", WATCH_DEFAULT).filter(t => IDX[t] || window.FU_COMPANIES?.get(t));
-function toggleWatch(t) { const w = store.get("watch", WATCH_DEFAULT); const i = w.indexOf(t); i >= 0 ? w.splice(i, 1) : w.push(t); store.set("watch", w); renderRail(); toast(i >= 0 ? `Removed ${t} from watchlist` : `Added ${t} to watchlist`); return i < 0; }
+function toggleWatch(t) {
+  const w = store.get("watch", WATCH_DEFAULT), i = w.indexOf(t), on = i < 0;
+  on ? w.push(t) : w.splice(i, 1); store.set("watch", w); renderRail();
+  const star = location.hash.toUpperCase() === "#COMPANY-" + t ? $("#star") : null;
+  if (star) { star.setAttribute("aria-pressed", String(on)); star.textContent = on ? "★ Watching" : "☆ Watch"; star.title = (on ? "Remove from" : "Add to") + " watchlist (s)"; }
+  toast(on ? `Added ${t} to watchlist` : `Removed ${t} from watchlist`); return on;
+}
 const STATE = { coTab: store.get("coTab", "overview"), finStmt: "income", finKind: "A", finView: "values", finRange: "all", finDense: store.get("dense", false), taSym: "NVDA", taRange: "1Y", taInd: { sma: true, bb: false, vol: true }, cmp: ["AAPL", "MSFT", "NVDA", "GOOGL"], cmpMetric: "Revenue", cmpKind: "Q", scr: (() => { const saved = store.get("scr", null); return saved ? { ...saved, uni: saved.uni || "sp500" } : { sector: "", sort: "market_cap", desc: true, q: "", uni: "all" }; })() };
 function renderRail() {
   const wl = $("#wl"); wl.innerHTML = "";
   const current = location.hash.startsWith("#company-") ? location.hash.slice(9).toUpperCase() : null;
   watchlist().forEach(t => {
-    const c = IDX[t] || window.FU_COMPANIES?.get(t), price = Number.isFinite(c.price) ? "$" + fnum(c.price) : "–";
+    const c = companySummary(t), price = Number.isFinite(c.price) ? "$" + fnum(c.price) : "–";
     wl.append(el("a", { href: "#company-" + t.toLowerCase(), "data-t": t, class: t === current ? "on" : "", "aria-current": t === current ? "page" : null, title: `${c.name} · ${price}` },
       el("span", { class: "t" }, miniLogo(t, 18), t), el("span", { class: "price num" }, price), el("span", { class: "p num " + cls(c.chg_1d) }, fsgn(c.chg_1d))));
   });
@@ -1125,6 +1137,7 @@ async function route() {
     if (seq !== ROUTE_SEQ) return;
     page.innerHTML = "";
     await fn();
+    if (seq === ROUTE_SEQ && pid === "company") renderRail();
   } catch (e) {
     if (seq !== ROUTE_SEQ) return;
     console.error(e);
@@ -1470,7 +1483,7 @@ async function pCompany(tk) {
       el("div", { class: "co-meta co-industry" }, c.sicDescription ? el("span", {}, c.sicDescription) : null, [a.city, a.stateOrCountry].some(Boolean) ? el("span", {}, [a.city, a.stateOrCountry].filter(Boolean).map(titleCase).join(", ")) : null)),
     el("div", { class: "px co-quote" }, el("div", { class: "big num" }, s.px == null ? "–" : "$" + fnum(s.px)), el("div", { class: "num co-change " + cls(st.chg1d) }, fsgn(st.chg1d, 2) + " last session"), el("div", { class: "co-price-date" }, st.date ? "Close " + fdate(st.date) : "Close date unavailable")),
     el("div", { class: "co-actions" },
-      el("button", { id: "star", class: "btn" + (watchlist().includes(tk) ? " pri" : ""), title: "Add to watchlist (s)", onclick: e => { const on = toggleWatch(tk); e.currentTarget.classList.toggle("pri", on); } }, "★ Watch"),
+      el("button", { id: "star", class: "btn" + (watchlist().includes(tk) ? " pri" : ""), "aria-pressed": String(watchlist().includes(tk)), title: (watchlist().includes(tk) ? "Remove from" : "Add to") + " watchlist (s)", onclick: e => { const on = toggleWatch(tk); e.currentTarget.classList.toggle("pri", on); } }, watchlist().includes(tk) ? "★ Watching" : "☆ Watch"),
       ...["10-K", "10-Q"].map(form => { const filing = filings.find(f => f.f === form); return filing ? el("a", { class: "btn", href: filingUrl(tk, filing), target: "_blank", rel: "noopener" }, `Latest ${form} ↗`) : null; }),
       IR[tk] ? el("a", { class: "btn co-text-action", href: IR[tk], target: "_blank", rel: "noopener" }, "IR ↗") : null,
       el("a", { class: "btn co-text-action", href: edgarUrl, target: "_blank", rel: "noopener" }, "EDGAR ↗"),

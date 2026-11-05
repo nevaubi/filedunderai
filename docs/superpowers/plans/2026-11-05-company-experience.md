@@ -23,10 +23,17 @@
 - [x] Audit baseline and production commit identified.
 - [x] Isolated worktree created.
 - [x] Design and implementation ownership recorded.
-- [ ] Directory/profile UI and routing.
-- [ ] Chart and technical insight integration.
-- [ ] PDL integration and live pilot.
-- [ ] Financial fixes and regression verification.
+- [x] Directory/profile UI and routing.
+- [x] Chart and technical insight integration.
+- [x] PDL integration and live pilot.
+- [x] Financial fixes and regression verification.
 - [ ] Legacy repair and aggregate publication verification.
 - [ ] Full tests/build, UI inspection, independent review.
 - [ ] Branch/PR/preview release and final evidence.
+
+The first implementation checkpoint was merged through PR #26 on November 5, 2026.
+The follow-up adds the three officially sourced rich profiles and the bounded
+server-only enrichment job. Browser checks have verified desktop layout, chart
+controls and keyboard inspection, source drawers, and a company outside the
+screener (AAON). Historical repair is a separately reviewed operation and must
+not be described as complete based on the code changes alone.
