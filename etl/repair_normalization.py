@@ -340,7 +340,8 @@ def retain_proved_reported_observations(candidate, before_facts, facts, as_of):
 
     This never trusts the database flag alone: the entire reported observation
     must match the archived source and subsequently pass the full source proof.
-    A changed value or unproved reported observation still reaches the blocker.
+    A changed value, accounting concept, or explicit selection conflict still
+    reaches the review gate; an equal amount does not resolve those questions.
     """
     before = fact_map(before_facts)
     retained = 0
@@ -351,6 +352,7 @@ def retain_proved_reported_observations(candidate, before_facts, facts, as_of):
                 for index, point in enumerate(line.get(bucket, [])):
                     prior = before.get((candidate['ticker'], statement, line['label'], kind, point['end']))
                     if (not prior or prior['derived'] is not False or not point.get('derived')
+                            or 'selection_conflict' in point or prior['concept'] != point.get('c')
                             or prior['value'] != point['v'] or prior['period_start'] != point.get('start')
                             or prior['unit'] != line['unit'] or prior['concept'] not in allowed
                             or not prior['filed'] or prior['filed'] > as_of):
