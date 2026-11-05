@@ -27,7 +27,7 @@ def comparability_review(statements, as_of=None):
                     if conflict:
                         entry = {'statement': statement, 'label': row['label'], 'unit': row['unit'],
                                  'bucket': bucket, 'point': copy.deepcopy(point), 'reason': conflict['reason']}
-                        for key in ('alternative', 'reported_observations'):
+                        for key in ('alternative', 'additional_alternatives', 'reported_observations'):
                             if key in conflict:
                                 entry[key] = copy.deepcopy(conflict[key])
                         conflicts.append(entry)

@@ -34,6 +34,57 @@
     const cell={tk:company.ticker,label:metric,v:value,unit,stmt:'ratios',kind:inputs[0].kind || 'Q',start:inputs[0].start,end:inputs[0].end,calc:{formula,inputs}};
     return {...cell,evidence:E()?.fromCell(cell,evidenceContext(company,cell)),availableAt:latest(inputs.map(x=>x.availableAt).filter(Boolean))};
   }
+  function supportedSourcePeriod(record, cutoff, active=new Set()) {
+    if (!record || typeof record!=='object' || active.has(record) || active.size>=32) return false;
+    const end=date(record.end),filed=date(record.filed),available=date(record.available_at);
+    if (filed && filed>cutoff || available && available>cutoff || end && (end>cutoff || filed && end>filed)) return false;
+    active.add(record);
+    const calculation=record.derived;
+    const valid=!calculation || typeof calculation!=='object' ||
+      ['from','minus'].every(key=>!calculation[key] || supportedSourcePeriod(calculation[key],cutoff,active));
+    active.delete(record);
+    return valid;
+  }
+  function sameReportedAmount(reported, alternative) {
+    if (reported.v===alternative.v) return true;
+    const big=alternative.derived?.from?.v,small=alternative.derived?.minus?.v;
+    const amounts=[reported.v,alternative.v,big,small];
+    if (amounts.some(value=>!finite(value) || Number.isInteger(value) && !Number.isSafeInteger(value)) || alternative.v!==big-small) return false;
+    // Compare the serialized decimal amounts exactly. Only a discrepancy fully
+    // reproduced by native subtraction is eligible; no tolerance or rounding.
+    const decimal=value=>{
+      const [mantissa,exponent='0']=String(value).toLowerCase().split('e');
+      const digits=mantissa.split('.');
+      return {coefficient:BigInt(digits.join('')),exponent:Number(exponent)-(digits[1]?.length || 0)};
+    };
+    const parts=[reported.v,big,small].map(decimal),exponent=Math.min(...parts.map(part=>part.exponent));
+    const [direct,total,prior]=parts.map(part=>part.coefficient*10n**BigInt(part.exponent-exponent));
+    return direct===total-prior;
+  }
+  function comparableSelection(selected, options, row, cutoff) {
+    const available=point=>date(point.available_at || point.filed);
+    const conflict=selected.selection_conflict;
+    if (conflict) {
+      const alternativeDate=available(conflict.alternative || {});
+      if (conflict.reason!=='later_derived_value_differs_from_reported' || !alternativeDate || alternativeDate<=cutoff || selected.derived) return null;
+      // Later evidence cannot change what an earlier historical view knew.
+      selected={...selected,selection_reason:'Reported observation available by the selected date'};
+      delete selected.selection_conflict;
+    }
+    const concept=selected.c || row.concept;
+    if (!concept) return selected;
+    const reported=options.filter(point=>!point.derived && (point.c || row.concept)===concept &&
+      point.filed && date(point.end)<=date(point.filed));
+    if (!reported.length) return selected;
+    const lastDate=latest(reported.map(available));
+    const direct=reported.filter(point=>available(point)===lastDate);
+    if (direct.some(point=>(point.start ?? null)!==(selected.start ?? null)) || new Set(direct.map(point=>point.v)).size!==1) return null;
+    const alternatives=options.filter(point=>point.derived && (point.c || row.concept)===concept && available(point)>=lastDate);
+    if (alternatives.some(point=>(point.start ?? null)!==(selected.start ?? null) || !sameReportedAmount(direct[0],point))) return null;
+    if (!selected.derived) return selected;
+    const preferred=direct.slice().sort((a,b)=>String(a.accn || '').localeCompare(String(b.accn || ''))).at(-1);
+    return comparableSelection(preferred,[],row,cutoff);
+  }
   function series(company, metric, {asOf, kind='Q', requireHistory=false} = {}) {
     const key = kind === 'A' ? 'annual' : 'quarterly';
     const all = Object.entries(company.statements || {}).flatMap(([stmt, rows]) => rows.map(row => ({stmt,row})));
@@ -52,18 +103,22 @@
     const {row,stmt}=match;
     if (requireHistory && !Array.isArray(row.filing_history?.[key])) return [];
     const rows=row.filing_history?.[key] || row[key] || [];
-    const byEnd = new Map();
+    const byEnd = new Map(),optionsByEnd=new Map(),cutoff=date(asOf || today());
     for (const r of rows) {
       if (!finite(r.v) || !r.end || ['invalid','rejected'].includes(r.validation_status)) continue;
+      if (!supportedSourcePeriod(r,cutoff)) continue;
       if (r.derived && (row.unit==='USD/shares' || /shares|^EPS /i.test(row.label))) continue;
       if (kind==='Q' && ['income','cashflow'].includes(stmt) && r.start && (diff(r.end,r.start)<69 || diff(r.end,r.start)>105)) continue;
       const available=r.available_at || r.filed;
       if (r.superseded_at && date(r.superseded_at)<=date(asOf || today())) continue;
       if ((asOf && !available) || (available && date(available)>date(asOf || today()))) continue;
       const old=byEnd.get(r.end);
+      if (!optionsByEnd.has(r.end)) optionsByEnd.set(r.end,[]);
+      optionsByEnd.get(r.end).push(r);
       if (!old || String(available || '').localeCompare(old.available_at || old.filed || '')>=0) byEnd.set(r.end,r);
     }
-    return [...byEnd.values()].sort((a,b)=>a.end.localeCompare(b.end)).map(r=>attach(company,row.label,row.unit,r,stmt,kind));
+    return [...byEnd.values()].map(r=>comparableSelection(r,optionsByEnd.get(r.end),row,cutoff)).filter(Boolean)
+      .sort((a,b)=>a.end.localeCompare(b.end)).map(r=>attach(company,row.label,row.unit,r,stmt,kind));
   }
   function attachBusinessMetrics(company,bundle,documentDates={}) {
     const extra={},items=(bundle?.groups || []).flatMap(g=>(g.items || []).map(r=>({...r,category:g.category}))),counts={};
