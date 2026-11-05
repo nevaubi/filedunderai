@@ -31,6 +31,8 @@ Do not feed partial document extractions to the legacy replacement KPI publisher
 5. Review a representative pilot and the complete staged batch. Publish through existing authorized credentials under distributed leases, with immutable source archives and checkpoints. Refresh coverage from grouped counts rather than global REST scans.
 6. Publish expanded public indexes only after their company bundles are available. Activate additions for scheduled maintenance only after successful read-back.
 
+**Observed release ordering (2026-11-05):** The active registry deployed while the price publisher held the shared aggregate lease. Production reached READY at 03:22:39.624 UTC; final price readbacks completed at 03:23:44.090581 UTC and coverage at 03:25:58 UTC. Public aggregate cutover began only after all per-company receipts and coverage were complete and the 305-second drain had elapsed. Activation acquired the shared lease after deployment and used a fresh run-bound marker; the release did not hold one activation lease across deployment. A later execution-service interruption after successful screener publication was resolved by a separate feed/final-verification recovery under the normal lease, preserving the original checkpoint and operator identity. The successful activation and final audit receipts are recorded in the verification report. The original acceptance requirements below remain unchanged.
+
 The user restored Vercel access and explicitly confirmed the existing Supabase project `apxfeteebnspwyajlxfh`. The authenticated Vercel project `filedunderai` and its production Supabase binding were checked before publication. Continue using this project and its existing grants; no replacement database is part of this work.
 
 ## Acceptance
