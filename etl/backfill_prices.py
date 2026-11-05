@@ -17,7 +17,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlsplit
 
-from .universe import ADDITIONAL_REGISTRY, BY_TICKER, SP500
+from .universe import BY_TICKER, COHORT_OF, SP500, registry_by_id, registry_for
 
 META_KEYS = ("symbol", "longName", "shortName", "currency", "exchangeName", "regularMarketPrice",
              "fiftyTwoWeekHigh", "fiftyTwoWeekLow", "gmtoffset", "regularMarketTime",
@@ -76,8 +76,7 @@ def local_bytes(root, path):
 
 def approved(company):
     ticker = company.get("ticker")
-    allowed = {r["ticker"] for r in ADDITIONAL_REGISTRY["companies"]}
-    if ticker not in allowed or ticker in SP500:
+    if ticker not in COHORT_OF or ticker in SP500:
         raise ValueError("Price backfill scope requires an approved additional issuer")
     if company.get("cik") != BY_TICKER[ticker]["cik"] or company.get("currency") != "USD":
         raise ValueError("Price backfill issuer CIK or currency mismatch")
@@ -207,7 +206,7 @@ def validate_company(root, company, manifest, cohort_hash):
     ticker = company["ticker"]
     if (manifest.get("ticker") != ticker or manifest.get("cik") != company["cik"]
             or manifest.get("name") != company["name"] or manifest.get("expected_currency") != company["currency"]
-            or manifest.get("cohort_id") != ADDITIONAL_REGISTRY["cohort_id"]
+            or manifest.get("cohort_id") != registry_for(ticker)["cohort_id"]
             or manifest.get("cohort_sha256") != cohort_hash or manifest.get("status") != "ok"
             or manifest.get("errors") or manifest.get("source", {}).get("provider") != "Yahoo Finance"):
         raise ValueError("Price manifest issuer, source or cohort identity mismatch")
@@ -248,7 +247,7 @@ def validate_company(root, company, manifest, cohort_hash):
         raise ValueError("Company manifest differs from the aggregate manifest")
     manifest_sha = digest(manifest_bytes)
     archive_path = f"market-prices/yahoo/{ticker}/{raw['body_sha256']}.response.bin.gz"
-    source_path = f"backfills/{ADDITIONAL_REGISTRY['cohort_id']}/prices/{ticker}/{manifest_sha}.source.json"
+    source_path = f"backfills/{registry_for(ticker)['cohort_id']}/prices/{ticker}/{manifest_sha}.source.json"
     rows = [{"symbol": ticker, "d": day_at(b[0]), "o": b[1], "h": b[2], "l": b[3], "c": b[4], "v": b[5]} for b in public["d"]]
     return {"source_root": str(Path(root).resolve()), "company": copy.deepcopy(company),
             "ticker": ticker, "cik": company["cik"], "cohort_id": manifest["cohort_id"], "cohort_sha256": cohort_hash,
@@ -260,14 +259,18 @@ def validate_company(root, company, manifest, cohort_hash):
 def validate_bundle(cohort_path, prices_dir, tickers=None, log=None):
     cohort_body = Path(cohort_path).read_bytes()
     cohort, cohort_hash = json.loads(cohort_body), digest(cohort_body)
-    if (cohort_hash != ADDITIONAL_REGISTRY["cohort_sha256"]
-            or cohort.get("cohort_id") != ADDITIONAL_REGISTRY["cohort_id"]):
+    try:
+        registry = registry_by_id(cohort.get("cohort_id"))
+    except ValueError:
+        raise ValueError("Cohort file differs from the approved registry SHA/identity")
+    if cohort_hash != registry["cohort_sha256"]:
         raise ValueError("Cohort file differs from the approved registry SHA/identity")
     companies = cohort["companies"]
     actual = {c["ticker"]: c["cik"] for c in companies}
-    expected = {c["ticker"]: c["cik"] for c in ADDITIONAL_REGISTRY["companies"]}
-    if len(companies) != 300 or len(actual) != 300 or actual != expected:
-        raise ValueError("Expected exactly the approved 300-company cohort")
+    expected = {c["ticker"]: c["cik"] for c in registry["companies"]}
+    size = len(registry["companies"])
+    if len(companies) != size or len(actual) != size or actual != expected:
+        raise ValueError(f"Expected exactly the approved {size}-company cohort")
     tickers = list(actual) if tickers is None else list(tickers)
     if not tickers or len(tickers) != len(set(tickers)) or not set(tickers) <= set(actual):
         raise ValueError("Requested ticker scope is outside the approved cohort")
@@ -275,7 +278,7 @@ def validate_bundle(cohort_path, prices_dir, tickers=None, log=None):
     aggregate = json.loads((root / "manifest.json").read_bytes())
     records = aggregate.get("companies") or []
     if (aggregate.get("status") != "complete" or aggregate.get("cohort_sha256") != cohort_hash
-            or aggregate.get("cohort_id") != cohort["cohort_id"] or len(records) != 300
+            or aggregate.get("cohort_id") != cohort["cohort_id"] or len(records) != size
             or {r["ticker"] for r in records} != set(actual)):
         raise ValueError("Collection manifest is incomplete or outside the approved cohort")
     by_ticker = {c["ticker"]: c for c in companies}
@@ -403,7 +406,7 @@ def _publish(sb, items, cohort_hash, workers=10, log=None):
         raise ValueError("Publish requires unique approved additional issuers")
     for item in items:
         approved({"ticker": item["ticker"], "cik": item["cik"], "currency": "USD"})
-        if item["cohort_sha256"] != cohort_hash or item["cohort_id"] != ADDITIONAL_REGISTRY["cohort_id"]:
+        if item["cohort_sha256"] != cohort_hash or item["cohort_id"] != registry_for(item["ticker"])["cohort_id"]:
             raise ValueError("Prepared price cohort mismatch")
     tickers = [i["ticker"] for i in items]
     # Preflight every shared input before any writes. Missing core companies or
@@ -471,7 +474,10 @@ def _publish(sb, items, cohort_hash, workers=10, log=None):
     visible = jobs.load_pricestats(sb)
     if any(visible.get(t) != value for t, value in expected_stats.items()):
         raise RuntimeError("Price statistics are hidden by an existing part after publication")
-    report = {"schema_version": 1, "mode": "published", "cohort_id": ADDITIONAL_REGISTRY["cohort_id"],
+    cohort_id = registry_for(items[0]["ticker"])["cohort_id"]
+    if any(registry_for(i["ticker"])["cohort_id"] != cohort_id for i in items):
+        raise ValueError("A price batch must contain issuers from exactly one cohort")
+    report = {"schema_version": 1, "mode": "published", "cohort_id": cohort_id,
               "cohort_sha256": cohort_hash, "completed_at": now(), "published": len(results),
               "daily_bars": sum(r["bars"] for r in results), "source_objects_verified": 2 * len(items),
               "source": "Yahoo Finance", "attribution": ATTRIBUTION,
@@ -479,7 +485,7 @@ def _publish(sb, items, cohort_hash, workers=10, log=None):
               "screener_calendar_preserved": True, "screener_dates": len(closes["dates"]),
               "stats_paths": [p for p, _ in stats_plan], "source_readbacks": source_checks,
               "companies": sorted(results, key=lambda r: r["ticker"])}
-    checkpoint = f"backfills/{ADDITIONAL_REGISTRY['cohort_id']}/prices/publication-report.json"
+    checkpoint = f"backfills/{cohort_id}/prices/publication-report.json"
     _verified_put(sb, "raw", checkpoint, encoded(report))
     return report
 
@@ -518,7 +524,7 @@ def main(argv=None):
     try:
         items, cohort_hash = validate_bundle(args.cohort, args.prices_dir, args.tickers, log)
         report = {"schema_version": 1, "mode": "offline_validation", "validated_at": now(),
-                  "cohort_id": ADDITIONAL_REGISTRY["cohort_id"], "cohort_sha256": cohort_hash,
+                  "cohort_id": registry_for(ticker)["cohort_id"], "cohort_sha256": cohort_hash,
                   "companies": len(items), "daily_bars": sum(len(i["rows"]) for i in items),
                   "source": "Yahoo Finance", "attribution": ATTRIBUTION,
                   "latest_date_counts": dict(Counter(i["rows"][-1]["d"] for i in items)),
