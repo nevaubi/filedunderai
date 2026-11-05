@@ -372,6 +372,18 @@ def era_of(*texts):
     return None
 
 
+def _conflicting_revenue_heading(name):
+    """A trailing workbook revenue heading cannot turn an explicit other measure into revenue."""
+    heading = re.search(r"^(.*?)\s*\((?:net )?(?:revenues?|sales)\)\s*$", name)
+    if not heading:
+        return False
+    label = re.sub(r"\(\s*\d+\s*\)", " ", heading.group(1)).strip()
+    # Keep named revenue businesses such as "Fixed income" and "Expense management".
+    return bool(re.search(r"\b(depreciation|amortization|operating (income|profit|earnings|loss)|"
+                          r"equity in (the )?income)\b", label)
+                or re.search(r"\b(expenses?|costs?)\s*$", label))
+
+
 def classify(d, parent=None, company_words=()):
     """Rule mapping for one KPI definition. Returns a dict (canonical, scope, member, era, confidence, reason) or None.
     d: {name, category, subcategory, unit, parent_id, sums_to_parent}; parent: the parent definition when there is one."""
@@ -424,6 +436,9 @@ def classify(d, parent=None, company_words=()):
             best = cand
     if best:
         return best
+    if _conflicting_revenue_heading(name):
+        # Leave the row unclassified rather than infer its measure or segment from a stale section heading.
+        return None
     # segment-level revenue and operating income: the name is the measure plus a member (segment, region, product)
     if unit_factor("usd", d.get("unit")) and not re.search(GROWTH_EXCL + r"|\b(margin|per|%|ratio|reconciliation|adjustments?|impact|eliminations?|intersegment|corporate|unallocated|other)\b", name):
         for sid in ("segment_revenue", "segment_operating_income"):
@@ -455,6 +470,8 @@ def _segmentish(res):
 def candidates(d):
     """Taxonomy entries a definition could plausibly be (keyword hit and compatible unit), for the LLM to choose from."""
     name = nn(d.get("name"))
+    if _conflicting_revenue_heading(name):
+        return []
     out = []
     for t in T:
         if t["id"] in SEGMENT_ONLY:

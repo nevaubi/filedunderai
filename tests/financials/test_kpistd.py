@@ -54,6 +54,16 @@ class PublicationStore(SourceStore):
         self.objects = {}
         self.writes = []
         self.db_writes = []
+        self.lease_calls = []
+        self.lease_available = True
+
+    def rpc(self, name, args):
+        self.lease_calls.append((name, copy.deepcopy(args)))
+        if name == 'acquire_etl_lease':
+            return self.lease_available
+        if name == 'release_etl_lease':
+            return True
+        raise AssertionError(name)
 
     def select(self, table, query):
         if table == 'companies':
@@ -81,6 +91,179 @@ class PublicationStore(SourceStore):
 
     def delete(self, table, query):
         self.db_writes.append((table, query))
+
+
+class StandardizedKpiPublicationLease(unittest.TestCase):
+    definitions = [{'ticker': 'TEST', 'kpi_id': 'arr', 'name': 'Annual recurring revenue',
+                    'unit': 'USD', 'updated_at': '2026-11-05T00:00:00Z'}]
+
+    def run_mapping(self, store):
+        with patch.object(kpistd, 'load_universe', return_value=({'TEST': {'tk': 'TEST', 'name': 'Example'}}, {})), \
+             patch.object(kpistd, 'fetch_all', return_value=copy.deepcopy(self.definitions)):
+            return kpistd.map_job(store, tickers=['TEST'], use_llm=False, log=lambda *args: None)
+
+    def test_busy_mapper_refuses_before_reading_or_writing(self):
+        store = PublicationStore()
+        store.lease_available = False
+        with patch.object(kpistd, '_raw_get') as read:
+            with self.assertRaises(common.LeaseBusy):
+                self.run_mapping(store)
+        read.assert_not_called()
+        self.assertEqual(store.writes, [])
+        self.assertEqual(store.db_writes, [])
+
+    def test_direct_publisher_uses_the_shared_financial_aggregate_lease(self):
+        store = PublicationStore()
+        kpistd.publish(store, {}, {}, {}, set(), [], '2026-11-05T00:00:00Z')
+        self.assertEqual([name for name, _ in store.lease_calls], ['acquire_etl_lease', 'release_etl_lease'])
+        self.assertTrue(all(args['lock_name'] == 'financial-aggregates' for _, args in store.lease_calls))
+        self.assertIsNone(getattr(store, '_aggregate_lease', None))
+
+    def test_mapper_and_nested_publisher_share_one_lease(self):
+        store = PublicationStore()
+        result = self.run_mapping(store)
+        self.assertEqual(result['companies_mapped'], 1)
+        self.assertEqual([name for name, _ in store.lease_calls], ['acquire_etl_lease', 'release_etl_lease'])
+        self.assertIn('kpistd/map.json', store.writes)
+
+    def test_lost_lease_stops_stale_mapping_deletion(self):
+        class LosingStore(PublicationStore):
+            def upsert(self, table, rows, *args, **kwargs):
+                super().upsert(table, rows, *args, **kwargs)
+                if table == 'kpi_std_map' and getattr(self, '_aggregate_lease', None):
+                    self._aggregate_lease.lost = 'offline regression: lease ownership lost'
+
+        store = LosingStore()
+        with self.assertRaisesRegex(RuntimeError, 'Aggregate lease lost'):
+            self.run_mapping(store)
+        self.assertFalse(any(isinstance(rows, str) for _, rows in store.db_writes), 'stale DELETE must check the lease first')
+        self.assertNotIn('kpistd/map.json', store.writes)
+
+
+class StandardizedKpiPublicationPreservation(unittest.TestCase):
+    def fixture(self):
+        point = ['2026-09-30', 12500000, 'Q3 FY26', 'workbook', {'sheet': 'Revenue', 'cell': 'A1'}]
+        series = {'kpi_id': 'arr', 'name': 'Annual recurring revenue', 'unit': 'USD',
+                  'factor': 1, 'Q': [point], 'A': [], 'alts': [], 'current': True}
+        return {'ticker': 'TEST', 'name': 'Example', 'fye': '1231', 'map': [],
+                'series': {'arr': series}, 'docs': {}}
+
+    def test_required_peer_failure_does_not_publish_incomplete_comparison(self):
+        for missing in (False, True):
+            with self.subTest(missing=missing):
+                class UnreadableStore(PublicationStore):
+                    def get_json(self, path):
+                        if path == 'kpistd/t/PEER.json':
+                            if missing:
+                                return None
+                            raise TimeoutError('peer read failed')
+                        return super().get_json(path)
+
+                store = UnreadableStore()
+                old = {'primary': {'PEER': {'arr': 'arr'}}}
+                store.public['kpistd/latest.json'] = {'kpis': {'arr': {'PEER': {'kpi_id': 'arr'}}}}
+                with self.assertRaises((RuntimeError, TimeoutError)):
+                    kpistd.publish(store, {}, old, {'TEST': self.fixture()}, {'arr'}, [], '2026-11-05T00:00:00Z')
+                self.assertEqual(store.writes, [], 'required peer reads must finish before aggregate writes')
+
+    def test_unreadable_existing_global_map_does_not_erase_other_companies(self):
+        class UnreadableStore(PublicationStore):
+            def get_json(self, path):
+                if path == 'kpistd/map.json':
+                    raise TimeoutError('global map read failed')
+                return super().get_json(path)
+
+        store = UnreadableStore()
+        with patch.object(kpistd, 'load_universe', return_value=({'TEST': {'tk': 'TEST'}}, {})), \
+             patch.object(kpistd, 'fetch_all', return_value=copy.deepcopy(StandardizedKpiPublicationLease.definitions)):
+            with self.assertRaisesRegex(TimeoutError, 'global map read failed'):
+                kpistd.map_job(store, tickers=['TEST'], use_llm=False, log=lambda *args: None)
+        self.assertEqual(store.writes, [])
+        self.assertEqual(store.db_writes, [])
+
+    def test_unreadable_latest_snapshot_does_not_start_aggregate_publication(self):
+        class UnreadableStore(PublicationStore):
+            def get_json(self, path):
+                if path == 'kpistd/latest.json':
+                    raise TimeoutError('latest read failed')
+                return super().get_json(path)
+
+        store = UnreadableStore()
+        with self.assertRaisesRegex(TimeoutError, 'latest read failed'):
+            kpistd.publish(store, {}, {'primary': {'TEST': {'arr': 'arr'}}},
+                           {'TEST': self.fixture()}, {'arr'}, [], '2026-11-05T00:00:00Z')
+        self.assertEqual(store.writes, [])
+
+    def test_failed_aggregate_publication_does_not_mark_company_signature_complete(self):
+        store = PublicationStore()
+        with patch.object(kpistd, 'load_universe', return_value=({'TEST': {'tk': 'TEST'}}, {})), \
+             patch.object(kpistd, 'fetch_all', return_value=copy.deepcopy(StandardizedKpiPublicationLease.definitions)), \
+             patch.object(kpistd, 'publish', side_effect=RuntimeError('publication interrupted')):
+            with self.assertRaisesRegex(RuntimeError, 'publication interrupted'):
+                kpistd.map_job(store, tickers=['TEST'], use_llm=False, log=lambda *args: None)
+        self.assertNotIn(('raw', kpistd.STATE_PATH), store.objects, 'an interrupted company must remain retryable')
+
+    def test_mapping_upsert_failure_preserves_prior_rows_and_retry_signature(self):
+        class FailedStore(PublicationStore):
+            def upsert(self, table, rows, *args, **kwargs):
+                if table == 'kpi_std_map':
+                    raise common.HTTPError(503, 'Unavailable')
+                return super().upsert(table, rows, *args, **kwargs)
+
+        store = FailedStore()
+        with patch.object(kpistd, 'load_universe', return_value=({'TEST': {'tk': 'TEST'}}, {})), \
+             patch.object(kpistd, 'fetch_all', return_value=copy.deepcopy(StandardizedKpiPublicationLease.definitions)):
+            with self.assertRaises(common.HTTPError):
+                kpistd.map_job(store, tickers=['TEST'], use_llm=False, log=lambda *args: None)
+        self.assertFalse(any(isinstance(rows, str) for _, rows in store.db_writes))
+        self.assertNotIn(('raw', kpistd.STATE_PATH), store.objects)
+
+    def run_definitions(self, store, definitions):
+        with patch.object(kpistd, 'load_universe', return_value=({'TEST': {'tk': 'TEST'}}, {})), \
+             patch.object(kpistd, 'fetch_all', return_value=definitions):
+            return kpistd.map_job(store, tickers=['TEST'], use_llm=False, log=lambda *args: None)
+
+    def test_no_applicable_definition_does_not_create_empty_coverage(self):
+        store = PublicationStore()
+        result = self.run_definitions(store, [{'ticker': 'TEST', 'kpi_id': 'cash',
+                                              'name': 'Cash and cash equivalents', 'unit': 'USD'}])
+        self.assertEqual(store.writes, [])
+        self.assertEqual(result['companies_mapped'], 0)
+        self.assertEqual(result['companies_examined'], 1)
+        self.assertEqual(result['companies_no_applicable'], 1)
+        self.assertEqual(result['new_series'], 0)
+        self.assertEqual(result['companies_left'], 0)
+        self.assertEqual(common.run_outcome(result), 'ok')
+
+    def test_unanswered_new_company_has_no_empty_file_and_remains_partial(self):
+        store = PublicationStore()
+        result = self.run_definitions(store, [{'ticker': 'TEST', 'kpi_id': 'arr',
+                                              'name': 'Contractually committed recurring revenue', 'unit': 'USD'}])
+        self.assertEqual(store.writes, [])
+        self.assertEqual(result['companies_mapped'], 0)
+        self.assertEqual(result['companies_no_applicable'], 0)
+        self.assertEqual(result['unanswered_companies'], 1)
+        self.assertEqual(common.run_outcome(result), 'partial')
+        self.assertNotIn('TEST', kpistd._raw_get(store, kpistd.STATE_PATH)['sig'])
+
+    def test_unanswered_prior_mapping_is_held_without_erasing_reviewed_series(self):
+        store = PublicationStore()
+        before = self.fixture()
+        before['map'] = [{'kpi_id': 'arr', 'name': 'Contractually committed recurring revenue', 'unit': 'USD',
+                          'canonical': 'arr', 'scope': 'total', 'method': 'llm+rules'}]
+        store.public = {'kpistd/t/TEST.json': before,
+                        'kpistd/map.json': {'primary': {'TEST': {'arr': 'arr'}}},
+                        'kpistd/latest.json': {'kpis': {'arr': {'TEST': {'kpi_id': 'arr'}}}}}
+        snapshot = copy.deepcopy(store.public)
+        result = self.run_definitions(store, [
+            {'ticker': 'TEST', 'kpi_id': 'arr', 'name': 'Contractually committed recurring revenue', 'unit': 'USD'},
+            {'ticker': 'TEST', 'kpi_id': 'fcf', 'name': 'Free cash flow', 'unit': 'USD'},
+        ])
+        self.assertEqual(store.public, snapshot)
+        self.assertEqual(store.db_writes, [])
+        self.assertEqual(result['companies_held'], 1)
+        self.assertEqual(result['companies_mapped'], 0)
+        self.assertEqual(common.run_outcome(result), 'partial')
 
 
 class StandardizedKpiDeadlines(unittest.TestCase):

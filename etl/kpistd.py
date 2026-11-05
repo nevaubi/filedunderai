@@ -30,7 +30,7 @@ import urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 
 from . import kpi_taxonomy as K
-from .common import HTTPError, now_iso, request
+from .common import HTTPError, now_iso, request, serialized_aggregates
 from .sectors import fetch_all, load_universe
 
 STATE_PATH = "kpistd/state.json.gz"
@@ -71,6 +71,16 @@ def _pub_get(sb, path):
         return sb.get_json(path)
     except Exception:
         return None
+
+
+def _publication_get(sb, path, required=False):
+    """Publisher reads must not turn an unavailable existing snapshot into empty coverage."""
+    obj = sb.get_json(path)
+    if obj is None and not required:
+        return None
+    if not isinstance(obj, dict):
+        raise RuntimeError(f"Required KPI publication snapshot is missing or invalid: {path}")
+    return obj
 
 
 _MISSING = set()
@@ -388,6 +398,7 @@ def choose(tk, maps, defs_by, values, fye, latest_all):
     return series
 
 
+@serialized_aggregates
 def map_job(sb, tickers=None, full=False, use_llm=True, time_budget=None, log=log_):
     t0 = time.time()
     deadline = t0 + time_budget if time_budget else None
@@ -429,15 +440,40 @@ def map_job(sb, tickers=None, full=False, use_llm=True, time_budget=None, log=lo
     # companies whose open ids did not all get an answer in this run are finished on the next one
     unanswered = {d["ticker"] for k, d, *_ in pending if k not in state["llm"]}
 
-    old_map = _pub_get(sb, "kpistd/map.json") or {}
+    old_map = _publication_get(sb, "kpistd/map.json", required=bool(state["sig"])) or {}
     touched = set()
     tfiles = {}
     done = []
+    examined, no_applicable, held = set(), set(), {}
+    new_series = 0
     for tk in todo:
         if deadline and time.time() > deadline:
             break
         defs_by = {d["kpi_id"]: d for d in by_t[tk]}
         m = maps.get(tk, {})
+        previous = _publication_get(sb, f"kpistd/t/{tk}.json",
+                                    required=tk in (old_map.get("primary") or {}) or tk in (old_map.get("segment_counts") or {})) or {}
+        # An unanswered model proposal or changed rule must not erase an existing
+        # reviewed mapping. The explicit revenue-heading contradiction is rejected
+        # by the taxonomy itself; other removals/interpretation changes need review.
+        changed = []
+        for prior in previous.get("map", []):
+            current = m.get(prior["kpi_id"])
+            if current is None and K._conflicting_revenue_heading(K.nn(prior.get("name"))):
+                continue
+            if current is None or (current["canonical"], current["scope"]) != (prior["canonical"], prior["scope"]):
+                changed.append(prior["kpi_id"])
+        if changed:
+            held[tk] = "existing mappings need review: " + ", ".join(sorted(changed))
+            examined.add(tk)
+            state["sig"].pop(tk, None)
+            continue
+        if not m and not previous.get("map") and not previous.get("series"):
+            examined.add(tk)
+            if tk not in unanswered:
+                no_applicable.add(tk)
+                state["sig"][tk] = sigs[tk]
+            continue
         ids = [kid for kid, r in m.items() if r["scope"] == "total"]
         try:
             rows = fetch_values(sb, tk, ids) if ids else []
@@ -450,6 +486,12 @@ def map_job(sb, tickers=None, full=False, use_llm=True, time_budget=None, log=lo
         latest_all = max((r["period_end"] for r in rows), default=None)
         fye = (cos.get(tk) or {}).get("fiscal_year_end") or "1231"
         series = choose(tk, m, defs_by, values, fye, latest_all)
+        missing_series = set(previous.get("series") or {}) - set(series)
+        if missing_series:
+            held[tk] = "existing series need review: " + ", ".join(sorted(missing_series))
+            examined.add(tk)
+            state["sig"].pop(tk, None)
+            continue
         docs = fetch_docs(sb, {p[3] for s in series.values() for pts in [s["Q"], s["A"]] + [a["Q"] + a["A"] for a in s["alts"]] for p in pts})
         c = uni.get(tk) or {}
         tf = {"ticker": tk, "generated": run_ts, "taxonomy_version": K.VERSION, "fye": fye, "sector": c.get("sector"), "industry": c.get("industry"),
@@ -467,20 +509,29 @@ def map_job(sb, tickers=None, full=False, use_llm=True, time_budget=None, log=lo
                     "era": r.get("era"), "role": r.get("role"), "basis": r.get("basis"), "confidence": r["confidence"], "method": r["method"],
                     "reason": r["reason"][:600], "factor": r["factor"], "taxonomy_version": K.VERSION, "mapped_at": run_ts} for kid, r in m.items()]
         if rows_db:
-            _try(sb, lambda: sb.upsert("kpi_std_map", rows_db, "ticker,kpi_id"), "kpi_std_map upsert", "kpi_std_map")
-        _try(sb, lambda: sb.delete("kpi_std_map", f"ticker=eq.{tk}&mapped_at=lt.{urllib.parse.quote(run_ts)}"), "kpi_std_map stale delete", "kpi_std_map")
+            sb.upsert("kpi_std_map", rows_db, "ticker,kpi_id")
+        # Supabase.delete does not apply the shared client's write guard itself.
+        sb._aggregate_lease.check()
+        sb.delete("kpi_std_map", f"ticker=eq.{tk}&mapped_at=lt.{urllib.parse.quote(run_ts)}")
         if tk not in unanswered:
             state["sig"][tk] = sigs[tk]
+        examined.add(tk)
+        new_series += len(set(series) - set((old_map.get("primary") or {}).get(tk) or {}))
         done.append(tk)
     # companies whose KPIs were withdrawn entirely
     gone = [tk for tk in ((old_map.get("primary") or {}).keys()) if tk not in by_t and not tickers]
     for tk in gone:
         touched |= set(old_map["primary"][tk].keys())
         state["sig"].pop(tk, None)
-    _raw_put(sb, STATE_PATH, state)
     stats = publish(sb, uni, old_map, tfiles, touched, gone, run_ts, log=log)
-    stats.update({"companies_mapped": len(done), "companies_left": len(todo) - len(done), "open_ids": len(pending), "unanswered_companies": len(unanswered),
-                  "skipped": len((set(todo) - set(done)) | unanswered),
+    # Do not mark definitions finished while their aggregate publication still needs retrying.
+    _raw_put(sb, STATE_PATH, state)
+    stats.update({"companies_mapped": len(done), "companies_examined": len(examined), "companies_no_applicable": len(no_applicable),
+                  "companies_with_published_series": sum(bool(tfiles[tk]["series"]) for tk in done), "new_series": new_series,
+                  "companies_held": len(held), "held": held, "no_applicable_tickers": sorted(no_applicable),
+                  "companies_left": len(set(todo) - set(done) - no_applicable),
+                  "open_ids": len(pending), "unanswered_companies": len(unanswered),
+                  "skipped": len((set(todo) - examined) | unanswered | set(held)),
                   "seconds": round(time.time() - t0, 1)})
     log("kpistd", stats)
     return stats
@@ -502,6 +553,7 @@ def _last_yoy(pts, uclass):
     return [p[0], p[1], p[2], yoy]
 
 
+@serialized_aggregates
 def publish(sb, uni, old_map, tfiles, touched, gone, run_ts, log=log_):
     """map.json, taxonomy.json and the series files of every canonical id whose members changed."""
     prim = dict(old_map.get("primary") or {})
@@ -539,21 +591,37 @@ def publish(sb, uni, old_map, tfiles, touched, gone, run_ts, log=log_):
         else:
             factors.pop(tk, None)
     mp = {"generated": run_ts, "taxonomy_version": K.VERSION, "primary": prim, "alts": alts, "factors": factors, "segment_counts": seg_counts}
-    sb.put_json("kpistd/map.json", mp, cache="max-age=600")
+    snapshot = _publication_get(sb, "kpistd/latest.json", required=bool(old_map.get("primary")))
+    latest = (snapshot or {}).get("kpis") or {}
+    if not isinstance(latest, dict):
+        raise RuntimeError("Invalid KPI latest snapshot")
     # series files: every company carrying the canonical id, read from its company file
     by_c = {}
     for tk, cs in prim.items():
         for cid in cs:
             by_c.setdefault(cid, []).append(tk)
     need = {tk for cid in touched for tk in by_c.get(cid, []) if tk not in tfiles}
+    if not latest:
+        need |= set(prim) - set(tfiles)
 
     def get_tf(tk):
-        return tk, _pub_get(sb, f"kpistd/t/{tk}.json")
+        tf = _publication_get(sb, f"kpistd/t/{tk}.json", required=True)
+        if tf.get("ticker") != tk:
+            raise RuntimeError(f"KPI company snapshot does not match its ticker: {tk}")
+        return tk, tf
 
     with ThreadPoolExecutor(8) as ex:
         for tk, tf in ex.map(get_tf, sorted(need)):
-            if tf:
-                tfiles[tk] = tf
+            tfiles[tk] = tf
+    # Every published member must be available before the first aggregate write.
+    # A stale or incomplete peer file must never silently remove that company's series.
+    for tk, cs in prim.items():
+        for cid, kid in cs.items():
+            if cid not in touched and latest:
+                continue
+            s = (tfiles.get(tk) or {}).get("series", {}).get(cid)
+            if not isinstance(s, dict) or s.get("kpi_id") != kid:
+                raise RuntimeError(f"KPI company snapshot is missing its published series: {tk}/{cid}")
     written = 0
     for cid in sorted(touched):
         t = K.BY_ID.get(cid)
@@ -575,12 +643,6 @@ def publish(sb, uni, old_map, tfiles, touched, gone, run_ts, log=log_):
                                                    "companies": comps, "docs": docs}, cache="max-age=600")
         written += 1
     # latest value and year-over-year change per company and canonical id (company panels, landing page)
-    latest = (_pub_get(sb, "kpistd/latest.json") or {}).get("kpis") or {}
-    if not latest:
-        with ThreadPoolExecutor(8) as ex:
-            for tk, tf in ex.map(get_tf, sorted(t for t in prim if t not in tfiles)):
-                if tf:
-                    tfiles[tk] = tf
     for cid in list(latest):
         for tk in list(latest[cid]):
             if tk in gone or tk in tfiles and cid not in tfiles[tk]["series"]:
@@ -611,6 +673,7 @@ def publish(sb, uni, old_map, tfiles, touched, gone, run_ts, log=log_):
                                                   "definition": x["definition"], "higher_is_better": x["higher_is_better"], "match": x["match"],
                                                   "industries": x["industries"], "taxonomy_version": K.VERSION, "updated_at": run_ts} for x in K.public_taxonomy()], "id"),
          "kpi_canonical upsert", "kpi_canonical")
+    sb.put_json("kpistd/map.json", mp, cache="max-age=600")
     return {"series_files": written, "companies_with_series": len(prim), "canonical_ids_covered": len(by_c)}
 
 
