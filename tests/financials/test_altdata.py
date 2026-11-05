@@ -101,5 +101,26 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(out["rows"][0]["amount"], 0)
 
 
+class ThrottleTests(unittest.TestCase):
+    def test_lda_throttle_waits_and_retries(self):
+        calls = []
+
+        def fake(url, **kw):
+            calls.append(url)
+            if len(calls) == 1:
+                raise RuntimeError('HTTP 429: {"detail":"Request was throttled. Expected available in 2 seconds."}')
+            return '{"results": [], "next": null}'
+        with mock.patch.object(A, "request", side_effect=fake), mock.patch.object(A.time, "sleep") as slept:
+            out = A._lda_get("https://lda.gov/api/v1/filings/", {"client_name": "ACME"})
+        self.assertEqual(out["results"], [])
+        self.assertEqual(len(calls), 2)
+        slept.assert_called_once_with(3)
+
+    def test_other_errors_are_raised(self):
+        with mock.patch.object(A, "request", side_effect=RuntimeError("HTTP 500: boom")):
+            with self.assertRaises(RuntimeError):
+                A._lda_get("https://lda.gov/api/v1/filings/")
+
+
 if __name__ == "__main__":
     unittest.main()
