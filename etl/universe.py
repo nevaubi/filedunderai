@@ -551,8 +551,51 @@ def load_additional_registry(document, base):
     return approved, [row for row in approved if row[0] in active_tickers]
 
 
-ADDITIONAL_REGISTRY = json.loads(Path(__file__).with_name("additional_companies.json").read_text())
-ADDITIONAL_LIST, ACTIVE_ADDITIONAL_LIST = load_additional_registry(ADDITIONAL_REGISTRY, SP500_LIST)
+def load_registries(paths, base):
+    """Load cohort registries in order. Each cohort is validated against the base list and every earlier cohort,
+    so a ticker or CIK can belong to one tracked issuer only. Returns (registries, approved, active)."""
+    registries, approved, active, ids = [], [], [], set()
+    for path in paths:
+        document = json.loads(Path(path).read_text())
+        cohort_id = document.get("cohort_id") if isinstance(document, dict) else None
+        if not isinstance(cohort_id, str) or not cohort_id or cohort_id in ids:
+            raise ValueError("Each additional-company registry needs a unique cohort_id")
+        ids.add(cohort_id)
+        rows, live = load_additional_registry(document, base + approved)
+        registries.append(document)
+        approved += rows
+        active += live
+    return registries, approved, active
+
+
+# The first cohort keeps its original file name; later cohorts are additional_companies_<cohort>.json.
+_REGISTRY_PATHS = [Path(__file__).with_name("additional_companies.json")] + sorted(
+    p for p in Path(__file__).parent.glob("additional_companies_*.json"))
+ADDITIONAL_REGISTRIES, ADDITIONAL_LIST, ACTIVE_ADDITIONAL_LIST = load_registries(_REGISTRY_PATHS, SP500_LIST)
+ADDITIONAL_REGISTRY = ADDITIONAL_REGISTRIES[0]
+COHORT_OF = {c["ticker"]: r for r in ADDITIONAL_REGISTRIES for c in r["companies"]}
+
+
+def registry_for(ticker):
+    """The cohort registry an additional issuer belongs to."""
+    if ticker not in COHORT_OF:
+        raise ValueError("Not an approved additional issuer")
+    return COHORT_OF[ticker]
+
+
+def registry_by_id(cohort_id):
+    for registry in ADDITIONAL_REGISTRIES:
+        if registry["cohort_id"] == cohort_id:
+            return registry
+    raise ValueError("Unknown cohort")
+
+
+def cohort_registry(tickers):
+    """The single cohort a batch of additional issuers belongs to; batches never mix cohorts."""
+    ids = {registry_for(t)["cohort_id"] for t in tickers}
+    if len(ids) != 1:
+        raise ValueError("A backfill batch must contain issuers from exactly one cohort")
+    return registry_by_id(ids.pop())
 UNIVERSE = SP500_LIST + ACTIVE_ADDITIONAL_LIST
 UNIVERSE_METADATA = {"id": "tracked", "membership_version": 1}
 # Pending issuers are addressable by an explicit batch, but ordinary scheduled jobs

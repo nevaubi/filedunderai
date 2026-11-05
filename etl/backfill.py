@@ -16,7 +16,7 @@ from urllib.parse import quote
 
 from . import fundamentals, jobs, sec
 from .common import Supabase, now_iso, serialized_aggregates
-from .universe import ADDITIONAL_REGISTRY, BY_TICKER, SP500
+from .universe import ADDITIONAL_REGISTRIES, ADDITIONAL_REGISTRY, BY_TICKER, SP500, cohort_registry, registry_by_id, registry_for
 
 TABLE_KEYS = {"companies": "ticker", "documents": "id", "filings": "accession",
               "facts": "ticker,statement,label,kind,period_end"}
@@ -114,7 +114,7 @@ class StageStore:
             table_meta.append({"table": table, "on_conflict": data["on_conflict"], "rows": len(rows),
                                "path": relative, "sha256": digest(body)})
         receipt = {"version": 1, "status": "staged", "ticker": self.ticker, "cik": BY_TICKER[self.ticker]["cik"],
-                   "cohort_id": ADDITIONAL_REGISTRY["cohort_id"], "created_at": now_iso(), "sources": sources,
+                   "cohort_id": registry_for(self.ticker)["cohort_id"], "created_at": now_iso(), "sources": sources,
                    "objects": list(self.objects.values()), "tables": table_meta, "fundamental": fundamental}
         atomic_write(self.root / "receipt.json", encoded(receipt))
         return receipt
@@ -150,7 +150,7 @@ def validate_stage(root):
     ticker = receipt["ticker"]
     if ticker in SP500 or ticker not in BY_TICKER or receipt["cik"] != BY_TICKER[ticker]["cik"]:
         raise ValueError("Staged issuer is not an approved additional company")
-    if receipt["cohort_id"] != ADDITIONAL_REGISTRY["cohort_id"] or receipt["status"] != "staged":
+    if receipt["cohort_id"] != registry_for(ticker)["cohort_id"] or receipt["status"] != "staged":
         raise ValueError("Staged cohort or status mismatch")
     objects = {}
     for item in receipt["objects"]:
@@ -360,7 +360,7 @@ The public universe is activated separately after batch counts are reconciled.
         raise ValueError("Staged receipt does not match the requested ticker scope")
     ownership = _publication_ownership(sb,root,receipts,workers)
     receipt_hashes = {t:digest((root / "staged" / t / "receipt.json").read_bytes()) for t in tickers}
-    cohort = ADDITIONAL_REGISTRY["cohort_id"]
+    cohort = cohort_registry(tickers)["cohort_id"]
     state_path = f"backfills/{cohort}/publish-state.json"
     previous = sb.get_object("raw", state_path)
     state = json.loads(previous) if previous else {"version":1, "cohort_id":cohort, "created_at":now_iso(), "companies":{}}
@@ -476,8 +476,10 @@ def main(argv=None):
     parser.add_argument("--tickers", nargs="*")
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--budget", type=float)
+    parser.add_argument("--cohort-id", help="default ticker scope when --tickers is omitted (default: the first cohort)")
     args = parser.parse_args(argv)
-    tickers = args.tickers or [r["ticker"] for r in ADDITIONAL_REGISTRY["companies"]]
+    registry = registry_by_id(args.cohort_id) if args.cohort_id else ADDITIONAL_REGISTRIES[0]
+    tickers = args.tickers or [r["ticker"] for r in registry["companies"]]
     if len(tickers) != len(set(tickers)) or any(t not in BY_TICKER or t in SP500 for t in tickers):
         raise ValueError("Batch must contain unique approved additional companies")
     if args.action == "publish":
