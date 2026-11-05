@@ -1,6 +1,16 @@
 (function (root) {
   'use strict';
   const day = s => Date.parse(s + 'T00:00:00Z') / 86400000;
+  function marketCap(price, shares, priceDate) {
+    const validDate = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(day(value)) && new Date(value + 'T00:00:00Z').toISOString().slice(0, 10) === value;
+    const asOf = priceDate || new Date().toISOString().slice(0, 10);
+    if (!Number.isFinite(price) || price <= 0 || !shares || !Number.isFinite(shares.val) || shares.val <= 0 || shares.basis !== 'reported_outstanding' || shares.derived || !validDate(asOf) || !validDate(shares.end)) return null;
+    const age = day(asOf) - day(shares.end);
+    if (age < 0 || age > 400) return null;
+    for (const field of ['filed', 'available_at']) if (shares[field] && (!validDate(shares[field]) || day(shares[field]) > day(asOf) || day(shares[field]) < day(shares.end))) return null;
+    const value = price * shares.val;
+    return Number.isFinite(value) ? value : null;
+  }
   function ttm(cells) {
     if (!Array.isArray(cells) || cells.length !== 4 || cells.some(x => !x || ![x.start, x.end].every(d => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d) && Number.isFinite(day(d)) && new Date(d + 'T00:00:00Z').toISOString().slice(0, 10) === d))) return null;
     const c = cells.slice().sort((a, b) => a.end.localeCompare(b.end)), first = c[0];
@@ -42,5 +52,5 @@
     else throw new Error('Unknown operation');
     if (!Number.isFinite(result)) throw new Error('Non-finite result'); return result;
   }
-  root.FU_FINANCIAL = Object.freeze({ ttm, formula, calculate });
+  root.FU_FINANCIAL = Object.freeze({ ttm, formula, calculate, marketCap });
 })(typeof window !== 'undefined' ? window : globalThis);

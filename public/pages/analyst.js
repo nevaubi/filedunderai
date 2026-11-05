@@ -25,9 +25,10 @@
   let metricsList=null;
   function metricsSelect(selected='Revenue') {if(!metricsList){metricsList=el('datalist',{id:'analyst-metric-options'},...[...new Set([...A.metrics,'Gross margin','Revenue growth YoY','Credit card losses'])].map(m=>el('option',{value:m})));document.body.append(metricsList);}return el('input',{'aria-label':'Metric',list:'analyst-metric-options',value:selected,placeholder:'Reported metric name'});}
   async function load(ticker,extra=false) {
-    if(!IDX[ticker])throw new Error(`${ticker} is outside coverage.`);
+    const identity=typeof companySummary==='function'?companySummary(ticker):IDX[ticker];
+    if(!identity)throw new Error(`${ticker} is outside coverage.`);
     if(!cache.has(ticker)) {
-      const task=Promise.all([getJSON(`companies/${ticker}.json`),ensureCompany(ticker)]).then(([b])=>({...b,ticker,industry:IDX[ticker].industry,sector:b.sector || IDX[ticker].sector}));
+      const task=Promise.all([getJSON(`companies/${ticker}.json`),ensureCompany(ticker)]).then(([b])=>({...b,ticker,industry:identity.industry,sector:b.sector || identity.sector}));
       cache.set(ticker,task);task.catch(()=>cache.delete(ticker));
     }
     const c=await cache.get(ticker);
@@ -146,7 +147,7 @@
     const host=el('div',{class:'analyst-page'});page.append(host);
     host.append(header('Watchlists & standing orders','Follow companies and define what to check when new filings arrive.',[button('Read morning brief',()=>location.hash='analyst')]));
     const picker=selectTicker(watchlist()[0] || TICKERS[0]),list=el('div',{class:'an-watch-list'});
-    const draw=()=>{list.innerHTML='';for(const t of watchlist())list.append(el('div',{class:'an-watch-row'},el('a',{href:'#company-'+t.toLowerCase()},el('b',{},t),el('span',{},SHORT[t])),el('span',{class:'muted'},IDX[t].sector),button('Remove',()=>{toggleWatch(t);draw();})));};draw();
+    const draw=()=>{list.innerHTML='';for(const t of watchlist())list.append(el('div',{class:'an-watch-row'},el('a',{href:'#company-'+t.toLowerCase()},el('b',{},t),el('span',{},SHORT[t])),el('span',{class:'muted'},(IDX[t] || window.FU_COMPANIES?.get(t))?.sector || ''),button('Remove',()=>{toggleWatch(t);draw();})));};draw();
     host.append(card('Companies you follow',el('div',{class:'an-card-body'},el('div',{class:'an-toolbar'},picker,button('Follow company',()=>{if(!watchlist().includes(picker.value))toggleWatch(picker.value);draw();},true)),list)));
     const grid=el('div',{class:'an-two-col'}),form=el('div',{class:'an-card-body'}),rulesHost=el('div',{class:'an-card-body'});
     ruleForm(form,()=>route());

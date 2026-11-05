@@ -1,0 +1,97 @@
+/* Reusable company chart. Scoped to avoid changing the Technicals page or app controls. */
+.fu-company-chart {
+  --fcc-ink: #172635;
+  --fcc-muted: #657384;
+  --fcc-line: #e5e9ee;
+  --fcc-accent: #2459c4;
+  color: var(--fcc-ink);
+  background: #fff;
+  border: 1px solid var(--fcc-line);
+  border-radius: 10px;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--f-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.fu-company-chart *, .fu-company-chart *::before, .fu-company-chart *::after { box-sizing: border-box; }
+.fu-company-chart [hidden] { display: none !important; }
+.fu-company-chart .fcc-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 20px 17px; }
+.fu-company-chart .fcc-eyebrow { margin: 0 0 6px; color: var(--fcc-muted); font: 10px/1.3 var(--f-mono, monospace); letter-spacing: .07em; text-transform: uppercase; }
+.fu-company-chart .fcc-title { margin: 0 0 8px; font-size: 17px; line-height: 1.2; font-weight: 550; letter-spacing: -.2px; }
+.fu-company-chart .fcc-quote { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px 12px; }
+.fu-company-chart .fcc-latest-value { font: 500 27px/1.2 var(--f-mono, monospace); letter-spacing: -.8px; }
+.fu-company-chart .fcc-change { font-size: 12px; font-weight: 550; }
+.fu-company-chart .fcc-change > span { color: var(--fcc-muted); font-size: 10px; font-weight: 400; }
+.fu-company-chart .fcc-positive { color: #18725d; }
+.fu-company-chart .fcc-negative { color: #b13d42; }
+.fu-company-chart .fcc-asof { display: flex; flex-direction: column; gap: 4px; color: var(--fcc-muted); text-align: right; font-size: 10px; white-space: nowrap; }
+.fu-company-chart .fcc-asof strong { color: var(--fcc-ink); font: 500 12px/1.4 var(--f-mono, monospace); }
+.fu-company-chart .fcc-toolbar { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 10px 20px; border-top: 1px solid var(--fcc-line); border-bottom: 1px solid var(--fcc-line); background: #fafbfc; }
+.fu-company-chart .fcc-segment { display: inline-flex; max-width: 100%; gap: 2px; }
+.fu-company-chart .fcc-segment button { appearance: none; border: 1px solid transparent; border-radius: 5px; background: transparent; color: #526174; font: inherit; font-size: 11px; font-weight: 500; min-height: 30px; padding: 6px 11px; cursor: pointer; white-space: nowrap; }
+.fu-company-chart .fcc-segment button[aria-pressed="true"] { background: #fff; border-color: #d4dce6; color: var(--fcc-ink); box-shadow: 0 1px 2px #15243506; }
+.fu-company-chart .fcc-segment button:hover:not(:disabled) { background: #edf2f8; color: var(--fcc-ink); }
+.fu-company-chart .fcc-segment button:disabled { color: #98a1ad; cursor: not-allowed; }
+.fu-company-chart .fcc-settings { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 12px 20px 8px; }
+.fu-company-chart .fcc-toggle { display: inline-flex; align-items: center; gap: 5px; margin: 0; padding: 5px 7px; min-height: 28px; border: 1px solid #e2e7ed; border-radius: 5px; color: #536274; background: #fff; cursor: pointer; font-size: 10px; line-height: 1.2; user-select: none; }
+.fu-company-chart .fcc-toggle:has(input:checked) { border-color: #d0dbe9; background: #f7f9fc; color: var(--fcc-ink); }
+.fu-company-chart .fcc-toggle input { width: 12px; height: 12px; padding: 0; margin: 0; accent-color: var(--fcc-accent); cursor: inherit; }
+.fu-company-chart .fcc-toggle.fcc-disabled { opacity: .55; cursor: not-allowed; }
+.fu-company-chart .fcc-swatch { width: 10px; height: 2px; display: inline-block; background: var(--fcc-swatch); flex: 0 0 auto; }
+.fu-company-chart .fcc-range-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 10px; padding: 7px 20px 10px; color: var(--fcc-muted); font-size: 10px; line-height: 1.5; }
+.fu-company-chart .fcc-range-summary > span:first-child { color: #4d5c70; font-family: var(--f-mono, monospace); }
+.fu-company-chart .fcc-range-summary strong { font-size: 11px; }
+.fu-company-chart .fcc-benchmark-summary { color: #536679; background: #f6f8fb; margin: 0 20px 10px; padding: 8px 10px; border-radius: 5px; font-size: 10px; line-height: 1.6; }
+.fu-company-chart .fcc-readout { display: flex; flex-wrap: wrap; gap: 9px 18px; min-height: 48px; margin: 0; padding: 8px 20px 7px; border-top: 1px solid #eef1f4; }
+.fu-company-chart .fcc-readout > div { display: flex; flex-direction: column; gap: 3px; }
+.fu-company-chart .fcc-readout dt { margin: 0; color: var(--fcc-muted); text-transform: uppercase; letter-spacing: .035em; font-size: 9px; line-height: 1.3; }
+.fu-company-chart .fcc-readout dd { margin: 0; min-width: 58px; font: 500 10px/1.3 var(--f-mono, monospace); }
+.fu-company-chart .fcc-readout .fcc-readout-date { min-width: 90px; }
+.fu-company-chart .fcc-plot { width: 100%; min-width: 0; outline-offset: -2px; position: relative; }
+.fu-company-chart .fcc-plot svg { display: block; width: 100%; height: auto; overflow: visible; touch-action: pan-y; user-select: none; }
+.fu-company-chart .fcc-plot svg text { font-family: var(--f-mono, ui-monospace, monospace); font-size: 10px; fill: var(--fcc-muted); }
+.fu-company-chart .fcc-grid line { stroke: #e9edf2; stroke-width: .8; }
+.fu-company-chart .fcc-grid .fcc-pane-title { fill: #6d7b8c; font-size: 9px; letter-spacing: .035em; }
+.fu-company-chart .fcc-last-marker text { fill: #fff; font-size: 10px; }
+.fu-company-chart .fcc-help { margin: 0; padding: 2px 20px 14px; color: #718092; font-size: 10px; line-height: 1.6; }
+.fu-company-chart .fcc-insights { padding: 15px 20px 13px; border-top: 1px solid var(--fcc-line); background: #fbfcfd; }
+.fu-company-chart .fcc-insights-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 5px 12px; align-items: baseline; margin-bottom: 13px; }
+.fu-company-chart .fcc-insights-heading h3 { margin: 0; font-size: 12px; font-weight: 600; }
+.fu-company-chart .fcc-insights-heading > span { color: var(--fcc-muted); font: 10px/1.4 var(--f-mono, monospace); }
+.fu-company-chart .fcc-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 24px; margin: 0; }
+.fu-company-chart .fcc-metrics > div { min-width: 0; }
+.fu-company-chart .fcc-metrics dt { color: var(--fcc-muted); font-size: 10px; margin-bottom: 6px; line-height: 1.4; }
+.fu-company-chart .fcc-metric-value { margin: 0; font: 500 15px/1.3 var(--f-mono, monospace); letter-spacing: -.25px; overflow-wrap: anywhere; }
+.fu-company-chart .fcc-metric-detail { margin: 5px 0 0; color: #6f7d8f; font-size: 10px; line-height: 1.6; }
+.fu-company-chart .fcc-calculation-note { margin: 14px 0 0; padding-top: 11px; border-top: 1px solid var(--fcc-line); color: #718092; font-size: 10px; line-height: 1.6; }
+.fu-company-chart .fcc-quality { margin: 0; padding: 11px 20px; border-top: 1px solid var(--fcc-line); background: #faf8f3; color: #786239; font-size: 10px; line-height: 1.6; }
+.fu-company-chart .fcc-provenance { padding: 12px 20px; border-top: 1px solid var(--fcc-line); }
+.fu-company-chart .fcc-provenance p { margin: 0; color: #718092; font-size: 10px; line-height: 1.7; overflow-wrap: anywhere; }
+.fu-company-chart .fcc-provenance p + p { margin-top: 3px; }
+.fu-company-chart .fcc-empty { padding: 26px 20px; }
+.fu-company-chart .fcc-empty h2 { margin: 0 0 8px; font-size: 16px; font-weight: 550; }
+.fu-company-chart .fcc-empty p { margin: 0; color: var(--fcc-muted); max-width: 580px; font-size: 12px; line-height: 1.7; }
+.fu-company-chart button:focus-visible, .fu-company-chart input:focus-visible, .fu-company-chart .fcc-plot:focus-visible { outline: 2px solid #2459c4; outline-offset: 2px; }
+.fu-company-chart .fcc-plot:focus-visible { outline-offset: -2px; }
+.fu-company-chart .fcc-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+@media (max-width: 650px) {
+  .fu-company-chart .fcc-header { align-items: flex-start; padding: 16px 14px; }
+  .fu-company-chart .fcc-latest-value { font-size: 24px; }
+  .fu-company-chart .fcc-change > span { display: block; margin-top: 3px; }
+  .fu-company-chart .fcc-asof { white-space: normal; max-width: 135px; line-height: 1.5; }
+  .fu-company-chart .fcc-toolbar { padding: 8px 12px; }
+  .fu-company-chart .fcc-segment button { min-height: 36px; padding: 7px 9px; }
+  .fu-company-chart .fcc-settings { padding: 10px 14px 6px; gap: 6px; }
+  .fu-company-chart .fcc-toggle { min-height: 34px; padding: 7px; }
+  .fu-company-chart .fcc-range-summary { padding: 6px 14px 10px; }
+  .fu-company-chart .fcc-benchmark-summary { margin-left: 14px; margin-right: 14px; }
+  .fu-company-chart .fcc-readout { padding: 9px 14px; gap: 10px 14px; }
+  .fu-company-chart .fcc-readout dd { min-width: 63px; }
+  .fu-company-chart .fcc-readout .fcc-readout-date { min-width: 100%; }
+  .fu-company-chart .fcc-readout .fcc-readout-date { flex-direction: row; align-items: baseline; gap: 9px; }
+  .fu-company-chart .fcc-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 15px; }
+  .fu-company-chart .fcc-insights { padding: 14px; }
+  .fu-company-chart .fcc-help, .fu-company-chart .fcc-quality, .fu-company-chart .fcc-provenance { padding-left: 14px; padding-right: 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .fu-company-chart * { scroll-behavior: auto; } }

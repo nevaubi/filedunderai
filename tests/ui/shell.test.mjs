@@ -129,7 +129,7 @@ test('actual routing keeps technicals and company navigation consistent when the
     }));
     for (const [hash, page, nav, selectedCompany] of [
       ['#technicals-AAPL', 'Technicals AAPL', 'technicals', null],
-      ['#company-aapl', 'Company AAPL', 'screener', 'AAPL'],
+      ['#company-aapl', 'Company AAPL', 'companies', 'AAPL'],
       ['#technicals-AAPL', 'Technicals AAPL', 'technicals', null],
     ]) {
       w.history.replaceState(null, '', hash);
