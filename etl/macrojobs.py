@@ -6,7 +6,7 @@ Sources: frb_daily, frb_weekly, frb_monthly, nyfed, treasury, bls, oecd, cftc, f
 import datetime as dt
 
 from . import bls, cftc, fdic, frb, mcal, mstore, nyfed, oecd, treasury
-from .common import Run
+from .common import Run, serialized_aggregates
 
 SOURCES = ["frb_daily", "frb_weekly", "frb_monthly", "nyfed", "treasury", "bls", "oecd", "cftc", "fdic", "calendar", "legacy", "catalog"]
 
@@ -22,12 +22,14 @@ def _state(sb):
         return {}
 
 
+@serialized_aggregates
 def _publish(sb, touched, log=print):
     reg = mstore.load_registry(sb)
     reg.update(touched)
     return mstore.publish_catalog(sb, reg, log=log)
 
 
+@serialized_aggregates
 def mdata_job(sb, source, full=False, force=False, log=print):
     with Run(sb, f"mdata:{source}") as run:
         touched, saved = {}, {}
@@ -104,24 +106,27 @@ def legacy_series_from_rows(rows):
     return [{"meta": legacy_meta(sid), "obs": sorted(obs)} for sid, obs in by.items()]
 
 
+@serialized_aggregates
 def migrate_legacy(sb, log=print):
     """Copies macro_observations into the series store. Requires the store tables."""
+    reg = mstore.load_registry(sb)
     if not mstore.db_ready(sb):
         log("legacy migration needs the macro_series tables; skipped")
         return 0
     rows = sb.select("macro_observations", "select=series,d,value&order=series,d")
     series = legacy_series_from_rows(rows)
     touched = {}
-    out = mstore.save(sb, series, touched, log=log)
-    reg = mstore.load_registry(sb)
+    out = mstore.save(sb, series, touched, prev_reg=reg, log=log)
     reg.update(touched)
     sb.put_json("macro/registry.json", reg, cache="no-store")
     return sum(out.values())
 
 
+@serialized_aggregates
 def legacy_store(sb, obs_rows, log=print):
     """Called by jobs.macro_job: mirrors the rows it writes to macro_observations into the series store."""
+    base = mstore.load_registry(sb)
     touched = {}
-    out = mstore.save(sb, legacy_series_from_rows(obs_rows), touched, log=log)
+    out = mstore.save(sb, legacy_series_from_rows(obs_rows), touched, prev_reg=base, log=log)
     _publish(sb, touched, log=log)
     return sum(out.values())

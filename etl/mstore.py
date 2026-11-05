@@ -12,7 +12,7 @@ import json
 import math
 import re
 
-from .common import HTTPError, now_iso
+from .common import HTTPError, now_iso, serialized_aggregates
 
 SECTIONS = [
     ("rates", "Rates and liquidity"),
@@ -132,19 +132,43 @@ def db_ready(sb):
     return _DB["ok"]
 
 
+def _published_collection(sb, path, kind, catalog_field):
+    """Read existing state strictly; only a genuinely new store may be empty."""
+    value = sb.get_json(path)
+    if value is not None and not isinstance(value, kind):
+        raise ValueError(f"Invalid {path}: expected {kind.__name__}")
+    if not value:
+        catalog = sb.get_json("macro/catalog.json")
+        if catalog is not None and not isinstance(catalog, dict):
+            raise ValueError("Invalid macro/catalog.json")
+        if catalog and catalog.get(catalog_field):
+            raise ValueError(f"Missing or empty {path} while its published catalog still has {catalog_field}")
+        return kind()
+    return value
+
+
 def load_registry(sb):
-    """Series metadata and statistics as last published (macro/registry.json)."""
-    try:
-        return sb.get_json("macro/registry.json") or {}
-    except Exception:
-        return {}
+    """Series metadata as last published; read failures cannot become deletions."""
+    return _published_collection(sb, "macro/registry.json", dict, "series")
 
 
-def _prev_bundle(sb, sid):
-    try:
-        return sb.get_json(f"macro/s/{fid(sid)}.json") or {}
-    except Exception:
+def _check_lease(sb):
+    lease = getattr(sb, "_aggregate_lease", None)
+    if lease:
+        lease.check()
+
+
+def _prev_bundle(sb, sid, expected=False):
+    value = sb.get_json(f"macro/s/{fid(sid)}.json")
+    if value is None:
+        if expected:
+            raise ValueError(f"Missing existing macro series bundle: {sid}")
         return {}
+    if not isinstance(value, dict) or not isinstance(value.get("obs"), list):
+        raise ValueError(f"Invalid macro series bundle: {sid}")
+    if expected and not value["obs"]:
+        raise ValueError(f"Empty existing macro series bundle: {sid}")
+    return value
 
 
 def _ingest_rest(sb, sid, rows, vt, published):
@@ -164,6 +188,7 @@ def _ingest(sb, sid, rows, vt, published):
         return _ingest_rest(sb, sid, rows, vt, published)
     changed = []
     for i in range(0, len(rows), 500):
+        _check_lease(sb)
         chunk = [{"s": sid, "d": d, "v": v, "vt": vt, "p": published or ""} for d, v in rows[i:i + 500]]
         try:
             res = sb.rpc("macro_ingest", {"p_rows": chunk}) or []
@@ -178,6 +203,7 @@ def _ingest(sb, sid, rows, vt, published):
     return changed
 
 
+@serialized_aggregates
 def save(sb, series, reg, partial=False, log=print, prev_reg=None):
     """Upserts metadata, ingests changed observations as new vintages, writes per-series bundles and snapshots.
 
@@ -194,13 +220,16 @@ def save(sb, series, reg, partial=False, log=print, prev_reg=None):
         for r in sb.select("macro_series", f"select=id,obs_count&id=in.({ids})"):
             known[r["id"]] = r.get("obs_count")
     for s in series:
+        _check_lease(sb)
         meta = dict(s["meta"])
         sid = meta["id"]
         floor = meta.get("start") or START.get(meta.get("frequency"), "1970-01-01")
         raw = sorted((d, str(v).strip()) for d, v in s["obs"] if d and d >= floor and _num(v) is not None)
         published = s.get("published")
         vt = published or stamp
-        prev = _prev_bundle(sb, sid)
+        prior_meta = (prev_reg if prev_reg is not None else reg).get(sid) or {}
+        expected = bool(prior_meta.get("obs_count") or prior_meta.get("last_date") or known.get(sid))
+        prev = _prev_bundle(sb, sid, expected=expected)
         pmap = {d: v for d, v in (prev.get("obs") or [])}
         cur = dict(pmap) if partial else {}
         for d, v in raw:
@@ -250,6 +279,7 @@ def save(sb, series, reg, partial=False, log=print, prev_reg=None):
                    "last_value": pts[-1][1] if pts else None, "obs_count": len(pts)}
         reg[sid] = dict(meta, **summary)
         if use_db:
+            _check_lease(sb)
             sb.update("macro_series", {"id": sid}, dict(summary, updated_at=now_iso()))
         out[sid] = len(changed)
     if out:
@@ -257,13 +287,10 @@ def save(sb, series, reg, partial=False, log=print, prev_reg=None):
     return out
 
 
+@serialized_aggregates
 def save_releases(sb, rows, log=print):
     """Release calendar rows: {release, release_date, release_time, provider, title, source_url}. Keeps other publishers' rows."""
-    cur = []
-    try:
-        cur = sb.get_json("macro/releases.json") or []
-    except Exception:
-        pass
+    cur = _published_collection(sb, "macro/releases.json", list, "calendar")
     mine = {r["release"] for r in rows}
     keep = [r for r in cur if r["release"] not in mine]
     stamp = now_iso()
@@ -329,15 +356,14 @@ def what_changed(series, days=7):
     return out
 
 
+@serialized_aggregates
 def publish_catalog(sb, reg, log=print):
     """Writes macro/registry.json and macro/catalog.json: series with metadata and statistics, upcoming releases, this week's moves."""
-    sb.put_json("macro/registry.json", reg, cache="no-store")
+    if not isinstance(reg, dict):
+        raise ValueError("Macro registry must be a dict")
     t0 = today()
     horizon = (dt.date.fromisoformat(t0) + dt.timedelta(days=45)).isoformat()
-    try:
-        rel = sb.get_json("macro/releases.json") or []
-    except Exception:
-        rel = []
+    rel = _published_collection(sb, "macro/releases.json", list, "calendar")
     cal = [r for r in rel if r["release_date"] >= t0]
     by_release = {}
     for sid, m in reg.items():
@@ -352,6 +378,9 @@ def publish_catalog(sb, reg, log=print):
         series[sid] = dict(m, next_release=[c["release_date"], c.get("release_time")] if c else None)
     calendar = [dict(c, series=by_release.get(c["release"], [])[:60]) for c in cal if c["release_date"] <= horizon and by_release.get(c["release"])]
     changes = what_changed([dict(m, id=sid) for sid, m in reg.items()])
+    # Resolve all existing inputs before either global object can be replaced.
+    _check_lease(sb)
+    sb.put_json("macro/registry.json", reg, cache="no-store")
     sb.put_json("macro/catalog.json", {"generated": now_iso(), "sections": SECTIONS, "series": series, "calendar": calendar, "changes": changes}, cache="max-age=300")
     log(f"catalog: {len(series)} series, {len(calendar)} upcoming release dates, {len(changes)} weekly moves")
     return len(series)
