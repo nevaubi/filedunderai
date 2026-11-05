@@ -8,7 +8,7 @@ from _common import serve  # noqa: E402
 
 def run(sb):
     from etl import jobs
-    done, failed = jobs.insiders_job(sb, workers=4, time_budget=250)
+    done, failed = jobs.insiders_job(sb, workers=4, time_budget=640)
     return {"parsed": done, "failed": failed}
 
 

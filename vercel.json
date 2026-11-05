@@ -13,7 +13,7 @@
       "maxDuration": 90
     },
     "api/cron/*.py": {
-      "maxDuration": 300,
+      "maxDuration": 800,
       "includeFiles": "{etl/**,api/cron/_common.py,public/data/company-profiles/**}"
     },
     "api/filing.js": {

@@ -8,7 +8,7 @@ from _common import serve  # noqa: E402
 
 def run(sb):
     from etl import jobs
-    done, failed = jobs.companies_job(sb, only_changed=True, time_budget=240, max_companies=15, workers=4)
+    done, failed = jobs.companies_job(sb, only_changed=True, time_budget=680, max_companies=40, workers=4)
     return {"updated": done, "failed": failed}
 
 

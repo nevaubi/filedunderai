@@ -11,7 +11,7 @@ def run(sb, query):
     step = query.get("step", "refresh")
     if step not in ("market", "refresh"):
         raise ValueError("step must be market or refresh")
-    return altdata.rotation_job(sb, step=step, time_budget=240)
+    return altdata.rotation_job(sb, step=step, time_budget=680)
 
 
 class handler(BaseHTTPRequestHandler):

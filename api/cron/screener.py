@@ -8,7 +8,7 @@ from _common import serve  # noqa: E402
 
 def run(sb):
     from etl import jobs
-    return jobs.screener_job(sb, time_budget=270, workers=8)
+    return jobs.screener_job(sb, time_budget=720, workers=8)
 
 
 class handler(BaseHTTPRequestHandler):

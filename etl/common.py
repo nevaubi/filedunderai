@@ -143,6 +143,35 @@ def sec_get(url, timeout=60):
     return request(url, headers={"User-Agent": SEC_UA}, timeout=timeout, retries=3)
 
 
+def dedupe_conflict_rows(rows, on_conflict):
+    """Collapse rows that share the on_conflict key, keeping the last occurrence of each key.
+
+    PostgREST runs one INSERT ... ON CONFLICT DO UPDATE per request, and Postgres rejects a
+    statement that would update the same row twice (error 21000). Later rows win, matching the
+    result of applying the batch in order. Rows missing any key column are passed through
+    unchanged because their effective key depends on database defaults.
+    """
+    rows = list(rows)
+    keys = [k.strip() for k in str(on_conflict or "").split(",") if k.strip()]
+    if not keys:
+        return rows
+    positions, out = {}, []
+    for row in rows:
+        if not isinstance(row, dict) or any(k not in row for k in keys):
+            out.append(row)
+            continue
+        try:
+            ident = tuple(json.dumps(row[k], sort_keys=True, default=str) for k in keys)
+        except (TypeError, ValueError):
+            out.append(row)
+            continue
+        if ident in positions:
+            out[positions[ident]] = None
+        positions[ident] = len(out)
+        out.append(row)
+    return [row for row in out if row is not None]
+
+
 class Supabase:
     def __init__(self):
         self.url = os.environ["SUPABASE_URL"].rstrip("/")
@@ -160,7 +189,7 @@ class Supabase:
 
     def upsert(self, table, rows, on_conflict, batch=500):
         self._check_lease()
-        rows = list(rows)
+        rows = dedupe_conflict_rows(rows, on_conflict)
         for i in range(0, len(rows), batch):
             self._check_lease()
             chunk = rows[i:i + batch]
