@@ -65,11 +65,14 @@ test("compact primary controls retain presets, counted editable filters and coll
   const { w, d, click, change, close } = await setup();
   try {
     assert.equal(d.querySelectorAll(".scr-tools > button").length, 2);
+    assert.equal(d.querySelector(".sx-chips").hidden, true, "an unfiltered screen has no redundant chip row");
+    assert.equal(d.querySelector(".sx-chips .sx-add"), null, "the collapsed row contains no hidden command");
     assert.equal(d.querySelector('select[aria-label="Preset screen"]').options.length, 20);
     assert.equal(d.querySelector(".sx-statistics").open, false);
     d.querySelector(".sx-statistics").open = true;
     assert.equal(d.querySelector(".sx-grid").classList.contains("nochat"), true);
     change('[aria-label="Preset screen"]', "quality");
+    assert.equal(d.querySelector(".sx-chips").hidden, false);
     assert.equal(d.querySelector(".sx-statistics").open, true, "explicit statistics expansion survives result updates");
     assert.equal(w.store.get("scr2").spec.filters.length, 4);
     assert.equal(d.querySelector(".sx-count b").textContent, "1");
@@ -96,13 +99,18 @@ test("compact primary controls retain presets, counted editable filters and coll
     assert.equal(d.querySelector('[aria-label="Preset screen"]').value, "");
     assert.equal(w.store.get("scr2").preset, null);
     assert.equal(w.store.get("scr2").spec.filters.length, 0);
+    assert.equal(d.querySelector(".sx-chips").hidden, true);
   } finally { close(); }
 });
 
-test("adding a filter focuses its new chip after the menu anchor is replaced", async () => {
+test("Filters creates the first filter and keeps new-chip focus when the empty row returns", async () => {
   const { w, d, click, close } = await setup();
   try {
-    const oldAdd = click("+ Add filter");
+    click("Filters (0)");
+    assert.equal(d.querySelector(".sx-filters").hidden, false);
+    const oldAdd = d.querySelector(".sx-filters .sx-add");
+    assert.ok(oldAdd, "the open Filters panel offers the first-filter shortcut");
+    oldAdd.click();
     click("peValuation");
     d.querySelector('[aria-label="Minimum"]').value = "10";
     click("Apply");
@@ -110,6 +118,17 @@ test("adding a filter focuses its new chip after the menu anchor is replaced", a
     assert.equal(w.store.get("scr2").spec.filters[0].field, "pe");
     assert.equal(d.activeElement, d.querySelector(".sx-chip .t"));
     assert.equal(d.activeElement.isConnected, true);
+    assert.equal(d.querySelector(".sx-chips").hidden, false);
+    d.querySelector(".sx-chips .sx-add").click();
+    click("omValuation");
+    d.querySelector('[aria-label="Minimum"]').value = "0.1";
+    click("Apply");
+    assert.equal(w.store.get("scr2").spec.filters[1].field, "om");
+    assert.equal(d.activeElement, d.querySelectorAll(".sx-chip .t")[1]);
+    d.querySelector(".sx-chip .x").click();
+    d.querySelector(".sx-chip .x").click();
+    assert.equal(d.querySelector(".sx-chips").hidden, true);
+    assert.equal(d.activeElement, d.querySelector('[aria-controls="sx-filters"]'), "removing the last chip returns focus to Filters");
   } finally { close(); }
 });
 
