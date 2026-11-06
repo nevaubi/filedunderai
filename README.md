@@ -36,7 +36,7 @@ flowchart TD
 - **`public/lib/evidence.js`** captures immutable records containing exact values, units, periods, source accessions, availability dates and derivation inputs. The assistant validates structured numerical claims against these records; narrative interpretation still needs review.
 - **`public/lib/analyst.js`** is shared by the browser and scheduled monitoring. It computes reported changes, exact-metric rules, thesis criteria, source-based ideas and conservative historical tests.
 - **`public/lib/workspace.js`** and **`public/pages/workspace.js`** implement document, worksheet and split views, local saved work, staged AI edits, cited model/report generation and XLSX/DOCX export.
-- **`supabase/migrations/`** contains explicit versioned migrations. Application builds do not execute SQL. `db/schema.sql` is a legacy reference, not a production migration runner. Monitoring settings/alerts have owner-scoped RLS; leases, monitoring state and the email outbox are service-only.
+- **`supabase/migrations/`** contains explicit versioned migrations. Application builds do not execute SQL. `20261104000000_production_baseline.sql` is the full public schema captured from production on 2026-11-05 (tables, constraints, indexes, views, functions, triggers, RLS, policies and API-role grants); production already contains it, so mark it applied once with `supabase migration repair --status applied 20261104000000` before any `supabase db push`. `db/schema.sql` is a legacy reference, not a production migration runner. Monitoring settings/alerts have owner-scoped RLS; leases, monitoring state and the email outbox are service-only.
 
 ## Research workspace
 
