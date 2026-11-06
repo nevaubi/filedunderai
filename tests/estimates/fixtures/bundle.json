@@ -1,0 +1,1030 @@
+{
+"ticker": "AAPL",
+"name": "Apple",
+"version": 1,
+"generated": "2026-11-06T04:00:00Z",
+"today": "2026-11-05",
+"attribution": {
+"benzinga": "Powered by Benzinga Data",
+"yahoo": "Consensus estimates from Yahoo Finance (third-party, not from company filings)"
+},
+"sources": {
+"benzinga": {
+"retrieved_at": "2026-11-06T03:00:00Z"
+}
+},
+"price": {
+"close": 331.9,
+"date": "2026-11-03",
+"source": "prices/AAPL.json"
+},
+"consensus": {
+"provider": "Yahoo Finance",
+"symbol": "AAPL",
+"name": "Apple Inc.",
+"url": "https://finance.yahoo.com/quote/AAPL/analysis/",
+"as_of": "2026-11-06T03:47:41Z",
+"periods": [
+{
+"code": "0q",
+"label": "Current quarter",
+"end": "2026-12-31",
+"eps": {
+"avg": 2.90354,
+"low": 2.87,
+"high": 2.94202,
+"n": 26.0,
+"year_ago": 1.85
+},
+"revenue": {
+"avg": 155568783890.0,
+"low": 138455000000.0,
+"high": 159565000000.0,
+"n": 15.0,
+"year_ago": 143756000000.0
+},
+"growth": 0.5689,
+"end_provider": "2026-09-30",
+"end_fixed": "provider end was an already reported quarter"
+},
+{
+"code": "+1q",
+"label": "Next quarter",
+"end": "2027-03-31",
+"eps": {
+"avg": 2.15241,
+"low": 1.87,
+"high": 2.48998,
+"n": 16.0,
+"year_ago": 2.01
+},
+"revenue": {
+"avg": 124937339510.0,
+"low": 110770000000.0,
+"high": 142811158840.0,
+"n": 15.0,
+"year_ago": 111184000000.0
+},
+"growth": 0.065799996
+},
+{
+"code": "0y",
+"label": "Current fiscal year",
+"end": "2027-09-30",
+"eps": {
+"avg": 9.44849,
+"low": 8.87,
+"high": 9.94337,
+"n": 38.0,
+"year_ago": 7.46
+},
+"revenue": {
+"avg": 477708596770.0,
+"low": 476002000000.0,
+"high": 484000000000.0,
+"n": 36.0,
+"year_ago": 416161000000.0
+},
+"growth": 0.2666
+},
+{
+"code": "+1y",
+"label": "Next fiscal year",
+"end": "2028-09-30",
+"eps": {
+"avg": 10.571,
+"low": 8.57,
+"high": 11.61414,
+"n": 28.0,
+"year_ago": 8.83814
+},
+"revenue": {
+"avg": 570058709710.0,
+"low": 492192000000.0,
+"high": 637905000000.0,
+"n": 26.0,
+"year_ago": 526938759100.0
+},
+"growth": 0.127,
+"end_provider": "2027-09-30",
+"end_fixed": "provider end repeated the current fiscal year"
+}
+],
+"history": [
+{
+"quarter_end": "2025-09-30",
+"eps_actual": 1.85,
+"eps_estimate": 1.77112,
+"eps_difference": 0.08,
+"surprise_pct": 0.044499997,
+"currency": "USD"
+},
+{
+"quarter_end": "2025-12-31",
+"eps_actual": 2.84,
+"eps_estimate": 2.6708,
+"eps_difference": 0.17,
+"surprise_pct": 0.0634,
+"currency": "USD"
+},
+{
+"quarter_end": "2026-03-31",
+"eps_actual": 2.01,
+"eps_estimate": 1.94275,
+"eps_difference": 0.07,
+"surprise_pct": 0.0346,
+"currency": "USD"
+},
+{
+"quarter_end": "2026-06-30",
+"eps_actual": 2.02,
+"eps_estimate": 1.89243,
+"eps_difference": 0.13,
+"surprise_pct": 0.0674,
+"currency": "USD"
+},
+{
+"quarter_end": "2026-09-30",
+"eps_actual": 2.1,
+"eps_estimate": 1.98579,
+"eps_difference": 0.11,
+"surprise_pct": 0.0575,
+"currency": "USD"
+}
+],
+"next_earnings": {
+"date": "2027-01-28",
+"is_estimate": true,
+"window_end": null,
+"call_date": "2026-11-02",
+"eps": {
+"avg": 2.90255,
+"low": 2.87,
+"high": 2.94202
+},
+"revenue": {
+"avg": 155568783890.0,
+"low": 138455000000.0,
+"high": 159565000000.0
+}
+}
+},
+"snapshots": [
+{
+"as_of": "2026-11-06",
+"at": "2026-11-06T03:47:41Z",
+"p": {
+"0q": {
+"end": "2026-12-31",
+"eps": 2.90354,
+"eps_n": 26.0,
+"eps_lo": 2.87,
+"eps_hi": 2.94202,
+"rev": 155568783890.0,
+"rev_n": 15.0
+},
+"+1q": {
+"end": "2027-03-31",
+"eps": 2.15241,
+"eps_n": 16.0,
+"eps_lo": 1.87,
+"eps_hi": 2.48998,
+"rev": 124937339510.0,
+"rev_n": 15.0
+},
+"0y": {
+"end": "2027-09-30",
+"eps": 9.44849,
+"eps_n": 38.0,
+"eps_lo": 8.87,
+"eps_hi": 9.94337,
+"rev": 477708596770.0,
+"rev_n": 36.0
+},
+"+1y": {
+"end": "2028-09-30",
+"eps": 10.571,
+"eps_n": 28.0,
+"eps_lo": 8.57,
+"eps_hi": 11.61414,
+"rev": 570058709710.0,
+"rev_n": 26.0
+}
+}
+}
+],
+"revisions": {
+"0q": {
+"7": null,
+"30": null,
+"60": null,
+"90": null
+},
+"+1q": {
+"7": null,
+"30": null,
+"60": null,
+"90": null
+},
+"0y": {
+"7": null,
+"30": null,
+"60": null,
+"90": null
+},
+"+1y": {
+"7": null,
+"30": null,
+"60": null,
+"90": null
+}
+},
+"surprises": [
+{
+"quarter_end": "2025-09-30",
+"eps_actual": 1.85,
+"eps_estimate": 1.77112,
+"eps_difference": 0.08,
+"surprise_pct": 0.044499997,
+"currency": "USD",
+"basis": "provider",
+"provider": "Yahoo Finance",
+"beat": 1,
+"gaap_eps": null,
+"revenue": null,
+"report": null,
+"reaction": null
+},
+{
+"quarter_end": "2025-12-31",
+"eps_actual": 2.84,
+"eps_estimate": 2.6708,
+"eps_difference": 0.17,
+"surprise_pct": 0.0634,
+"currency": "USD",
+"basis": "provider",
+"provider": "Yahoo Finance",
+"beat": 1,
+"gaap_eps": null,
+"revenue": null,
+"report": null,
+"reaction": null
+},
+{
+"quarter_end": "2026-03-31",
+"eps_actual": 2.01,
+"eps_estimate": 1.94275,
+"eps_difference": 0.07,
+"surprise_pct": 0.0346,
+"currency": "USD",
+"basis": "provider",
+"provider": "Yahoo Finance",
+"beat": 1,
+"gaap_eps": null,
+"revenue": null,
+"report": null,
+"reaction": null
+},
+{
+"quarter_end": "2026-06-30",
+"eps_actual": 2.02,
+"eps_estimate": 1.89243,
+"eps_difference": 0.13,
+"surprise_pct": 0.0674,
+"currency": "USD",
+"basis": "provider",
+"provider": "Yahoo Finance",
+"beat": 1,
+"gaap_eps": {
+"v": 2.02,
+"end": "2026-06-27",
+"form": "10-Q",
+"filed": "2026-07-31",
+"accn": "0000320193-26-000020",
+"url": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000020/",
+"derived": false
+},
+"revenue": null,
+"report": {
+"filed": "2026-07-30",
+"accn": "0000320193-26-000018",
+"url": "https://sec.example/8k-q3"
+},
+"reaction": {
+"date": "2026-07-31",
+"prev_date": "2026-07-30",
+"r1": 0.020000000000000018,
+"spy1": null,
+"close": 216.24,
+"prev_close": 212.0
+}
+},
+{
+"quarter_end": "2026-09-30",
+"eps_actual": 2.1,
+"eps_estimate": 1.98579,
+"eps_difference": 0.11,
+"surprise_pct": 0.0575,
+"currency": "USD",
+"basis": "provider",
+"provider": "Yahoo Finance",
+"beat": 1,
+"gaap_eps": null,
+"revenue": {
+"v": 114477000000,
+"end": "2026-09-26",
+"form": "10-K",
+"filed": "2026-11-03",
+"accn": "0000320193-26-000026",
+"url": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/",
+"derived": false
+},
+"report": {
+"filed": "2026-11-02",
+"accn": "0000320193-26-000024",
+"url": "https://sec.example/8k-q4"
+},
+"reaction": {
+"date": "2026-11-03",
+"prev_date": "2026-11-02",
+"r1": -0.018976117285410266,
+"spy1": null,
+"close": 331.9,
+"prev_close": 338.32
+}
+}
+],
+"revenue_surprises": [],
+"actions": [
+{
+"id": "6aec46a9b2012098b24ce0f1",
+"date": "2026-11-04",
+"time": "04:04:41",
+"ticker": "AAPL",
+"firm": "Bernstein",
+"firm_id": "6065d4f295bdbc00011d7b9d",
+"analyst": "Mark Newman",
+"analyst_id": "5f0ede7199d25a0001e079e5",
+"action": "Maintains",
+"action_pt": "Raises",
+"rating_prior": "Buy",
+"rating_current": "Buy",
+"pt_prior": 370.0,
+"pt_current": 380.0,
+"pt_prior_printed": "370.0000",
+"pt_current_printed": "380.0000",
+"adj_pt_prior": 370.0,
+"adj_pt_current": 380.0,
+"currency": "USD",
+"importance": 5,
+"notes": null,
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings",
+"url_news": "https://www.benzinga.com/stock-articles/AAPL/analyst-ratings",
+"updated": 1793869515
+},
+{
+"id": "6aea250c2962ad2b06f79910",
+"date": "2026-11-03",
+"time": "13:16:44",
+"ticker": "AAPL",
+"firm": "JP Morgan",
+"firm_id": "57f832a96b87f600016fa34c",
+"analyst": "Samik Chatterjee",
+"analyst_id": "58ac4af2b85e930001e6383f",
+"action": "Maintains",
+"action_pt": "Lowers",
+"rating_prior": "Overweight",
+"rating_current": "Overweight",
+"pt_prior": 360.0,
+"pt_current": 355.0,
+"pt_prior_printed": "360.00",
+"pt_current_printed": "355.0000",
+"adj_pt_prior": 360.0,
+"adj_pt_current": 355.0,
+"currency": "USD",
+"importance": 5,
+"notes": null,
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings",
+"url_news": "https://www.benzinga.com/stock-articles/AAPL/analyst-ratings",
+"updated": 1793729823
+},
+{
+"id": "6aea026a2962ad2b06f777ea",
+"date": "2026-11-03",
+"time": "10:48:58",
+"ticker": "AAPL",
+"firm": "UBS",
+"firm_id": "6065c3e6a93f970001f2c6ab",
+"analyst": "David Vogt",
+"analyst_id": "60644e9560c58c0001cd5c0a",
+"action": "Maintains",
+"action_pt": "Raises",
+"rating_prior": "Neutral",
+"rating_current": "Neutral",
+"pt_prior": 296.0,
+"pt_current": 340.0,
+"pt_prior_printed": "296.00",
+"pt_current_printed": "340.0000",
+"adj_pt_prior": 296.0,
+"adj_pt_current": 340.0,
+"currency": "USD",
+"importance": 5,
+"notes": null,
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings",
+"url_news": "https://www.benzinga.com/stock-articles/AAPL/analyst-ratings",
+"updated": 1793720960
+},
+{
+"id": "6ae9ece442a21a330e8740f7",
+"date": "2026-11-03",
+"time": "09:17:08",
+"ticker": "AAPL",
+"firm": "Argus Research",
+"firm_id": "57f832aa6b87f600016fa36a",
+"analyst": "Jim Kelleher",
+"analyst_id": "58d52968b85e930001416e52",
+"action": "Maintains",
+"action_pt": "Raises",
+"rating_prior": "Buy",
+"rating_current": "Buy",
+"pt_prior": 375.0,
+"pt_current": 400.0,
+"pt_prior_printed": "375.0000",
+"pt_current_printed": "400.0000",
+"adj_pt_prior": 375.0,
+"adj_pt_current": 400.0,
+"currency": "USD",
+"importance": 5,
+"notes": null,
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings",
+"url_news": "https://www.benzinga.com/stock-articles/AAPL/analyst-ratings",
+"updated": 1793715469
+},
+{
+"id": "6ae9ebbb2962ad2b06f75638",
+"date": "2026-11-03",
+"time": "09:12:11",
+"ticker": "AAPL",
+"firm": "Barclays",
+"firm_id": "6065cc39a93f970001f2c9aa",
+"analyst": "Tim Long",
+"analyst_id": "586e4055351b9b00018beea7",
+"action": "Maintains",
+"action_pt": "Raises",
+"rating_prior": "Underweight",
+"rating_current": "Underweight",
+"pt_prior": 245.0,
+"pt_current": 261.0,
+"pt_prior_printed": "245.00",
+"pt_current_printed": "261.0000",
+"adj_pt_prior": 245.0,
+"adj_pt_current": 261.0,
+"currency": "USD",
+"importance": 5,
+"notes": null,
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings",
+"url_news": "https://www.benzinga.com/stock-articles/AAPL/analyst-ratings",
+"updated": 1793715171
+},
+{
+"id": "6ae9eb0742a21a330e8740b9",
+"date": "2026-11-03",
+"time": "09:09:11",
+"ticker": "AAPL",
+"firm": "TD Cowen",
+"firm_id": "57f832aa6b87f600016fa359",
+"analyst": "Krish Sankar",
+"analyst_id": "5909e5c2290fa700012c0332",
+"action": "Maintains",
+"action_pt": "Lowers",
+"rating_prior": "Buy",
+"rating_current": "Buy",
+"pt_prior": 400.0,
+"pt_current": 390.0,
+"pt_prior_printed": "400.00",
+"pt_current_printed": "390.0000",
+"adj_pt_prior": 400.0,
+"adj_pt_current": 390.0,
+"currency": "USD",
+"importance": 5,
+"notes": null,
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings",
+"url_news": "https://www.benzinga.com/stock-articles/AAPL/analyst-ratings",
+"updated": 1793714989
+},
+{
+"id": "6ad73891d20ad83d41b074e2",
+"date": "2026-10-20",
+"time": "05:46:57",
+"ticker": "AAPL",
+"firm": "Loop Capital",
+"firm_id": "57f832c46b87f600016fa412",
+"analyst": "Ananda Baruah",
+"analyst_id": "57fdfca0ac6af40001334e49",
+"action": "Downgrades",
+"action_pt": "Lowers",
+"rating_prior": "Buy",
+"rating_current": "Hold",
+"pt_prior": 370.0,
+"pt_current": 330.0,
+"pt_prior_printed": "370.0000",
+"pt_current_printed": "330.0000",
+"adj_pt_prior": 370.0,
+"adj_pt_current": 330.0,
+"currency": "USD",
+"importance": 5,
+"notes": null,
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings",
+"url_news": "https://www.benzinga.com/stock-articles/AAPL/analyst-ratings",
+"updated": 1792499631
+},
+{
+"id": "6a8df91f6761a80001d0c73c",
+"date": "2026-08-17",
+"time": "16:20:47",
+"ticker": "AAPL",
+"firm": "Rothschild & Co",
+"firm_id": "66276392fb6e4e0001cfadcb",
+"analyst": "Timm Schulze-Melander",
+"analyst_id": "650965ca37008a000146226a",
+"action": "Upgrades",
+"action_pt": "Raises",
+"rating_prior": "Neutral",
+"rating_current": "Buy",
+"pt_prior": 260.0,
+"pt_current": 400.0,
+"pt_prior_printed": "260.0000",
+"pt_current_printed": "400.0000",
+"adj_pt_prior": 260.0,
+"adj_pt_current": 400.0,
+"currency": "USD",
+"importance": 5,
+"notes": null,
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings",
+"url_news": "https://www.benzinga.com/stock-articles/AAPL/analyst-ratings",
+"updated": 1787689519
+},
+{
+"id": "6a79c62d3cec6c00014bc3e9",
+"date": "2026-08-10",
+"time": "08:38:05",
+"ticker": "AAPL",
+"firm": "Jefferies",
+"firm_id": "6065ca27a93f970001f2c7fe",
+"analyst": "Edison Lee",
+"analyst_id": "604632e6e74cfd0001ed79ca",
+"action": "Downgrades",
+"action_pt": "Lowers",
+"rating_prior": "Hold",
+"rating_current": "Underperform",
+"pt_prior": 285.56,
+"pt_current": 263.66,
+"pt_prior_printed": "285.5600",
+"pt_current_printed": "263.6600",
+"adj_pt_prior": 285.56,
+"adj_pt_current": 263.66,
+"currency": "USD",
+"importance": 5,
+"notes": null,
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings",
+"url_news": "https://www.benzinga.com/stock-articles/AAPL/analyst-ratings",
+"updated": 1786365539
+}
+],
+"targets": {
+"since": "2025-11-05",
+"rows": [
+{
+"id": "6ae9ece442a21a330e8740f7",
+"date": "2026-11-03",
+"firm": "Argus Research",
+"firm_id": "57f832aa6b87f600016fa36a",
+"analyst": "Jim Kelleher",
+"analyst_id": "58d52968b85e930001416e52",
+"pt": 400.0,
+"pt_printed": "400.0000",
+"adjusted": false,
+"rating": "Buy",
+"bucket": "buy",
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings"
+},
+{
+"id": "6a8df91f6761a80001d0c73c",
+"date": "2026-08-17",
+"firm": "Rothschild & Co",
+"firm_id": "66276392fb6e4e0001cfadcb",
+"analyst": "Timm Schulze-Melander",
+"analyst_id": "650965ca37008a000146226a",
+"pt": 400.0,
+"pt_printed": "400.0000",
+"adjusted": false,
+"rating": "Buy",
+"bucket": "buy",
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings"
+},
+{
+"id": "6ae9eb0742a21a330e8740b9",
+"date": "2026-11-03",
+"firm": "TD Cowen",
+"firm_id": "57f832aa6b87f600016fa359",
+"analyst": "Krish Sankar",
+"analyst_id": "5909e5c2290fa700012c0332",
+"pt": 390.0,
+"pt_printed": "390.0000",
+"adjusted": false,
+"rating": "Buy",
+"bucket": "buy",
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings"
+},
+{
+"id": "6aec46a9b2012098b24ce0f1",
+"date": "2026-11-04",
+"firm": "Bernstein",
+"firm_id": "6065d4f295bdbc00011d7b9d",
+"analyst": "Mark Newman",
+"analyst_id": "5f0ede7199d25a0001e079e5",
+"pt": 380.0,
+"pt_printed": "380.0000",
+"adjusted": false,
+"rating": "Buy",
+"bucket": "buy",
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings"
+},
+{
+"id": "6aea250c2962ad2b06f79910",
+"date": "2026-11-03",
+"firm": "JP Morgan",
+"firm_id": "57f832a96b87f600016fa34c",
+"analyst": "Samik Chatterjee",
+"analyst_id": "58ac4af2b85e930001e6383f",
+"pt": 355.0,
+"pt_printed": "355.0000",
+"adjusted": false,
+"rating": "Overweight",
+"bucket": "buy",
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings"
+},
+{
+"id": "6aea026a2962ad2b06f777ea",
+"date": "2026-11-03",
+"firm": "UBS",
+"firm_id": "6065c3e6a93f970001f2c6ab",
+"analyst": "David Vogt",
+"analyst_id": "60644e9560c58c0001cd5c0a",
+"pt": 340.0,
+"pt_printed": "340.0000",
+"adjusted": false,
+"rating": "Neutral",
+"bucket": "hold",
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings"
+},
+{
+"id": "6ad73891d20ad83d41b074e2",
+"date": "2026-10-20",
+"firm": "Loop Capital",
+"firm_id": "57f832c46b87f600016fa412",
+"analyst": "Ananda Baruah",
+"analyst_id": "57fdfca0ac6af40001334e49",
+"pt": 330.0,
+"pt_printed": "330.0000",
+"adjusted": false,
+"rating": "Hold",
+"bucket": "hold",
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings"
+},
+{
+"id": "6a79c62d3cec6c00014bc3e9",
+"date": "2026-08-10",
+"firm": "Jefferies",
+"firm_id": "6065ca27a93f970001f2c7fe",
+"analyst": "Edison Lee",
+"analyst_id": "604632e6e74cfd0001ed79ca",
+"pt": 263.66,
+"pt_printed": "263.6600",
+"adjusted": false,
+"rating": "Underperform",
+"bucket": "sell",
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings"
+},
+{
+"id": "6ae9ebbb2962ad2b06f75638",
+"date": "2026-11-03",
+"firm": "Barclays",
+"firm_id": "6065cc39a93f970001f2c9aa",
+"analyst": "Tim Long",
+"analyst_id": "586e4055351b9b00018beea7",
+"pt": 261.0,
+"pt_printed": "261.0000",
+"adjusted": false,
+"rating": "Underweight",
+"bucket": "sell",
+"url": "https://www.benzinga.com/quote/AAPL/analyst-ratings"
+}
+],
+"stats": {
+"n": 9,
+"mean": 346.62888888888887,
+"median": 355.0,
+"high": 400.0,
+"low": 261.0,
+"upside_mean": 0.04437748987312107,
+"upside_median": 0.06959927689062972
+}
+},
+"ratings": {
+"since": "2025-11-05",
+"counts": {
+"buy": 5,
+"hold": 2,
+"sell": 2,
+"other": 0
+},
+"n": 9,
+"firms": [
+{
+"id": "6aec46a9b2012098b24ce0f1",
+"firm": "Bernstein",
+"firm_id": "6065d4f295bdbc00011d7b9d",
+"rating": "Buy",
+"bucket": "buy",
+"date": "2026-11-04"
+},
+{
+"id": "6aea250c2962ad2b06f79910",
+"firm": "JP Morgan",
+"firm_id": "57f832a96b87f600016fa34c",
+"rating": "Overweight",
+"bucket": "buy",
+"date": "2026-11-03"
+},
+{
+"id": "6aea026a2962ad2b06f777ea",
+"firm": "UBS",
+"firm_id": "6065c3e6a93f970001f2c6ab",
+"rating": "Neutral",
+"bucket": "hold",
+"date": "2026-11-03"
+},
+{
+"id": "6ae9ece442a21a330e8740f7",
+"firm": "Argus Research",
+"firm_id": "57f832aa6b87f600016fa36a",
+"rating": "Buy",
+"bucket": "buy",
+"date": "2026-11-03"
+},
+{
+"id": "6ae9ebbb2962ad2b06f75638",
+"firm": "Barclays",
+"firm_id": "6065cc39a93f970001f2c9aa",
+"rating": "Underweight",
+"bucket": "sell",
+"date": "2026-11-03"
+},
+{
+"id": "6ae9eb0742a21a330e8740b9",
+"firm": "TD Cowen",
+"firm_id": "57f832aa6b87f600016fa359",
+"rating": "Buy",
+"bucket": "buy",
+"date": "2026-11-03"
+},
+{
+"id": "6ad73891d20ad83d41b074e2",
+"firm": "Loop Capital",
+"firm_id": "57f832c46b87f600016fa412",
+"rating": "Hold",
+"bucket": "hold",
+"date": "2026-10-20"
+},
+{
+"id": "6a8df91f6761a80001d0c73c",
+"firm": "Rothschild & Co",
+"firm_id": "66276392fb6e4e0001cfadcb",
+"rating": "Buy",
+"bucket": "buy",
+"date": "2026-08-17"
+},
+{
+"id": "6a79c62d3cec6c00014bc3e9",
+"firm": "Jefferies",
+"firm_id": "6065ca27a93f970001f2c7fe",
+"rating": "Underperform",
+"bucket": "sell",
+"date": "2026-08-10"
+}
+]
+},
+"rating_history": [
+{
+"month": "2025-12",
+"end": "2025-12-31",
+"buy": 0,
+"hold": 0,
+"sell": 0,
+"other": 0,
+"n": 0
+},
+{
+"month": "2026-01",
+"end": "2026-01-31",
+"buy": 0,
+"hold": 0,
+"sell": 0,
+"other": 0,
+"n": 0
+},
+{
+"month": "2026-02",
+"end": "2026-02-28",
+"buy": 0,
+"hold": 0,
+"sell": 0,
+"other": 0,
+"n": 0
+},
+{
+"month": "2026-03",
+"end": "2026-03-31",
+"buy": 0,
+"hold": 0,
+"sell": 0,
+"other": 0,
+"n": 0
+},
+{
+"month": "2026-04",
+"end": "2026-04-30",
+"buy": 0,
+"hold": 0,
+"sell": 0,
+"other": 0,
+"n": 0
+},
+{
+"month": "2026-05",
+"end": "2026-05-31",
+"buy": 0,
+"hold": 0,
+"sell": 0,
+"other": 0,
+"n": 0
+},
+{
+"month": "2026-06",
+"end": "2026-06-30",
+"buy": 0,
+"hold": 0,
+"sell": 0,
+"other": 0,
+"n": 0
+},
+{
+"month": "2026-07",
+"end": "2026-07-31",
+"buy": 0,
+"hold": 0,
+"sell": 0,
+"other": 0,
+"n": 0
+},
+{
+"month": "2026-08",
+"end": "2026-08-31",
+"buy": 1,
+"hold": 0,
+"sell": 1,
+"other": 0,
+"n": 2
+},
+{
+"month": "2026-09",
+"end": "2026-09-30",
+"buy": 1,
+"hold": 0,
+"sell": 1,
+"other": 0,
+"n": 2
+},
+{
+"month": "2026-10",
+"end": "2026-10-31",
+"buy": 1,
+"hold": 1,
+"sell": 1,
+"other": 0,
+"n": 3
+},
+{
+"month": "2026-11",
+"end": "2026-11-05",
+"buy": 5,
+"hold": 2,
+"sell": 2,
+"other": 0,
+"n": 9
+}
+],
+"summary": {
+"d90": {
+"since": "2026-08-07",
+"count": 9,
+"upgrades": 1,
+"downgrades": 2,
+"initiations": 0,
+"target_raises": 5,
+"target_cuts": 4,
+"median_target_move": 0.027027027027026973
+},
+"d365": {
+"since": "2025-11-05",
+"count": 9,
+"upgrades": 1,
+"downgrades": 2,
+"initiations": 0,
+"target_raises": 5,
+"target_cuts": 4,
+"median_target_move": 0.027027027027026973
+}
+},
+"guidance": {
+"available": true,
+"generated": "x",
+"coverage": null,
+"items": [
+{
+"id": "g1",
+"series": "revenue|gaap|level|USD|",
+"metric": "revenue",
+"label": "Revenue",
+"basis": "gaap",
+"unit": "USD",
+"segment": null,
+"period": "Q1 FY27",
+"period_type": "Q",
+"period_end": "2026-12-27",
+"issued": "2026-10-30",
+"low": 138000000000.0,
+"high": 142000000000.0,
+"mid": 140000000000.0,
+"bound": null,
+"action": null,
+"withdrawn": false,
+"quote": "revenue between $138 billion and $142 billion",
+"printed": null,
+"doc": "d1",
+"page": 1,
+"method": null
+}
+],
+"docs": {
+"d1": {
+"id": "d1",
+"url": "https://sec.example/ex99.htm"
+}
+},
+"vs_consensus": [
+{
+"metric": "revenue",
+"label": "Revenue",
+"basis": "gaap",
+"period": "Q1 FY27",
+"period_end": "2026-12-27",
+"code": "0q",
+"guide_low": 138000000000.0,
+"guide_high": 142000000000.0,
+"guide_mid": 140000000000.0,
+"guide_id": "g1",
+"issued": "2026-10-30",
+"doc": "d1",
+"page": 1,
+"quote": "revenue between $138 billion and $142 billion",
+"consensus": 155568783890.0,
+"consensus_low": 138455000000.0,
+"consensus_high": 159565000000.0,
+"consensus_n": 15.0,
+"consensus_as_of": "2026-11-06T03:47:41Z",
+"gap_pct": 0.11120559921428572,
+"scale_check": true,
+"position": "above"
+}
+],
+"outcomes": [],
+"credibility": null,
+"withdrawn": []
+},
+"street_view": null,
+"coverage": {
+"consensus": true,
+"periods": 4,
+"snapshots": 1,
+"surprises": 5,
+"actions": 9,
+"actions_from": "2026-08-10",
+"actions_to": "2026-11-04",
+"firms": 9,
+"analysts": 9,
+"guidance_items": 1,
+"guidance_vs_consensus": 1
+}
+}
