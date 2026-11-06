@@ -235,15 +235,23 @@ def persist_normalized_facts(sb, ticker, rows, delete_batch_size=1):
 
 # ---------------------------------------------------------------- companies
 def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_docs=True, store_raw=True, log=print,
-                    facts_only=None, source_inputs=None, source_retrieved_at=None):
+                    facts_only=None, source_inputs=None, source_retrieved_at=None, retain_reported_conflicts=False):
+    """retain_reported_conflicts is an explicit opt-in (additive staging and the scheduled companies job): when every
+    current conflict is a reported-versus-derived disagreement, the directly reported SEC observation is published,
+    each disagreement stays attached to its point (selection_conflict) and a warning records the count. Two reported
+    observations that disagree on value or period still block publication, as do the separate replacement gates."""
     u = BY_TICKER[tk]
     cik = u["cik"]
     # Newly onboarded issuers retain strict provenance on subsequent scheduled runs.
     facts_only = tk in {t for t, *_ in ADDITIONAL_LIST} if facts_only is None else facts_only
     if facts_only and not store_raw:
         raise ValueError("Facts-only imports require immutable source archiving")
-    if facts_only and (refresh_news or refresh_summary):
+    # Archived-source imports (explicit source_inputs) never call providers. Scheduled facts-only refreshes keep
+    # strict financial provenance but may add news and the AI summary, which are separate, labeled enrichment.
+    staged_import = source_inputs is not None
+    if facts_only and staged_import and (refresh_news or refresh_summary):
         raise ValueError("Facts-only imports cannot request provider enrichment")
+    enrich = not facts_only or not staged_import
     warnings = []
     def warn(message):
         warnings.append(message.strip())
@@ -280,7 +288,11 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
         raise ValueError("No usable statement facts; preserving prior company bundle")
     comparability = comparability_review(statements)
     if comparability['current_conflicts']:
-        raise ValueError(f"{len(comparability['current_conflicts'])} reported/derived source conflicts require comparability review; preserving prior financial publication")
+        ambiguous = [c for c in comparability['current_conflicts'] if c['reason'] == 'reported_period_or_value_ambiguity']
+        if not retain_reported_conflicts or ambiguous:
+            raise ValueError(f"{len(comparability['current_conflicts'])} reported/derived source conflicts require comparability review; preserving prior financial publication")
+        warn(f"{len(comparability['current_conflicts'])} current reported/derived disagreements retained for comparability review; "
+             "published values are the directly reported SEC observations and each alternative stays on its point (selection_conflict).")
     digest = hashlib.sha256(original).hexdigest()
     provenance = None
     if facts_only:
@@ -359,7 +371,7 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
             warn(f"  {tk} release failed: {str(e)[:160]}")
 
     coverage = prev.get("news") or {}
-    if not facts_only and (refresh_news or not coverage.get("items")):
+    if enrich and (refresh_news or not coverage.get("items")):
         try:
             coverage = {"items": news.company_news(u["name"], tk), "fetched_at": now_iso()}
         except Exception as e:
@@ -367,7 +379,7 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
 
     summary = prev.get("summary")
     release_changed = (release or {}).get("accn") != ((prev.get("release") or {}).get("accn"))
-    if not facts_only and (refresh_summary or not summary or release_changed or refresh_news):
+    if enrich and (refresh_summary or not summary or release_changed or refresh_news):
         try:
             summary = summaries.company(u["name"], tk, statements, prof["fiscalYearEnd"], (release or {}).get("markdown"), coverage.get("items", []))
         except Exception as e:
@@ -521,7 +533,8 @@ def companies_job(sb, tickers=None, workers=4, refresh_news=False, refresh_summa
             if time_budget and time.time() - t0 > time_budget:
                 return tk, None, "skipped: time budget"
             try:
-                return tk, process_company(sb, tk, refresh_news=refresh_news, refresh_summary=refresh_summary, fetch_docs=fetch_docs, facts_only=facts_only), None
+                return tk, process_company(sb, tk, refresh_news=refresh_news, refresh_summary=refresh_summary, fetch_docs=fetch_docs,
+                                           facts_only=facts_only, retain_reported_conflicts=True), None
             except Exception as e:
                 return tk, None, str(e)[:300]
 
@@ -1136,9 +1149,15 @@ def _ir_rotation_job(sb, per_run, time_budget, started):
     picked_retry = retry[:max(1, per_run // 2)]
     hot = [r["ticker"] for r in recent if "2.02" in (r.get("items") or "")]
     hot = [t for t in dict.fromkeys(hot) if t in tickers and t not in picked_retry and state["done_hot"].get(t) != dt.date.today().isoformat()][:max(0, per_run - len(picked_retry))]
+    # Newly activated issuers with no IR coverage entry take up to half the remaining slots, so a cohort's first
+    # document pass finishes in days instead of one full cursor cycle. The cursor still advances only over `rest`.
+    covered = set(((_cache(sb, "meta/coverage_ir.json", {}) or {}).get("companies") or {}))
+    slots = max(0, per_run - len(hot) - len(picked_retry))
+    fresh = [t for t in tickers if t not in covered and t not in pending and t not in hot and t not in picked_retry][:slots // 2]
     start = state.get("cursor", 0) % len(tickers)
-    rest = [t for t in tickers[start:] + tickers[:start] if t not in hot and t not in picked_retry][:max(0, per_run - len(hot) - len(picked_retry))]
-    selected = picked_retry + hot + rest
+    rest = [t for t in tickers[start:] + tickers[:start]
+            if t not in hot and t not in picked_retry and t not in fresh][:max(0, slots - len(fresh))]
+    selected = picked_retry + hot + fresh + rest
     remaining = max(0, time_budget - (time.monotonic() - started)) if time_budget is not None else None
     done, failed = ir_job(sb, selected, workers=4, time_budget=remaining)
     for tk, result in done.items():

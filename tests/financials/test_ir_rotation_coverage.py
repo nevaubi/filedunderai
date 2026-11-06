@@ -77,6 +77,21 @@ class RotationCoverageReplayTests(unittest.TestCase):
                 patch.object(kpitools, 'build_index', side_effect=aggregate):
             return jobs.ir_rotation_job(store, per_run=per_run, time_budget=240)
 
+    def test_uncovered_issuers_take_half_the_open_slots_without_moving_the_cursor(self):
+        tickers = ['AAA', 'BBB', 'CCC', 'NEW1', 'NEW2', 'NEW3']
+        store = SnapshotStore(tickers[:3])
+        selected = []
+        def process(sb, chosen, **kwargs):
+            selected.extend(chosen)
+            return ({t: {'status': 'unverified', 'coverage': coverage('2026-11-02T00:00:00Z', t)} for t in chosen}, {})
+        with patch.object(jobs, 'UNIVERSE', [(t,) for t in tickers]), \
+                patch('etl.universe.UNIVERSE', [(t,) for t in tickers]), \
+                patch.object(jobs, 'ir_job', side_effect=process), \
+                patch.object(kpitools, 'build_index', return_value=None):
+            jobs.ir_rotation_job(store, per_run=4, time_budget=240)
+        self.assertEqual(selected, ['NEW1', 'NEW2', 'AAA', 'BBB'])
+        self.assertEqual(store.json['meta/ir_rotation.json']['cursor'], 2)
+
     def test_failed_aaa_aggregate_replays_with_bbb_next_rotation(self):
         tickers = ['AAA', 'BBB']; sb = SnapshotStore(tickers); calls = []
         values = {'AAA': coverage('2026-11-04T10:00:00Z', 'first'),

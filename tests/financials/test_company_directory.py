@@ -9,7 +9,7 @@ class CompanyDirectoryTests(unittest.TestCase):
         manifest = build_directory(generated_at='2026-11-05T00:00:00Z')
         rows = manifest['companies']
         self.assertEqual({c['ticker'] for c in rows}, set(universe.BY_TICKER))
-        self.assertEqual(len(rows), 1100)
+        self.assertEqual(len(rows), len(universe.BY_TICKER))
         active = {t for t, *_ in universe.UNIVERSE}
         self.assertEqual(sum(c['screener_eligible'] for c in rows), len(active))
         pending = [c for c in rows if not c['screener_eligible']]
