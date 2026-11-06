@@ -1,0 +1,2220 @@
+{
+ "schema_version": 1,
+ "cohort_id": "additional-369-mcap-2026-11-06-r1",
+ "companies": [
+  {
+   "ticker": "SPCX",
+   "cik": 1181412,
+   "name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SCCO",
+   "cik": 1001838,
+   "name": "SOUTHERN COPPER CORP/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SNOW",
+   "cik": 1640147,
+   "name": "Snowflake Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NET",
+   "cik": 1477333,
+   "name": "Cloudflare, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BAM",
+   "cik": 1937926,
+   "name": "Brookfield Asset Management Ltd.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EPD",
+   "cik": 1061219,
+   "name": "ENTERPRISE PRODUCTS PARTNERS L.P.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LNG",
+   "cik": 3570,
+   "name": "Cheniere Energy, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MSTR",
+   "cik": 1050446,
+   "name": "Strategy Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NTRA",
+   "cik": 1604821,
+   "name": "Natera, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MDLN",
+   "cik": 2046386,
+   "name": "Medline Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HEI",
+   "cik": 46619,
+   "name": "HEICO CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RKT",
+   "cik": 1805284,
+   "name": "Rocket Companies, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RPRX",
+   "cik": 1802768,
+   "name": "Royalty Pharma plc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RVMD",
+   "cik": 1628171,
+   "name": "Revolution Medicines, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RBLX",
+   "cik": 1315098,
+   "name": "Roblox Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ZS",
+   "cik": 1713683,
+   "name": "Zscaler, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SUNB",
+   "cik": 2083785,
+   "name": "Sunbelt Rentals Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UI",
+   "cik": 1511737,
+   "name": "Ubiquiti Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ALAB",
+   "cik": 1736297,
+   "name": "Astera Labs, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TW",
+   "cik": 1758730,
+   "name": "Tradeweb Markets Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CPNG",
+   "cik": 1834584,
+   "name": "Coupang, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RKLB",
+   "cik": 1819994,
+   "name": "Rocket Lab Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VG",
+   "cik": 2007855,
+   "name": "Venture Global, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FCNCA",
+   "cik": 798941,
+   "name": "FIRST CITIZENS BANCSHARES INC /DE/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ZM",
+   "cik": 1585521,
+   "name": "Zoom Communications, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FWONA",
+   "cik": 1560385,
+   "name": "Liberty Media Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MDB",
+   "cik": 1441816,
+   "name": "MongoDB, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IOT",
+   "cik": 1642896,
+   "name": "Samsara Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CRWV",
+   "cik": 1769628,
+   "name": "CoreWeave, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MKL",
+   "cik": 1096343,
+   "name": "MARKEL GROUP INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "INSM",
+   "cik": 1104506,
+   "name": "INSMED Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AFRM",
+   "cik": 1820953,
+   "name": "Affirm Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LPLA",
+   "cik": 1397911,
+   "name": "LPL Financial Holdings Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RBRK",
+   "cik": 1943896,
+   "name": "Rubrik, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SYM",
+   "cik": 1837240,
+   "name": "Symbotic Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ALNY",
+   "cik": 1178670,
+   "name": "ALNYLAM PHARMACEUTICALS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ARXS",
+   "cik": 2093536,
+   "name": "Arxis, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CRDO",
+   "cik": 1807794,
+   "name": "Credo Technology Group Holding Ltd",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SOFI",
+   "cik": 1818874,
+   "name": "SoFi Technologies, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GH",
+   "cik": 1576280,
+   "name": "Guardant Health, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PS",
+   "cik": 2026053,
+   "name": "PERSHING SQUARE INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RIVN",
+   "cik": 1874178,
+   "name": "Rivian Automotive, Inc. / DE",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CBRS",
+   "cik": 2021728,
+   "name": "Cerebras Systems Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SSNC",
+   "cik": 1402436,
+   "name": "SS&C Technologies Holdings Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TPG",
+   "cik": 1880661,
+   "name": "TPG Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CRCL",
+   "cik": 1876042,
+   "name": "Circle Internet Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "YUMC",
+   "cik": 1673358,
+   "name": "Yum China Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FTAI",
+   "cik": 1590364,
+   "name": "FTAI Aviation Ltd.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "W",
+   "cik": 1616707,
+   "name": "Wayfair Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "OWL",
+   "cik": 1823945,
+   "name": "BLUE OWL CAPITAL INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BBIO",
+   "cik": 1743881,
+   "name": "BridgeBio Pharma, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LOGI",
+   "cik": 1032975,
+   "name": "LOGITECH INTERNATIONAL S.A.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CNA",
+   "cik": 21175,
+   "name": "CNA FINANCIAL CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TEM",
+   "cik": 1717115,
+   "name": "Tempus AI, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "QXO",
+   "cik": 1236275,
+   "name": "QXO, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ASTS",
+   "cik": 1780312,
+   "name": "AST SpaceMobile, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DKNG",
+   "cik": 1883685,
+   "name": "DraftKings Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PCOR",
+   "cik": 1611052,
+   "name": "PROCORE TECHNOLOGIES, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SMMT",
+   "cik": 1599298,
+   "name": "Summit Therapeutics Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BMNR",
+   "cik": 1829311,
+   "name": "BITMINE IMMERSION TECHNOLOGIES, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CHYM",
+   "cik": 1795586,
+   "name": "Chime Financial, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UHAL",
+   "cik": 4457,
+   "name": "U-Haul Holding Co /NV/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IONQ",
+   "cik": 1824920,
+   "name": "IonQ, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GSAT",
+   "cik": 1366868,
+   "name": "Globalstar, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "KYMR",
+   "cik": 1815442,
+   "name": "Kymera Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MAIR",
+   "cik": 2098430,
+   "name": "Madison Air Solutions Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SAIL",
+   "cik": 2030781,
+   "name": "SailPoint, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "OSCR",
+   "cik": 1568651,
+   "name": "Oscar Health, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BPOP",
+   "cik": 763901,
+   "name": "POPULAR, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FIG",
+   "cik": 1579878,
+   "name": "Figma, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PCVX",
+   "cik": 1649094,
+   "name": "Vaxcyte, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LLYVA",
+   "cik": 2078416,
+   "name": "Liberty Live Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "JAN",
+   "cik": 2100805,
+   "name": "Janus Living, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HNGE",
+   "cik": 1673743,
+   "name": "Hinge Health, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SYRE",
+   "cik": 1636282,
+   "name": "Spyre Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FROG",
+   "cik": 1800667,
+   "name": "JFrog Ltd",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LINE",
+   "cik": 1868159,
+   "name": "Lineage, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CBC",
+   "cik": 2065601,
+   "name": "Central Bancompany, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ESTC",
+   "cik": 1707753,
+   "name": "Elastic N.V.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NTSK",
+   "cik": 2063196,
+   "name": "Netskope Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LEVI",
+   "cik": 94845,
+   "name": "LEVI STRAUSS & CO",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SNAP",
+   "cik": 1564408,
+   "name": "Snap Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GTLB",
+   "cik": 1653482,
+   "name": "Gitlab Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AUR",
+   "cik": 1828108,
+   "name": "Aurora Innovation, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PACS",
+   "cik": 2001184,
+   "name": "PACS Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PRMB",
+   "cik": 2042694,
+   "name": "Primo Brands Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TTAN",
+   "cik": 1638826,
+   "name": "ServiceTitan, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TWST",
+   "cik": 1581280,
+   "name": "Twist Bioscience Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "QNT",
+   "cik": 2110105,
+   "name": "Quantinuum Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BOKF",
+   "cik": 875357,
+   "name": "BOK FINANCIAL CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SFD",
+   "cik": 91388,
+   "name": "SMITHFIELD FOODS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ANDG",
+   "cik": 2065708,
+   "name": "Andersen Group Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TXG",
+   "cik": 1770787,
+   "name": "10x Genomics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CAI",
+   "cik": 2019410,
+   "name": "Caris Life Sciences, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "S",
+   "cik": 1583708,
+   "name": "SentinelOne, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ZETA",
+   "cik": 1851003,
+   "name": "Zeta Global Holdings Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PRAX",
+   "cik": 1689548,
+   "name": "Praxis Precision Medicines, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RYTM",
+   "cik": 1649904,
+   "name": "RHYTHM PHARMACEUTICALS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BLCO",
+   "cik": 1860742,
+   "name": "Bausch & Lomb Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ZG",
+   "cik": 1617640,
+   "name": "ZILLOW GROUP, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "COMP",
+   "cik": 1563190,
+   "name": "Compass, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "KNSA",
+   "cik": 1730430,
+   "name": "Kiniksa Pharmaceuticals International, plc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AXSM",
+   "cik": 1579428,
+   "name": "Axsome Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NAVN",
+   "cik": 1639723,
+   "name": "Navan, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "OMF",
+   "cik": 1584207,
+   "name": "OneMain Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IONS",
+   "cik": 874015,
+   "name": "IONIS PHARMACEUTICALS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ORKA",
+   "cik": 907654,
+   "name": "Oruka Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "XMTR",
+   "cik": 1657573,
+   "name": "Xometry, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HGTY",
+   "cik": 1840776,
+   "name": "Hagerty, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "JMKE",
+   "cik": 2127043,
+   "name": "Jersey Mike's Subs Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MIRM",
+   "cik": 1759425,
+   "name": "Mirum Pharmaceuticals, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NIQ",
+   "cik": 2054696,
+   "name": "NIQ Global Intelligence plc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IMVT",
+   "cik": 1764013,
+   "name": "Immunovant, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "KVYO",
+   "cik": 1835830,
+   "name": "Klaviyo, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CGON",
+   "cik": 1991792,
+   "name": "CG Oncology, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "KOD",
+   "cik": 1468748,
+   "name": "Kodiak Sciences Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BETA",
+   "cik": 1784570,
+   "name": "BETA Technologies, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "OCTV",
+   "cik": 2083632,
+   "name": "Octave Intelligence plc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "INGM",
+   "cik": 1897762,
+   "name": "Ingram Micro Holding Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VRNS",
+   "cik": 1361113,
+   "name": "VARONIS SYSTEMS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RIOT",
+   "cik": 1167419,
+   "name": "Riot Platforms, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SRRK",
+   "cik": 1727196,
+   "name": "Scholar Rock Holding Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HUT",
+   "cik": 1964789,
+   "name": "Hut 8 Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FPS",
+   "cik": 2080126,
+   "name": "Forgent Power Solutions, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WTM",
+   "cik": 776867,
+   "name": "WHITE MOUNTAINS INSURANCE GROUP LTD",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GRAL",
+   "cik": 1699031,
+   "name": "GRAIL, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MANE",
+   "cik": 1827635,
+   "name": "Veradermics, Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BLLN",
+   "cik": 2070849,
+   "name": "BillionToOne, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "JOBY",
+   "cik": 1819848,
+   "name": "Joby Aviation, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PAGP",
+   "cik": 1581990,
+   "name": "PLAINS GP HOLDINGS LP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BRZE",
+   "cik": 1676238,
+   "name": "Braze, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "COGT",
+   "cik": 1622229,
+   "name": "Cogent Biosciences, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MMED",
+   "cik": 2062583,
+   "name": "MiniMed Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GLXY",
+   "cik": 1859392,
+   "name": "Galaxy Digital Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WULF",
+   "cik": 1083301,
+   "name": "TERAWULF INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SITE",
+   "cik": 1650729,
+   "name": "SiteOne Landscape Supply, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MWH",
+   "cik": 2065636,
+   "name": "SOLV Energy, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MOD",
+   "cik": 67347,
+   "name": "MODINE MANUFACTURING CO",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LB",
+   "cik": 1995807,
+   "name": "LandBridge Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TVTX",
+   "cik": 1438533,
+   "name": "Travere Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DNTH",
+   "cik": 1690585,
+   "name": "Dianthus Therapeutics, Inc. /DE/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ERAS",
+   "cik": 1761918,
+   "name": "Erasca, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TFSL",
+   "cik": 1381668,
+   "name": "TFS Financial CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NNI",
+   "cik": 1258602,
+   "name": "NELNET INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CCC",
+   "cik": 1818201,
+   "name": "CCC Intelligent Solutions Holdings Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "COLD",
+   "cik": 1455863,
+   "name": "AMERICOLD REALTY TRUST",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ALH",
+   "cik": 1317685,
+   "name": "Alliance Laundry Holdings Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HTFL",
+   "cik": 1464521,
+   "name": "Heartflow, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BWIN",
+   "cik": 1781755,
+   "name": "Baldwin Insurance Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ADPT",
+   "cik": 1478320,
+   "name": "Adaptive Biotechnologies Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "APLD",
+   "cik": 1144879,
+   "name": "Applied Digital Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IRTC",
+   "cik": 1388658,
+   "name": "iRhythm Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EWTX",
+   "cik": 1710072,
+   "name": "Edgewise Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PAY",
+   "cik": 1841156,
+   "name": "Paymentus Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PL",
+   "cik": 1836833,
+   "name": "Planet Labs PBC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DFTX",
+   "cik": 1813814,
+   "name": "Definium Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EE",
+   "cik": 1888447,
+   "name": "Excelerate Energy, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CDNA",
+   "cik": 1217234,
+   "name": "CareDx, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AAOI",
+   "cik": 1158114,
+   "name": "APPLIED OPTOELECTRONICS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MGNI",
+   "cik": 1595974,
+   "name": "MAGNITE, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HESM",
+   "cik": 1789832,
+   "name": "Hess Midstream LP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "APPN",
+   "cik": 1441683,
+   "name": "APPIAN CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NP",
+   "cik": 2067129,
+   "name": "Neptune Insurance Holdings Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GPGI",
+   "cik": 1823144,
+   "name": "GPGI, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CLMT",
+   "cik": 2013745,
+   "name": "Calumet, Inc. /DE",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PLSE",
+   "cik": 1625101,
+   "name": "PULSE BIOSCIENCES, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RLAY",
+   "cik": 1812364,
+   "name": "Relay Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "XE",
+   "cik": 2088896,
+   "name": "X-Energy, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CORZ",
+   "cik": 1839341,
+   "name": "Core Scientific, Inc./tx",
+   "currency": "USD"
+  },
+  {
+   "ticker": "OKLO",
+   "cik": 1849056,
+   "name": "Oklo Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MSGE",
+   "cik": 1952073,
+   "name": "Madison Square Garden Entertainment Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BATRA",
+   "cik": 1958140,
+   "name": "Atlanta Braves Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TNGX",
+   "cik": 1819133,
+   "name": "Tango Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IRON",
+   "cik": 1816736,
+   "name": "Disc Medicine, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IOVA",
+   "cik": 1425205,
+   "name": "IOVANCE BIOTHERAPEUTICS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AMLX",
+   "cik": 1658551,
+   "name": "Amylyx Pharmaceuticals, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EQPT",
+   "cik": 1693736,
+   "name": "EquipmentShare.com Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PFSI",
+   "cik": 1745916,
+   "name": "PennyMac Financial Services, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "QBTS",
+   "cik": 1907982,
+   "name": "D-Wave Quantum Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MIAX",
+   "cik": 1438472,
+   "name": "MIAMI INTERNATIONAL HOLDINGS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PBLS",
+   "cik": 1657677,
+   "name": "Parabilis Medicines, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "INTA",
+   "cik": 1565687,
+   "name": "Intapp, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TARS",
+   "cik": 1819790,
+   "name": "Tarsus Pharmaceuticals, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VKTX",
+   "cik": 1607678,
+   "name": "Viking Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RGTI",
+   "cik": 1838359,
+   "name": "Rigetti Computing, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FIGS",
+   "cik": 1846576,
+   "name": "FIGS, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ELVN",
+   "cik": 1672619,
+   "name": "Enliven Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SEB",
+   "cik": 88121,
+   "name": "SEABOARD CORP /DE/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DYN",
+   "cik": 1818794,
+   "name": "Dyne Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VRDN",
+   "cik": 1590750,
+   "name": "Viridian Therapeutics, Inc.\\DE",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MCHB",
+   "cik": 1518715,
+   "name": "Mechanics Bancorp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LMND",
+   "cik": 1691421,
+   "name": "Lemonade, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DNLI",
+   "cik": 1714899,
+   "name": "Denali Therapeutics Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CELC",
+   "cik": 1603454,
+   "name": "Celcuity Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SLDE",
+   "cik": 1886428,
+   "name": "Slide Insurance Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VIA",
+   "cik": 1603015,
+   "name": "Via Transportation, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TNET",
+   "cik": 937098,
+   "name": "TRINET GROUP, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PTRN",
+   "cik": 1811935,
+   "name": "Pattern Group Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SGRY",
+   "cik": 1638833,
+   "name": "Surgery Partners, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ACHR",
+   "cik": 1824502,
+   "name": "Archer Aviation Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "XXI",
+   "cik": 2070457,
+   "name": "Twenty One Capital, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AVAH",
+   "cik": 1832332,
+   "name": "Aveanna Healthcare Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WBI",
+   "cik": 2064947,
+   "name": "WaterBridge Infrastructure LLC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IDYA",
+   "cik": 1676725,
+   "name": "IDEAYA Biosciences, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CLBK",
+   "cik": 2115119,
+   "name": "Columbia Financial, Inc./MD/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AXGN",
+   "cik": 805928,
+   "name": "Axogen, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LFTO",
+   "cik": 1850351,
+   "name": "Liftoff Mobile, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VERX",
+   "cik": 1806837,
+   "name": "Vertex, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SKWD",
+   "cik": 1519449,
+   "name": "Skyward Specialty Insurance Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DX",
+   "cik": 826675,
+   "name": "DYNEX CAPITAL INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "USAR",
+   "cik": 1970622,
+   "name": "USA Rare Earth, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AMC",
+   "cik": 1411579,
+   "name": "AMC ENTERTAINMENT HOLDINGS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LCLN",
+   "cik": 1925283,
+   "name": "Lincoln International, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LGN",
+   "cik": 2052568,
+   "name": "Legence Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AD",
+   "cik": 821130,
+   "name": "ARRAY DIGITAL INFRASTRUCTURE, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PRCH",
+   "cik": 1784535,
+   "name": "Porch Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BEAM",
+   "cik": 1745999,
+   "name": "Beam Therapeutics Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ONDS",
+   "cik": 1646188,
+   "name": "Ondas Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ASST",
+   "cik": 1920406,
+   "name": "Strive, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UWMC",
+   "cik": 1783398,
+   "name": "UWM Holdings Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BKD",
+   "cik": 1332349,
+   "name": "Brookdale Senior Living Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FLYW",
+   "cik": 1580560,
+   "name": "Flywire Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FRME",
+   "cik": 712534,
+   "name": "FIRST MERCHANTS CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ASAN",
+   "cik": 1477720,
+   "name": "Asana, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FLY",
+   "cik": 1860160,
+   "name": "Firefly Aerospace Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "QS",
+   "cik": 1811414,
+   "name": "QuantumScape Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CIFR",
+   "cik": 1819989,
+   "name": "Cipher Digital Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GCMG",
+   "cik": 1819796,
+   "name": "GCM Grosvenor Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GRDN",
+   "cik": 1802255,
+   "name": "Guardian Pharmacy Services, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BOBS",
+   "cik": 2085187,
+   "name": "Bob's Discount Furniture, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FSLY",
+   "cik": 1517413,
+   "name": "Fastly, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PVLA",
+   "cik": 1583648,
+   "name": "PALVELLA THERAPEUTICS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NCNO",
+   "cik": 1902733,
+   "name": "nCino, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SYBT",
+   "cik": 835324,
+   "name": "Stock Yards Bancorp, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IOND",
+   "cik": 2007691,
+   "name": "Ionic Digital Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PURR",
+   "cik": 2078856,
+   "name": "Hyperliquid Strategies Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AMBA",
+   "cik": 1280263,
+   "name": "AMBARELLA INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EROK",
+   "cik": 2104882,
+   "name": "EagleRock Land, LLC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "STUB",
+   "cik": 1337634,
+   "name": "StubHub Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BUSE",
+   "cik": 314489,
+   "name": "FIRST BUSEY CORP /NV/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CLOV",
+   "cik": 1801170,
+   "name": "CLOVER HEALTH INVESTMENTS, CORP. /DE",
+   "currency": "USD"
+  },
+  {
+   "ticker": "XERS",
+   "cik": 1867096,
+   "name": "Xeris Biopharma Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MBX",
+   "cik": 1776111,
+   "name": "MBX Biosciences, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RUM",
+   "cik": 1830081,
+   "name": "RUM Group Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FRVO",
+   "cik": 1853868,
+   "name": "Fervo Energy Co",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CSQR",
+   "cik": 2105398,
+   "name": "Csquare, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ATRO",
+   "cik": 8063,
+   "name": "ASTRONICS CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GCT",
+   "cik": 1857816,
+   "name": "GigaCloud Technology Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WTTR",
+   "cik": 1693256,
+   "name": "Select Water Solutions, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "OUST",
+   "cik": 1816581,
+   "name": "Ouster, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ARDT",
+   "cik": 1756655,
+   "name": "Ardent Health, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BELFA",
+   "cik": 729580,
+   "name": "BEL FUSE INC /NJ",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CLDX",
+   "cik": 744218,
+   "name": "Celldex Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EFSC",
+   "cik": 1025835,
+   "name": "ENTERPRISE FINANCIAL SERVICES CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SEPN",
+   "cik": 1984086,
+   "name": "Septerna, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UPST",
+   "cik": 1647639,
+   "name": "Upstart Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RXRX",
+   "cik": 1601830,
+   "name": "RECURSION PHARMACEUTICALS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VERA",
+   "cik": 1831828,
+   "name": "Vera Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MH",
+   "cik": 1951070,
+   "name": "McGraw Hill, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NMRK",
+   "cik": 1690680,
+   "name": "NEWMARK GROUP, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AGM",
+   "cik": 845877,
+   "name": "FEDERAL AGRICULTURAL MORTGAGE CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "COAG",
+   "cik": 2114044,
+   "name": "Hemab Therapeutics Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IMNM",
+   "cik": 1472012,
+   "name": "Immunome Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SMA",
+   "cik": 1585389,
+   "name": "SmartStop Self Storage REIT, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NVTS",
+   "cik": 1821769,
+   "name": "Navitas Semiconductor Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LIFE",
+   "cik": 1788451,
+   "name": "Ethos Technologies Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TRLV",
+   "cik": 1754195,
+   "name": "Trulieve Cannabis Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TIC",
+   "cik": 2032966,
+   "name": "TIC Solutions, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SRCE",
+   "cik": 34782,
+   "name": "1ST SOURCE CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BHVN",
+   "cik": 1935979,
+   "name": "Biohaven Ltd.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LIND",
+   "cik": 1512499,
+   "name": "LINDBLAD EXPEDITIONS HOLDINGS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UTZ",
+   "cik": 1739566,
+   "name": "Utz Brands, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SPB",
+   "cik": 109177,
+   "name": "Spectrum Brands Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IDT",
+   "cik": 1005731,
+   "name": "IDT CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ZYME",
+   "cik": 1937653,
+   "name": "Zymeworks Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AMPL",
+   "cik": 1866692,
+   "name": "Amplitude, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SOUN",
+   "cik": 1840856,
+   "name": "SOUNDHOUND AI, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DCO",
+   "cik": 30305,
+   "name": "DUCOMMUN INC /DE/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BKV",
+   "cik": 1838406,
+   "name": "BKV Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DRVN",
+   "cik": 1804745,
+   "name": "Driven Brands Holdings Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LUNR",
+   "cik": 1844452,
+   "name": "Intuitive Machines, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HLIO",
+   "cik": 1024795,
+   "name": "HELIOS TECHNOLOGIES, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BCRX",
+   "cik": 882796,
+   "name": "BIOCRYST PHARMACEUTICALS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WMK",
+   "cik": 105418,
+   "name": "WEIS MARKETS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CRCT",
+   "cik": 1828962,
+   "name": "Cricut, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WGS",
+   "cik": 1818331,
+   "name": "GeneDx Holdings Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TRAX",
+   "cik": 2091349,
+   "name": "First Tracks Biotherapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MQ",
+   "cik": 1522540,
+   "name": "Marqeta, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "REPL",
+   "cik": 1737953,
+   "name": "Replimune Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GABC",
+   "cik": 714395,
+   "name": "GERMAN AMERICAN BANCORP, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PLUG",
+   "cik": 1093691,
+   "name": "PLUG POWER INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SMR",
+   "cik": 1822966,
+   "name": "NUSCALE POWER Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RLJ",
+   "cik": 1511337,
+   "name": "RLJ Lodging Trust",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AGL",
+   "cik": 1831097,
+   "name": "agilon health, inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ALMR",
+   "cik": 2104204,
+   "name": "Alamar Biosciences, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CTRI",
+   "cik": 1981599,
+   "name": "Centuri Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HAPN",
+   "cik": 1409970,
+   "name": "Happen, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SIND",
+   "cik": 2096861,
+   "name": "Sinda Ltd.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BLBD",
+   "cik": 1589526,
+   "name": "Blue Bird Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TRVI",
+   "cik": 1563880,
+   "name": "Trevi Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AI",
+   "cik": 1577526,
+   "name": "C3.ai, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ARHS",
+   "cik": 1875444,
+   "name": "Arhaus, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MRVI",
+   "cik": 1823239,
+   "name": "MARAVAI LIFESCIENCES HOLDINGS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "STDN",
+   "cik": 2086716,
+   "name": "Standard Nuclear, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "OCFC",
+   "cik": 1004702,
+   "name": "OCEANFIRST FINANCIAL CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MAZE",
+   "cik": 1842295,
+   "name": "Maze Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FSUN",
+   "cik": 1709442,
+   "name": "FIRSTSUN CAPITAL BANCORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GIC",
+   "cik": 945114,
+   "name": "GLOBAL INDUSTRIAL Co",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GRC",
+   "cik": 42682,
+   "name": "GORMAN RUPP CO",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RBCAA",
+   "cik": 921557,
+   "name": "REPUBLIC BANCORP INC /KY/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SSMR",
+   "cik": 2091017,
+   "name": "Sunshine Silver Mining & Refining Co",
+   "currency": "USD"
+  },
+  {
+   "ticker": "OPEN",
+   "cik": 1801169,
+   "name": "Opendoor Technologies Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BY",
+   "cik": 1702750,
+   "name": "BYLINE BANCORP, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FLOC",
+   "cik": 2035149,
+   "name": "Flowco Holdings Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TDOC",
+   "cik": 1477449,
+   "name": "Teladoc Health, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ICFI",
+   "cik": 1362004,
+   "name": "ICF International, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HUN",
+   "cik": 1307954,
+   "name": "Huntsman CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DHC",
+   "cik": 1075415,
+   "name": "DIVERSIFIED HEALTHCARE TRUST",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LASR",
+   "cik": 1124796,
+   "name": "NLIGHT, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "STOK",
+   "cik": 1623526,
+   "name": "Stoke Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ZBIO",
+   "cik": 1953926,
+   "name": "Zenas BioPharma, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AGIO",
+   "cik": 1439222,
+   "name": "AGIOS PHARMACEUTICALS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "INFQ",
+   "cik": 2007825,
+   "name": "Infleqtion, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PSNL",
+   "cik": 1527753,
+   "name": "Personalis, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TCBK",
+   "cik": 356171,
+   "name": "TRICO BANCSHARES /",
+   "currency": "USD"
+  },
+  {
+   "ticker": "KMTS",
+   "cik": 1877184,
+   "name": "KESTRA MEDICAL TECHNOLOGIES, LTD.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HLMN",
+   "cik": 1822492,
+   "name": "Hillman Solutions Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LILA",
+   "cik": 1712184,
+   "name": "Liberty Latin America Ltd.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WLTH",
+   "cik": 1524566,
+   "name": "WEALTHFRONT CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SNDA",
+   "cik": 1043000,
+   "name": "SONIDA SENIOR LIVING, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "QCRH",
+   "cik": 906465,
+   "name": "QCR HOLDINGS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GENB",
+   "cik": 2100782,
+   "name": "Generate Biomedicines, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ULCC",
+   "cik": 1670076,
+   "name": "Frontier Group Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BFC",
+   "cik": 1746109,
+   "name": "Bank First Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CNOB",
+   "cik": 712771,
+   "name": "ConnectOne Bancorp, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NRIX",
+   "cik": 1549595,
+   "name": "Nurix Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BFLY",
+   "cik": 1804176,
+   "name": "Butterfly Network, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DSGR",
+   "cik": 703604,
+   "name": "Distribution Solutions Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "REAL",
+   "cik": 1573221,
+   "name": "TheRealReal, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ABSI",
+   "cik": 1672688,
+   "name": "Absci Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NVAX",
+   "cik": 1000694,
+   "name": "NOVAVAX INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IMKTA",
+   "cik": 50493,
+   "name": "INGLES MARKETS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AEHR",
+   "cik": 1040470,
+   "name": "AEHR TEST SYSTEMS",
+   "currency": "USD"
+  },
+  {
+   "ticker": "YSWY",
+   "cik": 1859836,
+   "name": "Yesway, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SLS",
+   "cik": 1390478,
+   "name": "SELLAS Life Sciences Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HYMC",
+   "cik": 1718405,
+   "name": "HYCROFT MINING HOLDING CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RARE",
+   "cik": 1515673,
+   "name": "Ultragenyx Pharmaceutical Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "KLRA",
+   "cik": 2096997,
+   "name": "Kailera Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BXDC",
+   "cik": 2100161,
+   "name": "Blackstone Digital Infrastructure Trust Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NEXT",
+   "cik": 1612720,
+   "name": "NextDecade Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BRVE",
+   "cik": 2131524,
+   "name": "Braveheart Bio, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LOB",
+   "cik": 1462120,
+   "name": "Live Oak Bancshares, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TWFG",
+   "cik": 2007596,
+   "name": "TWFG, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NTLA",
+   "cik": 1652130,
+   "name": "Intellia Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "XZO",
+   "cik": 1873951,
+   "name": "Exzeo Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NRP",
+   "cik": 1171486,
+   "name": "NATURAL RESOURCE PARTNERS LP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RDW",
+   "cik": 1819810,
+   "name": "Redwire Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ESQ",
+   "cik": 1531031,
+   "name": "Esquire Financial Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SHLS",
+   "cik": 1831651,
+   "name": "Shoals Technologies Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NUVB",
+   "cik": 1811063,
+   "name": "Nuvation Bio Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PGEN",
+   "cik": 1356090,
+   "name": "PRECIGEN, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AADX",
+   "cik": 2118195,
+   "name": "Applied Aerospace & Defense, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CBL",
+   "cik": 910612,
+   "name": "CBL & ASSOCIATES PROPERTIES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ATLC",
+   "cik": 1464343,
+   "name": "Atlanticus Holdings Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CHRN",
+   "cik": 1549084,
+   "name": "ChronoScale Holdings Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EVCM",
+   "cik": 1853145,
+   "name": "EverCommerce Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AMAL",
+   "cik": 1823608,
+   "name": "Amalgamated Financial Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PGY",
+   "cik": 1883085,
+   "name": "Pagaya Technologies Ltd.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EROC",
+   "cik": 2110029,
+   "name": "ERock, Inc.",
+   "currency": "USD"
+  }
+ ]
+}
