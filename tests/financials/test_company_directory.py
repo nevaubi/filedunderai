@@ -15,7 +15,7 @@ class CompanyDirectoryTests(unittest.TestCase):
         pending = [c for c in rows if not c['screener_eligible']]
         self.assertEqual({c['ticker'] for c in pending}, set(universe.BY_TICKER) - active)
         self.assertTrue(all(c['cik'] and c['name'] and c['sector'] for c in rows))
-        self.assertEqual(len(universe.UNIVERSE), 1100)
+        self.assertEqual(len(universe.UNIVERSE), 1485)
 
     def test_profile_metadata_cannot_override_registry_identity(self):
         from scripts.generate_company_directory import build_directory
