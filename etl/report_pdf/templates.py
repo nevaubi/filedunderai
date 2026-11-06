@@ -16,12 +16,20 @@ MACROS = """
 {% elif b.t == 'section' %}<div class="sec"><div class="no">{{ '%02d' % b.no }}</div><h2>{{ b.title }}</h2>{% if b.lede %}<div class="lede">{{ b.lede }}</div>{% endif %}</div>
 {% elif b.t == 'exhibit' %}<div class="exh"><div class="no">Exhibit {{ b.no }}</div><div class="tt">{{ b.title }}</div>{% if b.sub %}<div class="st">{{ b.sub }}</div>{% endif %}
   {% if b.chart %}<div class="chart" data-kind="{{ b.chart }}" data-w="{{ b.w }}" data-h="{{ b.h or '' }}"></div>{% endif %}
-  {% if b.table %}{{ table(b.table) }}{% endif %}<div class="src">Source: {{ b.src }}</div></div>
+  {% if b.table %}{{ table(b.table) }}{% endif %}{% if b.model %}{{ block(b.model) }}{% endif %}<div class="src">Source: {{ b.src }}</div></div>
 {% elif b.t == 'table' %}{% if b.title %}<h3>{{ b.title }}</h3>{% endif %}{{ table(b) }}
 {% elif b.t == 'callout' %}<div class="callout"><h3>{{ b.title }}</h3>{{ b.html }}</div>
 {% elif b.t == 'two' %}<div class="two">{% for col in b.cols %}<div>{% for x in col %}{{ block(x) }}{% endfor %}</div>{% endfor %}</div>
 {% elif b.t == 'cols' %}<div class="cols"><div>{% for x in b.main %}{{ block(x) }}{% endfor %}</div><aside class="side">{% for x in b.side %}{{ block(x) }}{% endfor %}</aside></div>
 {% elif b.t == 'disc' %}<p class="disc">{{ b.html }}</p>
+{% elif b.t == 'feature' %}<div class="feature"><div class="rail">{% for s in b.stats %}<div class="big">{{ s[0] }}</div><div class="cap">{{ s[1] }}</div>{% endfor %}{% for x in b.rail %}{{ block(x) }}{% endfor %}</div><div>{% for x in b.main %}{{ block(x) }}{% endfor %}</div></div>
+{% elif b.t == 'grid' %}<div class="grid2">{% for x in b.cells %}<div>{{ block(x) }}</div>{% endfor %}</div>
+{% elif b.t == 'tiles' %}<div class="tiles">{% for x in b.tiles %}<div class="tile"><div class="k">{{ x.k }}</div><div class="v">{{ x.v }}</div><div class="d {{ x.cls or '' }}">{{ x.d }}</div><div class="chart" data-kind="spark" data-style="{{ x.style or 'line' }}" data-w="140" data-h="26" data-series='{{ x.series | tojson }}'></div><div class="s">{{ x.s }}</div></div>{% endfor %}</div>
+{% elif b.t == 'divider' %}<div class="divider"><div><div class="no">SECTION {{ '%02d' % b.no }}</div><h2>{{ b.title }}</h2><p>{{ b.lede }}</p></div><div class="stat"><div class="v">{{ b.stat[0] }}</div><div class="c">{{ b.stat[1] }}</div></div></div>
+{% elif b.t == 'stats' %}<div class="stats" style="--n:{{ b.items | length }}">{% for s in b.items %}<div><div class="v">{{ s[0] }}</div><div class="k">{{ s[1] }}</div></div>{% endfor %}</div>
+{% elif b.t == 'model' %}<table class="model"><tr><th></th>{% for h in b.head %}<th class="n {{ 'cur' if loop.last else '' }}">{{ h }}</th>{% endfor %}<th class="n">Trend</th></tr>
+{% for r in b.rows %}<tr class="{{ r.cls or '' }}"><td>{{ r.label }}</td>{% for c in r.cells %}<td class="n {{ 'cur' if loop.last else '' }}">{{ c }}</td>{% endfor %}<td class="sp">{% if r.series %}<div class="chart" data-kind="spark" data-style="bar" data-w="70" data-h="14" data-series='{{ r.series | tojson }}'></div>{% endif %}</td></tr>{% endfor %}</table>
+{% elif b.t == 'quotes' %}{% if b.title %}<h3>{{ b.title }}</h3>{% endif %}<ul class="quotes">{% for q in b.qs %}<li><span class="m">{{ q[0] }}</span>{{ q[1] }}</li>{% endfor %}</ul>
 {% endif %}
 {%- endmacro %}
 {% macro table(tb) -%}

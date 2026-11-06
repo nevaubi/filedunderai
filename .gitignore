@@ -10,3 +10,4 @@ dist/
 etl/report_pdf/*.pdf
 etl/report_pdf/body.html
 etl/report_pdf/cover.html
+etl/report_pdf/*.html

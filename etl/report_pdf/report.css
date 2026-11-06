@@ -97,3 +97,46 @@ svg .grid line { stroke: var(--line); } svg .grid .domain { display: none; }
 .cover .toc li span:last-child { font-family: var(--f-mono); color: #8FA4FF; }
 .cover .note { font-size: 7.4pt; color: #9AA5C4; line-height: 1.45; }
 .cover svg text { fill: #8FA4FF; }
+
+/* ---------- layout archetypes ---------- */
+/* feature: narrative rail + one large exhibit */
+.feature { display: grid; grid-template-columns: 2.15in 1fr; gap: 18px; margin: 6px 0 10px; }
+.rail { border-top: 2px solid var(--navy); padding-top: 7px; font-size: 8.9pt; }
+.rail .big { font-family: var(--f-mono); font-size: 19pt; font-weight: 500; line-height: 1.05; color: var(--navy); }
+.rail .big + .cap { font-size: 7.4pt; color: var(--muted); margin-bottom: 9px; }
+.rail p { color: var(--ink2); }
+/* grid: dashboard of exhibits */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 18px; }
+.grid2 .exh { margin: 4px 0 4px; }
+/* tiles: KPI scorecard */
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 6px 0 12px; }
+.tile { border: 1px solid var(--line); border-top: 2px solid var(--navy); padding: 7px 9px 6px; break-inside: avoid; }
+.tile .k { font-size: 6.9pt; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); min-height: 2.4em; }
+.tile .v { font-family: var(--f-mono); font-size: 14pt; font-weight: 500; line-height: 1.15; }
+.tile .d { font-family: var(--f-mono); font-size: 7.3pt; }
+.tile .s { font-size: 6.8pt; color: var(--faint); margin-top: 2px; }
+/* divider: section opener band for premium reports */
+.divider { background: var(--navy); color: #fff; margin: 0 0 12px; padding: 16px 18px 15px; display: grid; grid-template-columns: 1fr 2.2in; gap: 22px; break-inside: avoid; }
+.divider .no { font-family: var(--f-mono); color: #8FA4FF; font-size: 9pt; letter-spacing: .1em; }
+.divider h2 { font-family: var(--f-disp); font-weight: 400; font-size: 26pt; line-height: 1.02; margin: 4px 0 8px; }
+.divider p { color: #C4CCE4; font-size: 9.6pt; margin: 0; }
+.divider .stat { border-left: 1px solid rgba(255,255,255,.2); padding-left: 16px; align-self: end; }
+.divider .stat .v { font-family: var(--f-mono); font-size: 24pt; color: #fff; line-height: 1.05; }
+.divider .stat .c { font-size: 7.6pt; color: #9AA5C4; }
+/* stats row */
+.stats { display: grid; grid-template-columns: repeat(var(--n, 4), 1fr); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--line); margin: 4px 0 10px; }
+.stats > div { padding: 6px 10px 6px 0; }
+.stats .v { font-family: var(--f-mono); font-size: 12pt; font-weight: 500; }
+.stats .k { font-size: 7pt; color: var(--muted); }
+/* model table */
+table.model td, table.model th { padding: 3px 5px; }
+table.model tr.tot td { font-weight: 600; border-top: 1px solid var(--ink2); }
+table.model tr.pct td { color: var(--muted); font-style: italic; font-size: 7.6pt; }
+table.model tr.pct td.n { font-size: 7.3pt; }
+table.model th.cur, table.model td.cur { background: var(--acc-soft); }
+table.model td.sp { width: 74px; padding: 0 2px; }
+table.model .chart svg { display: block; }
+/* quote list */
+.quotes { margin: 0; padding: 0; list-style: none; }
+.quotes li { border-left: 2px solid var(--line); padding: 2px 0 2px 9px; margin-bottom: 6px; font-size: 8.1pt; color: var(--ink2); }
+.quotes li .m { display: block; font-family: var(--f-mono); font-size: 6.8pt; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
