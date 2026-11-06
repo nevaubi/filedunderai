@@ -234,6 +234,22 @@
     {
       "path": "/api/cron/analyst",
       "schedule": "5 * * * *"
+    },
+    {
+      "path": "/api/cron/govflows?step=daily",
+      "schedule": "43 7 * * *"
+    },
+    {
+      "path": "/api/cron/govflows?step=hearings",
+      "schedule": "13 10 * * *"
+    },
+    {
+      "path": "/api/cron/govflows?step=company",
+      "schedule": "37 */4 * * *"
+    },
+    {
+      "path": "/api/cron/govflows?step=holders",
+      "schedule": "53 5 * * *"
     }
   ],
   "headers": [
