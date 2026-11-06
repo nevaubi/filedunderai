@@ -1080,7 +1080,13 @@ def ir_job(sb, tickers=None, workers=4, time_budget=None, refresh_site=False, we
     io_deadline = getattr(sb, "io_deadline", io_deadline)
     reserve = min(5, max(0, io_deadline - started) / 5) if io_deadline is not None else 0
     deadline = io_deadline - reserve if io_deadline is not None else None
-    with Run(sb, "ir") as run:
+    # The run record is written with an unbounded copy so a run that used its whole I/O budget still records its
+    # outcome instead of staying "running" forever.
+    import copy as _copy
+    run_sb = _copy.copy(sb)
+    if hasattr(run_sb, "io_deadline"):
+        run_sb.io_deadline = None
+    with Run(run_sb, "ir") as run:
         tickers = list(dict.fromkeys(tickers if tickers is not None else [t for t, *_ in UNIVERSE]))
         done, failed = {}, {}
 
