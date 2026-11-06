@@ -1,0 +1,91 @@
+name: Partner app datasets
+# Builds SEC statement + price datasets with the partner app's own ingest
+# (nevaubi/company-showcase-launchpad scripts/ingest.ts) and uploads them to our private
+# `app-datasets` bucket, which /api/app-data serves to that app's signed-in users.
+# Needs repository secrets SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.
+on:
+  schedule:
+    - cron: "17 9 * * 2,5"
+  workflow_dispatch:
+    inputs:
+      tickers:
+        description: "Comma-separated tickers (blank = whole coverage list)"
+        required: false
+        default: ""
+permissions:
+  contents: read
+concurrency:
+  group: app-datasets
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        shard: [0, 1, 2, 3]
+    env:
+      SHARDS: 4
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: nevaubi/company-showcase-launchpad
+          path: app
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: oven-sh/setup-bun@v2
+      - name: Install app dependencies
+        working-directory: app
+        run: bun install --frozen-lockfile || bun install
+      - name: Pick this shard's tickers
+        working-directory: app
+        env:
+          ONLY: ${{ github.event.inputs.tickers }}
+        run: |
+          cat > /tmp/pick.ts <<'EOF'
+          import { COVERAGE, isBundled } from "./src/lib/coverage";
+          const only = (process.env.ONLY || "").split(",").map((s) => s.trim().toUpperCase()).filter(Boolean);
+          const shards = Number(process.env.SHARDS), shard = Number(process.env.SHARD);
+          const all = COVERAGE.map((c) => c.ticker).filter((t) => !only.length || only.includes(t));
+          const mine = all.filter((_, i) => i % shards === shard);
+          console.log(`BUNDLED=${mine.filter((t) => isBundled(t)).join(",")}`);
+          console.log(`EXTRA=${mine.filter((t) => !isBundled(t)).join(",")}`);
+          EOF
+          cp /tmp/pick.ts ./pick.ts
+          SHARD=${{ matrix.shard }} bun pick.ts >> "$GITHUB_ENV"
+          rm pick.ts
+      - name: Build curated companies
+        if: env.BUNDLED != ''
+        working-directory: app
+        run: |
+          bun scripts/ingest.ts --only=sec --tickers="$BUNDLED" --concurrency=3
+          bun scripts/ingest.ts --only=prices --tickers="$BUNDLED"
+      - name: Build partner-universe companies
+        if: env.EXTRA != ''
+        working-directory: app
+        run: bun scripts/ingest.ts --extra --tickers="$EXTRA" --concurrency=3
+      - name: Upload curated
+        if: env.BUNDLED != ''
+        run: node scripts/app-datasets-sync.mjs app/public/data --tickers="$BUNDLED"
+      - name: Upload partner universe
+        if: env.EXTRA != ''
+        run: node scripts/app-datasets-sync.mjs /tmp/ingest/extra --tickers="$EXTRA"
+  merge:
+    needs: build
+    if: always()
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/app-datasets-sync.mjs --merge-only

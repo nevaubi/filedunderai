@@ -28,6 +28,9 @@
     "api/export.py": {
       "maxDuration": 60,
       "includeFiles": "{etl/__init__.py,etl/matrix_export.py}"
+    },
+    "api/app-data.js": {
+      "maxDuration": 30
     }
   },
   "crons": [
