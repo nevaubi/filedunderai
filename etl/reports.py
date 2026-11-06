@@ -410,6 +410,13 @@ def tidy_numbers(text):
     return text
 
 
+def clean_line(text):
+    """Title and subtitle: house number style, without clauses that only report missing data."""
+    parts = [x.strip() for x in re.split(r";\s*", str(text or "")) if x.strip()]
+    keep = [x for x in parts if not re.search(r"\b(no [\w\s-]{0,30}(data|record)s?\b|not available|unavailable|\bnull\b)", x, re.I)]
+    return tidy_numbers("; ".join(keep or parts[:1]))
+
+
 def validate_items(items, ev):
     out = []
     for p in items or []:
@@ -461,7 +468,7 @@ def write(kind, tk, ev, completer=complete, key=None):
     total = sum(len(s["paragraphs"]) + len(s["bullets"]) for s in sections) + len(summary)
     unverified = sum(1 for s in sections for p in s["paragraphs"] + s["bullets"] if not p["verified"]) + sum(1 for p in summary if not p["verified"])
     return {"schema_version": 1, "kind": kind, "kind_label": KINDS[kind], "ticker": tk, "name": u["name"], "sector": u["sector"],
-            "title": str(out.get("title") or f"{u['name']}: {KINDS[kind]}")[:160], "subtitle": str(out.get("subtitle") or "")[:240],
+            "title": clean_line(out.get("title") or f"{u['name']}: {KINDS[kind]}")[:160], "subtitle": clean_line(out.get("subtitle"))[:240],
             "label": "AI-generated from cited records", "model": model, "generated_at": now_iso(),
             "summary": summary, "sections": sections, "metrics": metrics_table(ev),
             "evidence": {k: ev[k] for k in used} | {k: ev[k] for k in ev if k.startswith("FIN:")},
