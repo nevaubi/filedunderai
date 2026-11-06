@@ -350,6 +350,11 @@ Every paragraph and bullet must cite one or more evidence ids in "cites". Quote 
 cited records; you may round, convert fractions to percentages (0.1234 -> 12.3%) and express USD in millions or billions.
 Do not compute new figures beyond simple differences between two cited numbers.
 
+Number style: dollar amounts as $9.35B or $580M (never long digit strings), per-share figures to two decimals ($3.88),
+percentages to one decimal (39.0%), multiples to one decimal (21.5x). Write dates as Nov 9, 2026.
+Never write a sentence whose only content is that some data is missing, null or unavailable; leave that topic out.
+Lead each paragraph with its conclusion, then the supporting figures. Explain why a figure matters in plain words.
+
 Sections (keep this order and these ids):
 {outline}
 
@@ -380,6 +385,31 @@ def _evidence_for_prompt(ev, limit=60000):
     return json.dumps(out, default=str)
 
 
+_MISSING = re.compile(r"\b(no [\w\s-]{0,40}(data|record|records|information) (is|are|was|were) (available|provided)|(is|are) (null|not available|unavailable))\b", re.I)
+
+
+def _money(m):
+    v = float(m.group(1).replace(",", ""))
+    if v >= 1e12:
+        return f"${v / 1e12:.2f}T"
+    if v >= 1e9:
+        return f"${v / 1e9:.2f}B" if v < 1e10 else f"${v / 1e9:.1f}B"
+    if v >= 1e6:
+        return f"${v / 1e6:,.0f}M"
+    return m.group(0)
+
+
+def tidy_numbers(text):
+    """Display-only rounding after verification: long dollar integers to $M/$B/$T, long decimals to 2 places,
+    percentages to 1 place. The verified value is unchanged; only its printed precision is."""
+    text = re.sub(r"\$(\d{1,3}(?:,\d{3}){2,}|\d{7,})(?![\d.])", _money, text)
+    rnd = lambda n: (lambda m: f"{float(m.group(1)):.{n}f}")
+    text = re.sub(r"(?<=\$)(\d+\.\d{3,})", rnd(2), text)
+    text = re.sub(r"(?<![\d.])(\d+\.\d{2,})(?=\s?%)", rnd(1), text)
+    text = re.sub(r"(?<![\d.$])(\d+\.\d{4,})(?![\d])", rnd(2), text)
+    return text
+
+
 def validate_items(items, ev):
     out = []
     for p in items or []:
@@ -389,7 +419,9 @@ def validate_items(items, ev):
             continue
         vals = values_in([ev[c]["data"] for c in cites])
         bad = [t for t in number_tokens(text) if not supported(t, vals)]
-        out.append({"text": text, "cites": cites, "verified": not bad, "unsupported_numbers": bad or None})
+        if _MISSING.search(text) and len(number_tokens(text)) <= 2:
+            continue
+        out.append({"text": tidy_numbers(text), "cites": cites, "verified": not bad, "unsupported_numbers": bad or None})
     return out
 
 

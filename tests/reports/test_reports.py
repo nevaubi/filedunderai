@@ -85,3 +85,17 @@ class ModelReplyParsing(unittest.TestCase):
         with patch.object(reports, "request", side_effect=lambda *a, **k: next(replies)):
             out, model = reports.complete("p", "k", models=["m1", "m2"])
         self.assertEqual((out, model), ({"title": "ok"}, "m2"))
+
+
+class TidyNumbers(unittest.TestCase):
+    def test_rounds_for_display_only(self):
+        from etl.reports import tidy_numbers
+        self.assertEqual(tidy_numbers("EPS $3.87662 on $9,349,229,100; fell 39.01% to $580,000,000; $2.47 and 12.5% stay"),
+                         "EPS $3.88 on $9.35B; fell 39.0% to $580M; $2.47 and 12.5% stay")
+
+    def test_missing_data_sentences_are_dropped(self):
+        from etl.reports import validate_items
+        ev = {"REVS": {"data": {"x": None}}, "CONS": {"data": {"eps": 3.87}}}
+        out = validate_items([{"text": "No estimate-revision data is available: the record is null.", "cites": ["REVS"]},
+                              {"text": "Consensus EPS is $3.87.", "cites": ["CONS"]}], ev)
+        self.assertEqual([o["text"] for o in out], ["Consensus EPS is $3.87."])
