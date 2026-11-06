@@ -53,7 +53,7 @@ test('top-right button and shortcut open a docked panel; dock state persists', a
     d.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'j', ctrlKey: true, bubbles: true }));
     assert.equal(aside.classList.contains('open'), false, 'Ctrl+J toggles');
     assert.equal(JSON.parse(w.localStorage.getItem('fu:assistant:ui')).open, false);
-    assert.ok(w.eval('SHORTCUTS').some(s => s[0] === '⌘ J'));
+    assert.ok(w.eval('shortcutRows()').some(s => s[0] === '⌘ J'));
   } finally { h.close(); }
   const again = setup({ storage: { 'fu:assistant:ui': { open: true, docked: false, box: { x: 30, y: 40, w: 500, h: 600 }, deep: true } } });
   try {

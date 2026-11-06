@@ -1334,7 +1334,7 @@ function paletteNavItems() {
   return out;
 }
 const SHORTCUTS_TOP = [["⌘ K or /", "Command palette"], ["?", "This list"]];
-const SHORTCUTS_REST = [["Esc", "Close panel or dialog"], ["← / →", "Previous or next period in the source panel"], ["c", "Copy citation in the source panel"], ["1 – 9", "Company tabs"], ["s", "Star or unstar the open company"], ["[", "Collapse or expand the sidebar"], ["⌘ Enter", "Send to the assistant"]];
+const SHORTCUTS_REST = [["Esc", "Close panel or dialog"], ["← / →", "Previous or next period in the source panel"], ["c", "Copy citation in the source panel"], ["1 – 9", "Company tabs"], ["s", "Star or unstar the open company"], ["[", "Collapse or expand the sidebar"], ["⌘ Enter", "Send to the assistant"], ["⌘ J", "Open or close the assistant panel"]];
 const shortcutRows = () => [...SHORTCUTS_TOP, ...paletteNavItems().filter(n => n.key).map(n => [`g then ${n.key}`, n.label]), ...SHORTCUTS_REST];
 function openShortcuts() { const l = $("#sc-list"); l.innerHTML = ""; shortcutRows().forEach(([k, d]) => l.append(el("div", {}, el("span", {}, d), el("span", {}, ...k.split(" ").map(x => /^(then|or|–)$/.test(x) ? el("span", { class: "faint", style: "margin:0 4px" }, x) : el("span", { class: "kbd" }, x)))))); $("#kbsheet").hidden = false; }
 function setupKeys() {
