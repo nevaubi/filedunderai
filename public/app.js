@@ -377,7 +377,16 @@ async function copyText(text, label) { try { await navigator.clipboard.writeText
 /* ---------- source drawer ---------- */
 const drawer = $("#drawer"), scrim = $("#scrim");
 const DR = { cell: null, tab: "filing" };
-function closeSource() { drawer.classList.remove("open"); drawer.setAttribute("aria-hidden", "true"); scrim.hidden = true; DR.cell = null; document.querySelectorAll("td.c.sel").forEach(x => x.classList.remove("sel")); }
+const reduceMotion = () => typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+// Smoothly bring a node into view inside its nearest scroll containers; instant when reduced motion is preferred.
+function reveal(node, block = "nearest") { if (!node?.scrollIntoView) return; requestAnimationFrame(() => node.isConnected && node.scrollIntoView({ block, inline: "nearest", behavior: reduceMotion() ? "auto" : "smooth" })); }
+function closeSource() {
+  const wasOpen = drawer.classList.contains("open");
+  drawer.classList.remove("open"); drawer.setAttribute("aria-hidden", "true"); scrim.hidden = true; DR.cell = null;
+  document.querySelectorAll("td.c.sel").forEach(x => x.classList.remove("sel"));
+  const trigger = DR.trigger; DR.trigger = null;
+  if (trigger) { trigger.classList.remove("src-active"); if (wasOpen && trigger.isConnected && document.activeElement && (drawer.contains(document.activeElement) || document.activeElement === document.body)) trigger.focus({ preventScroll: true }); }
+}
 scrim.addEventListener("click", closeSource);
 const formCls = f => /^10-K/.test(f) ? "k" : /^10-Q/.test(f) ? "q" : /^8-K/.test(f) ? "e" : /^4$|^144|^3$|^5$/.test(f) ? "i" : "";
 function colHeader(key) {
@@ -400,6 +409,8 @@ function openSource(cell, tab) {
   if (!cell) return;
   hideTip();
   const evidence = evidenceForCell(cell);
+  const wasOpen = drawer.classList.contains("open"), prevCell = DR.cell;
+  if (!wasOpen) { const active = document.activeElement; DR.trigger?.classList.remove("src-active"); DR.trigger = active && active !== document.body && !drawer.contains(active) ? active : null; DR.trigger?.classList.add("src-active"); }
   DR.cell = cell; if (tab) DR.tab = tab;
   if (cell.calc && DR.tab === "filing") DR.tab = "filing";
   const dh = $("#dh"), db = $("#db");
@@ -431,6 +442,9 @@ function openSource(cell, tab) {
   else renderFiling(body, cell, D.companies[cell.tk]);
   drawer.classList.add("open"); drawer.setAttribute("aria-hidden", "false");
   if (innerWidth < 860) scrim.hidden = false;
+  // A new value starts at the top of the panel; switching tabs on the same value brings the tab content into view.
+  if (!wasOpen || prevCell !== cell) { db.scrollTop = 0; if (!wasOpen) { const heading = dh.querySelector("h2"); heading?.setAttribute("tabindex", "-1"); heading?.focus({ preventScroll: true }); } }
+  else reveal(tabs, "start");
 }
 function svgUse(id) { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.innerHTML = `<use href="#${id}"/>`; return s; }
 function renderCalc(body, cell) {
@@ -1101,10 +1115,10 @@ function buildShell() {
     nav.append(el("div", { class: "nav-heading" }, label));
     for (const p of entries) {
       used.add(p.id);
-      nav.append(el("a", { href: "#" + p.id, "data-p": p.id, title: `${p.name} (g then ${p.key})` }, svgUse(p.icon), p.name));
+      nav.append(el("a", { href: "#" + p.id, "data-p": p.id, title: `${p.name} (g then ${p.key})` }, svgUse(p.icon), el("span", { class: "nav-label" }, p.name)));
     }
   }
-  for (const p of visible.filter(p => !used.has(p.id))) nav.append(el("a", { href: "#" + p.id, "data-p": p.id, title: `${p.name} (g then ${p.key})` }, svgUse(p.icon), p.name));
+  for (const p of visible.filter(p => !used.has(p.id))) nav.append(el("a", { href: "#" + p.id, "data-p": p.id, title: `${p.name} (g then ${p.key})` }, svgUse(p.icon), el("span", { class: "nav-label" }, p.name)));
   $("#mnav").append(...PAGES.filter(p => !p.hidden).map(p => el("a", { href: "#" + p.id, "data-p": p.id }, p.name)));
   renderRail();
   renderMarketTape();
@@ -1116,14 +1130,53 @@ function buildShell() {
   $("#kbsheet").addEventListener("click", e => { if (e.target.id === "kbsheet") e.target.hidden = true; });
   $("#q").addEventListener("focus", e => { e.target.blur(); openPalette(); });
   $("#q").addEventListener("click", () => openPalette());
-  setupPalette(); setupKeys();
+  setupPalette(); setupKeys(); setupRail();
+}
+/* Sidebar: collapsible icon rail on desktop, off-canvas sheet on mobile. The preference is per browser. */
+const RAIL_KEY = "fu:rail-collapsed";
+const railMobile = () => typeof window.matchMedia === "function" && window.matchMedia("(max-width: 860px)").matches;
+function railCollapsedPref() { try { return localStorage.getItem(RAIL_KEY) === "1"; } catch { return false; } }
+function syncRailToggle() {
+  const app = document.querySelector(".app"), btn = $("#rail-toggle");
+  if (!app || !btn) return;
+  const mobile = railMobile(), open = mobile ? app.classList.contains("rail-open") : !app.classList.contains("rail-collapsed");
+  const label = mobile ? (open ? "Close menu" : "Open menu") : (open ? "Collapse sidebar" : "Expand sidebar");
+  btn.setAttribute("aria-expanded", String(open)); btn.setAttribute("aria-label", label); btn.title = label + (mobile ? "" : " ([)");
+}
+function setRailCollapsed(collapsed) {
+  const app = document.querySelector(".app"); if (!app) return;
+  app.classList.toggle("rail-collapsed", collapsed);
+  try { localStorage.setItem(RAIL_KEY, collapsed ? "1" : "0"); } catch {}
+  syncRailToggle();
+}
+function setRailOpen(open, { restoreFocus = true } = {}) {
+  const app = document.querySelector(".app"), scrimEl = $("#rail-scrim"); if (!app) return;
+  const was = app.classList.contains("rail-open");
+  app.classList.toggle("rail-open", open);
+  if (scrimEl) scrimEl.hidden = !open;
+  const main = document.querySelector(".main .page"); if (main) main.inert = open;
+  syncRailToggle();
+  if (open) $("#nav a.on, #nav a")?.focus({ preventScroll: true });
+  else if (was && restoreFocus) $("#rail-toggle")?.focus({ preventScroll: true });
+}
+function toggleRail() { if (railMobile()) setRailOpen(!document.querySelector(".app")?.classList.contains("rail-open")); else setRailCollapsed(!document.querySelector(".app")?.classList.contains("rail-collapsed")); }
+function setupRail() {
+  const app = document.querySelector(".app"), btn = $("#rail-toggle");
+  if (!app || !btn) return;
+  app.classList.toggle("rail-collapsed", railCollapsedPref());
+  btn.addEventListener("click", toggleRail);
+  $("#rail-scrim")?.addEventListener("click", () => setRailOpen(false));
+  $("#rail")?.addEventListener("keydown", e => { if (e.key === "Escape" && app.classList.contains("rail-open")) { e.stopPropagation(); setRailOpen(false); } });
+  window.addEventListener("hashchange", () => { if (app.classList.contains("rail-open")) setRailOpen(false, { restoreFocus: false }); });
+  if (typeof window.matchMedia === "function") window.matchMedia("(max-width: 860px)").addEventListener?.("change", () => { setRailOpen(false, { restoreFocus: false }); syncRailToggle(); });
+  syncRailToggle();
 }
 function loadingView(msg = "Loading") { page.innerHTML = ""; page.append(el("div", { class: "ph" }, el("div", { style: "width:100%" }, el("div", { class: "skel", style: "height:12px;width:120px;margin-bottom:12px" }), el("div", { class: "skel", style: "height:28px;width:320px;margin-bottom:10px" }), el("div", { class: "skel", style: "height:14px;width:min(560px,90%)" }))), el("div", { class: "grid g2" }, el("div", { class: "skel", style: "height:280px" }), el("div", { class: "skel", style: "height:280px" })), el("div", { class: "faint", style: "font-size:12px" }, msg + "…")); }
 let ROUTE_SEQ = 0;
 async function route() {
   closeSource(); hideTip();
   window.FU_COMPANY_CLEANUP?.(); window.FU_COMPANY_CLEANUP = null;
-  page.classList.remove("companies-page");
+  page.classList.remove("companies-page", "company-page");
   const seq = ++ROUTE_SEQ;
   const h = (location.hash || "#markets").slice(1);
   let pid = h, arg = null;
@@ -1203,7 +1256,7 @@ function renderPalette(keepScroll) {
   });
   if (!PAL.items.length) list.append(el("div", { class: "empty" }, "No matches. Try a ticker like NVDA, or “AAPL gross margin”."));
 }
-const SHORTCUTS = [["⌘ K or /", "Command palette"], ["?", "This list"], ["g then m", "Markets"], ["g then c", "Companies"], ["g then o", "Compare"], ["g then t", "Technicals"], ["g then x", "Macro"], ["g then w", "Workbench"], ["g then r", "Research agent"], ["Esc", "Close panel or dialog"], ["← / →", "Previous or next period in the source panel"], ["c", "Copy citation in the source panel"], ["1 – 6", "Company tabs"], ["s", "Star or unstar the open company"], ["⌘ Enter", "Send to the assistant"]];
+const SHORTCUTS = [["⌘ K or /", "Command palette"], ["?", "This list"], ["g then m", "Markets"], ["g then c", "Companies"], ["g then o", "Compare"], ["g then t", "Technicals"], ["g then x", "Macro"], ["g then w", "Workbench"], ["g then r", "Research agent"], ["Esc", "Close panel or dialog"], ["← / →", "Previous or next period in the source panel"], ["c", "Copy citation in the source panel"], ["1 – 6", "Company tabs"], ["s", "Star or unstar the open company"], ["[", "Collapse or expand the sidebar"], ["⌘ Enter", "Send to the assistant"]];
 function openShortcuts() { const l = $("#sc-list"); l.innerHTML = ""; SHORTCUTS.forEach(([k, d]) => l.append(el("div", {}, el("span", {}, d), el("span", {}, ...k.split(" ").map(x => /^(then|or|–)$/.test(x) ? el("span", { class: "faint", style: "margin:0 4px" }, x) : el("span", { class: "kbd" }, x)))))); $("#kbsheet").hidden = false; }
 function setupKeys() {
   let g = 0;
@@ -1218,6 +1271,7 @@ function setupKeys() {
     }
     if (e.key === "/") { e.preventDefault(); openPalette(); return; }
     if (e.key === "?") { openShortcuts(); return; }
+    if (e.key === "[") { toggleRail(); return; }
     if (e.key === "g") { g = Date.now(); return; }
     if (Date.now() - g < 900) { const p = PAGES.find(p => p.key === e.key && !p.hidden); if (p) { location.hash = p.id; g = 0; } return; }
     if (/^[1-6]$/.test(e.key) && location.hash.startsWith("#company-")) { const b = document.querySelectorAll(".tabs button")[+e.key - 1]; b?.click(); }
@@ -1235,7 +1289,7 @@ const cellChip = (cell, text) => cell ? el("button", { class: "chip link acc mon
 /* ================= PAGES ================= */
 function aiCredit(meta) {
   if (!meta?.at) return null;
-  return el("div", { class: "aimeta", title: "Generated from the filings, the latest release and recent coverage. Check figures against the linked sources." }, el("span", { class: "chip acc" }, svgUse("i-spark"), "Summary"), el("span", {}, `Updated ${relTime(meta.at)}`));
+  return el("div", { class: "aimeta", title: "Generated from the filings, the latest release and recent coverage. Check figures against the linked sources." }, el("span", { class: "chip chip-ai" }, svgUse("i-spark"), "AI-generated"), el("span", {}, `Updated ${relTime(meta.at)}`));
 }
 function relTime(s) { if (!s) return ""; const t = new Date(s); if (isNaN(t)) return ""; const m = Math.max(0, (Date.now() - t) / 6e4); return m < 1 ? "just now" : m < 60 ? `${Math.round(m)}m ago` : m < 1440 ? `${Math.round(m / 60)}h ago` : `${Math.round(m / 1440)}d ago`; }
 const domainOf = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; } };
@@ -1476,6 +1530,7 @@ async function pCompany(tk) {
   await Promise.all([ensureCompany(tk), window.FU_COMPANY_PROFILE?.loadHistory?.(tk, { dataBase: typeof PUB === "string" ? PUB : "" }), window.FU_COMPANY_PROFILE?.loadHistory?.("SPY", { dataBase: typeof PUB === "string" ? PUB : "" })]);
   if (requestedRoute != null && requestedRoute !== ROUTE_SEQ) return;
   page.innerHTML = "";
+  page.classList.add("company-page");
   const s = snapshot(tk), c = s.c, a = c.address || {};
   const st = priceStats(tk) || {}, filings = c.filings || [];
   const officialName = c.name || summary.name || tk;
@@ -1487,7 +1542,7 @@ async function pCompany(tk) {
   const edgarUrl = `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${c.cik || ""}&type=&dateb=&owner=include&count=40`;
   const crumbs = el("div", { class: "crumbs co-crumbs" }, el("a", { href: "#companies" }, "Companies"), el("span", { class: "sep" }, "/"), el("span", {}, displayName), el("span", { class: "sep" }, "/"), el("span", { id: "crumb-tab" }, ""));
   const head = el("header", { class: "co-head" },
-    logoTile(tk, 64),
+    logoTile(tk, 48),
     el("div", { class: "co-identity" },
       el("div", { class: "co-title-row" }, el("h1", {}, displayName), el("span", { class: "co-ticker" }, [exchanges, tk].filter(Boolean).join(": "))),
       el("div", { class: "co-meta co-registrant" }, el("span", {}, officialName), summary.sector ? el("span", {}, summary.sector) : null),
@@ -1504,6 +1559,7 @@ async function pCompany(tk) {
     el("dl", {}, profileItem("Registrant", officialName), profileItem("Address", address), profileItem("Phone", c.phone), profileItem("Fiscal year end", fiscalYearEnd), profileItem("Incorporation", c.stateOfIncorporation), profileItem("CIK", c.cik ? String(c.cik).padStart(10, "0") : null), profileItem("Industry", [c.sicDescription, c.sic ? `SIC ${c.sic}` : null].filter(Boolean).join(" · ")), profileItem("Website", WEB[tk] ? el("a", { href: "https://" + WEB[tk], target: "_blank", rel: "noopener" }, WEB[tk] + " ↗") : null)),
     el("div", { class: "co-history" }, "Company identity from SEC filings."));
   head.querySelector(".co-identity").append(profile);
+  profile.addEventListener("toggle", () => { if (profile.open && typeof reveal === "function") reveal(profile.querySelector("dl")); });
   page.append(crumbs, head);
   const rangeSpan = st.hi52 - st.lo52;
   const rangePosition = rangeSpan > 0 && s.px != null ? Math.max(0, Math.min(100, ((s.px - st.lo52) / rangeSpan) * 100)) : 50;
@@ -1563,9 +1619,13 @@ function signals(tk) {
   if (cash && cashP) out.push({ tone: "neutral", text: `Cash and current marketable securities stand at ${fmtMoney(cash.v)}, ${cash.v >= cashP.v ? "up" : "down"} from ${fmtMoney(cashP.v)} a year earlier.`, refs: [[cash, "Cash " + L(lq)], [cashP, "Cash prior year"]] });
   return out;
 }
+function aiOverview(tk) {
+  const N = E?.narratives?.[tk];
+  return N ? { narratives: N.narratives || [], highlights: N.release_highlights || [], generatedAt: N.meta?.at || N.generated_at || null } : null;
+}
 function coOverview(body, tk) {
   if (window.FU_COMPANY_PROFILE) {
-    window.FU_COMPANY_CLEANUP = window.FU_COMPANY_PROFILE.render(body, { ticker: tk, company: D.companies[tk], summary: companySummary(tk), snapshot: snapshot(tk), model: model(tk), prices: window.FU_COMPANY_PROFILE.history(tk, PX[tk]), benchmarkPrices: window.FU_COMPANY_PROFILE.history("SPY", PX.SPY), news: E.news[tk]?.news || [], signals: signals(tk), related: window.FU_COMPANIES?.related(tk) || [], helpers: { el, fmtMoney, fnum, fpct, fsgn, fdate, plabel, openSource, cellChip, miniLogo, filingUrl, logoTile }, dataBase: PUB, onTab: id => body.parentElement.querySelector(`.co-tabs button[data-id="${id}"]`)?.click(), onCompany: () => { STATE.coTab = "overview"; } });
+    window.FU_COMPANY_CLEANUP = window.FU_COMPANY_PROFILE.render(body, { ticker: tk, company: D.companies[tk], summary: companySummary(tk), snapshot: snapshot(tk), model: model(tk), prices: window.FU_COMPANY_PROFILE.history(tk, PX[tk]), benchmarkPrices: window.FU_COMPANY_PROFILE.history("SPY", PX.SPY), news: E.news[tk]?.news || [], signals: signals(tk), related: window.FU_COMPANIES?.related(tk) || [], ai: aiOverview(tk), helpers: { el, fmtMoney, fnum, fpct, fsgn, fdate, plabel, openSource, cellChip, miniLogo, filingUrl, logoTile, metricChip: label => { const m = model(tk), lq = m.latestQ(), cell = lq ? m.metric(label, "Q", lq) : null; return cell ? cellChip(cell, `${label} ${fmtCell(cell)}`) : null; } }, dataBase: PUB, onTab: id => body.parentElement.querySelector(`.co-tabs button[data-id="${id}"]`)?.click(), onCompany: () => { STATE.coTab = "overview"; } });
     return;
   }
   const m = model(tk);
@@ -1651,7 +1711,7 @@ function coFinancials(body, tk) {
         const nx = tr.nextElementSibling; if (nx?.classList.contains("exp")) { nx.remove(); return; }
         const host = el("div", { style: "max-width:900px" });
         const ex = el("tr", { class: "exp" }, el("td", { class: "lab" }, el("div", { class: "muted", style: "font-size:12px;white-space:normal" }, `${r.label}, ${kind === "A" ? "annual" : "quarterly"}. Click a bar for its source.`)), el("td", { colspan: ends.length, style: "text-align:left" }, host));
-        tr.after(ex);
+        tr.after(ex); reveal(ex);
         requestAnimationFrame(() => barChart(host, ends.map((e, i) => ({ k: plabel(tk, e, kind), vals: [{ v: cells[i]?.v ?? null, name: r.label, cell: cells[i] }] })), { height: 170, yfmt: r.unit === "pct" ? v => fpct(v, 0) : r.unit === "x" ? v => v.toFixed(1) : v => fmtMoney(v, r.unit), tfmt: r.unit === "pct" ? v => fpct(v) : v => fmtMoney(v, r.unit) }));
       };
     });
@@ -1700,7 +1760,7 @@ function coEarnings(body, tk) {
     const doc = el("div", { class: "release", html: md(relLines.slice(Math.max(0, startAt)).join("\n")) });
     g0.append(panel(`Earnings release · filed ${fdate(R.filed)}`, el("a", { href: R.url, target: "_blank", rel: "noopener" }, "Exhibit 99.1 on EDGAR ↗"), doc, el("div", { class: "src", style: "padding-top:10px" }, `8-K accession ${R.accn}. Text taken from the filed exhibit; tables shown as filed.`)));
     const hl = el("div", { class: "bd brief" }, el("ul", {}, (N?.release_highlights || []).map(b => el("li", {}, b))));
-    const side = el("div", { style: "display:flex;flex-direction:column;gap:16px" }, panel("Release highlights", aiCredit(N?.meta), hl));
+    const side = el("div", { class: "co-ai-side", style: "display:flex;flex-direction:column;gap:16px" }, panel("Release highlights", aiCredit(N?.meta), hl));
     const ch = el("div", { class: "bd" });
     side.append(panel("Next-session move after each release", null, ch, el("div", { class: "src" }, "Stock vs SPY on the first session after the 8-K Item 2.02 filing date.")));
     g0.append(side);

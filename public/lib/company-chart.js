@@ -17,7 +17,7 @@
   "use strict";
   const NS = "http://www.w3.org/2000/svg", DAY = 86400000;
   const RANGES = ["1M", "3M", "6M", "YTD", "1Y", "3Y", "All"];
-  const COLORS = { price: "#2459c4", up: "#18725d", down: "#b13d42", sma20: "#16828e", sma50: "#7952b3", sma200: "#b77620", rsi: "#7952b3", signal: "#b77620", benchmark: "#687789" };
+  const COLORS = { price: "#315b86", up: "#18725d", down: "#b13d42", sma20: "#16828e", sma50: "#7952b3", sma200: "#b77620", rsi: "#7952b3", signal: "#b77620", benchmark: "#687789" };
   const mounted = new WeakMap();
   let sequence = 0;
   const finite = value => typeof value === "number" && Number.isFinite(value);
@@ -285,12 +285,12 @@
       const hasVolume = visible.some(b => b.v != null);
       const showVolume = hasVolume && state.volume, showRSI = technicals && bars.length >= 15 && state.rsi, showMACD = technicals && bars.length >= 34 && state.macd;
       const left = 16, right = width < 500 ? 72 : 86, chartWidth = width - left - right;
-      const top = 18, priceHeight = width < 500 ? 258 : 308, paneGap = 28;
+      const top = 18, priceHeight = width < 500 ? 236 : 276, paneGap = 22;
       let bottom = top + priceHeight;
       const panes = {};
-      if (showVolume) { panes.volume = { top: bottom + paneGap, height: 62 }; bottom = panes.volume.top + panes.volume.height; }
-      if (showRSI) { panes.rsi = { top: bottom + paneGap, height: 84 }; bottom = panes.rsi.top + panes.rsi.height; }
-      if (showMACD) { panes.macd = { top: bottom + paneGap, height: 96 }; bottom = panes.macd.top + panes.macd.height; }
+      if (showVolume) { panes.volume = { top: bottom + paneGap, height: 56 }; bottom = panes.volume.top + panes.volume.height; }
+      if (showRSI) { panes.rsi = { top: bottom + paneGap, height: 72 }; bottom = panes.rsi.top + panes.rsi.height; }
+      if (showMACD) { panes.macd = { top: bottom + paneGap, height: 84 }; bottom = panes.macd.top + panes.macd.height; }
       const height = bottom + 38, step = chartWidth / count, x = i => left + step * (i + 0.5);
       const ma = Object.fromEntries([20, 50, 200].map(n => [`sma${n}`, visible.map(b => indicators[`sma${n}`][b.index])]));
       const main = comparison ? comparison.company : visible.map(b => b.c);
