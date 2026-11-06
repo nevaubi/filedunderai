@@ -25,6 +25,7 @@
 <link rel="stylesheet" href="/analyst.css">
 <link rel="stylesheet" href="/ir-library.css">
 <link rel="stylesheet" href="/research.css">
+<link rel="stylesheet" href="/assistant.css">
 <script>window.FU_CONFIG = { dataBase: "https://apxfeteebnspwyajlxfh.supabase.co/storage/v1/object/public/public-data/" };</script>
 </head>
 <body>
@@ -78,7 +79,7 @@
       </div>
       <span class="asof" id="asof"></span>
       <nav class="market-tape" id="market-tape" aria-label="Market closing prices"></nav>
-      <a class="btn top-assistant" href="#research" aria-label="Open research assistant"><svg aria-hidden="true"><use href="#i-spark"/></svg>Assistant</a>
+      <button class="btn top-assistant" id="asst-toggle" type="button" aria-controls="fu-asst" aria-expanded="false" title="Assistant (⌘J)"><svg aria-hidden="true"><use href="#i-spark"/></svg><span>Assistant</span><kbd>⌘J</kbd></button>
       <button class="iconbtn" id="kbhelp" title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts"><span class="mono" style="font-size:13px;font-weight:600">?</span></button>
     </header>
     <nav class="mnav" id="mnav" aria-label="Pages"></nav>
@@ -123,5 +124,8 @@
 <script src="/lib/workspace.js"></script>
 <script src="/pages/workspace.js"></script>
 <script src="/pages/analyst.js"></script>
+<script src="/lib/assistant-loop.js"></script>
+<script src="/lib/assistant-tools.js"></script>
+<script src="/lib/assistant-panel.js"></script>
 </body>
 </html>

@@ -15,6 +15,20 @@ export function validCompletion(d) {
   });
   return typeof m.content === "string" && m.content.trim().length > 0;
 }
+// Tool specs come from the browser; only well-formed, bounded function definitions reach the provider.
+const TOOL_NAME = /^[A-Za-z_][A-Za-z0-9_]{0,63}$/;
+export function validTools(tools) {
+  if (tools == null) return true;
+  if (!Array.isArray(tools) || tools.length > 64 || JSON.stringify(tools).length > 160_000) return false;
+  const names = new Set();
+  return tools.every(t => {
+    const f = t?.function;
+    if (t?.type !== "function" || !f || typeof f.name !== "string" || !TOOL_NAME.test(f.name) || names.has(f.name)) return false;
+    names.add(f.name);
+    if (f.description != null && (typeof f.description !== "string" || f.description.length > 4000)) return false;
+    return f.parameters == null || (typeof f.parameters === "object" && !Array.isArray(f.parameters) && f.parameters.type === "object");
+  });
+}
 export async function complete(model, body, signal, budget = FU_RESEARCH_RUNTIME.requestBudget(body)) {
   const timeout = AbortSignal.timeout(budget.timeoutMs);
   const r = await fetch("https://api.fireworks.ai/inference/v1/chat/completions", {
@@ -47,6 +61,7 @@ export default async function handler(req, res) {
   const body = readBody(req);
   if (JSON.stringify(body).length > MAX_BODY) return res.status(413).json({ error: "Request too large" });
   if (!Array.isArray(body.messages) || !body.messages.length || body.messages.some(m => !m || !["system", "user", "assistant", "tool"].includes(m.role))) return res.status(400).json({ error: "Valid messages are required" });
+  if (!validTools(body.tools)) return res.status(400).json({ error: "Invalid tool definitions" });
   try { FU_RESEARCH_RUNTIME.requestBudget(body); } catch (e) { return res.status(400).json({ error: e.message }); }
   const ctl = new AbortController(), cancel = () => ctl.abort();
   req.on?.("aborted", cancel);

@@ -7,7 +7,13 @@
     detailed: { id: 'detailed', label: 'Detailed', maxCalls: 8, maxTools: 32, maxTokens: 9000, totalTokens: 36000, finalTokens: 6000, maxMs: 150000, requestMs: 45000, maxChars: 100000, maxClaims: 160, instruction: 'Develop an evidence-backed analysis with comparisons, calculations, drivers, risks, counterarguments and missing evidence. Use sections and tables where useful. Match depth to the question; avoid padding.' },
     report: { id: 'report', label: 'Report', maxCalls: 10, maxTools: 48, maxTokens: 12000, totalTokens: 60000, finalTokens: 9000, maxMs: 240000, requestMs: 60000, maxChars: 180000, maxClaims: 320, instruction: 'Write a substantive research report: executive findings, scope and periods, source-backed comparisons, reproducible calculations, scenarios with explicit assumptions, risks, conflicting evidence and research gaps. Develop reasoning fully without repetition. Mark unresolved scope; do not claim exhaustive coverage.' }
   });
-  function profile(id = 'detailed') { if (typeof id !== 'string' || !Object.hasOwn(profiles, id)) throw new Error('Unknown research profile'); return profiles[id]; }
+  // Side-panel agent profiles (public/lib/assistant-loop.js). Kept apart from the chat depth selector.
+  // One provider call per loop step; Deep adds steps and one self-review pass.
+  const agentProfiles = freeze({
+    agent_fast: { id: 'agent_fast', label: 'Fast', maxCalls: 18, maxTools: 60, maxTokens: 6000, totalTokens: 90000, finalTokens: 4000, maxMs: 300000, requestMs: 60000, maxChars: 80000, maxClaims: 160, instruction: 'Answer directly with the evidence that matters.' },
+    agent_deep: { id: 'agent_deep', label: 'Deep', maxCalls: 38, maxTools: 160, maxTokens: 9000, totalTokens: 240000, finalTokens: 8000, maxMs: 900000, requestMs: 120000, maxChars: 140000, maxClaims: 320, instruction: 'Research in loops, cross-check important figures and review the draft before answering.' }
+  });
+  function profile(id = 'detailed') { if (typeof id !== 'string') throw new Error('Unknown research profile'); if (Object.hasOwn(profiles, id)) return profiles[id]; if (Object.hasOwn(agentProfiles, id)) return agentProfiles[id]; throw new Error('Unknown research profile'); }
   function requestBudget(body = {}) {
     const p = profile(body.profile), capped = (v, max, name) => { if (v == null) return max; if (!Number.isFinite(v) || v <= 0 || !Number.isInteger(v)) throw new Error('Invalid ' + name); return Math.min(v, max); };
     const remainingTokens = capped(body.remainingTokens, p.totalTokens, 'remaining tokens');
@@ -93,5 +99,5 @@
     const output = {status:'calculated',verification:'Deterministic calculation from structurally valid evidence; source truth and narrative are not independently verified.',rows:sets.get(program.output),assumptions:[...assumptions.values()],program:JSON.parse(JSON.stringify(program)),inputRecords:sources.size};
     check(); if (JSON.stringify(output).length > 60000) throw new Error('Analysis output exceeds context budget; filter or group first'); return freeze(output);
   }
-  root.FU_RESEARCH_RUNTIME = Object.freeze({ profiles, profile, requestBudget, runAnalysis });
+  root.FU_RESEARCH_RUNTIME = Object.freeze({ profiles, agentProfiles, profile, requestBudget, runAnalysis });
 })(typeof window !== 'undefined' ? window : globalThis);

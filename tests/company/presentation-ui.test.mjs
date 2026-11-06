@@ -49,6 +49,8 @@ async function setup({ minimal = false } = {}) {
   w.sparkSVG = () => w.el('svg');
   w.svgUse = () => w.el('svg');
   w.RESEARCH = { ask: prompt => { w.briefPrompt = prompt; } };
+  w.requestResearch = prompt => w.dispatchEvent(new w.CustomEvent('fu:research-request', { detail: prompt }));
+  w.addEventListener('fu:research-request', event => { w.briefPrompt = event.detail; });
   w.setTimeout = callback => callback();
   for (const id of ['Overview', 'Financials', 'Segments', 'News', 'Filings', 'Earnings', 'Insiders']) {
     w['co' + id] = (body, ticker) => { body.append(w.el('div', {}, id + ' ' + ticker)); };
@@ -80,7 +82,8 @@ test('company presentation preserves official details, actual quote date, filing
     assert.equal(w.watched, 'TEST');
     assert.ok(w.document.querySelector('#star').classList.contains('pri'));
     [...w.document.querySelectorAll('.co-actions button')].find(node => node.textContent.includes('Write a brief')).click();
-    assert.equal(w.location.hash, '#research');
+    // The brief is handed to the global assistant panel for review; the company page stays open.
+    assert.notEqual(w.location.hash, '#research');
     assert.match(w.briefPrompt, /one-page brief on TEST/);
   } finally { h.close(); }
 });
