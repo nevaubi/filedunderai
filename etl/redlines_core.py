@@ -211,6 +211,7 @@ def diff_paras(old, new, min_len=40, pair_ratio=0.55):
     a = [norm(p) for p in old if len(p) >= min_len]
     b = [norm(p) for p in new if len(p) >= min_len]
     am, bm = [masked(p) for p in a], [masked(p) for p in b]
+    aw, bw = [x.split() for x in am], [x.split() for x in bm]   # word sequences: pairing ratios on words, not characters
     sm = difflib.SequenceMatcher(None, am, bm, autojunk=False)
     changes, unchanged = [], 0
     for tag, i1, i2, j1, j2 in sm.get_opcodes():
@@ -228,9 +229,12 @@ def diff_paras(old, new, min_len=40, pair_ratio=0.55):
             for j in news:
                 if j in used:
                     continue
-                r = difflib.SequenceMatcher(None, am[i], bm[j], autojunk=False).quick_ratio()
-                if r >= br:
-                    r = difflib.SequenceMatcher(None, am[i], bm[j], autojunk=False).ratio()
+                la, lb = len(aw[i]), len(bw[j])
+                if not la or not lb or 2 * min(la, lb) / (la + lb) < br:
+                    continue
+                m = difflib.SequenceMatcher(None, aw[i], bw[j], autojunk=False)
+                if m.quick_ratio() >= br:
+                    r = m.ratio()
                     if r >= br:
                         best, br = j, r
             if best is None:
