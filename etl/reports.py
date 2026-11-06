@@ -540,7 +540,7 @@ def due(sb, index, today=None, max_n=MAX_PER_RUN):
     """[(kind, ticker, signature)] to generate now: previews before earnings, recaps after, then stale primers."""
     today = today or _today()
     est_idx = {r["ticker"]: r for r in ((_get(sb, "estimates/index.json") or {}).get("companies") or [])}
-    fund = _get(sb, "meta/fundamentals.json") or {}
+    caps_by = {r["ticker"]: float(r.get("market_cap") or 0) for r in ((_get(sb, "index.json") or {}).get("companies") or [])}
     universe = [u[0] for u in UNIVERSE]
     todo = []
     for tk in universe:
@@ -549,7 +549,7 @@ def due(sb, index, today=None, max_n=MAX_PER_RUN):
         if ne and 1 <= (ne - today).days <= PREVIEW_WINDOW:
             sig = f"preview:{ne}"
             if (index.get(tk) or {}).get("preview", {}).get("sig") != sig:
-                mcap = float(((fund.get(tk) or {}).get("fund") or {}).get("market_cap") or 0)
+                mcap = caps_by.get(tk, 0)
                 todo.append((0, (ne - today).days * 1e15 - mcap, "preview", tk, sig))
     try:
         since = (today - dt.timedelta(days=RECAP_WINDOW)).isoformat()
@@ -564,7 +564,7 @@ def due(sb, index, today=None, max_n=MAX_PER_RUN):
         sig = f"recap:{r['accession']}"
         if (index.get(tk) or {}).get("recap", {}).get("sig") != sig and not any(t[3] == tk and t[2] == "recap" for t in todo):
             todo.append((1, -int(r["filed"].replace("-", "")), "recap", tk, sig))
-    caps = sorted(universe, key=lambda t: -float(((fund.get(t) or {}).get("fund") or {}).get("market_cap") or 0))
+    caps = sorted(universe, key=lambda t: -caps_by.get(t, 0))
     for rank, tk in enumerate(caps):
         p = (index.get(tk) or {}).get("primer") or {}
         g = _pd(p.get("generated_at"))
