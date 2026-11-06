@@ -18,8 +18,36 @@
    Registration can happen before or after this file loads; the panel reads the registry at the start of each turn. */
 (function (root) {
   'use strict';
-  const has = name => { try { return typeof root.eval(name) !== 'undefined'; } catch { return false; } };
-  const G = name => { try { return root.eval(name); } catch { return undefined; } };
+  // app.js globals (classic-script bindings) resolved at call time, so this file loads before or after app.js.
+  const APP = {
+    D: () => typeof D !== 'undefined' ? D : undefined,
+    E: () => typeof E !== 'undefined' ? E : undefined,
+    IDX: () => typeof IDX !== 'undefined' ? IDX : undefined,
+    INDEX: () => typeof INDEX !== 'undefined' ? INDEX : undefined,
+    MACRO: () => typeof MACRO !== 'undefined' ? MACRO : undefined,
+    PAGES: () => typeof PAGES !== 'undefined' ? PAGES : undefined,
+    PX: () => typeof PX !== 'undefined' ? PX : undefined,
+    STATE: () => typeof STATE !== 'undefined' ? STATE : undefined,
+    applyMacro: () => typeof applyMacro !== 'undefined' ? applyMacro : undefined,
+    companySummary: () => typeof companySummary !== 'undefined' ? companySummary : undefined,
+    earningsReactions: () => typeof earningsReactions !== 'undefined' ? earningsReactions : undefined,
+    ensureCompany: () => typeof ensureCompany !== 'undefined' ? ensureCompany : undefined,
+    ensurePrices: () => typeof ensurePrices !== 'undefined' ? ensurePrices : undefined,
+    ensureSegments: () => typeof ensureSegments !== 'undefined' ? ensureSegments : undefined,
+    evidenceForCell: () => typeof evidenceForCell !== 'undefined' ? evidenceForCell : undefined,
+    getJSON: () => typeof getJSON !== 'undefined' ? getJSON : undefined,
+    loadFilingDoc: () => typeof loadFilingDoc !== 'undefined' ? loadFilingDoc : undefined,
+    macroSeries: () => typeof macroSeries !== 'undefined' ? macroSeries : undefined,
+    model: () => typeof model !== 'undefined' ? model : undefined,
+    plabel: () => typeof plabel !== 'undefined' ? plabel : undefined,
+    priceStats: () => typeof priceStats !== 'undefined' ? priceStats : undefined,
+    route: () => typeof route !== 'undefined' ? route : undefined,
+    segCell: () => typeof segCell !== 'undefined' ? segCell : undefined,
+    segPeriods: () => typeof segPeriods !== 'undefined' ? segPeriods : undefined,
+    store: () => typeof store !== 'undefined' ? store : undefined,
+    FU_COMPANIES: () => root.FU_COMPANIES,
+  };
+  const G = name => APP[name]?.();
   const MAX = 12000;
   const clip = (s, n = MAX) => (s.length > n ? s.slice(0, n) + '\n…[truncated; request a narrower slice]' : s);
   const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return String(u || ''); } };
