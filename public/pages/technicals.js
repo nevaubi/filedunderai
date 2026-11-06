@@ -1,5 +1,5 @@
 // Technicals page. Registers window.FU_PAGES.technicals(arg); app.js route() uses it in place of the built-in page when set.
-// #technicals opens the last symbol, #technicals-TICKER a given one. Indicator math lives in technicals-lib.js (window.TA),
+// #technicals opens the last symbol, #technicals-TICKER a given one, #technicals-TICKER/tab[/BENCH] a tab (quant tabs in quant.js). Indicator math lives in technicals-lib.js (window.TA),
 // heavier per-symbol analysis runs in technicals-worker.js. Data: tech/bars/{SYM}.json (daily history since 2008),
 // tech/events/{T}.json (EDGAR 8-K/10-K/10-Q and parsed Form 4 trades), tech/signals.json, tech/breadth.json, tech/states.json.
 window.FU_PAGES = window.FU_PAGES || {};
@@ -49,7 +49,7 @@ window.FU_PAGES = window.FU_PAGES || {};
     sym: "NVDA", tab: "chart", range: "1Y", type: "candle", log: false, cmp: "", ma: [["sma", 20, false], ["sma", 50, true], ["sma", 200, true], ["ema", 21, false]],
     bb: [false, 20, 2], kc: [false, 20, 2, 10], ich: [false, 9, 26, 52], st: [false, 10, 3], vwap: [true],
     panes: { vol: [true], rsi: [true, 14], stoch: [false, 14, 3, 3], macd: [true, 12, 26, 9], adx: [false, 14], atr: [false, 14], obv: [false], mfi: [false, 14], cmf: [false, 20], rs: [false] },
-    pat: { levels: true, trend: true, gaps: true, events: true, hilo: true }, mk: { earn: true, k8: true, ins: true, per: false }, anchors: {}, hz: 20, riskWin: 252, riskMet: "corr", mktSort: ["rs63", true], showInd: false,
+    bench: "SPY", pat: { levels: true, trend: true, gaps: true, events: true, hilo: true }, mk: { earn: true, k8: true, ins: true, per: false }, anchors: {}, hz: 20, riskWin: 252, riskMet: "corr", mktSort: ["rs63", true], showInd: false,
   };
   const TX = Object.assign(JSON.parse(JSON.stringify(DEF)), store.get("tx", {}));
   for (const k of ["panes", "pat", "mk"]) TX[k] = Object.assign({}, DEF[k], TX[k]);
@@ -282,10 +282,21 @@ window.FU_PAGES = window.FU_PAGES || {};
   }
 
   /* ---------- page ---------- */
+  // Hash: #technicals-SYM[/tab[/BENCH]]. The symbol is the parent state of every tab; BENCH (SPY default) drives the
+  // statistics and correlation tabs of the quant lab (public/pages/quant.js).
+  const QTABS = () => (window.FU_QUANT?.TABS || []);
+  const hashFor = (sym, tab, bench) => `#technicals-${sym.replace("^", "")}${tab && tab !== "chart" ? "/" + tab : bench && bench !== "SPY" ? "/chart" : ""}${bench && bench !== "SPY" ? "/" + bench.replace("^", "") : ""}`;
+  window.FU_TX = { openCalc, openFiling, loadHist, num, itemsText, edgarUrl, HIST };
   window.FU_PAGES.technicals = async function (arg) {
     const all = [...MKT, ...TICKERS];
-    if (arg) { const a = String(arg).toUpperCase(); const m = all.find(s => s.replace("^", "") === a.replace("^", "")); if (m) TX.sym = m; }
+    const find = v => all.find(s => s.replace("^", "") === String(v || "").toUpperCase().replace("^", ""));
+    const parts = String(arg || "").split("/");
+    if (parts[0]) { const m = find(parts[0]); if (m) TX.sym = m; }
+    const T = [["chart", "Chart"], ...QTABS(), ["signals", "Signal scorecard"], ["risk", "Volatility and risk"], ["market", "Market breadth"]];
+    if (parts[1] && T.some(t => t[0] === parts[1])) TX.tab = parts[1];
+    if (parts[2]) { const b = find(parts[2]); if (b) TX.bench = b; } else if (parts[0]) TX.bench = "SPY";
     if (!all.includes(TX.sym)) TX.sym = "NVDA";
+    if (!TX.bench || !all.includes(TX.bench)) TX.bench = "SPY";
     save();
     const sym = TX.sym;
     const [H] = await Promise.all([loadHist(sym), loadHist("SPY")]);
@@ -293,17 +304,41 @@ window.FU_PAGES = window.FU_PAGES || {};
     const sector = IDX[sym]?.sector, secEtf = SECTOR_ETF[sector];
     const dl = el("datalist", { id: "tx-syms" }, all.map(s => el("option", { value: s.replace("^", "") }, nameOf(s))));
     const inp = el("input", { class: "tx-sym mono", list: "tx-syms", value: sym.replace("^", ""), "aria-label": "Symbol", placeholder: "Symbol" });
-    const go = () => { const v = inp.value.trim().toUpperCase(); const m = all.find(s => s.replace("^", "") === v.replace("^", "")); if (m) location.hash = "#technicals-" + m.replace("^", ""); else toast(`${v} is not covered`); };
+    const go = () => { const m = find(inp.value.trim()); if (m) location.hash = hashFor(m, TX.tab, TX.bench); else toast(`${inp.value.trim().toUpperCase()} is not covered`); };
     inp.addEventListener("change", go); inp.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+    // benchmark selector: SPY, the sector ETF, broad ETFs, or any covered symbol
+    const benchOpts = [["SPY", "SPY · S&P 500"], ...(secEtf ? [[secEtf, `${secEtf} · sector`]] : []), ["QQQ", "QQQ · Nasdaq 100"], ["IWM", "IWM · Russell 2000"], ["DIA", "DIA · Dow"]];
+    if (!benchOpts.some(o => o[0] === TX.bench)) benchOpts.push([TX.bench, `${TX.bench.replace("^", "")} · custom`]);
+    const bsel = el("select", { class: "btn", "aria-label": "Benchmark", title: "Benchmark for the Statistics and Correlation tabs" }, [...benchOpts, ["__custom", "Custom…"]].map(([v, l]) => { const o = el("option", { value: v }, l); if (v === TX.bench) o.selected = true; return o; }));
+    bsel.onchange = () => {
+      let v = bsel.value;
+      if (v === "__custom") { const q = prompt("Benchmark symbol (any covered company or ETF)", ""); const m = find(q); if (!m) { if (q) toast(`${q.toUpperCase()} is not covered`); bsel.value = TX.bench; return; } v = m; }
+      TX.bench = v; save();
+      location.hash = hashFor(sym, TX.tab, v);
+    };
     const last = H.n - 1, chg = H.c[last] / H.c[last - 1] - 1;
-    page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Technicals"),
+    page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Technicals & quant lab"),
       el("h1", {}, nameOf(sym), " ", el("span", { class: "muted mono", style: "font-size:18px" }, sym.replace("^", ""))),
       el("div", { class: "sub" }, el("span", { class: "num" }, f2(H.c[last])), " ", el("span", { class: "num " + cls(chg) }, pp(chg, 2)), ` · close ${fdate(H.d[last])} · ${H.n.toLocaleString()} daily bars since ${fdate(H.d[0])}`, IDX[sym] ? [" · ", el("a", { href: "#company-" + sym.toLowerCase() }, "Company page")] : null)),
-      el("div", { class: "right tx-top" }, inp, dl)));
+      el("div", { class: "right tx-top" }, inp, dl, el("label", { class: "faint", style: "font-size:12px;display:flex;gap:6px;align-items:center" }, "Benchmark", bsel))));
     const tabs = el("div", { class: "tabs", role: "tablist", style: "margin-bottom:16px" });
     const body = el("div", { style: "display:flex;flex-direction:column;gap:16px" });
-    const T = [["chart", "Chart and patterns"], ["signals", "Signal scorecard"], ["risk", "Volatility and risk"], ["market", "Market breadth"]];
-    const show = id => { TX.tab = id; save(); tabs.querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.v === id)); body.innerHTML = ""; ({ chart: chartTab, signals: signalsTab, risk: riskTab, market: marketTab })[id](body, H, { sector, secEtf }); };
+    const quantIds = new Set(QTABS().map(t => t[0]));
+    let seq = 0;
+    const show = async id => {
+      TX.tab = id; save();
+      const h = hashFor(sym, id, TX.bench); if (location.hash !== h) history.replaceState(null, "", h);
+      tabs.querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.v === id); b.setAttribute("aria-selected", b.dataset.v === id ? "true" : "false"); });
+      body.innerHTML = "";
+      const my = ++seq;
+      const ctx = { sector, secEtf };
+      if (quantIds.has(id)) {
+        const holder = el("div", { style: "display:flex;flex-direction:column;gap:16px" }); body.append(holder);
+        try { await window.FU_QUANT.render(id, holder, { sym, H, ctx, bench: TX.bench }); } catch (e) { console.error(e); if (my === seq) holder.append(el("div", { class: "note" }, `This tab could not be rendered (${e.message}).`)); }
+        return;
+      }
+      ({ chart: chartTab, signals: signalsTab, risk: riskTab, market: marketTab })[id](body, H, ctx);
+    };
     T.forEach(([id, n]) => tabs.append(el("button", { "data-v": id, role: "tab", onclick: () => show(id) }, n)));
     page.append(tabs, body);
     show(T.some(t => t[0] === TX.tab) ? TX.tab : "chart");
