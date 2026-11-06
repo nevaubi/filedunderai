@@ -93,7 +93,24 @@ def pick_concept(facts, names):
     return (first, unit, merged, latest) if first else None
 
 
-def _revenue_rank(facts, r, names):
+# Issuers whose consolidated "Revenues" total is reported beside a smaller ASC 606 contract-revenue component
+# in the same filing context, where the component omits a primary revenue stream (self-mining, commodity
+# merchandising, purchased-receivable collections, lending, collaboration/royalty income). Reviewed per CIK;
+# for these the reported total is preferred whenever both are reported for the identical start/end/accession.
+REPORTED_TOTAL_REVENUE_CIKS = {
+    1507605: "MARA: bitcoin mining revenue is outside contract revenue",
+    821026: "ANDE: commodity merchandising sales are outside contract revenue",
+    1084961: "ECPG: portfolio collections revenue is outside contract revenue",
+    1362468: "ALGT: total operating revenue exceeds the contract component",
+    1845815: "PAYO: interest income on customer balances is part of total revenues",
+    1724521: "RCUS: collaboration and license revenue is part of total revenues",
+    1662991: "SEZL: interest and fee income on receivables is part of total revenues",
+    873303: "SRPT: collaboration and royalty revenue is part of total revenues",
+    1497770: "WD: servicing and loan income is part of total revenues",
+}
+
+
+def _revenue_rank(facts, r, names, total_scope=False):
     """Explicit accounting scopes, never largest-value selection.
 
     ASC 606 contract revenue excludes leases and financial instruments. A reported
@@ -114,6 +131,11 @@ def _revenue_rank(facts, r, names):
         return -2, "reported consolidated revenue includes lease income outside ASC 606"
     if c == "Revenues" and carries(insurance):
         return -2, "reported consolidated insurance revenue includes premiums outside ASC 606"
+    if total_scope and c == "Revenues":
+        contract = [x["val"] for x in facts.get("us-gaap", {}).get("RevenueFromContractWithCustomerExcludingAssessedTax", {}).get("units", {}).get("USD", [])
+                    if (x.get("start"), x["end"], x["accn"]) == (r.get("start"), r["end"], r["accn"])]
+        if contract and r["val"] > max(contract):
+            return -2, "reviewed issuer: reported consolidated revenue exceeds its ASC 606 contract-revenue component"
     return names.index(c), "reported concept priority within accounting scope"
 
 
@@ -198,7 +220,7 @@ def prefer_reported_observation(selected, options):
     return preferred
 
 
-def build_series(facts, stmt, vintage="latest", as_of=None, concepts=None, instant=None):
+def build_series(facts, stmt, vintage="latest", as_of=None, concepts=None, instant=None, total_revenue_scope=False):
     """Normalize reported observations and retain filing histories for point-in-time use.
 
     as_of is a filing-date cutoff (daily granularity). Cross-filing subtraction is
@@ -220,7 +242,8 @@ def build_series(facts, stmt, vintage="latest", as_of=None, concepts=None, insta
                 continue
             if as_of and r.get("filed", "") > as_of:
                 continue
-            rank, reason = _revenue_rank(facts, r, names) if label == "Revenue" else (names.index(r["c"]), "reported concept priority")
+            rank, reason = (_revenue_rank(facts, r, names, total_revenue_scope) if label == "Revenue"
+                            else (names.index(r["c"]), "reported concept priority"))
             rec = {"v": r["val"], "end": r["end"], "accn": r["accn"], "form": r["form"],
                    "filed": r["filed"], "c": r["c"], "available_at": r["filed"],
                    "accessions": [r["accn"]], "vintage": vintage, "validation_status": "reported",

@@ -278,7 +278,8 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
             sec.fill_gaps(cik, facts, sub, log=log)
         except Exception as e:
             warn(f"  {tk} gap filler failed: {str(e)[:200]}")
-    statements = {k: sec.build_series(facts, k) for k in sec.CONCEPTS}
+    total_scope = cik in sec.REPORTED_TOTAL_REVENUE_CIKS
+    statements = {k: sec.build_series(facts, k, total_revenue_scope=total_scope) for k in sec.CONCEPTS}
     from .source_quality import partition_supported_periods, comparability_review
     statements, quarantined = partition_supported_periods(statements)
     if quarantined:
