@@ -8,6 +8,7 @@ import unittest
 import urllib.request
 from pathlib import Path
 from unittest.mock import patch
+from etl import repair_screener as repair_screener_module
 
 from etl import fundamentals, screener
 
@@ -103,9 +104,7 @@ class StoredScreenerRepairTests(unittest.TestCase):
                 'normalized_tickers': self.tickers, 'legacy_tickers': [],
                 'normalized_metadata_sha256': {t: sha(body(fund[t])) for t in self.tickers},
                 'inputs': [], 'outputs': [], 'code_sha256': {p: sha((Path(__file__).resolve().parents[2] / p).read_bytes()) for p in
-                    ('etl/screener.py', 'etl/jobs.py', 'etl/fundamentals.py', 'etl/sec.py', 'etl/source_provenance.py',
-                     'etl/source_quality.py', 'etl/universe.py', 'etl/common.py', 'etl/kpi_taxonomy.py', 'etl/repair_screener.py',
-                     'etl/additional_companies.json', 'etl/additional_companies_mdy-spsm-2026-11-04.json')},
+                    repair_screener_module.code_paths()},
                 'validation': {'exact_price_matches': 2, 'price_mismatches': [],
                     'missing_normalized_cache': [], 'unexpected_legacy_cache': [],
                     'market_cap_mismatches_after_screener_rounding': [], 'same_columns': True, 'same_tickers': True}}
