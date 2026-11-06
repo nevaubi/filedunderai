@@ -7,7 +7,8 @@ Serves the built site from dist/ and answers:
   GET  /api/filing  404 (filings come from the public bucket cache)
 
 The /api/ai script reads the conversation it receives, so citations in the final answer use the real evidence ids
-and filing passages returned by the browser-side tools. Scenario is chosen by a keyword in the user's question.
+and filing passages returned by the browser-side tools. Deep mode (agent_deep) runs the self-review script,
+a question containing "(slow)" waits 25 s for the Stop test, anything else runs plan -> tools -> ask_user -> answer.
 Usage: python3 tests/assistant/e2e/mock_api.py [port]
 """
 import json
@@ -90,10 +91,10 @@ def script(body):
     outs = tool_outputs(after)
     reviewed = any(m.get("role") == "user" and str(m.get("content", "")).startswith("[Self-review") for m in after)
     q = question.lower()
-    if "scenario slow" in q:
+    if "(slow)" in q:
         time.sleep(25)
         return reply("Too late.")
-    if "scenario deep" in q:
+    if body.get("profile") == "agent_deep":
         if not reviewed and stage == 0:
             return reply("", [
                 call("update_plan", {"goal": "Assess NVDA momentum versus semiconductors", "steps": [{"title": "Pull NVDA technicals", "status": "doing"}, {"title": "Compare with SMH", "status": "todo"}, {"title": "Rank the screen", "status": "todo"}], "notes": ""}, 0),

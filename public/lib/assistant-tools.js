@@ -156,14 +156,22 @@
         const tables = (seg?.tables || []).filter(t => t.rows.length && (!a.metric || String(t.metric).toLowerCase().includes(a.metric.toLowerCase())));
         if (!tables.length) return { output: `No segment tables on file for ${tk}.`, summary: 'no segments' };
         const out = [], segCell = G('segCell'), evidenceForCell = G('evidenceForCell');
-        for (const t of tables.slice(0, 6)) {
-          const ends = G('segPeriods')(t, K, n);
-          out.push(`## ${t.category_label} · ${t.metric} (${t.concept})`);
-          for (const r of t.rows.filter(r => !r.memo).slice(0, 14)) {
-            const vals = ends.map(e => r[K]?.[e] ? (() => { const c = segCell(tk, t, r, K, r[K][e], r[K]), ev = evidenceForCell(c); return `${r[K][e].p || e} = ${raw(ev.value)} ≈ ${pretty(ev.value, 'USD')} [${ev.id}]`; })() : null).filter(Boolean);
-            if (vals.length) out.push(`${'  '.repeat(r.depth || 0)}${r.label}: ${vals.join(' | ')}`);
+        let shown = 0;
+        for (const t of tables) {
+          if (shown >= 6) break;
+          let k = K;
+          if (!G('segPeriods')(t, k, 1).length) k = k === 'Q' ? (G('segPeriods')(t, 'A', 1).length ? 'A' : 'I') : (G('segPeriods')(t, 'Q', 1).length ? 'Q' : 'I');
+          const ends = G('segPeriods')(t, k, n), lines = [];
+          for (const r of t.rows.filter(r => !r.memo && ends.some(e => r[k]?.[e]))) {
+            if (lines.length >= 16) break;
+            const vals = ends.filter(e => r[k]?.[e]).map(e => { const c = segCell(tk, t, r, k, r[k][e], r[k]), ev = evidenceForCell(c); return `${r[k][e].p || e} = ${raw(ev.value)} ≈ ${pretty(ev.value, 'USD')} [${ev.id}]`; });
+            lines.push(`${'  '.repeat(r.depth || 0)}${r.label}: ${vals.join(' | ')}`);
           }
+          if (!lines.length) continue;
+          shown++;
+          out.push(`## ${t.category_label} · ${t.metric} (${t.concept}${t.id.endsWith(':summary') ? ', summary view' : ''}; ${k === 'A' ? 'annual' : 'quarterly'})`, ...lines);
         }
+        if (!out.length) return { output: `No segment values on file for ${tk} in the latest ${n} periods.`, summary: 'no recent segments' };
         return { output: clip(out.join('\n')), summary: `${tk} ${K === 'A' ? 'annual' : 'quarterly'} segments, ${tables.length} tables` };
       } });
 
@@ -343,7 +351,12 @@
 
   /* -------- sandbox: model-written JavaScript in a throwaway Worker with network removed -------- */
   const WORKER_SRC = `
-self.fetch = undefined; self.XMLHttpRequest = undefined; self.WebSocket = undefined; self.EventSource = undefined; self.indexedDB = undefined; self.caches = undefined;
+// Remove network, storage and nested-worker APIs from the global object and its prototype chain.
+for (let p = self; p; p = Object.getPrototypeOf(p)) {
+  for (const k of ["fetch", "XMLHttpRequest", "WebSocket", "WebTransport", "EventSource", "indexedDB", "caches", "BroadcastChannel", "Worker", "SharedWorker", "importScripts", "navigator"]) {
+    try { Object.defineProperty(p, k, { value: undefined, writable: false, configurable: false }); } catch { /* non-configurable built-ins stay shadowed below */ }
+  }
+}
 self.importScripts = () => { throw new Error("imports are disabled"); };
 self.onmessage = async (e) => {
   const logs = [];

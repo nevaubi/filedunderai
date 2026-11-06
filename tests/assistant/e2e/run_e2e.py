@@ -150,7 +150,7 @@ def main():
         # Scenario 2: Deep mode with a self-review pass
         page.locator('#fu-asst [data-act="new"]').click()
         page.locator('#fu-asst [data-depth="deep"]').click()
-        ask(page, "SCENARIO deep: is NVDA momentum strong versus semis?")
+        ask(page, "Is NVDA's momentum strong versus semiconductors? Check it twice.")
         page.wait_for_selector(".asst-mfoot", timeout=90000)
         page.locator(".asst-stoggle").last.click()
         text = page.locator(".asst-m.a").last.inner_text()
@@ -163,7 +163,7 @@ def main():
         # Scenario 3: Stop
         page.locator('#fu-asst [data-act="new"]').click()
         page.locator('#fu-asst [data-depth="fast"]').click()
-        ask(page, "SCENARIO slow: take your time")
+        ask(page, "Run a long backtest (slow)")
         page.wait_for_selector(".asst-send.stop")
         page.wait_for_timeout(700)
         page.locator(".asst-send.stop").click()
@@ -198,6 +198,38 @@ def main():
         b2 = page.locator("#fu-asst").bounding_box()
         check("float state and box persist across reload", abs(b2["x"] - b1["x"]) < 3 and abs(b2["width"] - b1["width"]) < 3, f"{b1} -> {b2}")
         page.locator('#fu-asst [data-act="dock"]').click()
+
+        # Every built-in executor against the real public data bundles (web tools hit the mock routes)
+        smoke = page.evaluate("""async () => {
+          const tools = Object.fromEntries(FU_ASSISTANT_TOOLKIT.toolsFor('company').map(t => [t.name, t]));
+          const calls = [
+            ['get_coverage', { query: 'nvidia' }], ['screen_companies', { sort_by: 'fcf_yield', limit: 3, index: 'sp500' }],
+            ['get_financials', { ticker: 'AAPL', statement: 'cashflow', frequency: 'annual', periods: 3 }], ['get_financials', { ticker: 'NVDA', statement: 'ratios', periods: 4 }],
+            ['get_segments', { ticker: 'NVDA', frequency: 'annual', periods: 2 }], ['list_filings', { ticker: 'NVDA', forms: ['10-Q'], limit: 3 }],
+            ['read_filing', { ticker: 'NVDA', accession: '0001045810-26-000075', query: 'gross margin' }], ['search_filings', { query: '"data center"', ticker: 'NVDA' }],
+            ['get_price_history', { symbol: 'NVDA', range: '6mo' }], ['get_technicals', { symbol: 'SPY' }], ['get_quotes', { symbols: ['NVDA', 'QQQ'] }],
+            ['get_insider_trades', { ticker: 'NVDA', limit: 3 }], ['get_macro', { name: 'CPI', n: 3 }], ['get_macro', { name: 'CURVE' }], ['get_news', { ticker: 'NVDA' }], ['get_news', {}],
+            ['get_earnings_reactions', { ticker: 'NVDA' }], ['web_research', { query: 'x' }], ['read_webpage', { url: 'https://example.com' }], ['web_map', { url: 'https://example.com' }],
+            ['web_extract', { url: 'https://example.com', prompt: 'x' }], ['get_page_context', {}],
+            ['run_code', { code: 'console.log(data.universe.length); return { revenueMean: stats.mean(data.companies.NVDA.annual.rows.Revenue.filter(Number.isFinite).slice(-3)) > 0, spyBars: data.prices.SPY.length > 100, network: typeof fetch }', tickers: ['NVDA'], price_symbols: ['SPY'] }],
+            ['run_code', { code: 'return [typeof fetch, typeof WorkerGlobalScope.prototype.fetch, typeof Object.getPrototypeOf(self).fetch, typeof XMLHttpRequest, typeof WebSocket, typeof indexedDB, typeof importScripts].join(",")' }],
+            ['run_code', { code: 'while (true) {}' }],
+          ];
+          const out = [];
+          for (const [name, args] of calls) {
+            try { const r = await tools[name].run(args, {}); const text = typeof r === 'string' ? r : r.output; out.push([name, true, (r.summary || '') + (text.includes('[ev_') ? ' [evidence ids]' : '') + ' | ' + text.slice(0, 160).replace(/\\n/g, ' ')]); }
+            catch (e) { out.push([name, false, String(e.message || e)]); }
+          }
+          return out;
+        }""")
+        for name, ok, detail in smoke:
+            print(f"   tool {name}: {'ok' if ok else 'ERROR'} {detail[:150]}")
+        check("all built-in tools execute on real data", all(ok for n, ok, d in smoke[:-1]), "; ".join(d for _, ok, d in smoke[:-1] if not ok))
+        check("segments tool returns evidence-linked values", all("[evidence ids]" in d for n, ok, d in smoke if n in ("get_segments", "get_financials")))
+        code = [d for n, ok, d in smoke if n == "run_code"]
+        check("run_code sandbox has data and no network", '"revenueMean": true' in code[0] and '"spyBars": true' in code[0] and '"network": "undefined"' in code[0], code[0])
+        check("run_code sandbox strips network APIs from the prototype chain", ",".join(["undefined"] * 7) in code[1], code[1])
+        check("run_code sandbox enforces its time limit", "Timed out" in code[2], code[2])
 
         # History view
         page.goto(base + "/#research")

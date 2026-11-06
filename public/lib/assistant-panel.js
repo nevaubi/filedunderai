@@ -115,10 +115,9 @@
       if (isTable(ln) && i + 1 < lines.length && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1])) {
         const cells = l => { const slots = []; const p = l.replace(/\[\[[^\]]+\]\]|\[[^\]]*\]\([^)]*\)/g, t => { slots.push(t); return `${slots.length - 1}`; }); return p.trim().replace(/^\||\|$/g, '').split('|').map(c => c.replace(/(\d+)/g, (_, n) => slots[+n]).trim()); };
         const head = cells(ln), align = cells(lines[i + 1]).map(c => /^:-+:$/.test(c) ? 'center' : /-+:$/.test(c) ? 'right' : '');
-        const numeric = col => col >= 0;
         let t = '<div class="asst-tw"><table><thead><tr>' + head.map((c, k) => `<th${align[k] ? ` style="text-align:${align[k]}"` : ''}>${inline(c)}</th>`).join('') + '</tr></thead><tbody>';
         i += 2;
-        while (i < lines.length && isTable(lines[i])) { const r = cells(lines[i++]); t += '<tr>' + r.map((c, k) => `<td${align[k] ? ` style="text-align:${align[k]}"` : /^[-−+$€£(]?\d[\d,.]*[%xBMKT)]*\b/.test(c) && numeric(k) ? ' class="n"' : ''}>${inline(c)}</td>`).join('') + '</tr>'; }
+        while (i < lines.length && isTable(lines[i])) { const r = cells(lines[i++]); t += '<tr>' + r.map((c, k) => `<td${/^[-−+$€£(]?\d[\d,.]*[%xBMKT)]*\b/.test(c) ? ' class="n"' : ''}${align[k] ? ` style="text-align:${align[k]}"` : ''}>${inline(c)}</td>`).join('') + '</tr>'; }
         html += t + '</tbody></table></div>'; continue;
       }
       let m;
@@ -393,12 +392,12 @@ Answer format (Markdown): lead with a 1-2 sentence answer, then short sections, 
     if (btn) { btn.setAttribute('aria-expanded', String(S.open)); btn.classList.toggle('on', S.open); }
   }
   function setOpen(open, { focus = true } = {}) {
-    S.open = !!open; saveUI(); syncChrome();
+    S.open = !!open; syncChrome(); saveUI();
     if (S.open && !P.body.childElementCount) renderAll();
-    if (S.open && focus) setTimeout(() => P.ta.disabled ? P.aside.focus({ preventScroll: true }) : P.ta.focus({ preventScroll: true }), 30);
+    if (S.open && focus && !mobile()) setTimeout(() => P.ta.disabled ? P.aside.focus({ preventScroll: true }) : P.ta.focus({ preventScroll: true }), 30);
     if (!S.open) doc.querySelector('#asst-toggle')?.focus({ preventScroll: true });
   }
-  function setDocked(d) { S.docked = !!d; saveUI(); syncChrome(); }
+  function setDocked(d) { S.docked = !!d; syncChrome(); saveUI(); }
   function fit() { P.ta.style.height = 'auto'; P.ta.style.height = Math.min(160, Math.max(40, P.ta.scrollHeight)) + 'px'; }
 
   function drag(e, mode) {
@@ -687,6 +686,14 @@ Answer format (Markdown): lead with a 1-2 sentence answer, then short sections, 
       if ((e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'j') { e.preventDefault(); setOpen(!S.open); return; }
       if (e.key === 'Escape' && S.open && P.aside.contains(doc.activeElement) && !S.busy && mobile()) setOpen(false);
     });
+    // "c" copies a citation in the source panel; give assistant-cited filing passages their own citation text.
+    doc.addEventListener('keydown', e => {
+      const cell = typeof DR !== 'undefined' ? DR.cell : null;
+      if (e.key !== 'c' || !cell?.assistantFiling || e.metaKey || e.ctrlKey || e.altKey || /INPUT|TEXTAREA|SELECT/.test(doc.activeElement?.tagName || '')) return;
+      e.stopImmediatePropagation(); e.preventDefault();
+      const text = `${cell.quote ? '“' + cell.quote + '” ' : ''}SEC filing, accession ${cell.assistantFiling} (cited by the Filed Under assistant; verify in the filing).`;
+      if (typeof copyText === 'function') copyText(text, 'Citation copied');
+    }, true);
     root.addEventListener('fu:research-request', e => { if (typeof e.detail === 'string' && e.detail.trim()) prefill(e.detail); });
     root.addEventListener('hashchange', () => { syncChrome(); if (!S.busy && S.open && !S.session?.messages.length) renderAll(); });
     let rt; root.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(syncChrome, 120); });
