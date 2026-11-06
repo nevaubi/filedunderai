@@ -1,0 +1,2400 @@
+{
+ "schema_version": 1,
+ "cohort_id": "additional-399-spsm-2026-11-04-r1",
+ "companies": [
+  {
+   "ticker": "BNL",
+   "cik": 1424182,
+   "name": "Broadstone Net Lease, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NIC",
+   "cik": 1174850,
+   "name": "NICOLET BANKSHARES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CBU",
+   "cik": 723188,
+   "name": "COMMUNITY FINANCIAL SYSTEM, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AMTM",
+   "cik": 2011286,
+   "name": "Amentum Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CPK",
+   "cik": 19745,
+   "name": "CHESAPEAKE UTILITIES CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SFNC",
+   "cik": 90498,
+   "name": "SIMMONS FIRST NATIONAL CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TDW",
+   "cik": 98222,
+   "name": "TIDEWATER INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SHOO",
+   "cik": 913241,
+   "name": "STEVEN MADDEN, LTD.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FRPT",
+   "cik": 1611647,
+   "name": "Freshpet, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DAVE",
+   "cik": 1841408,
+   "name": "Dave Inc./DE",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AVA",
+   "cik": 104918,
+   "name": "AVISTA CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ALRM",
+   "cik": 1459200,
+   "name": "Alarm.com Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NMIH",
+   "cik": 1547903,
+   "name": "NMI Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ATRC",
+   "cik": 1323885,
+   "name": "AtriCure, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SBCF",
+   "cik": 730708,
+   "name": "SEACOAST BANKING CORP OF FLORIDA",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AEO",
+   "cik": 919012,
+   "name": "AMERICAN EAGLE OUTFITTERS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HWKN",
+   "cik": 46250,
+   "name": "HAWKINS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LRN",
+   "cik": 1157408,
+   "name": "Stride, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MGRC",
+   "cik": 752714,
+   "name": "MCGRATH RENTCORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "KNTK",
+   "cik": 1692787,
+   "name": "Kinetik Holdings Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "COCO",
+   "cik": 1482981,
+   "name": "Vita Coco Company, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ABM",
+   "cik": 771497,
+   "name": "ABM INDUSTRIES INC /DE/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FIBK",
+   "cik": 860413,
+   "name": "FIRST INTERSTATE BANCSYSTEM INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BKU",
+   "cik": 1504008,
+   "name": "BankUnited, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SKYW",
+   "cik": 793733,
+   "name": "SKYWEST INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TDC",
+   "cik": 816761,
+   "name": "TERADATA CORP /DE/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GPI",
+   "cik": 1031203,
+   "name": "GROUP 1 AUTOMOTIVE INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CURB",
+   "cik": 2027317,
+   "name": "Curbline Properties Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "OSW",
+   "cik": 1758488,
+   "name": "ONESPAWORLD HOLDINGS Ltd",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FHB",
+   "cik": 36377,
+   "name": "FIRST HAWAIIAN, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "OSIS",
+   "cik": 1039065,
+   "name": "OSI SYSTEMS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AGYS",
+   "cik": 78749,
+   "name": "AGILYSYS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VAC",
+   "cik": 1524358,
+   "name": "MARRIOTT VACATIONS WORLDWIDE Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WDFC",
+   "cik": 105132,
+   "name": "WD 40 CO",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ARCB",
+   "cik": 894405,
+   "name": "ARCBEST CORP /TX/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CWT",
+   "cik": 1035201,
+   "name": "CALIFORNIA WATER SERVICE GROUP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AXTI",
+   "cik": 1051627,
+   "name": "AXT INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SPSC",
+   "cik": 1092699,
+   "name": "SPS COMMERCE INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PFS",
+   "cik": 1178970,
+   "name": "PROVIDENT FINANCIAL SERVICES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AAP",
+   "cik": 1158449,
+   "name": "ADVANCE AUTO PARTS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SXI",
+   "cik": 310354,
+   "name": "STANDEX INTERNATIONAL CORP/DE/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EXTR",
+   "cik": 1078271,
+   "name": "EXTREME NETWORKS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CXW",
+   "cik": 1070985,
+   "name": "CoreCivic, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VGNT",
+   "cik": 2078008,
+   "name": "Versigent PLC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DRH",
+   "cik": 1298946,
+   "name": "DiamondRock Hospitality Co",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ACHC",
+   "cik": 1520697,
+   "name": "Acadia Healthcare Company, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CALM",
+   "cik": 16160,
+   "name": "CAL-MAINE FOODS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AGO",
+   "cik": 1273813,
+   "name": "ASSURED GUARANTY LTD",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PRK",
+   "cik": 805676,
+   "name": "PARK NATIONAL CORP /OH/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SHAK",
+   "cik": 1620533,
+   "name": "Shake Shack Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MGEE",
+   "cik": 1161728,
+   "name": "MGE ENERGY INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FRSH",
+   "cik": 1544522,
+   "name": "Freshworks Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BANC",
+   "cik": 1169770,
+   "name": "BANC OF CALIFORNIA, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SPHR",
+   "cik": 1795250,
+   "name": "Sphere Entertainment Co.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UNFI",
+   "cik": 1020859,
+   "name": "UNITED NATURAL FOODS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "APAM",
+   "cik": 1517302,
+   "name": "Artisan Partners Asset Management Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "KN",
+   "cik": 1587523,
+   "name": "Knowles Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ACLS",
+   "cik": 1113232,
+   "name": "AXCELIS TECHNOLOGIES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "KSS",
+   "cik": 885639,
+   "name": "KOHLS Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PRVA",
+   "cik": 1759655,
+   "name": "Privia Health Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FUL",
+   "cik": 39368,
+   "name": "FULLER H B CO",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BOH",
+   "cik": 46195,
+   "name": "BANK OF HAWAII CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NBTB",
+   "cik": 790359,
+   "name": "NBT BANCORP INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CUBI",
+   "cik": 1488813,
+   "name": "Customers Bancorp, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FBK",
+   "cik": 1649749,
+   "name": "FB Financial Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DNOW",
+   "cik": 1599617,
+   "name": "DNOW Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ACAD",
+   "cik": 1070494,
+   "name": "ACADIA PHARMACEUTICALS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CARG",
+   "cik": 1494259,
+   "name": "CarGurus, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DGII",
+   "cik": 854775,
+   "name": "DIGI INTERNATIONAL INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "REZI",
+   "cik": 1740332,
+   "name": "RESIDEO TECHNOLOGIES, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FBNC",
+   "cik": 811589,
+   "name": "FIRST BANCORP /NC/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PATK",
+   "cik": 76605,
+   "name": "PATRICK INDUSTRIES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BFAM",
+   "cik": 1437578,
+   "name": "BRIGHT HORIZONS FAMILY SOLUTIONS INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AKR",
+   "cik": 899629,
+   "name": "ACADIA REALTY TRUST",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BCC",
+   "cik": 1328581,
+   "name": "BOISE CASCADE Co",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FIVN",
+   "cik": 1288847,
+   "name": "Five9, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NEOG",
+   "cik": 711377,
+   "name": "NEOGEN CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AAMI",
+   "cik": 1748824,
+   "name": "Acadian Asset Management Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NHC",
+   "cik": 1047335,
+   "name": "NATIONAL HEALTHCARE CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CRVL",
+   "cik": 874866,
+   "name": "CORVEL CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UE",
+   "cik": 1611547,
+   "name": "Urban Edge Properties",
+   "currency": "USD"
+  },
+  {
+   "ticker": "JOE",
+   "cik": 745308,
+   "name": "ST JOE Co",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TRMK",
+   "cik": 36146,
+   "name": "TRUSTMARK CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WT",
+   "cik": 880631,
+   "name": "WisdomTree, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MARA",
+   "cik": 1507605,
+   "name": "MARA Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SPNT",
+   "cik": 1576018,
+   "name": "SiriusPoint Ltd",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PHIN",
+   "cik": 1968915,
+   "name": "PHINIA INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CACC",
+   "cik": 885550,
+   "name": "CREDIT ACCEPTANCE CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NTCT",
+   "cik": 1078075,
+   "name": "NETSCOUT SYSTEMS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BBT",
+   "cik": 1108134,
+   "name": "Beacon Financial Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "POWI",
+   "cik": 833640,
+   "name": "POWER INTEGRATIONS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PPLI",
+   "cik": 1800227,
+   "name": "People Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AVPT",
+   "cik": 1777921,
+   "name": "AvePoint, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MD",
+   "cik": 893949,
+   "name": "Pediatrix Medical Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FCPT",
+   "cik": 1650132,
+   "name": "Four Corners Property Trust, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ACMR",
+   "cik": 1680062,
+   "name": "ACM Research, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CALY",
+   "cik": 837465,
+   "name": "Callaway Golf Co",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HURN",
+   "cik": 1289848,
+   "name": "Huron Consulting Group Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UFPT",
+   "cik": 914156,
+   "name": "UFP TECHNOLOGIES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DAN",
+   "cik": 26780,
+   "name": "DANA Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NGVT",
+   "cik": 1653477,
+   "name": "Ingevity Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TRN",
+   "cik": 99780,
+   "name": "TRINITY INDUSTRIES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LCII",
+   "cik": 763744,
+   "name": "LCI INDUSTRIES",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PBH",
+   "cik": 1295947,
+   "name": "Prestige Consumer Healthcare Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TMDX",
+   "cik": 1756262,
+   "name": "TransMedics Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PEB",
+   "cik": 1474098,
+   "name": "Pebblebrook Hotel Trust",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LTC",
+   "cik": 887905,
+   "name": "LTC PROPERTIES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IVT",
+   "cik": 1307748,
+   "name": "InvenTrust Properties Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NWL",
+   "cik": 814453,
+   "name": "NEWELL BRANDS INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LOAR",
+   "cik": 2000178,
+   "name": "Loar Holdings Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PENG",
+   "cik": 1616533,
+   "name": "Penguin Solutions, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BANF",
+   "cik": 760498,
+   "name": "BANCFIRST CORP /OK/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CPRI",
+   "cik": 1530721,
+   "name": "Capri Holdings Ltd",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VVX",
+   "cik": 1601548,
+   "name": "V2X, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "XNCR",
+   "cik": 1326732,
+   "name": "Xencor Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HHH",
+   "cik": 1981792,
+   "name": "Howard Hughes Holdings Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BANR",
+   "cik": 946673,
+   "name": "BANNER CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SHO",
+   "cik": 1295810,
+   "name": "Sunstone Hotel Investors, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DXC",
+   "cik": 1688568,
+   "name": "DXC Technology Co",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BHE",
+   "cik": 863436,
+   "name": "BENCHMARK ELECTRONICS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NOG",
+   "cik": 1104485,
+   "name": "NORTHERN OIL & GAS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MCY",
+   "cik": 64996,
+   "name": "MERCURY GENERAL CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RRR",
+   "cik": 1653653,
+   "name": "Red Rock Resorts, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GPOR",
+   "cik": 874499,
+   "name": "GULFPORT ENERGY CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GOLF",
+   "cik": 1672013,
+   "name": "Acushnet Holdings Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ADMA",
+   "cik": 1368514,
+   "name": "ADMA BIOLOGICS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SEZL",
+   "cik": 1662991,
+   "name": "Sezzle Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ADUS",
+   "cik": 1468328,
+   "name": "Addus HomeCare Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PLUS",
+   "cik": 1022408,
+   "name": "EPLUS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PTON",
+   "cik": 1639825,
+   "name": "PELOTON INTERACTIVE, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TILE",
+   "cik": 715787,
+   "name": "INTERFACE INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VCEL",
+   "cik": 887359,
+   "name": "Vericel Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PGNY",
+   "cik": 1551306,
+   "name": "Progyny, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HTO",
+   "cik": 766829,
+   "name": "H2O AMERICA",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NWBI",
+   "cik": 1471265,
+   "name": "Northwest Bancshares, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WAFD",
+   "cik": 936528,
+   "name": "WAFD INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IPAR",
+   "cik": 822663,
+   "name": "INTERPARFUMS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CENX",
+   "cik": 949157,
+   "name": "CENTURY ALUMINUM CO",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PENN",
+   "cik": 921738,
+   "name": "PENN Entertainment, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NEO",
+   "cik": 1077183,
+   "name": "NEOGENOMICS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VECO",
+   "cik": 103145,
+   "name": "VEECO INSTRUMENTS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PBI",
+   "cik": 78814,
+   "name": "PITNEY BOWES INC /DE/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PRGO",
+   "cik": 1585364,
+   "name": "PERRIGO Co plc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MAN",
+   "cik": 871763,
+   "name": "ManpowerGroup Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WRBY",
+   "cik": 1504776,
+   "name": "Warby Parker Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FCF",
+   "cik": 712537,
+   "name": "FIRST COMMONWEALTH FINANCIAL CORP /PA/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "OFG",
+   "cik": 1030469,
+   "name": "OFG BANCORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ROG",
+   "cik": 84748,
+   "name": "ROGERS CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NWN",
+   "cik": 1733998,
+   "name": "Northwest Natural Holding Co",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EPAC",
+   "cik": 6955,
+   "name": "ENERPAC TOOL GROUP CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CNS",
+   "cik": 1284812,
+   "name": "COHEN & STEERS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "KWR",
+   "cik": 81362,
+   "name": "QUAKER CHEMICAL CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LBRT",
+   "cik": 1694028,
+   "name": "Liberty Energy Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CENTA",
+   "cik": 887733,
+   "name": "CENTRAL GARDEN & PET CO",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FA",
+   "cik": 1210677,
+   "name": "FIRST ADVANTAGE CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ECPG",
+   "cik": 1084961,
+   "name": "ENCORE CAPITAL GROUP INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HCI",
+   "cik": 1400810,
+   "name": "HCI Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RUN",
+   "cik": 1469367,
+   "name": "Sunrun Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "KMPR",
+   "cik": 860748,
+   "name": "KEMPER Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CC",
+   "cik": 1627223,
+   "name": "Chemours Co",
+   "currency": "USD"
+  },
+  {
+   "ticker": "COHU",
+   "cik": 21535,
+   "name": "COHU INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BTU",
+   "cik": 1064728,
+   "name": "PEABODY ENERGY CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EVTC",
+   "cik": 1559865,
+   "name": "EVERTEC, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WLY",
+   "cik": 107140,
+   "name": "JOHN WILEY & SONS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CHCO",
+   "cik": 726854,
+   "name": "CITY HOLDING CO",
+   "currency": "USD"
+  },
+  {
+   "ticker": "OLN",
+   "cik": 74303,
+   "name": "OLIN Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WU",
+   "cik": 1365135,
+   "name": "Western Union CO",
+   "currency": "USD"
+  },
+  {
+   "ticker": "XHR",
+   "cik": 1616000,
+   "name": "Xenia Hotels & Resorts, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AIN",
+   "cik": 819793,
+   "name": "ALBANY INTERNATIONAL CORP /DE/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MTX",
+   "cik": 891014,
+   "name": "MINERALS TECHNOLOGIES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DXPE",
+   "cik": 1020710,
+   "name": "DXP ENTERPRISES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WOR",
+   "cik": 108516,
+   "name": "WORTHINGTON ENTERPRISES, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HMN",
+   "cik": 850141,
+   "name": "HORACE MANN EDUCATORS CORP /DE/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RCUS",
+   "cik": 1724521,
+   "name": "Arcus Biosciences, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IOSP",
+   "cik": 1054905,
+   "name": "INNOSPEC INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "KMT",
+   "cik": 55242,
+   "name": "KENNAMETAL INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ALGT",
+   "cik": 1362468,
+   "name": "Allegiant Travel CO",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SRPT",
+   "cik": 873303,
+   "name": "Sarepta Therapeutics, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GRBK",
+   "cik": 1373670,
+   "name": "Green Brick Partners, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UCTT",
+   "cik": 1275014,
+   "name": "Ultra Clean Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DBD",
+   "cik": 28823,
+   "name": "DIEBOLD NIXDORF, Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FTRE",
+   "cik": 1965040,
+   "name": "Fortrea Holdings Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CALX",
+   "cik": 1406666,
+   "name": "CALIX, INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MSGR",
+   "cik": 2132873,
+   "name": "MSG Rangers Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TALO",
+   "cik": 1724965,
+   "name": "TALOS ENERGY INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WKC",
+   "cik": 789460,
+   "name": "WORLD KINECT CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PAYO",
+   "cik": 1845815,
+   "name": "Payoneer Global Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "INSP",
+   "cik": 1609550,
+   "name": "Inspire Medical Systems, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WWW",
+   "cik": 110471,
+   "name": "WOLVERINE WORLD WIDE INC /DE/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BLKB",
+   "cik": 1280058,
+   "name": "BLACKBAUD INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NTST",
+   "cik": 1798100,
+   "name": "NETSTREIT Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ADEA",
+   "cik": 1803696,
+   "name": "Adeia Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ANDE",
+   "cik": 821026,
+   "name": "Andersons, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PRDO",
+   "cik": 1046568,
+   "name": "PERDOCEO EDUCATION Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LMAT",
+   "cik": 1158895,
+   "name": "LEMAITRE VASCULAR INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AMN",
+   "cik": 1142750,
+   "name": "AMN HEALTHCARE SERVICES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "STBA",
+   "cik": 719220,
+   "name": "S&T BANCORP INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NSP",
+   "cik": 1000753,
+   "name": "INSPERITY, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SEDG",
+   "cik": 1419612,
+   "name": "SOLAREDGE TECHNOLOGIES, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PRGS",
+   "cik": 876167,
+   "name": "PROGRESS SOFTWARE CORP /MA",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HCSG",
+   "cik": 731012,
+   "name": "HEALTHCARE SERVICES GROUP INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BXMT",
+   "cik": 1061630,
+   "name": "BLACKSTONE MORTGAGE TRUST, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "KALU",
+   "cik": 811596,
+   "name": "KAISER ALUMINUM CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LPG",
+   "cik": 1596993,
+   "name": "DORIAN LPG LTD.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DV",
+   "cik": 1819928,
+   "name": "DoubleVerify Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TBBK",
+   "cik": 1295401,
+   "name": "Bancorp, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "OMCL",
+   "cik": 926326,
+   "name": "OMNICELL, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CTS",
+   "cik": 26058,
+   "name": "CTS CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SBH",
+   "cik": 1368458,
+   "name": "Sally Beauty Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LEU",
+   "cik": 1065059,
+   "name": "CENTRUS ENERGY CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ARR",
+   "cik": 1428205,
+   "name": "Armour Residential REIT, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MFP",
+   "cik": 2088281,
+   "name": "Midera Food Processing, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DEI",
+   "cik": 1364250,
+   "name": "Douglas Emmett Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DCOM",
+   "cik": 846617,
+   "name": "Dime Commercial Bancshares, Inc. /NY/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WERN",
+   "cik": 793074,
+   "name": "WERNER ENTERPRISES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CLSK",
+   "cik": 827876,
+   "name": "CLEANSPARK, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ZD",
+   "cik": 1084048,
+   "name": "ZIFF DAVIS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HRMY",
+   "cik": 1802665,
+   "name": "Harmony Biosciences Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ATEN",
+   "cik": 1580808,
+   "name": "A10 Networks, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EZPW",
+   "cik": 876523,
+   "name": "EZCORP INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NBHC",
+   "cik": 1475841,
+   "name": "National Bank Holdings Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HOPE",
+   "cik": 1128361,
+   "name": "HOPE BANCORP INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DFIN",
+   "cik": 1669811,
+   "name": "Donnelley Financial Solutions, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "THRM",
+   "cik": 903129,
+   "name": "Gentherm Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SAM",
+   "cik": 949870,
+   "name": "BOSTON BEER CO INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GTY",
+   "cik": 1052752,
+   "name": "GETTY REALTY CORP /MD/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ASTH",
+   "cik": 1083446,
+   "name": "Astrana Health, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SONO",
+   "cik": 1314727,
+   "name": "Sonos Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VSTS",
+   "cik": 1967649,
+   "name": "Vestis Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CASH",
+   "cik": 907471,
+   "name": "PATHWARD FINANCIAL, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HUBG",
+   "cik": 940942,
+   "name": "Hub Group, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BL",
+   "cik": 1666134,
+   "name": "BLACKLINE, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ARLO",
+   "cik": 1736946,
+   "name": "Arlo Technologies, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SDGR",
+   "cik": 1490978,
+   "name": "Schrodinger, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "STRA",
+   "cik": 1013934,
+   "name": "Strategic Education, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PLAB",
+   "cik": 810136,
+   "name": "PHOTRONICS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CNMD",
+   "cik": 816956,
+   "name": "CONMED Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PRLB",
+   "cik": 1443669,
+   "name": "Proto Labs Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PRG",
+   "cik": 1808834,
+   "name": "PROG Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CBRL",
+   "cik": 1067294,
+   "name": "CRACKER BARREL OLD COUNTRY STORE, INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AMR",
+   "cik": 1704715,
+   "name": "Alpha Metallurgical Resources, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ALG",
+   "cik": 897077,
+   "name": "ALAMO GROUP INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CNXC",
+   "cik": 1803599,
+   "name": "Concentrix Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LKFN",
+   "cik": 721994,
+   "name": "LAKELAND FINANCIAL CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MLKN",
+   "cik": 66382,
+   "name": "MILLERKNOLL, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IIPR",
+   "cik": 1677576,
+   "name": "INNOVATIVE INDUSTRIAL PROPERTIES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AZTA",
+   "cik": 933974,
+   "name": "Azenta, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MBC",
+   "cik": 1941365,
+   "name": "MasterBrand, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "INVA",
+   "cik": 1080014,
+   "name": "Innoviva, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SAFT",
+   "cik": 1172052,
+   "name": "SAFETY INSURANCE GROUP INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EFOR",
+   "cik": 890564,
+   "name": "Everforth Inc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EFC",
+   "cik": 1411342,
+   "name": "Ellington Financial Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FLO",
+   "cik": 1128928,
+   "name": "FLOWERS FOODS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ENR",
+   "cik": 1632790,
+   "name": "ENERGIZER HOLDINGS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ALHC",
+   "cik": 1832466,
+   "name": "Alignment Healthcare, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SCL",
+   "cik": 94049,
+   "name": "STEPAN CO",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PDFS",
+   "cik": 1120914,
+   "name": "PDF SOLUTIONS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VIR",
+   "cik": 1706431,
+   "name": "Vir Biotechnology, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SNDR",
+   "cik": 1692063,
+   "name": "Schneider National, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TFIN",
+   "cik": 1539638,
+   "name": "Triumph Financial, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BKE",
+   "cik": 885245,
+   "name": "BUCKLE INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HE",
+   "cik": 354707,
+   "name": "HAWAIIAN ELECTRIC INDUSTRIES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PCRX",
+   "cik": 1396814,
+   "name": "Pacira BioSciences, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GNL",
+   "cik": 1526113,
+   "name": "Global Net Lease, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "STC",
+   "cik": 94344,
+   "name": "STEWART INFORMATION SERVICES CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ANIP",
+   "cik": 1023024,
+   "name": "ANI PHARMACEUTICALS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RSI",
+   "cik": 1793659,
+   "name": "Rush Street Interactive, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HTH",
+   "cik": 1265131,
+   "name": "Hilltop Holdings Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EYE",
+   "cik": 1710155,
+   "name": "National Vision Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ENOV",
+   "cik": 1420800,
+   "name": "Enovis CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CCS",
+   "cik": 1576940,
+   "name": "Century Communities, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "REYN",
+   "cik": 1786431,
+   "name": "Reynolds Consumer Products Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EPC",
+   "cik": 1096752,
+   "name": "EDGEWELL PERSONAL CARE Co",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GBX",
+   "cik": 923120,
+   "name": "GREENBRIER COMPANIES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WABC",
+   "cik": 311094,
+   "name": "WESTAMERICA BANCORPORATION",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GO",
+   "cik": 1771515,
+   "name": "Grocery Outlet Holding Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MCRI",
+   "cik": 907242,
+   "name": "MONARCH CASINO & RESORT INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "USLM",
+   "cik": 82020,
+   "name": "UNITED STATES LIME & MINERALS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MBIN",
+   "cik": 1629019,
+   "name": "Merchants Bancorp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GSHD",
+   "cik": 1726978,
+   "name": "Goosehead Insurance, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "JJSF",
+   "cik": 785956,
+   "name": "J&J SNACK FOODS CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TNDM",
+   "cik": 1438133,
+   "name": "TANDEM DIABETES CARE INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ADIG",
+   "cik": 2105139,
+   "name": "ADI GLOBAL DISTRIBUTION INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "USPH",
+   "cik": 885978,
+   "name": "U S PHYSICAL THERAPY INC /NV",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WS",
+   "cik": 1968487,
+   "name": "Worthington Steel, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "COTY",
+   "cik": 1024305,
+   "name": "COTY INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UPBD",
+   "cik": 933036,
+   "name": "UPBOUND GROUP, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WD",
+   "cik": 1497770,
+   "name": "Walker & Dunlop, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ACT",
+   "cik": 1823529,
+   "name": "Enact Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ADNT",
+   "cik": 1670541,
+   "name": "Adient plc",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LZB",
+   "cik": 57131,
+   "name": "LA-Z-BOY INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TMP",
+   "cik": 1005817,
+   "name": "TOMPKINS FINANCIAL CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GT",
+   "cik": 42582,
+   "name": "GOODYEAR TIRE & RUBBER CO /OH/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VYX",
+   "cik": 70866,
+   "name": "NCR Voyix Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BJRI",
+   "cik": 1013488,
+   "name": "BJs RESTAURANTS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ROCK",
+   "cik": 912562,
+   "name": "GIBRALTAR INDUSTRIES, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "INVX",
+   "cik": 1042893,
+   "name": "Innovex International, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AORT",
+   "cik": 784199,
+   "name": "ARTIVION, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UPWK",
+   "cik": 1627475,
+   "name": "UPWORK, INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TNC",
+   "cik": 97134,
+   "name": "TENNANT CO",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ICHR",
+   "cik": 1652535,
+   "name": "ICHOR HOLDINGS, LTD.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TRUP",
+   "cik": 1371285,
+   "name": "TRUPANION, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CERT",
+   "cik": 1827090,
+   "name": "Certara, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CVI",
+   "cik": 1376139,
+   "name": "CVR ENERGY INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CRI",
+   "cik": 1060822,
+   "name": "CARTERS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UTI",
+   "cik": 1261654,
+   "name": "UNIVERSAL TECHNICAL INSTITUTE INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WEN",
+   "cik": 30697,
+   "name": "Wendy's Co",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GIII",
+   "cik": 821002,
+   "name": "G III APPAREL GROUP LTD /DE/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HFWA",
+   "cik": 1046025,
+   "name": "HERITAGE FINANCIAL CORP /WA/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TRIP",
+   "cik": 1526520,
+   "name": "TripAdvisor, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SCSC",
+   "cik": 918965,
+   "name": "SCANSOURCE, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DCH",
+   "cik": 1062231,
+   "name": "Dauch Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NSSC",
+   "cik": 69633,
+   "name": "NAPCO SECURITY TECHNOLOGIES, INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "REX",
+   "cik": 744187,
+   "name": "REX AMERICAN RESOURCES Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SLVM",
+   "cik": 1856485,
+   "name": "Sylvamo Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "JBLU",
+   "cik": 1158463,
+   "name": "JETBLUE AIRWAYS CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PRSU",
+   "cik": 884219,
+   "name": "Pursuit Attractions & Hospitality, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "YELP",
+   "cik": 1345016,
+   "name": "YELP INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HLIT",
+   "cik": 851310,
+   "name": "HARMONIC INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LQDT",
+   "cik": 1235468,
+   "name": "LIQUIDITY SERVICES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MSEX",
+   "cik": 66004,
+   "name": "MIDDLESEX WATER CO",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LNN",
+   "cik": 836157,
+   "name": "LINDSAY CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UAA",
+   "cik": 1336917,
+   "name": "Under Armour, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "XPEL",
+   "cik": 1767258,
+   "name": "XPEL, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DLX",
+   "cik": 27996,
+   "name": "DELUXE CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SMPL",
+   "cik": 1702744,
+   "name": "Simply Good Foods Co",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AAT",
+   "cik": 1500217,
+   "name": "American Assets Trust, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CRK",
+   "cik": 23194,
+   "name": "COMSTOCK RESOURCES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UFCS",
+   "cik": 101199,
+   "name": "UNITED FIRE GROUP INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "QNST",
+   "cik": 1117297,
+   "name": "QUINSTREET, INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HZO",
+   "cik": 1057060,
+   "name": "MARINEMAX INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NX",
+   "cik": 1423221,
+   "name": "Quanex Building Products CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DEA",
+   "cik": 1622194,
+   "name": "Easterly Government Properties, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UTL",
+   "cik": 755001,
+   "name": "UNITIL CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MPT",
+   "cik": 1287865,
+   "name": "MEDICAL PROPERTIES TRUST INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HAFC",
+   "cik": 1109242,
+   "name": "HANMI FINANCIAL CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CFFN",
+   "cik": 1490906,
+   "name": "Capitol Federal Financial, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CPF",
+   "cik": 701347,
+   "name": "CENTRAL PACIFIC FINANCIAL CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SBSI",
+   "cik": 705432,
+   "name": "SOUTHSIDE BANCSHARES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LGIH",
+   "cik": 1580670,
+   "name": "LGI Homes, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "APOG",
+   "cik": 6845,
+   "name": "APOGEE ENTERPRISES, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VTOL",
+   "cik": 1525221,
+   "name": "Bristow Group Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CSR",
+   "cik": 798359,
+   "name": "CENTERSPACE",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UVV",
+   "cik": 102037,
+   "name": "UNIVERSAL CORP /VA/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "GTM",
+   "cik": 1794515,
+   "name": "ZoomInfo Technologies Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TRST",
+   "cik": 357301,
+   "name": "TRUSTCO BANK CORP N Y",
+   "currency": "USD"
+  },
+  {
+   "ticker": "QDEL",
+   "cik": 1906324,
+   "name": "QuidelOrtho Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "IART",
+   "cik": 917520,
+   "name": "INTEGRA LIFESCIENCES HOLDINGS CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "UNIT",
+   "cik": 2020795,
+   "name": "Uniti Group Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CNXN",
+   "cik": 1050377,
+   "name": "PC CONNECTION INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SMP",
+   "cik": 93389,
+   "name": "STANDARD MOTOR PRODUCTS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WGO",
+   "cik": 107687,
+   "name": "WINNEBAGO INDUSTRIES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EGBN",
+   "cik": 1050441,
+   "name": "EAGLE BANCORP INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DMC",
+   "cik": 1047340,
+   "name": "DEL MONTE CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ASTE",
+   "cik": 792987,
+   "name": "ASTEC INDUSTRIES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FIZZ",
+   "cik": 69891,
+   "name": "NATIONAL BEVERAGE CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AMPH",
+   "cik": 1297184,
+   "name": "Amphastar Pharmaceuticals, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "EIG",
+   "cik": 1379041,
+   "name": "Employers Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HOS",
+   "cik": 866829,
+   "name": "HORNBECK OFFSHORE SERVICES, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "OI",
+   "cik": 812074,
+   "name": "O-I Glass, Inc. /DE/",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PAHC",
+   "cik": 1069899,
+   "name": "PHIBRO ANIMAL HEALTH CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WINA",
+   "cik": 908315,
+   "name": "WINMARK CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "STAA",
+   "cik": 718937,
+   "name": "STAAR SURGICAL CO",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CXM",
+   "cik": 1569345,
+   "name": "Sprinklr, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FUN",
+   "cik": 1999001,
+   "name": "Six Flags Entertainment Corporation/NEW",
+   "currency": "USD"
+  },
+  {
+   "ticker": "KOP",
+   "cik": 1315257,
+   "name": "Koppers Holdings Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "LZ",
+   "cik": 1286139,
+   "name": "LEGALZOOM.COM, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "VRTS",
+   "cik": 883237,
+   "name": "VIRTUS INVESTMENT PARTNERS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "TR",
+   "cik": 98677,
+   "name": "TOOTSIE ROLL INDUSTRIES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AHCO",
+   "cik": 1725255,
+   "name": "AdaptHealth Corp.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FMC",
+   "cik": 37785,
+   "name": "FMC CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FG",
+   "cik": 1934850,
+   "name": "F&G Annuities & Life, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "COLL",
+   "cik": 1267565,
+   "name": "COLLEGIUM PHARMACEUTICAL, INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NPK",
+   "cik": 80172,
+   "name": "NATIONAL PRESTO INDUSTRIES INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SAH",
+   "cik": 1043509,
+   "name": "SONIC AUTOMOTIVE INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HSTM",
+   "cik": 1095565,
+   "name": "HEALTHSTREAM INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "FOXF",
+   "cik": 1424929,
+   "name": "FOX FACTORY HOLDING CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PMT",
+   "cik": 1464423,
+   "name": "PennyMac Mortgage Investment Trust",
+   "currency": "USD"
+  },
+  {
+   "ticker": "JBGS",
+   "cik": 1689796,
+   "name": "JBG SMITH Properties",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MRTN",
+   "cik": 799167,
+   "name": "MARTEN TRANSPORT LTD",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MMI",
+   "cik": 1578732,
+   "name": "Marcus & Millichap, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PZZA",
+   "cik": 901491,
+   "name": "PAPA JOHNS INTERNATIONAL INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "MTUS",
+   "cik": 1598428,
+   "name": "Metallus Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CRSR",
+   "cik": 1743759,
+   "name": "Corsair Gaming, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "PRKS",
+   "cik": 1564902,
+   "name": "United Parks & Resorts Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SCHL",
+   "cik": 866729,
+   "name": "SCHOLASTIC CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SABR",
+   "cik": 1597033,
+   "name": "Sabre Corp",
+   "currency": "USD"
+  },
+  {
+   "ticker": "NAVI",
+   "cik": 2152623,
+   "name": "Navient Holdings, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AESI",
+   "cik": 1984060,
+   "name": "Atlas Energy Solutions Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "RES",
+   "cik": 742278,
+   "name": "RPC INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AOSL",
+   "cik": 1387467,
+   "name": "ALPHA & OMEGA SEMICONDUCTOR Ltd",
+   "currency": "USD"
+  },
+  {
+   "ticker": "ADAM",
+   "cik": 1273685,
+   "name": "ADAMAS TRUST, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "JBSS",
+   "cik": 880117,
+   "name": "SANFILIPPO JOHN B & SON INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "HTLD",
+   "cik": 799233,
+   "name": "HEARTLAND EXPRESS INC",
+   "currency": "USD"
+  },
+  {
+   "ticker": "SAFE",
+   "cik": 1095651,
+   "name": "Safehold Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "WRLD",
+   "cik": 108385,
+   "name": "WORLD ACCEPTANCE CORP",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AGNT",
+   "cik": 1495932,
+   "name": "AGNT, Inc.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "BFS",
+   "cik": 907254,
+   "name": "SAUL CENTERS, INC.",
+   "currency": "USD"
+  },
+  {
+   "ticker": "DFH",
+   "cik": 1825088,
+   "name": "Dream Finders Homes, Inc.",
+   "currency": "USD"
+  }
+ ]
+}
