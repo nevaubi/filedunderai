@@ -8,7 +8,7 @@ const shell = app.slice(app.indexOf('const PAGES = ['), app.indexOf('function lo
 const router = app.slice(app.indexOf('let ROUTE_SEQ = 0;'), app.indexOf('addEventListener("hashchange", route);'));
 
 function setup() {
-  const dom = new JSDOM('<main id="page"></main><nav id="nav"></nav><nav id="mnav"></nav><div id="wl"></div><nav id="market-tape"></nav><span id="asof"></span><span id="built"></span><button id="kbhelp"></button><button id="kbclose"></button><div id="kbsheet"></div><input id="q">', { url: 'https://research.example/#company-aapl', runScripts: 'outside-only' });
+  const dom = new JSDOM('<main id="page"></main><nav id="nav"></nav><nav id="mnav"></nav><nav id="hubbar" hidden></nav><div id="wl"></div><nav id="market-tape"></nav><span id="asof"></span><span id="built"></span><button id="kbhelp"></button><button id="kbclose"></button><div id="kbsheet"></div><input id="q">', { url: 'https://research.example/#company-aapl', runScripts: 'outside-only' });
   const w = dom.window;
   w.$ = selector => w.document.querySelector(selector);
   w.el = (tag, attrs = {}, ...children) => {
@@ -44,25 +44,103 @@ function setup() {
   for (const name of ['pMarkets', 'pScreener', 'pCompare', 'pFeed', 'pTechnicals', 'pSectors', 'pMacro', 'pTheses', 'pWorkbench', 'pResearch', 'pCoverage']) w[name] = () => {};
   w.pCompany = ticker => { w.document.querySelector('#page').textContent = 'Company ' + ticker; };
   w.FU_PAGES = { technicals: symbol => { w.document.querySelector('#page').textContent = 'Technicals ' + symbol; } };
-  w.eval(shell + router + '\nPAGES.push({id:"analyst",name:"Morning brief",key:"a",icon:"i-home"},{id:"watchlists",name:"Watchlists",key:"l",icon:"i-feed"},{id:"ideas",name:"Research ideas",key:"i",icon:"i-ag"},{id:"future",name:"Future page",key:"z",icon:"i-home"});');
+  for (const id of ['analyst', 'watchlists', 'ideas', 'theses']) w.FU_PAGES[id] = () => { w.document.querySelector('#page').textContent = id; };
+  w.FU_PAGES.future = () => { w.document.querySelector('#page').textContent = 'Future'; };
+  w.FU_PAGES.compare = arg => { w.document.querySelector('#page').textContent = 'Compare ' + (arg || ''); };
+  w.FU_PAGES.sectors = arg => { w.document.querySelector('#page').textContent = 'Sectors ' + (arg || ''); };
+  w.FU_PAGES.kpis = arg => { w.document.querySelector('#page').textContent = 'KPIs ' + (arg || ''); };
+  w.eval(shell + router + '\nPAGES.push({id:"future",name:"Future page",key:"z",icon:"i-home"});');
   return { w, close: () => w.close() };
 }
 
-test('grouped navigation retains all visible routes, fallback entries and mobile links', () => {
+test('navigation is one entry per hub, mirrored on mobile, with module pages kept as fallback entries', () => {
   const h = setup();
   try {
     const { w } = h;
     w.buildShell();
-    assert.deepEqual(Array.from(w.document.querySelectorAll('.nav-heading'), el => el.textContent), ['Research', 'Markets', 'Workspace']);
-    const desktop = Array.from(w.document.querySelectorAll('#nav a'), el => el.getAttribute('href'));
-    const mobile = Array.from(w.document.querySelectorAll('#mnav a'), el => el.getAttribute('href'));
-    assert.equal(new Set(desktop).size, desktop.length);
-    assert.deepEqual([...desktop].sort(), [...mobile].sort());
-    assert.ok(desktop.includes('#future'));
-    assert.ok(desktop.includes('#workbench'));
-    assert.ok(desktop.includes('#research'));
-    assert.ok(!desktop.includes('#coverage'));
+    assert.equal(w.document.querySelectorAll('.nav-heading').length, 0);
+    const desktop = Array.from(w.document.querySelectorAll('#nav a'), a => [a.dataset.hub, a.getAttribute('href'), a.textContent]);
+    assert.deepEqual(desktop, [
+      ['home', '#markets', 'Home'], ['companies', '#companies', 'Companies'], ['screen', '#screener', 'Screen & compare'],
+      ['technicals', '#technicals', 'Technicals'], ['supply', '#supply', 'Supply chain'], ['macro', '#macro', 'Macro & sectors'],
+      ['workspace', '#theses', 'Workspace'], ['future', '#future', 'Future page'],
+    ]);
+    const mobile = Array.from(w.document.querySelectorAll('#mnav a'), a => [a.dataset.hub, a.getAttribute('href')]);
+    assert.deepEqual(mobile, desktop.map(([hub, href]) => [hub, href]));
+    for (const hidden of ['#research', '#coverage', '#compare', '#kpis']) assert.ok(!desktop.some(([, href]) => href === hidden), hidden);
+    w.buildShell();
+    assert.equal(w.document.querySelectorAll('#nav a').length, desktop.length, 'rebuilding does not duplicate entries');
     assert.match(w.document.querySelector('#asof').textContent, /^Close 2026-11-03$/);
+  } finally { h.close(); }
+});
+
+test('hub tabs: every old route resolves to its hub and tab, deep links keep their arguments, aliases and unknown ids redirect', async () => {
+  const h = setup();
+  try {
+    const { w } = h;
+    w.buildShell();
+    const cases = [
+      ['#markets', 'home', 'markets', 'Markets,Morning brief,Watchlist,Filings feed', null],
+      ['#analyst', 'home', 'analyst', 'Markets,Morning brief,Watchlist,Filings feed', null],
+      ['#watchlists', 'home', 'watchlists', null, null],
+      ['#feed', 'home', 'feed', null, null],
+      ['#compare', 'screen', 'compare', 'Screener,Compare,KPI peers,Research ideas', null],
+      ['#compare-AAPL,MSFT', 'screen', 'compare', null, null, 'Compare AAPL,MSFT'],
+      ['#kpis-revenue_growth/aapl', 'screen', 'kpis', null, null, 'KPIs revenue_growth/aapl'],
+      ['#ideas', 'screen', 'ideas', null, null],
+      ['#screener', 'screen', 'screener', null, null],
+      ['#sectors', 'macro', 'sectors', 'Macro,Sectors', null],
+      ['#sectors-semiconductors', 'macro', 'sectors', null, null, 'Sectors semiconductors'],
+      ['#macro', 'macro', 'macro', null, null],
+      ['#theses', 'workspace', 'theses', 'Theses,Workbench', null],
+      ['#workbench', 'workspace', 'workbench', null, null],
+      ['#technicals-SPY', 'technicals', null, '', null, 'Technicals SPY'],
+      ['#supply', 'supply', null, '', null],
+      ['#research', null, null, '', null],
+      ['#coverage', null, null, '', null],
+      ['#home', 'home', 'markets', null, '#markets'],
+      ['#screen', 'screen', 'screener', null, '#screener'],
+      ['#workspace', 'workspace', 'theses', null, '#theses'],
+      ['#watchlist', 'home', 'watchlists', null, '#watchlists'],
+      ['#not-a-page', 'home', 'markets', null, '#markets'],
+      ['#future', 'future', null, '', null, 'Future'],
+    ];
+    for (const [hash, hub, tab, tabs, redirect, text] of cases) {
+      w.history.replaceState(null, '', hash);
+      await w.route();
+      const nav = Array.from(w.document.querySelectorAll('#nav a.on'), a => a.dataset.hub);
+      assert.deepEqual(nav, hub ? [hub] : [], hash + ' nav');
+      assert.deepEqual(Array.from(w.document.querySelectorAll('#mnav a.on'), a => a.dataset.hub), nav, hash + ' mobile nav');
+      const bar = w.document.querySelector('#hubbar');
+      if (tab) {
+        assert.equal(bar.hidden, false, hash + ' hub bar shown');
+        assert.equal(bar.querySelector('a.on').getAttribute('href'), '#' + tab, hash + ' active tab');
+        assert.equal(bar.querySelector('a.on').getAttribute('aria-current'), 'page');
+        assert.equal(bar.querySelectorAll('a[aria-current]').length, 1);
+        if (tabs) assert.equal(Array.from(bar.querySelectorAll('a'), a => a.textContent).join(','), tabs, hash + ' tab list');
+      } else assert.equal(bar.hidden, true, hash + ' single-page hubs have no tab bar');
+      if (redirect) assert.equal(w.location.hash, redirect, hash + ' redirect');
+      else assert.equal(w.location.hash, hash, hash + ' keeps its address');
+      if (text) assert.equal(w.document.querySelector('#page').textContent, text, hash + ' arguments');
+    }
+  } finally { h.close(); }
+});
+
+test('the supply chain route shows a tidy empty state until its module registers', async () => {
+  const h = setup();
+  try {
+    const { w } = h;
+    w.page = w.document.querySelector('#page');
+    w.buildShell();
+    w.history.replaceState(null, '', '#supply');
+    await w.route();
+    assert.match(w.document.querySelector('#page').textContent, /Supply chain data is not available yet/);
+    w.FU_PAGES.supply = () => { w.document.querySelector('#page').textContent = 'Supply module'; };
+    await w.route();
+    assert.equal(w.document.querySelector('#page').textContent, 'Supply module');
+    w.history.replaceState(null, '', '#supply-AAPL');
+    await w.route();
+    assert.equal(w.location.hash, '#supply-AAPL');
   } finally { h.close(); }
 });
 
@@ -151,7 +229,7 @@ test('actual routing keeps technicals and company navigation consistent when the
       w.history.replaceState(null, '', hash);
       await w.route();
       assert.equal(w.document.querySelector('#page').textContent, page);
-      const navState = selection('[data-p]');
+      const navState = selection('[data-hub]');
       for (const link of navState) {
         assert.equal(link.on, link.href === '#' + nav, hash + ' nav class');
         assert.equal(link.current, link.on ? 'page' : null, hash + ' nav aria-current');
@@ -164,7 +242,7 @@ test('actual routing keeps technicals and company navigation consistent when the
       }
       w.renderRail();
       assert.deepEqual(selection('#wl a'), watchState, hash + ' watchlist rerender');
-      assert.deepEqual(selection('[data-p]'), navState, hash + ' nav after watchlist rerender');
+      assert.deepEqual(selection('[data-hub]'), navState, hash + ' nav after watchlist rerender');
     }
   } finally { h.close(); }
 });

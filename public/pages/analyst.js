@@ -17,9 +17,10 @@
     const label=pp?(c.v*100).toFixed(2)+' pp':change?pct(c.v):c.unit==='pct'?(c.v*100).toFixed(1)+'%':fmtMoney(c.v,c.unit);
     return el('button',{class:'an-value'+(change?' '+cls(c.v):''),title:`${c.label} · ${c.end} · inspect exact value and source`,onclick:()=>openSource(FU_EVIDENCE.cell(c.evidence?.id)||c)},label,el('span',{'aria-hidden':'true'},' ↗'));
   }
-  function header(title,description,actions=[]) {
-    return el('header',{class:'an-header'},el('div',{},el('h1',{},title),el('p',{},description)),actions.length?el('div',{class:'an-actions'},...actions):null);
+  function header(title,description,actions=[],eyebrow=null) {
+    return el('header',{class:'an-header'},el('div',{},eyebrow?el('div',{class:'eyebrow'},eyebrow):null,el('h1',{},title),el('p',{},description)),actions.length?el('div',{class:'an-actions'},...actions):null);
   }
+  const today=()=>new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   function card(title,content,action=null) {return el('section',{class:'an-card'},el('div',{class:'an-card-head'},el('h2',{},title),action),content);}
   function selectTicker(selected) {const s=el('select',{'aria-label':'Company'},...TICKERS.map(t=>el('option',{value:t,selected:t===selected},`${t} · ${SHORT[t] || t}`)));return s;}
   let metricsList=null;
@@ -96,7 +97,7 @@
     const host=el('div',{class:'analyst-page'});page.append(host);
     const since=saved('briefSince',new Date(Date.now()-7*864e5).toISOString().slice(0,10));
     const dateInput=el('input',{type:'date',value:since,max:new Date().toISOString().slice(0,10),'aria-label':'Show events since'});
-    host.append(header('Morning brief','New filings and quarterly changes across the companies you follow.',[button('Manage watchlist',()=>location.hash='watchlists'),button('Research ideas',()=>location.hash='ideas')]));
+    host.append(header('Morning brief','New filings and quarterly changes across the companies you follow. Edit the list and standing orders on the Watchlist tab.',[],'Brief · '+today()));
     const toolbar=el('div',{class:'an-toolbar an-brief-toolbar'},field('Activity since',dateInput),button('Refresh brief',()=>{save('briefSince',dateInput.value);route();}));
     host.append(toolbar);
     const progress=note('Loading your watchlist…');host.append(progress);
@@ -145,10 +146,12 @@
   }
   async function pWatchlists() {
     const host=el('div',{class:'analyst-page'});page.append(host);
-    host.append(header('Watchlists & standing orders','Follow companies and define what to check when new filings arrive.',[button('Read morning brief',()=>location.hash='analyst')]));
-    const picker=selectTicker(watchlist()[0] || TICKERS[0]),list=el('div',{class:'an-watch-list'});
-    const draw=()=>{list.innerHTML='';for(const t of watchlist())list.append(el('div',{class:'an-watch-row'},el('a',{href:'#company-'+t.toLowerCase()},el('b',{},t),el('span',{},SHORT[t])),el('span',{class:'muted'},(IDX[t] || window.FU_COMPANIES?.get(t))?.sector || ''),button('Remove',()=>{toggleWatch(t);draw();})));};draw();
-    host.append(card('Companies you follow',el('div',{class:'an-card-body'},el('div',{class:'an-toolbar'},picker,button('Follow company',()=>{if(!watchlist().includes(picker.value))toggleWatch(picker.value);draw();},true)),list)));
+    const count=el('span',{}),compare=button('Compare watchlist',()=>{const list=watchlist().slice(0,8);if(list.length)location.hash='compare-'+list.join(',');});
+    host.append(header('Watchlist','The companies you follow, how they trade, and what to check when they file.',[compare],count));
+    const picker=selectTicker(TICKERS.find(t=>!watchlist().includes(t)) || TICKERS[0]),list=el('div',{class:'an-watch-table'});
+    // One list: the quote table (shared with the rest of the app) with a Remove action per row.
+    const draw=()=>{const n=watchlist().length;count.textContent=`Watchlist · ${n} compan${n===1?'y':'ies'}`;compare.disabled=n<2;list.replaceChildren(typeof watchlistTable==='function'?watchlistTable({onRemove:t=>{toggleWatch(t);draw();}}):note('Watchlist table unavailable.'));};draw();
+    host.append(card('Companies you follow',el('div',{class:'an-card-body'},el('div',{class:'an-toolbar'},field('Add a company',picker),button('Follow company',()=>{if(!watchlist().includes(picker.value))toggleWatch(picker.value);draw();},true)),list)));
     const grid=el('div',{class:'an-two-col'}),form=el('div',{class:'an-card-body'}),rulesHost=el('div',{class:'an-card-body'});
     ruleForm(form,()=>route());
     for(const r of saved('rules',[]))rulesHost.append(el('div',{class:'an-rule-row'},el('b',{},r.text || A.describeRule(r)),el('p',{},A.describeRule(r)),el('div',{class:'an-actions'},badge(r.enabled?'Active':'Paused',r.enabled?'positive':''),button(r.enabled?'Pause':'Resume',()=>{save('rules',saved('rules',[]).map(x=>x.id===r.id?{...x,enabled:!x.enabled}:x));route();}),button('Delete',()=>{save('rules',saved('rules',[]).filter(x=>x.id!==r.id));route();}),button('Run full scope',async e=>{
@@ -173,7 +176,7 @@
   }
   async function pGuardian() {
     const host=el('div',{class:'analyst-page'});page.append(host);
-    host.append(header('Thesis guardian','Track your thesis against measurable, reported results.'));
+    host.append(header('Thesis guardian','Track your thesis against measurable, reported results.',[],'Theses · '+readTheses().length+' tracked'));
     const title=el('textarea',{rows:2,maxlength:2000,placeholder:'AMD gains data-center share','aria-label':'Your investment thesis'}),tk=selectTicker(watchlist()[0] || 'AMD'),metric=metricsSelect('Revenue');
     const ruleType=el('select',{'aria-label':'Criterion type'},el('option',{value:'threshold'},'Threshold'),el('option',{value:'trend'},'Consecutive quarterly change'));
     const operator=el('select',{'aria-label':'Criterion operator'},el('option',{value:'gte'},'At least'),el('option',{value:'gt'},'Greater than'),el('option',{value:'lte'},'At most'),el('option',{value:'lt'},'Less than'));
@@ -280,7 +283,7 @@
   }
   async function pIdeas() {
     const host=el('div',{class:'analyst-page'});page.append(host);
-    host.append(header('Research ideas','Compare signals, peers and scenarios using reported evidence.'));
+    host.append(header('Research ideas','Compare signals, peers and scenarios using reported evidence.',[],'Ideas · signals and peer divergence'));
     const selected=selectTicker(saved('ideaTicker',watchlist()[0] || 'AAPL')),peer=selectTicker(saved('peerTicker','MSFT'));
     const body=el('div',{class:'an-stack'});host.append(el('div',{class:'an-toolbar'},field('Company',selected),field('Compare with',peer),button('Analyze',()=>{save('ideaTicker',selected.value);save('peerTicker',peer.value);route();},true),button('Scan watchlist',async e=>{
       const scanButton=e.currentTarget;scanButton.disabled=true;const results=await loadMany(watchlist()),scan=el('div',{class:'an-card-body'});
@@ -419,15 +422,9 @@
     if(calls.length)loadSelected().catch(error=>{busy=false;updateComparisonState(error.message);});
     return host;
   }
-  async function companyChanges(host,tk) {
-    host.append(note('Loading comparable periods…'));
-    try{const c=await load(tk);host.innerHTML='';host.append(card('What changed this quarter',el('div',{class:'an-card-body'},note(`Period ended ${A.changes(c).periodEnd}. Each value opens its immutable evidence record.`),changesTable(c),companyActions(c))));}catch(e){host.innerHTML='';host.append(note(e.message));}
-  }
+  // Routes only: app.js PAGES places these in the Home (analyst, watchlists), Screen & compare (ideas) and Workspace (theses) hubs.
+  // The company "What changed" tab was retired; the same quarterly changes table remains in the morning brief.
   window.FU_PAGES=Object.assign(window.FU_PAGES || {},{analyst:pAnalyst,watchlists:pWatchlists,ideas:pIdeas,theses:pGuardian});
-  (window.FU_COTABS=window.FU_COTABS || []).push({id:'changes',name:'What changed',after:'overview',render:companyChanges});
-  PAGES.splice(0,0,{id:'analyst',name:'Morning brief',icon:'i-news',key:'b'});
-  PAGES.splice(2,0,{id:'watchlists',name:'Watchlists',icon:'i-feed',key:'l'},{id:'ideas',name:'Research ideas',icon:'i-spark',key:'i'});
-  const thesisNav=PAGES.find(p=>p.id==='theses');if(thesisNav)thesisNav.name='Thesis guardian';
   function pack(x) { if(Array.isArray(x))return x.map(pack); if(!x || typeof x!=='object')return x; if(typeof x.v==='number' && x.unit && x.label && x.end)return {value:x.v,unit:x.unit,ticker:x.tk,metric:x.label,period:x.end,availableAt:x.availableAt,evidenceId:x.evidence?.id,citation:x.evidence?FU_EVIDENCE.citation(x.evidence.id):null,sourceUrl:x.evidence?.sourceUrl};return Object.fromEntries(Object.entries(x).map(([k,v])=>[k,pack(v)])); }
   (window.FU_TOOL_PROVIDERS=window.FU_TOOL_PROVIDERS || []).push(trace=>{
     const tool=(name,description,properties,required,fn)=>({name,description,inputSchema:{type:'object',properties,required,additionalProperties:false},execute:async input=>{const step=trace?.(name,input);try{const result=pack(await fn(input));step?.done(result);return result;}catch(e){step?.fail(e);throw e;}}});

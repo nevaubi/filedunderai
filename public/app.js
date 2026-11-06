@@ -1053,21 +1053,74 @@ function macroSeries(name, n) {
 }
 
 /* ---------- router & shell ---------- */
+/* Navigation model. Every route is a page; pages are grouped into hubs, and each hub is one entry in the sidebar.
+   A hub with several pages shows them as tabs in the hub bar. The hash names the tab itself (#compare, #kpis-<id>/<tk>,
+   #sectors-<slug>), so every deep link keeps working and the hub is derived from the page. Hidden pages are routable
+   and listed in the command palette but have no nav entry. Modules may still push extra pages: one without a hub
+   gets its own sidebar entry. */
 const PAGES = [
-  { id: "markets", name: "Markets", icon: "i-home", key: "m" },
-  { id: "companies", name: "Companies", icon: "i-co", key: "c" },
-  { id: "screener", name: "Screener", icon: "i-cmp", key: "e" },
-  { id: "compare", name: "Compare", icon: "i-cmp", key: "o" },
-  { id: "feed", name: "Filings feed", icon: "i-feed", key: "f", hidden: true },
-  { id: "technicals", name: "Technicals", icon: "i-ta", key: "t" },
-  { id: "sectors", name: "Sectors", icon: "i-sec", key: "s" },
-  { id: "kpis", name: "KPI peers", icon: "i-cmp", key: "k" },
-  { id: "macro", name: "Macro", icon: "i-mac", key: "x" },
-  { id: "theses", name: "Theses", icon: "i-th", key: "h" },
-  { id: "workbench", name: "Workbench", icon: "i-wb", key: "w" },
-  { id: "research", name: "Research assistant", icon: "i-ag", key: "r" },
+  { id: "markets", name: "Markets", hub: "home", icon: "i-home", key: "m" },
+  { id: "analyst", name: "Morning brief", hub: "home", icon: "i-news", key: "b" },
+  { id: "watchlists", name: "Watchlist", hub: "home", icon: "i-feed", key: "l" },
+  { id: "feed", name: "Filings feed", hub: "home", icon: "i-feed", key: "f" },
+  { id: "companies", name: "Companies", hub: "companies", icon: "i-co", key: "c" },
+  { id: "screener", name: "Screener", hub: "screen", icon: "i-cmp", key: "e" },
+  { id: "compare", name: "Compare", hub: "screen", icon: "i-cmp", key: "o" },
+  { id: "kpis", name: "KPI peers", hub: "screen", icon: "i-cmp", key: "k" },
+  { id: "ideas", name: "Research ideas", hub: "screen", icon: "i-spark", key: "i" },
+  { id: "technicals", name: "Technicals", hub: "technicals", icon: "i-ta", key: "t" },
+  { id: "supply", name: "Supply chain", hub: "supply", icon: "i-chain", key: "p" },
+  { id: "macro", name: "Macro", hub: "macro", icon: "i-mac", key: "x" },
+  { id: "sectors", name: "Sectors", hub: "macro", icon: "i-sec", key: "s" },
+  { id: "theses", name: "Theses", hub: "workspace", icon: "i-th", key: "h" },
+  { id: "workbench", name: "Workbench", hub: "workspace", icon: "i-wb", key: "w" },
+  { id: "research", name: "Research assistant", icon: "i-ag", key: "r", hidden: true },
   { id: "coverage", name: "Data status", icon: "i-src", key: "d", hidden: true },
 ];
+const HUBS = [
+  { id: "home", name: "Home", icon: "i-home" },
+  { id: "companies", name: "Companies", icon: "i-co" },
+  { id: "screen", name: "Screen & compare", icon: "i-cmp" },
+  { id: "technicals", name: "Technicals", icon: "i-ta" },
+  { id: "supply", name: "Supply chain", icon: "i-chain" },
+  { id: "macro", name: "Macro & sectors", icon: "i-mac" },
+  { id: "workspace", name: "Workspace", icon: "i-wb" },
+];
+// Hub-level names that are not page ids resolve to the hub's first tab.
+const ROUTE_ALIASES = { home: "markets", brief: "analyst", watchlist: "watchlists", screen: "screener", workspace: "theses", assistant: "research" };
+const pageHub = p => p.hub || p.id;
+const hubPages = hubId => PAGES.filter((p, i) => pageHub(p) === hubId && !p.hidden && PAGES.findIndex(x => x.id === p.id) === i);
+const hubOf = pid => { if (pid === "company") return "companies"; const p = PAGES.find(x => x.id === pid); return p ? pageHub(p) : null; };
+function navEntries() {
+  const ids = [...HUBS.map(h => h.id), ...PAGES.filter(p => !p.hidden).map(pageHub)].filter((id, i, a) => a.indexOf(id) === i);
+  return ids.map(id => {
+    const tabs = hubPages(id); if (!tabs.length) return null;
+    const def = HUBS.find(h => h.id === id) || tabs[0];
+    return { id, name: def.name, icon: def.icon || tabs[0].icon, href: tabs[0].id, key: tabs[0].key, tabs };
+  }).filter(Boolean);
+}
+/* Hub bar: the tab strip for hubs with more than one page. It sits outside #page so page modules that clear #page keep it. */
+function renderHubBar(hubId, pid) {
+  const bar = $("#hubbar"); if (!bar) return;
+  const tabs = hubId ? hubPages(hubId) : [];
+  const app = document.querySelector(".app"); if (app) { app.dataset.hub = hubId || ""; app.classList.toggle("has-hubbar", tabs.length > 1); }
+  if (tabs.length < 2) { bar.hidden = true; bar.replaceChildren(); return; }
+  const name = (HUBS.find(h => h.id === hubId) || tabs[0]).name;
+  bar.setAttribute("aria-label", name + " sections");
+  bar.replaceChildren(el("span", { class: "hub-name" }, name), el("div", { class: "hub-tabs" }, ...tabs.map(p => {
+    const on = p.id === pid;
+    return el("a", { href: "#" + p.id, "data-p": p.id, class: on ? "on" : null, "aria-current": on ? "page" : null, title: p.key ? `${p.name} (g then ${p.key})` : p.name }, p.name);
+  })));
+  bar.hidden = false;
+  const strip = bar.querySelector(".hub-tabs");
+  keepInStrip(strip, strip.querySelector("a.on"));
+}
+// Scroll a horizontal tab strip so its selected item is visible (mobile nav, hub bar, company tabs). Never scrolls the page.
+function keepInStrip(strip, item) {
+  if (!strip || !item || strip.scrollWidth <= strip.clientWidth) return;
+  const left = item.offsetLeft - strip.offsetLeft, right = left + item.offsetWidth;
+  if (left < strip.scrollLeft || right > strip.scrollLeft + strip.clientWidth) strip.scrollLeft = Math.max(0, left - 24);
+}
 const page = $("#page");
 const WATCH_DEFAULT = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "JPM", "LLY"];
 const watchlist = () => store.get("watch", WATCH_DEFAULT).filter(t => IDX[t] || window.FU_COMPANIES?.get(t));
@@ -1103,23 +1156,13 @@ function renderMarketTape() {
   }
 }
 function buildShell() {
-  const nav = $("#nav"), visible = PAGES.filter(p => !p.hidden), used = new Set();
-  const sections = [
-    ["Research", ["analyst", "companies", "screener", "watchlists", "compare"]],
-    ["Markets", ["markets", "technicals", "sectors", "ideas", "kpis", "macro"]],
-    ["Workspace", ["theses", "research", "workbench"]],
-  ];
-  for (const [label, ids] of sections) {
-    const entries = ids.map(id => visible.find(p => p.id === id)).filter(Boolean);
-    if (!entries.length) continue;
-    nav.append(el("div", { class: "nav-heading" }, label));
-    for (const p of entries) {
-      used.add(p.id);
-      nav.append(el("a", { href: "#" + p.id, "data-p": p.id, title: `${p.name} (g then ${p.key})` }, svgUse(p.icon), el("span", { class: "nav-label" }, p.name)));
-    }
+  const nav = $("#nav"), mnav = $("#mnav");
+  nav.replaceChildren(); mnav.replaceChildren();
+  for (const n of navEntries()) {
+    const title = n.key ? `${n.name} (g then ${n.key})` : n.name;
+    nav.append(el("a", { href: "#" + n.href, "data-hub": n.id, title }, svgUse(n.icon), el("span", { class: "nav-label" }, n.name)));
+    mnav.append(el("a", { href: "#" + n.href, "data-hub": n.id }, n.name));
   }
-  for (const p of visible.filter(p => !used.has(p.id))) nav.append(el("a", { href: "#" + p.id, "data-p": p.id, title: `${p.name} (g then ${p.key})` }, svgUse(p.icon), el("span", { class: "nav-label" }, p.name)));
-  $("#mnav").append(...PAGES.filter(p => !p.hidden).map(p => el("a", { href: "#" + p.id, "data-p": p.id }, p.name)));
   renderRail();
   renderMarketTape();
   const lt = last("SPY")?.t;
@@ -1173,24 +1216,51 @@ function setupRail() {
 }
 function loadingView(msg = "Loading") { page.innerHTML = ""; page.append(el("div", { class: "ph" }, el("div", { style: "width:100%" }, el("div", { class: "skel", style: "height:12px;width:120px;margin-bottom:12px" }), el("div", { class: "skel", style: "height:28px;width:320px;margin-bottom:10px" }), el("div", { class: "skel", style: "height:14px;width:min(560px,90%)" }))), el("div", { class: "grid g2" }, el("div", { class: "skel", style: "height:280px" }), el("div", { class: "skel", style: "height:280px" })), el("div", { class: "faint", style: "font-size:12px" }, msg + "…")); }
 let ROUTE_SEQ = 0;
+// Pages app.js renders itself. Registered window.FU_PAGES entries take precedence (analyst, compare, screener, ...).
+const builtinPages = () => ({ markets: pMarkets, screener: pScreener, compare: pCompare, feed: pFeed, technicals: pTechnicals, sectors: pSectors, macro: pMacro, theses: pTheses, workbench: pWorkbench, research: pResearch, coverage: pCoverage, supply: pSupplyPending });
+/* Hash -> { pid, arg, redirect }. "#<page>-<arg>" splits on the first dash when <page> is known (#technicals-SPY,
+   #kpis-<id>/<ticker>, #sectors-<slug>, #compare-AAPL,MSFT). Aliases and unknown ids redirect so the address bar
+   always names a real page. */
+function resolveRoute(hash) {
+  let h = String(hash || "").replace(/^#/, ""), redirect = null;
+  if (!h) return { pid: "markets", arg: null, redirect: null };
+  if (h.startsWith("company-")) return { pid: "company", arg: h.slice(8).toUpperCase(), redirect: null };
+  if (Object.prototype.hasOwnProperty.call(ROUTE_ALIASES, h)) { h = ROUTE_ALIASES[h]; redirect = h; }
+  const reg = window.FU_PAGES || {}, builtin = builtinPages(), known = id => !!(reg[id] || builtin[id]);
+  const i = h.indexOf("-");
+  if (i > 0 && known(h.slice(0, i))) {
+    let arg = h.slice(i + 1); try { arg = decodeURIComponent(arg); } catch {}
+    return { pid: h.slice(0, i), arg, redirect };
+  }
+  if (known(h)) return { pid: h, arg: null, redirect };
+  return { pid: "markets", arg: null, redirect: "markets" };
+}
+// Placeholder until the supply chain module registers window.FU_PAGES.supply.
+function pSupplyPending() {
+  page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Supply chain"), el("h1", {}, "Supply chain"), el("div", { class: "sub" }, "Supplier and customer relationships between covered companies."))),
+    el("section", { class: "panel" }, el("div", { class: "empty" }, el("h2", {}, "Supply chain data is not available yet"), el("p", { class: "muted" }, "This view has not been published in this build. Company filings remain the source for disclosed customers and suppliers."), el("a", { class: "btn", href: "#companies" }, "Browse companies"))));
+}
 async function route() {
   closeSource(); hideTip();
   window.FU_COMPANY_CLEANUP?.(); window.FU_COMPANY_CLEANUP = null;
   page.classList.remove("companies-page", "company-page");
   const seq = ++ROUTE_SEQ;
-  const h = (location.hash || "#markets").slice(1);
-  let pid = h, arg = null;
-  if (h.startsWith("company-")) { pid = "company"; arg = h.slice(8).toUpperCase(); }
-  else { const i = h.indexOf("-"); if (i > 0 && window.FU_PAGES && window.FU_PAGES[h.slice(0, i)]) { pid = h.slice(0, i); arg = decodeURIComponent(h.slice(i + 1)); } }
-  document.querySelectorAll("[data-p]").forEach(a => {
-    const current = a.dataset.p === pid || (pid === "company" && a.dataset.p === "companies");
+  const { pid, arg, redirect } = resolveRoute(location.hash);
+  if (redirect != null && location.hash !== "#" + redirect) history.replaceState(null, "", location.pathname + location.search + "#" + redirect);
+  const hub = hubOf(pid);
+  document.querySelectorAll("[data-hub]").forEach(a => {
+    const current = a.dataset.hub === hub;
     a.classList.toggle("on", current);
     if (current) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   });
+  renderHubBar(hub, pid);
+  keepInStrip($("#mnav"), $("#mnav a.on"));
   document.querySelectorAll("#wl a").forEach(a => { const current = pid === "company" && a.dataset.t === arg; a.classList.toggle("on", current); if (current) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   const reg = window.FU_PAGES && window.FU_PAGES[pid];
-  const fn = reg ? () => reg(arg) : { markets: pMarkets, screener: pScreener, company: () => pCompany(arg), compare: pCompare, feed: pFeed, technicals: pTechnicals, sectors: pSectors, macro: pMacro, theses: pTheses, workbench: pWorkbench, research: pResearch, coverage: pCoverage }[pid] || pMarkets;
-  document.title = (pid === "company" && arg ? `${arg} · ${SHORT[arg] || ""} · ` : (PAGES.find(p => p.id === pid)?.name ? PAGES.find(p => p.id === pid).name + " · " : "")) + "Filed Under";
+  const builtin = builtinPages()[pid];
+  const fn = reg ? () => reg(arg) : pid === "company" ? () => pCompany(arg) : builtin ? () => builtin(arg) : pMarkets;
+  const pg = PAGES.find(p => p.id === pid), hubName = HUBS.find(x => x.id === hub)?.name;
+  document.title = (pid === "company" && arg ? `${arg} · ${SHORT[arg] || ""} · ` : pg ? pg.name + (hubName && hubName !== pg.name && hubPages(hub).length > 1 ? " · " + hubName : "") + " · " : "") + "Filed Under";
   window.scrollTo(0, 0);
   loadingView(pid === "company" ? `Loading ${arg} filings` : "Loading");
   try {
@@ -1234,12 +1304,12 @@ function paletteItems(v) {
   if (tk && parts.length > 1) {
     const rest = parts.slice(1).join(" ");
     allMetricLabels().filter(m => m.toLowerCase().includes(rest)).slice(0, 6).forEach(mt => add("Metrics", `${tk} ${mt}`, "latest quarter, opens the source", tk[0], async () => { await ensureCompany(tk); const m = model(tk); const cell = m.metric(mt, "Q", m.latestQ()) || m.metric(mt, "A", m.latestA()); STATE.coTab = "financials"; if (location.hash !== "#company-" + tk.toLowerCase()) { location.hash = "company-" + tk.toLowerCase(); await new Promise(r => setTimeout(r, 400)); } if (cell) openSource(cell, "filing"); else toast(`${tk} doesn't report ${mt}`); }));
-    [["financials", "Financials"], ["segments", "Segments & KPIs"], ["news", "News & narratives"], ["earnings", "Earnings & IR"], ["filings", "Filings"]].filter(([, n]) => n.toLowerCase().includes(rest)).forEach(([id, n]) => add("Companies", `${tk} · ${n}`, SHORT[tk], tk[0], () => { STATE.coTab = id; location.hash === "#company-" + tk.toLowerCase() ? route() : location.hash = "company-" + tk.toLowerCase(); }));
+    companyTabs().filter(t => t.id !== "overview" && (t.name.toLowerCase().includes(rest) || (t.keywords || "").includes(rest))).forEach(t => add("Companies", `${tk} · ${t.name}`, SHORT[tk], tk[0], () => { STATE.coTab = t.id; location.hash === "#company-" + tk.toLowerCase() ? route() : location.hash = "company-" + tk.toLowerCase(); }));
   }
   const matches = window.FU_COMPANIES ? window.FU_COMPANIES.query({ q: v }).map(c => c.ticker) : TICKERS.filter(t => { const c = IDX[t]; return !v || t.toLowerCase().startsWith(v) || (c.name || "").toLowerCase().includes(v) || (c.legal_name || "").toLowerCase().includes(v); });
   (v ? matches : watchlist()).slice(0, v ? 10 : 8).forEach(t => { const c = companySummary(t); add("Companies", `${t} · ${c.name}`, Number.isFinite(c.price) ? `${fnum(c.price)} · ${fsgn(c.chg_1d, 2)}` : `${c.sector || "Company profile"}`, miniLogo(t, 20), () => { STATE.coTab = "overview"; location.hash = "company-" + t.toLowerCase(); }); });
   if (v) { const sec = [...new Set(Object.values(IDX).map(c => c.sector))].filter(s => s.toLowerCase().includes(v)); sec.forEach(s => add("Screener", `${s} sector`, "screener", "▤", () => { STATE.scr.sector = s; store.set("scr", STATE.scr); location.hash === "#screener" ? route() : location.hash = "screener"; })); }
-  for (const p of PAGES) if (!p.hidden && (!v || p.name.toLowerCase().includes(v))) add("Pages", p.name, `g ${p.key}`, "→", () => location.hash = p.id);
+  for (const n of paletteNavItems()) if (!v || n.label.toLowerCase().includes(v)) add("Pages", n.label, n.key ? `g ${n.key}` : "", "→", () => location.hash = n.id);
   if (v) for (const s of Object.keys(SYMNAME)) if (s.toLowerCase().replace("^", "").startsWith(v) || SYMNAME[s].toLowerCase().includes(v)) add("Charts", `${s.replace("^", "")} · ${SYMNAME[s]}`, "technicals", "↗", () => { STATE.taSym = s; location.hash === "#technicals" ? route() : location.hash = "technicals"; });
   if (v.length > 3) add("Ask", `Ask the research assistant: “${v}”`, "assistant", "✦", () => { location.hash = "research"; setTimeout(() => RESEARCH?.ask(v), 300); });
   return out.slice(0, 26);
@@ -1256,8 +1326,17 @@ function renderPalette(keepScroll) {
   });
   if (!PAL.items.length) list.append(el("div", { class: "empty" }, "No matches. Try a ticker like NVDA, or “AAPL gross margin”."));
 }
-const SHORTCUTS = [["⌘ K or /", "Command palette"], ["?", "This list"], ["g then m", "Markets"], ["g then c", "Companies"], ["g then o", "Compare"], ["g then t", "Technicals"], ["g then x", "Macro"], ["g then w", "Workbench"], ["g then r", "Research agent"], ["Esc", "Close panel or dialog"], ["← / →", "Previous or next period in the source panel"], ["c", "Copy citation in the source panel"], ["1 – 6", "Company tabs"], ["s", "Star or unstar the open company"], ["[", "Collapse or expand the sidebar"], ["⌘ Enter", "Send to the assistant"]];
-function openShortcuts() { const l = $("#sc-list"); l.innerHTML = ""; SHORTCUTS.forEach(([k, d]) => l.append(el("div", {}, el("span", {}, d), el("span", {}, ...k.split(" ").map(x => /^(then|or|–)$/.test(x) ? el("span", { class: "faint", style: "margin:0 4px" }, x) : el("span", { class: "kbd" }, x)))))); $("#kbsheet").hidden = false; }
+// Palette page entries: one per tab, labelled "Hub › Tab" when the hub has several, then the pages without a nav entry.
+function paletteNavItems() {
+  const out = [];
+  for (const n of navEntries()) for (const p of n.tabs) out.push({ id: p.id, key: p.key, label: n.tabs.length > 1 ? `${n.name} › ${p.name}` : n.name });
+  for (const p of PAGES) if (p.hidden && !out.some(x => x.id === p.id)) out.push({ id: p.id, key: p.key, label: p.name });
+  return out;
+}
+const SHORTCUTS_TOP = [["⌘ K or /", "Command palette"], ["?", "This list"]];
+const SHORTCUTS_REST = [["Esc", "Close panel or dialog"], ["← / →", "Previous or next period in the source panel"], ["c", "Copy citation in the source panel"], ["1 – 9", "Company tabs"], ["s", "Star or unstar the open company"], ["[", "Collapse or expand the sidebar"], ["⌘ Enter", "Send to the assistant"]];
+const shortcutRows = () => [...SHORTCUTS_TOP, ...paletteNavItems().filter(n => n.key).map(n => [`g then ${n.key}`, n.label]), ...SHORTCUTS_REST];
+function openShortcuts() { const l = $("#sc-list"); l.innerHTML = ""; shortcutRows().forEach(([k, d]) => l.append(el("div", {}, el("span", {}, d), el("span", {}, ...k.split(" ").map(x => /^(then|or|–)$/.test(x) ? el("span", { class: "faint", style: "margin:0 4px" }, x) : el("span", { class: "kbd" }, x)))))); $("#kbsheet").hidden = false; }
 function setupKeys() {
   let g = 0;
   document.addEventListener("keydown", e => {
@@ -1273,8 +1352,8 @@ function setupKeys() {
     if (e.key === "?") { openShortcuts(); return; }
     if (e.key === "[") { toggleRail(); return; }
     if (e.key === "g") { g = Date.now(); return; }
-    if (Date.now() - g < 900) { const p = PAGES.find(p => p.key === e.key && !p.hidden); if (p) { location.hash = p.id; g = 0; } return; }
-    if (/^[1-6]$/.test(e.key) && location.hash.startsWith("#company-")) { const b = document.querySelectorAll(".tabs button")[+e.key - 1]; b?.click(); }
+    if (Date.now() - g < 900) { const p = PAGES.find(p => p.key === e.key); if (p) { location.hash = p.id; g = 0; } return; }
+    if (/^[1-9]$/.test(e.key) && location.hash.startsWith("#company-")) { const b = document.querySelectorAll(".co-tabs button")[+e.key - 1]; b?.click(); }
     if (e.key === "s" && location.hash.startsWith("#company-")) { const t = location.hash.slice(9).toUpperCase(); if (companySummary(t)) { const on = toggleWatch(t); document.querySelector("#star")?.classList.toggle("pri", on); } }
   });
 }
@@ -1302,7 +1381,7 @@ function newsList(items, lines, n = 10) {
   return box;
 }
 function pMarkets() {
-  page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Markets · " + d3.utcFormat("%A, %B %d")(last("SPY").t)), el("h1", {}, "Today across the tape"), el("div", { class: "sub" }, "Indexes, rates, commodities, tracked companies and your watchlist. Every tile opens its chart.")), el("div", { class: "right" }, el("button", { class: "btn", onclick: () => openPalette() }, svgUse("i-search"), "Search", el("span", { class: "kbd" }, "⌘K")))));
+  page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Markets · " + d3.utcFormat("%A, %B %d")(last("SPY").t)), el("h1", {}, "Today across the tape"), el("div", { class: "sub" }, "Indexes, rates, commodities and the tracked companies. Every tile opens its chart; your companies are on the Watchlist tab."))));
   const syms = ["SPY", "QQQ", "IWM", "DIA", "SMH", "^VIX", "^TNX", "UUP", "CL=F", "GC=F", "HG=F", "BTC-USD"];
   page.append(el("div", { class: "tiles" }, syms.filter(s => PX[s]).map(s => {
     const ch = s === "^TNX" ? (last(s).c - prev(s).c) / 100 : dayChg(s);
@@ -1340,29 +1419,19 @@ function pMarkets() {
   page.append(g0);
 
   const g = el("div", { class: "grid g64" });
-  const wl = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Watchlist"), el("th", { class: "r" }, "Price"), el("th", { class: "r" }, "1D"), el("th", { class: "r" }, "YTD"), el("th", { class: "r" }, "Mkt cap"), el("th", { class: "r" }, "P/E"), el("th", { class: "r" }, "Rev growth"), el("th", {}, "3M"))));
-  const tb = el("tbody");
-  watchlist().forEach(t => { const c = companySummary(t); tb.append(el("tr", { class: "click", onclick: () => location.hash = "company-" + t.toLowerCase() },
-    el("td", {}, el("span", { class: "tkc" }, miniLogo(t, 20), el("b", {}, t), el("span", { class: "muted" }, c.name))),
-    el("td", { class: "r num" }, fnum(c.price)), el("td", { class: "r num " + cls(c.chg_1d) }, fsgn(c.chg_1d, 2)), el("td", { class: "r num " + cls(c.ret_ytd) }, fsgn(c.ret_ytd)),
-    el("td", { class: "r num" }, fmtMoney(c.market_cap)), el("td", { class: "r num" }, c.pe_ttm ? c.pe_ttm.toFixed(1) : "–"), el("td", { class: "r num " + cls(c.rev_growth_lq) }, c.rev_growth_lq != null ? fsgn(c.rev_growth_lq) : "–"),
-    el("td", { style: "width:90px" }, sparkSVG((c.spark || []).slice(-63), css("--c1"), 90, 22)))); });
-  if (!watchlist().length) tb.append(el("tr", {}, el("td", { colspan: 8, class: "muted" }, "Your watchlist is empty. Star companies from the screener or a company page.")));
-  wl.append(tb);
-  g.append(panel("Your watchlist", el("a", { href: "#compare" }, "Compare"), el("div", { class: "scroll" }, wl), el("div", { class: "src" }, "Market cap = last close × shares outstanding from the latest filing cover page. P/E uses the last four reported diluted EPS figures. Star a company to add it.")));
   const feed = el("div", { class: "bd", style: "padding:4px 16px" });
   const fl = allFilings().filter(f => ["10-K", "10-Q", "8-K", "DEF 14A"].includes(f.f)).slice(0, 9);
   fl.forEach(f => feed.append(filingRow(f)));
   if (!fl.length) feed.append(el("div", { class: "muted", style: "padding:12px 0" }, "Loading filings…"));
-  g.append(panel("Latest filings", null, feed));
+  g.append(panel("Latest filings", el("a", { href: "#feed" }, "Filings feed"), feed));
+  g.append(panel("Macro headlines", null, el("div", { class: "bd", style: "padding-top:0" }, newsList(E?.macro_news || [], null, 6))));
   page.append(g);
 
-  const g2 = el("div", { class: "grid g3" });
+  const g2 = el("div", { class: "grid g2" });
   const secHost = el("div", { class: "bd" });
   g2.append(panel("Sector SPDRs, 1-month return", el("a", { href: "#sectors" }, "Sectors"), secHost));
   const mac = el("div", { class: "bd" });
   g2.append(panel("Macro snapshot", el("a", { href: "#macro" }, "Macro"), mac));
-  g2.append(panel("Macro headlines", null, el("div", { class: "bd", style: "padding-top:0" }, newsList(E?.macro_news || [], null, 6))));
   page.append(g2);
   requestAnimationFrame(() => barChart(secHost, SECTORS.filter(s => PX[s]).map(s => ({ k: s, vals: [{ v: retOver(s, 30), name: SYMNAME[s], color: retOver(s, 30) >= 0 ? css("--up") : css("--down") }] })).sort((a, b) => b.vals[0].v - a.vals[0].v), { yfmt: v => fpct(v, 0), tfmt: v => fsgn(v, 2), height: 220 }));
   if (D.macro["FRED:CPIAUCSL"]?.length) {
@@ -1384,6 +1453,20 @@ function pMarkets() {
         el("b", { class: "mono tkc" }, miniLogo(r.t, 18), r.t), el("span", { class: "muted", style: "overflow:hidden;text-overflow:ellipsis;white-space:nowrap" }, `${r[cnt]} trade${r[cnt] === 1 ? "" : "s"} · ${r[who]} insider${r[who] === 1 ? "" : "s"}`), el("span", {}), el("span", { class: "chip " + c, style: "justify-self:end" }, fmtMoney(r[key]))))) : el("div", { class: "muted" }, "None in the window."));
     insHost.append(el("div", { class: "grid g2", style: "gap:24px" }, list("Largest buying", buys, "buy_value", "buys", "buyers", "up"), list("Largest selling", sells, "sell_value", "sells", "sellers", "down")));
   }).catch(() => { insHost.innerHTML = ""; insHost.append(el("div", { class: "muted" }, "Insider data is being processed.")); });
+}
+/* Watchlist table (Home › Watchlist): quote, returns and fundamentals for followed companies; rows open the company. */
+function watchlistTable({ onRemove } = {}) {
+  const t = el("table", { class: "t wl-table" }, el("thead", {}, el("tr", {}, el("th", {}, "Company"), el("th", { class: "r" }, "Price"), el("th", { class: "r" }, "1D"), el("th", { class: "r" }, "YTD"), el("th", { class: "r" }, "Mkt cap"), el("th", { class: "r" }, "P/E"), el("th", { class: "r" }, "Rev growth"), el("th", {}, "3M"), onRemove ? el("th", {}, el("span", { class: "sr-only" }, "Remove")) : null)));
+  const tb = el("tbody");
+  watchlist().forEach(tk => { const c = companySummary(tk) || {}; tb.append(el("tr", { class: "click", onclick: () => location.hash = "company-" + tk.toLowerCase() },
+    el("td", {}, el("a", { class: "tkc", href: "#company-" + tk.toLowerCase(), onclick: e => e.stopPropagation() }, miniLogo(tk, 20), el("b", {}, tk), el("span", { class: "muted" }, c.name || ""))),
+    el("td", { class: "r num" }, fnum(c.price)), el("td", { class: "r num " + cls(c.chg_1d) }, fsgn(c.chg_1d, 2)), el("td", { class: "r num " + cls(c.ret_ytd) }, fsgn(c.ret_ytd)),
+    el("td", { class: "r num" }, fmtMoney(c.market_cap)), el("td", { class: "r num" }, c.pe_ttm ? c.pe_ttm.toFixed(1) : "–"), el("td", { class: "r num " + cls(c.rev_growth_lq) }, c.rev_growth_lq != null ? fsgn(c.rev_growth_lq) : "–"),
+    el("td", { style: "width:90px" }, c.spark?.length ? sparkSVG(c.spark.slice(-63), css("--c1"), 90, 22) : el("span", { class: "faint" }, "–")),
+    onRemove ? el("td", { class: "r" }, el("button", { class: "btn wl-remove", type: "button", title: `Stop following ${tk}`, "aria-label": `Remove ${tk} from watchlist`, onclick: e => { e.stopPropagation(); onRemove(tk); } }, "Remove")) : null)); });
+  if (!watchlist().length) tb.append(el("tr", {}, el("td", { colspan: onRemove ? 9 : 8, class: "muted" }, "Your watchlist is empty. Follow a company here, or star one from the screener or a company page.")));
+  t.append(tb);
+  return el("div", {}, el("div", { class: "scroll" }, t), el("div", { class: "src" }, "Market cap = last close × shares outstanding from the latest filing cover page. P/E uses the last four reported diluted EPS figures."));
 }
 function allFilings() { return (FEED?.filings || []).map(f => ({ f: f.form, d: f.filed, r: f.report_date, a: f.accession, p: f.primary_doc, i: f.items || "", x: f.description || "", t: f.ticker, url: f.url })); }
 const ITEMS = { "1.01": "Material agreement", "2.02": "Results of operations", "2.03": "Debt obligation", "5.02": "Officer/director change", "5.03": "Bylaw amendment", "5.07": "Shareholder vote", "7.01": "Reg FD disclosure", "8.01": "Other events", "9.01": "Exhibits" };
@@ -1569,15 +1652,44 @@ async function pCompany(tk) {
     stat("Market cap", fmtMoney(s.mcap)), stat("Revenue TTM", fmtMoney(s.rev?.v), s.rev), stat("Net income TTM", fmtMoney(s.ni?.v), s.ni), stat("EPS TTM", s.eps ? "$" + s.eps.v.toFixed(2) : "–", s.eps),
     stat("P/E TTM", s.pe ? s.pe.toFixed(1) : "–"), stat("P/S TTM", s.ps ? s.ps.toFixed(1) : "–"), stat("FCF yield", fpct(s.fcfy), s.fcf), stat("Gross margin LQ", fpct(s.gm?.v), s.gm), stat("Rev growth LQ", fsgn(s.growth?.v), s.growth),
     el("div", {}, el("div", { class: "l" }, "52-week range"), el("div", { class: "num co-range-values" }, el("span", {}, fnum(st.lo52)), el("span", {}, fnum(st.hi52))), rng));
-  const tabsDef = [["overview", "Overview"], ["financials", "Financials"], ["segments", "Segments & KPIs"], ["news", "News & narratives"], ["earnings", "Earnings & IR"], ["filings", "Filings"], ["insiders", "Insiders"]];
-  const extra = window.FU_COTABS || [];
-  extra.forEach(t => tabsDef.splice(Math.max(0, tabsDef.findIndex(x => x[0] === t.after) + 1) || tabsDef.length, 0, [t.id, t.name]));
+  const tabsDef = companyTabs();
   const tabs = el("div", { class: "tabs co-tabs", role: "tablist", "aria-label": "Company research" });
   const body = el("div", { class: "co-body" });
-  const show = id => { if (!tabsDef.find(t => t[0] === id)) id = "overview"; window.FU_COMPANY_CLEANUP?.(); window.FU_COMPANY_CLEANUP = null; STATE.coTab = id; store.set("coTab", id); $("#crumb-tab").textContent = tabsDef.find(t => t[0] === id)[1]; tabs.querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.id === id); b.setAttribute("aria-selected", b.dataset.id === id); }); body.innerHTML = ""; if (id === "overview") body.append(metrics); ({ overview: coOverview, financials: coFinancials, segments: coSegments, news: coNews, filings: coFilings, earnings: coEarnings, insiders: coInsiders, ...Object.fromEntries(extra.map(t => [t.id, t.render])) })[id](body, tk); };
-  tabsDef.forEach(([id, n], i) => tabs.append(el("button", { "data-id": id, role: "tab", title: `${n} (${i + 1})`, onclick: () => show(id) }, n)));
+  const show = id => { id = coTabId(id, tabsDef); window.FU_COMPANY_CLEANUP?.(); window.FU_COMPANY_CLEANUP = null; STATE.coTab = id; store.set("coTab", id); const tab = tabsDef.find(t => t.id === id); $("#crumb-tab").textContent = tab.name; tabs.querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.id === id); b.setAttribute("aria-selected", b.dataset.id === id); }); keepInStrip(tabs, tabs.querySelector("button.on")); body.innerHTML = ""; if (id === "overview") body.append(metrics); tab.render(body, tk); };
+  tabsDef.forEach((t, i) => tabs.append(el("button", { "data-id": t.id, role: "tab", title: i < 9 ? `${t.name} (${i + 1})` : t.name, onclick: () => show(t.id) }, t.name)));
   page.append(tabs, body);
   show(STATE.coTab);
+}
+/* Company tabs. Built-ins are listed here; modules add tabs with
+     window.FU_COTABS.push({ id, name, after, render(body, ticker), keywords })
+   - A new id is inserted after the tab whose id equals `after` (appended when `after` is missing or unknown).
+   - Override: an entry whose id equals an existing tab id (built-in or added earlier) replaces that tab in place.
+     Its render replaces the existing render, its name (when given) replaces the label, and `after` is ignored,
+     so the tab keeps its position and saved selections, deep links and keyboard numbers stay valid.
+   Retired ids are mapped by CO_TAB_ALIASES so saved coTab values and old links land on the tab that replaced them. */
+const CO_TAB_ALIASES = { earnings: "filings", ir: "filings", changes: "overview" };
+function companyTabs() {
+  const tabs = [
+    { id: "overview", name: "Overview", render: coOverview },
+    { id: "financials", name: "Financials", render: coFinancials, keywords: "income balance cash flow statements metrics" },
+    { id: "segments", name: "Segments & KPIs", render: coSegments, keywords: "segments kpis" },
+    { id: "news", name: "News & narratives", render: coNews, keywords: "news narratives coverage" },
+    { id: "filings", name: "Filings & IR", render: coFilings, keywords: "filings ir investor relations earnings release call transcript presentation 10-k 10-q 8-k sec documents" },
+    { id: "insiders", name: "Insiders", render: coInsiders, keywords: "insiders form 4 trades" },
+  ];
+  for (const t of window.FU_COTABS || []) {
+    if (!t || !t.id || typeof t.render !== "function") continue;
+    const at = tabs.findIndex(x => x.id === t.id);
+    if (at >= 0) { tabs[at] = { ...tabs[at], render: t.render, name: t.name || tabs[at].name, keywords: t.keywords || tabs[at].keywords }; continue; }
+    const after = tabs.findIndex(x => x.id === t.after);
+    tabs.splice(after >= 0 ? after + 1 : tabs.length, 0, { id: t.id, name: t.name || t.id, render: t.render, keywords: t.keywords || "" });
+  }
+  return tabs;
+}
+function coTabId(id, tabs = companyTabs()) {
+  if (tabs.some(t => t.id === id)) return id;
+  const alias = CO_TAB_ALIASES[id];
+  return alias && tabs.some(t => t.id === alias) ? alias : "overview";
 }
 function coNews(body, tk) {
   const N = E?.narratives?.[tk], news = E?.news?.[tk]?.news || [], tr = [];
@@ -1625,7 +1737,7 @@ function aiOverview(tk) {
 }
 function coOverview(body, tk) {
   if (window.FU_COMPANY_PROFILE) {
-    window.FU_COMPANY_CLEANUP = window.FU_COMPANY_PROFILE.render(body, { ticker: tk, company: D.companies[tk], summary: companySummary(tk), snapshot: snapshot(tk), model: model(tk), prices: window.FU_COMPANY_PROFILE.history(tk, PX[tk]), benchmarkPrices: window.FU_COMPANY_PROFILE.history("SPY", PX.SPY), news: E.news[tk]?.news || [], signals: signals(tk), related: window.FU_COMPANIES?.related(tk) || [], ai: aiOverview(tk), helpers: { el, fmtMoney, fnum, fpct, fsgn, fdate, plabel, openSource, cellChip, miniLogo, filingUrl, logoTile, metricChip: label => { const m = model(tk), lq = m.latestQ(), cell = lq ? m.metric(label, "Q", lq) : null; return cell ? cellChip(cell, `${label} ${fmtCell(cell)}`) : null; } }, dataBase: PUB, onTab: id => body.parentElement.querySelector(`.co-tabs button[data-id="${id}"]`)?.click(), onCompany: () => { STATE.coTab = "overview"; } });
+    window.FU_COMPANY_CLEANUP = window.FU_COMPANY_PROFILE.render(body, { ticker: tk, company: D.companies[tk], summary: companySummary(tk), snapshot: snapshot(tk), model: model(tk), prices: window.FU_COMPANY_PROFILE.history(tk, PX[tk]), benchmarkPrices: window.FU_COMPANY_PROFILE.history("SPY", PX.SPY), news: E.news[tk]?.news || [], signals: signals(tk), related: window.FU_COMPANIES?.related(tk) || [], ai: aiOverview(tk), helpers: { el, fmtMoney, fnum, fpct, fsgn, fdate, plabel, openSource, cellChip, miniLogo, filingUrl, logoTile, metricChip: label => { const m = model(tk), lq = m.latestQ(), cell = lq ? m.metric(label, "Q", lq) : null; return cell ? cellChip(cell, `${label} ${fmtCell(cell)}`) : null; } }, dataBase: PUB, onTab: id => body.parentElement.querySelector(`.co-tabs button[data-id="${coTabId(id)}"]`)?.click(), onCompany: () => { STATE.coTab = "overview"; } });
     return;
   }
   const m = model(tk);
@@ -1723,61 +1835,114 @@ function coFinancials(body, tk) {
   }
   draw();
 }
-function coFilings(body, tk) {
-  const c = D.companies[tk];
-  let form = "all";
-  const host = el("div", { class: "scroll" });
-  const forms = ["all", ...new Set(c.filings.map(f => f.f))];
-  body.append(panel(`${c.filings.length} most recent filings`, seg(forms.slice(0, 9).map(f => [f, f === "all" ? "All" : f]), form, v => { form = v; draw(); }), host));
-  function draw() {
-    const t = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Form"), el("th", {}, "Filed"), el("th", {}, "Period"), el("th", {}, "Description"), el("th", {}, "Accession no."), el("th", {}, ""))));
-    const tb = el("tbody");
-    c.filings.filter(f => form === "all" || f.f === form).forEach(f => tb.append(el("tr", {}, el("td", {}, el("span", { class: "form " + formCls(f.f) }, f.f)), el("td", { class: "num" }, fdate(f.d)), el("td", { class: "num muted" }, f.r ? fdate(f.r) : "–"), el("td", {}, filingDesc({ ...f, t: tk })), el("td", { class: "mono faint", style: "font-size:12px" }, f.a), el("td", {}, el("a", { href: filingUrl(tk, f), target: "_blank", rel: "noopener" }, "Open ↗")))));
-    t.append(tb); host.innerHTML = ""; host.append(t);
-  }
-  draw();
+/* ---------- Filings & IR tab: latest earnings materials, the SEC filing list and the IR document library ---------- */
+const CALL_DOC_TYPES = ["release", "presentation", "remarks", "transcript", "supplement"];
+// The newest reporting period's release, presentation, remarks, transcript and supplement from the IR collection.
+function latestCallMaterials(ir) {
+  const docs = (Array.isArray(ir?.documents) ? ir.documents : []).filter(d => d && typeof d === "object" && CALL_DOC_TYPES.includes(d.doc_type));
+  const when = d => String(d.period_end || d.published || "").slice(0, 10);
+  const dated = docs.filter(d => /^\d{4}-\d{2}-\d{2}$/.test(when(d)));
+  if (!dated.length) return { label: null, docs: [] };
+  const top = dated.reduce((a, d) => when(d) > when(a) ? d : a);
+  const label = top.fiscal_label || null;
+  const pick = docs.filter(d => label ? d.fiscal_label === label : when(d) === when(top));
+  pick.sort((a, b) => CALL_DOC_TYPES.indexOf(a.doc_type) - CALL_DOC_TYPES.indexOf(b.doc_type) || String(b.published || "").localeCompare(String(a.published || "")));
+  return { label: label || when(top), docs: pick.slice(0, 10) };
 }
-function coEarnings(body, tk) {
-  const documents = el("div", { class: "co-ir-documents" });
-  body.append(documents);
-  const loadDocuments = async () => {
-    documents.replaceChildren(el("div", { class: "note", role: "status" }, "Loading investor relations documents…"));
-    try {
-      const ir = await getJSON(`ir/${tk}.json`);
-      documents.replaceChildren();
-      renderIrDocs(documents, tk, ir);
-    } catch {
-      documents.replaceChildren(el("div", { class: "note", role: "alert" }, "Could not load investor relations documents. ",
-        el("button", { class: "btn", onclick: loadDocuments }, "Retry")));
-    }
+function renderCallMaterials(host, tk, ir) {
+  const { label, docs } = latestCallMaterials(ir);
+  host.replaceChildren();
+  if (!docs.length) { host.append(el("div", { class: "muted fi-empty" }, "No release, presentation or call documents have been collected for this company yet.")); return; }
+  host.append(el("div", { class: "fi-mat-period" }, "Period ", el("b", {}, label), ` · ${docs.length} document${docs.length === 1 ? "" : "s"}`), el("ul", { class: "fi-mat" }, ...docs.map(d => {
+    const name = docTitle(d), url = /^https?:\/\//i.test(d.url || "") ? d.url : null;
+    return el("li", {},
+      el("span", { class: "fi-mat-type" }, DOC_TYPES[d.doc_type] || d.doc_type),
+      el("button", { type: "button", class: "fi-mat-title", title: "Open in the document panel", onclick: () => openDoc(tk, d, {}) }, name),
+      el("span", { class: "fi-mat-date num" }, /^\d{4}-\d{2}-\d{2}/.test(d.published || "") ? fdate(d.published.slice(0, 10)) : "Date unavailable"),
+      url ? el("a", { class: "fi-mat-src", href: url, target: "_blank", rel: "noopener", "aria-label": "Original source: " + name, title: "Original source" }, "↗") : el("span"));
+  })));
+}
+function coFilings(body, tk) {
+  const c = D.companies[tk] || {}, filings = Array.isArray(c.filings) ? c.filings : [];
+  const R = E?.releases?.[tk], N = E?.narratives?.[tk], ers = earningsReactions(tk);
+  const jumps = [];
+  const section = (id, title, meta) => {
+    const s = el("section", { class: "fi-sec", "data-sec": id, "aria-labelledby": `fi-${id}-h` }, el("div", { class: "fi-sec-h" }, el("h2", { id: `fi-${id}-h` }, title), meta ? el("span", { class: "fi-sec-meta" }, meta) : null));
+    const count = el("span", { class: "fi-jump-n" });
+    jumps.push(el("button", { type: "button", "data-sec": id, onclick: () => s.scrollIntoView({ behavior: "smooth", block: "start" }) }, title, count));
+    s.count = count; return s;
   };
-  loadDocuments();
-  const ers = earningsReactions(tk);
-  const R = E?.releases?.[tk], N = E?.narratives?.[tk];
+
+  // Latest earnings: release text, highlights, call materials, post-release moves and the release log.
+  const earn = section("earnings", "Latest earnings", R ? `Release filed ${fdate(R.filed)}` : "No release processed yet");
+  const materials = el("div", { class: "bd fi-materials" }, el("div", { class: "muted", role: "status" }, "Loading call materials…"));
+  const g0 = el("div", { class: "grid g64" });
   if (R) {
-    const g0 = el("div", { class: "grid g64" });
     const relLines = R.markdown.replace(/\\\$/g, "$").replace(/\*\*\*/g, "**").split("\n"); const startAt = relLines.findIndex(l => l.trim().split(/\s+/).length >= 4 && !/\.htm/.test(l));
     const doc = el("div", { class: "release", html: md(relLines.slice(Math.max(0, startAt)).join("\n")) });
-    g0.append(panel(`Earnings release · filed ${fdate(R.filed)}`, el("a", { href: R.url, target: "_blank", rel: "noopener" }, "Exhibit 99.1 on EDGAR ↗"), doc, el("div", { class: "src", style: "padding-top:10px" }, `8-K accession ${R.accn}. Text taken from the filed exhibit; tables shown as filed.`)));
-    const hl = el("div", { class: "bd brief" }, el("ul", {}, (N?.release_highlights || []).map(b => el("li", {}, b))));
-    const side = el("div", { class: "co-ai-side", style: "display:flex;flex-direction:column;gap:16px" }, panel("Release highlights", aiCredit(N?.meta), hl));
-    const ch = el("div", { class: "bd" });
-    side.append(panel("Next-session move after each release", null, ch, el("div", { class: "src" }, "Stock vs SPY on the first session after the 8-K Item 2.02 filing date.")));
-    g0.append(side);
-    body.append(g0);
-    requestAnimationFrame(() => barChart(ch, ers.slice().reverse().map(e => ({ k: fmon(e.date), vals: [{ v: e.r1, name: tk, color: e.r1 >= 0 ? css("--up") : css("--down") }, { v: e.s1, name: "SPY", color: css("--c6") }] })), { yfmt: v => fpct(v, 0), tfmt: v => fsgn(v, 2), height: 200, legend: [tk, "SPY"] }));
-  }
+    g0.append(panel(`Earnings release · filed ${fdate(R.filed)}`, el("a", { href: R.url, target: "_blank", rel: "noopener" }, "Exhibit 99.1 on EDGAR ↗"), el("div", { class: "fi-release", tabindex: "0", "aria-label": "Earnings release text" }, doc), el("div", { class: "src" }, `8-K accession ${R.accn}. Text taken from the filed exhibit; tables shown as filed.`)));
+  } else g0.append(panel("Earnings release", null, el("div", { class: "bd muted" }, "No earnings release exhibit (8-K Item 2.02) has been processed for this company yet. Releases collected from the company appear under Latest call materials and in the IR document library.")));
+  const side = el("div", { class: "fi-side" });
+  if (N?.release_highlights?.length) side.append(panel("Release highlights", aiCredit(N?.meta), el("div", { class: "bd brief" }, el("ul", {}, N.release_highlights.map(b => el("li", {}, b))))));
+  side.append(panel("Latest call materials", IR[tk] ? el("a", { href: IR[tk], target: "_blank", rel: "noopener" }, "IR site ↗") : null, materials));
+  g0.append(side);
+  const g1 = el("div", { class: "grid g2" });
+  const ch = el("div", { class: "bd" });
+  g1.append(panel("Next-session move after each release", null, ers.length ? ch : el("div", { class: "bd muted" }, "No 8-K Item 2.02 filings with price history yet."), el("div", { class: "src" }, "Stock vs SPY on the first session after the 8-K Item 2.02 filing date.")));
   const t = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Release (8-K)"), el("th", { class: "r" }, "Next 1D"), el("th", { class: "r" }, "SPY 1D"), el("th", { class: "r" }, "Excess"), el("th", { class: "r" }, "5D drift"), el("th", {}, ""))));
   const tb = el("tbody"); ers.forEach(e => tb.append(el("tr", {}, el("td", { class: "num" }, fdate(e.date)), el("td", { class: "r num " + cls(e.r1) }, fsgn(e.r1)), el("td", { class: "r num " + cls(e.s1) }, fsgn(e.s1)), el("td", { class: "r num " + cls(e.r1 - (e.s1 || 0)) }, fsgn(e.r1 - (e.s1 || 0))), el("td", { class: "r num " + cls(e.r5) }, fsgn(e.r5)), el("td", {}, el("a", { href: e.url, target: "_blank", rel: "noopener" }, "8-K ↗")))));
+  if (!ers.length) tb.append(el("tr", {}, el("td", { colspan: 6, class: "muted" }, "No earnings releases on file.")));
   t.append(tb);
-  const g = el("div", { class: "grid g2" });
-  g.append(panel("Release log", null, el("div", { class: "scroll" }, t)));
-  const ir = el("div", { class: "bd cover" },
-    srcCard("Earnings press releases", "8-K Exhibit 99.1", "live", "Latest release text pulled from EDGAR when the 8-K lands, with highlights."),
-    srcCard("Earnings call transcripts", "IR event pages", "planned", "Speaker-tagged transcripts, searchable and citable."),
-    srcCard("News coverage", "News search", "live", "Recent articles, refreshed on a rolling schedule and summarized on the News tab."));
-  g.append(panel("Sources for this company", IR[tk] ? el("a", { href: IR[tk], target: "_blank", rel: "noopener" }, "Open IR site ↗") : null, ir));
-  body.append(g);
+  g1.append(panel("Release log", el("span", { class: "faint fi-panel-meta" }, `${ers.length} release${ers.length === 1 ? "" : "s"}`), el("div", { class: "scroll fi-log" }, t)));
+  earn.append(g0, g1);
+
+  // SEC filings: every filing in the company record, filterable by form and searchable.
+  const sec = section("sec", "SEC filings", "From EDGAR submissions");
+  sec.count.textContent = String(filings.length);
+  let form = "all";
+  const counts = new Map(); filings.forEach(f => counts.set(f.f, (counts.get(f.f) || 0) + 1));
+  // Periodic and current reports first, then the most frequent other forms; the search box reaches every form.
+  const FORM_ORDER = ["10-K", "10-Q", "8-K", "DEF 14A", "4", "144", "S-8", "SC 13G", "SC 13G/A"], rank = f => { const i = FORM_ORDER.indexOf(f); return i < 0 ? 99 : i; };
+  const forms = [...counts.keys()].sort((a, b) => rank(a) - rank(b) || counts.get(b) - counts.get(a) || String(a).localeCompare(String(b))).slice(0, 8);
+  const q = el("input", { type: "search", class: "fi-search", placeholder: "Search filings", "aria-label": "Search filings by form, description, date or accession number" });
+  const status = el("span", { class: "fi-count", role: "status", "aria-live": "polite" });
+  const host = el("div", { class: "fi-table", tabindex: "0", "aria-label": "SEC filings table" });
+  const edgar = c.cik ? el("a", { href: `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${c.cik}&type=&dateb=&owner=include&count=40`, target: "_blank", rel: "noopener" }, "Full history on EDGAR ↗") : null;
+  sec.append(panel(`${filings.length} most recent filings`, el("div", { class: "fi-controls" }, seg([["all", "All"], ...forms.map(f => [f, f])], form, v => { form = v; draw(); }), q), host, el("div", { class: "src fi-foot" }, status, edgar)));
+  const desc = f => filingDesc({ ...f, t: tk });
+  function draw() {
+    const needle = q.value.trim().toLowerCase();
+    const rows = filings.filter(f => (form === "all" || f.f === form) && (!needle || [f.f, desc(f), f.a, f.d, f.r].filter(Boolean).join(" ").toLowerCase().includes(needle)));
+    const table = el("table", { class: "t" }, el("thead", {}, el("tr", {}, el("th", {}, "Form"), el("th", {}, "Filed"), el("th", {}, "Period"), el("th", {}, "Description"), el("th", {}, "Accession no."), el("th", {}, ""))));
+    const rowsBody = el("tbody");
+    rows.forEach(f => rowsBody.append(el("tr", {}, el("td", {}, el("span", { class: "form " + formCls(f.f) }, f.f)), el("td", { class: "num" }, fdate(f.d)), el("td", { class: "num muted" }, f.r ? fdate(f.r) : "–"), el("td", {}, desc(f)), el("td", { class: "mono faint", style: "font-size:12px" }, f.a), el("td", {}, el("a", { href: filingUrl(tk, f), target: "_blank", rel: "noopener", "aria-label": `Open ${f.f} filed ${fdate(f.d)} on EDGAR` }, "Open ↗")))));
+    table.append(rowsBody); host.replaceChildren(rows.length ? table : el("div", { class: "muted fi-empty" }, filings.length ? "No filings match these filters." : "No filings on record for this company."));
+    status.textContent = `${rows.length} of ${filings.length} filings`;
+  }
+  q.addEventListener("input", draw);
+  draw();
+
+  // IR document library: everything collected from the company's IR site and SEC exhibits.
+  const irs = section("ir", "IR document library", "Company IR site and SEC exhibits");
+  const documents = el("div", { class: "co-ir-documents" });
+  irs.append(documents);
+  const loadDocuments = async () => {
+    documents.replaceChildren(el("div", { class: "note", role: "status" }, "Loading investor relations documents…"));
+    let ir;
+    try { ir = await getJSON(`ir/${tk}.json`); } catch {
+      documents.replaceChildren(el("div", { class: "note", role: "alert" }, "Could not load investor relations documents. ",
+        el("button", { class: "btn", onclick: loadDocuments }, "Retry")));
+      materials.replaceChildren(el("div", { class: "muted fi-empty" }, "Call materials could not be loaded. Retry from the IR document library below."));
+      return;
+    }
+    documents.replaceChildren();
+    renderIrDocs(documents, tk, ir);
+    irs.count.textContent = String(Array.isArray(ir?.documents) ? ir.documents.length : 0);
+    try { renderCallMaterials(materials, tk, ir); } catch (e) { console.error(e); materials.replaceChildren(el("div", { class: "muted fi-empty" }, "Call materials could not be displayed. The documents are listed in the IR document library below.")); }
+  };
+  body.append(el("nav", { class: "fi-jump", "aria-label": "Filings & IR sections" }, ...jumps), earn, sec, irs);
+  loadDocuments();
+  if (ers.length) requestAnimationFrame(() => barChart(ch, ers.slice().reverse().map(e => ({ k: fmon(e.date), vals: [{ v: e.r1, name: tk, color: e.r1 >= 0 ? css("--up") : css("--down") }, { v: e.s1, name: "SPY", color: css("--c6") }] })), { yfmt: v => fpct(v, 0), tfmt: v => fsgn(v, 2), height: 200, legend: [tk, "SPY"] }));
 }
 function srcCard(title, sub, status, note) {
   const map = { live: ["up", "Live"], partial: ["warn", "Partial"], planned: ["", "Planned"] };
