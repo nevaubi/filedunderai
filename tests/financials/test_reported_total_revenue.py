@@ -61,3 +61,32 @@ class RevenueScopeReplacementTests(unittest.TestCase):
             self.check('ADM', 'Revenues', 'RevenueFromContractWithCustomerExcludingAssessedTax')
         with self.assertRaisesRegex(ValueError, 'reported_accounting_scope_changed'):
             self.check('ADM', 'CostOfRevenue', 'CostOfGoodsAndServicesSold', label='Cost of revenue')
+
+
+class PublishedConceptPinTests(unittest.TestCase):
+    def facts(self):
+        return {'us-gaap': {
+            'OtherNonoperatingIncomeExpense': {'units': {'USD': [obs('a', 10)]}},
+            'NonoperatingIncomeExpense': {'units': {'USD': [obs('b', 12, accn='0000000000-26-000002')]}}}}
+
+    def row(self, pinned):
+        from etl import sec as s
+        names = [('Other income', ['NonoperatingIncomeExpense', 'OtherNonoperatingIncomeExpense'])]
+        return next(r for r in s.build_series(self.facts(), 'income', concepts=names, pinned=pinned) if r['label'] == 'Other income')['annual'][-1]
+
+    def test_default_uses_concept_priority(self):
+        self.assertEqual(self.row(None)['c'], 'NonoperatingIncomeExpense')
+
+    def test_published_concept_keeps_its_period(self):
+        point = self.row({('Other income', '2025-01-01', '2025-12-31'): 'OtherNonoperatingIncomeExpense'})
+        self.assertEqual((point['c'], point['v']), ('OtherNonoperatingIncomeExpense', 10))
+        self.assertEqual(point['selection_reason'], 'published concept retained for this period')
+
+    def test_pin_for_another_period_is_ignored(self):
+        self.assertEqual(self.row({('Other income', '2024-01-01', '2024-12-31'): 'OtherNonoperatingIncomeExpense'})['c'], 'NonoperatingIncomeExpense')
+
+    def test_reviewed_total_revenue_is_not_pinned_back(self):
+        from etl import sec as s
+        row = next(r for r in s.build_series(facts(58, 907), 'income', total_revenue_scope=True,
+                   pinned={('Revenue', '2025-01-01', '2025-12-31'): 'RevenueFromContractWithCustomerExcludingAssessedTax'}) if r['label'] == 'Revenue')
+        self.assertEqual(row['annual'][-1]['c'], 'Revenues')

@@ -245,7 +245,7 @@ def prefer_reported_observation(selected, options):
     return preferred
 
 
-def build_series(facts, stmt, vintage="latest", as_of=None, concepts=None, instant=None, total_revenue_scope=False):
+def build_series(facts, stmt, vintage="latest", as_of=None, concepts=None, instant=None, total_revenue_scope=False, pinned=None):
     """Normalize reported observations and retain filing histories for point-in-time use.
 
     as_of is a filing-date cutoff (daily granularity). Cross-filing subtraction is
@@ -269,6 +269,12 @@ def build_series(facts, stmt, vintage="latest", as_of=None, concepts=None, insta
                 continue
             rank, reason = (_revenue_rank(facts, r, names, total_revenue_scope) if label == "Revenue"
                             else (names.index(r["c"]), "reported concept priority"))
+            # pinned: {(label, period_start or None, period_end): concept} already published for that period.
+            # While that concept is still reported for the period, it keeps the cell, so a later XBRL vintage
+            # that tags an old period under another concept cannot silently change its accounting scope.
+            if (pinned and pinned.get((label, r.get("start"), r["end"])) == r["c"]
+                    and not (total_revenue_scope and r["c"] == "RevenueFromContractWithCustomerExcludingAssessedTax")):
+                rank, reason = -100, "published concept retained for this period"
             rec = {"v": r["val"], "end": r["end"], "accn": r["accn"], "form": r["form"],
                    "filed": r["filed"], "c": r["c"], "available_at": r["filed"],
                    "accessions": [r["accn"]], "vintage": vintage, "validation_status": "reported",
@@ -322,6 +328,13 @@ def build_series(facts, stmt, vintage="latest", as_of=None, concepts=None, insta
                 date = (max if vintage == "latest" else min)(r["available_at"] for r in options)
                 pool = [r for r in options if r["available_at"] == date]
                 selected = min(pool, key=lambda r: (r["_rank"], bool(r.get("derived")), r["accn"]))
+                # A pinned (already published) concept keeps its period when the normal choice is a directly
+                # or derived value under a different concept (a later XBRL vintage re-tagging an old period).
+                # Same-concept revisions keep the normal path and its review checks.
+                pins = [r for r in options if r["_rank"] == -100 and not r.get("derived")]
+                if pins and selected["c"] != pins[0]["c"]:
+                    pdate = (max if vintage == "latest" else min)(r["available_at"] for r in pins)
+                    selected = min((r for r in pins if r["available_at"] == pdate), key=lambda r: r["accn"])
                 if vintage == "latest":
                     selected = prefer_reported_observation(selected, options)
                 chosen.append(selected)

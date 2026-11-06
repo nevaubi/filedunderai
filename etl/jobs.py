@@ -140,6 +140,23 @@ def statement_fact_rows(ticker, statements):
     return list(rows.values())
 
 
+def published_concepts(sb, ticker):
+    """Concepts of directly reported facts already published, by statement then (label, start, end).
+
+    Local stages and stores without a select (tests, additive staging of new issuers) have none."""
+    if getattr(sb, "stage_only", False) is True or not callable(getattr(sb, "select", None)):
+        return {}
+    try:
+        rows = sb.select("facts", f"select=statement,label,period_start,period_end,concept&ticker=eq.{quote(ticker, safe='')}&derived=is.false&order=statement.asc,label.asc,kind.asc,period_end.asc")
+    except Exception:
+        return {}
+    out = {}
+    for r in rows if isinstance(rows, list) else []:
+        if r.get("concept") and r.get("period_end"):
+            out.setdefault(r["statement"], {})[(r["label"], r.get("period_start"), r["period_end"])] = r["concept"]
+    return out
+
+
 def check_reported_fact_replacements(sb, ticker, rows):
     """Reject unsafe overwrites; absent historical rows are never deleted here.
 
@@ -283,7 +300,8 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
         except Exception as e:
             warn(f"  {tk} gap filler failed: {str(e)[:200]}")
     total_scope = cik in sec.REPORTED_TOTAL_REVENUE_CIKS
-    statements = {k: sec.build_series(facts, k, total_revenue_scope=total_scope) for k in sec.CONCEPTS}
+    pinned = published_concepts(sb, tk)
+    statements = {k: sec.build_series(facts, k, total_revenue_scope=total_scope, pinned=pinned.get(k)) for k in sec.CONCEPTS}
     from .source_quality import partition_supported_periods, comparability_review
     statements, quarantined = partition_supported_periods(statements)
     if quarantined:
