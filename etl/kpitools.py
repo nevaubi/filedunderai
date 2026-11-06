@@ -819,8 +819,12 @@ def build_index(sb, coverage_updates=None):
             raise ValueError("Missing or incomplete prior coverage snapshot; explicit full rebuild required")
         out = copy.deepcopy(prior["companies"])
         required = {ticker for ticker, *_ in UNIVERSE} | set(coverage_updates)
-        if not required.issubset(out):
-            raise ValueError("Incomplete prior coverage snapshot: missing company counts; explicit full rebuild required")
+        # Issuers activated after the last full rebuild have no snapshot row yet. They start at zero counts; document
+        # counts are refreshed below when they appear in coverage_updates, KPI counts at the next full rebuild.
+        unknown = set(coverage_updates) - {ticker for ticker, *_ in UNIVERSE}
+        if unknown:
+            raise ValueError(f"IR coverage update outside the universe: {sorted(unknown)[:5]}")
+        missing = required - set(out)
         def count(value):
             return type(value) is int and value >= 0
         for ticker, company in out.items():
@@ -838,6 +842,9 @@ def build_index(sb, coverage_updates=None):
                 raise ValueError(f"Inconsistent prior coverage snapshot: {key}; explicit full rebuild required")
         if "companies" in prior["summary"] and prior["summary"]["companies"] != len(out):
             raise ValueError("Inconsistent prior coverage snapshot: company count")
+        for ticker in missing:
+            out[ticker] = {"docs": 0, "bytes": 0, "kpis": 0, "kpi_values": 0, "types": {},
+                           "coverage": {"version": 1, "status": "unverified", "limits": ["not yet in a full coverage rebuild"]}}
         as_of = {}
         for key in ("kpi_counts_as_of", "segment_counts_as_of"):
             # Legacy generated is accepted only after all per-company/summary counts agree.

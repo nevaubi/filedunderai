@@ -127,6 +127,19 @@ class RotationCoverageReplayTests(unittest.TestCase):
         self.assertEqual(store.json['meta/ir_rotation.json']['cursor'], 0)
         self.assertEqual(store.json['meta/ir_rotation.json']['retry'], ['AAA'])
 
+    def test_index_update_seeds_issuers_added_after_the_last_full_rebuild(self):
+        tickers = ['AAA', 'BBB', 'NEW1', 'NEW2']
+        store = SnapshotStore(tickers[:2])
+        with patch('etl.universe.UNIVERSE', [(t,) for t in tickers]):
+            kpitools.build_index(store, coverage_updates={'NEW1': coverage('2026-11-06T18:00:00Z', 'n1')})
+        companies = store.json['meta/coverage_ir.json']['companies']
+        self.assertEqual(set(companies), set(tickers))
+        self.assertEqual(companies['NEW1']['docs'], 1)
+        self.assertEqual(companies['NEW2']['docs'], 0)
+        self.assertEqual(companies['NEW2']['coverage']['status'], 'unverified')
+        with patch('etl.universe.UNIVERSE', [(t,) for t in tickers]), self.assertRaises(ValueError):
+            kpitools.build_index(store, coverage_updates={'ZZZ': coverage('2026-11-06T18:00:00Z', 'z')})
+
     def test_failed_aaa_aggregate_replays_with_bbb_next_rotation(self):
         tickers = ['AAA', 'BBB']; sb = SnapshotStore(tickers); calls = []
         values = {'AAA': coverage('2026-11-04T10:00:00Z', 'first'),
