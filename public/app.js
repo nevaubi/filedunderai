@@ -1311,7 +1311,7 @@ function paletteItems(v) {
   if (v) { const sec = [...new Set(Object.values(IDX).map(c => c.sector))].filter(s => s.toLowerCase().includes(v)); sec.forEach(s => add("Screener", `${s} sector`, "screener", "▤", () => { STATE.scr.sector = s; store.set("scr", STATE.scr); location.hash === "#screener" ? route() : location.hash = "screener"; })); }
   for (const n of paletteNavItems()) if (!v || n.label.toLowerCase().includes(v)) add("Pages", n.label, n.key ? `g ${n.key}` : "", "→", () => location.hash = n.id);
   if (v) for (const s of Object.keys(SYMNAME)) if (s.toLowerCase().replace("^", "").startsWith(v) || SYMNAME[s].toLowerCase().includes(v)) add("Charts", `${s.replace("^", "")} · ${SYMNAME[s]}`, "technicals", "↗", () => { STATE.taSym = s; location.hash === "#technicals" ? route() : location.hash = "technicals"; });
-  if (v.length > 3) add("Ask", `Ask the research assistant: “${v}”`, "assistant", "✦", () => { location.hash = "research"; setTimeout(() => RESEARCH?.ask(v), 300); });
+  if (v.length > 3) add("Ask", `Ask the research assistant: “${v}”`, "assistant", "✦", () => { requestResearch(v); });
   return out.slice(0, 26);
 }
 function renderPalette(keepScroll) {
@@ -1636,7 +1636,7 @@ async function pCompany(tk) {
       ...["10-K", "10-Q"].map(form => { const filing = filings.find(f => f.f === form); return filing ? el("a", { class: "btn", href: filingUrl(tk, filing), target: "_blank", rel: "noopener" }, `Latest ${form} ↗`) : null; }),
       IR[tk] ? el("a", { class: "btn co-text-action", href: IR[tk], target: "_blank", rel: "noopener" }, "IR ↗") : null,
       el("a", { class: "btn co-text-action", href: edgarUrl, target: "_blank", rel: "noopener" }, "EDGAR ↗"),
-      el("button", { class: "btn co-text-action", onclick: () => { location.hash = "research"; setTimeout(() => RESEARCH?.ask(`Give me a one-page brief on ${tk}: latest quarter vs prior year, margin trend, cash returns vs free cash flow, recent news, and how the stock reacted to earnings. Cite every financial number.`), 300); } }, svgUse("i-spark"), "Write a brief")));
+      el("button", { class: "btn co-text-action", onclick: () => { requestResearch(`Give me a one-page brief on ${tk}: latest quarter vs prior year, margin trend, cash returns vs free cash flow, recent news, and how the stock reacted to earnings. Cite every financial number.`); } }, svgUse("i-spark"), "Write a brief")));
   const profileItem = (label, value) => el("div", {}, el("dt", {}, label), el("dd", {}, value || "Unavailable"));
   const profile = el("details", { class: "co-profile" }, el("summary", {}, "Company details"),
     el("dl", {}, profileItem("Registrant", officialName), profileItem("Address", address), profileItem("Phone", c.phone), profileItem("Fiscal year end", fiscalYearEnd), profileItem("Incorporation", c.stateOfIncorporation), profileItem("CIK", c.cik ? String(c.cik).padStart(10, "0") : null), profileItem("Industry", [c.sicDescription, c.sic ? `SIC ${c.sic}` : null].filter(Boolean).join(" · ")), profileItem("Website", WEB[tk] ? el("a", { href: "https://" + WEB[tk], target: "_blank", rel: "noopener" }, WEB[tk] + " ↗") : null)),
@@ -1747,7 +1747,7 @@ function coOverview(body, tk) {
   const draw = () => { const days = { "3M": 91, "6M": 182, "1Y": 365, "2Y": 730 }[rng]; const t0 = new Date(last(tk).t - days * 864e5); const b = PX[tk].bars.filter(x => x.t >= t0); const marks = earningsReactions(tk).filter(e => e.t >= t0).map(e => ({ t: e.t, label: "ER" })); const spy = PX.SPY.bars.filter(x => x.t >= t0); lineChart(pxHost, [{ name: tk, pts: b.map(x => [x.t, x.c / b[0].c - 1]) }, { name: "SPY", pts: spy.map(x => [x.t, x.c / spy[0].c - 1]), color: css("--c6"), width: 1.2, dash: "3 3" }], { height: 250, yfmt: v => fpct(v, 0), tfmt: v => fsgn(v), marks }); };
   g.append(panel("Price vs S&P 500", seg([["3M", "3M"], ["6M", "6M"], ["1Y", "1Y"], ["2Y", "2Y"]], rng, v => { rng = v; draw(); }), pxHost, el("div", { class: "src" }, "Daily closes, Yahoo Finance. ER marks the session after each 8-K Item 2.02 earnings release.")));
   const sg = el("div", { class: "bd sig" });
-  const aiBtn = el("button", { class: "btn", onclick: () => { location.hash = "research"; setTimeout(() => RESEARCH?.ask(`Write a five-bullet brief on ${tk}: latest quarter results vs the prior year, margin trend, cash returns vs free cash flow, and how the stock has reacted to earnings. Cite every financial number.`), 80); } }, svgUse("i-spark"), "AI brief");
+  const aiBtn = el("button", { class: "btn", onclick: () => { requestResearch(`Write a five-bullet brief on ${tk}: latest quarter results vs the prior year, margin trend, cash returns vs free cash flow, and how the stock has reacted to earnings. Cite every financial number.`); } }, svgUse("i-spark"), "AI brief");
   signals(tk).forEach(s => sg.append(el("div", { class: "it" }, el("span", { class: "dot", style: `background:${s.tone === "up" ? css("--up") : s.tone === "down" ? css("--down") : s.tone === "warn" ? css("--warn") : css("--c6")}` }), el("div", {}, el("div", { class: "tx" }, s.text), s.refs.length ? el("div", { class: "refs" }, s.refs.filter(r => r[0]).map(r => cellChip(r[0], r[1]))) : null))));
   g.append(panel("Signals from the filings", aiBtn, sg, el("div", { class: "src" }, "Computed from reported figures. Highlighted chips open the filing behind each number.")));
   body.append(g);
@@ -2832,7 +2832,7 @@ async function pTheses() {
         el("div", {}, el("div", {}, `${r.ch.metric} ${r.ch.op === ">=" ? "≥" : "≤"} ${model(th.ticker).ratioDefs.find(d => d.label === r.ch.metric)?.unit === "pct" ? fpct(r.ch.value, 0) : fmtMoney(r.ch.value)}`), r.history ? el("div", { style: "margin-top:4px;width:140px" }, sparkSVG(r.history.map(x => x.cell.v), css(r.status === "fail" ? "--down" : "--c1"), 140, 20)) : null),
         el("span", { class: "val", onclick: () => r.cell && openSource(r.cell), title: "Open source" }, r.cell ? `${r.cell.unit === "pct" ? fpct(r.cell.v) : fmtMoney(r.cell.v, r.cell.unit)} · ${plabel(th.ticker, r.cell.end, r.cell.kind)}` : "–")))),
       el("div", {}, el("div", { class: "eyebrow", style: "margin-bottom:6px" }, "Updates since created"), ...D.companies[th.ticker].filings.filter(f => f.d >= th.created && ["10-K", "10-Q", "8-K"].includes(f.f)).slice(0, 4).map(f => filingRow({ ...f, t: th.ticker }))),
-      el("div", { style: "display:flex;gap:8px" }, fb, el("button", { class: "btn", onclick: () => { location.hash = "research"; setTimeout(() => RESEARCH?.ask(`Stress-test this thesis on ${th.ticker}: "${th.title}". ${th.body} Pull the relevant quarterly series, say what the latest filings show, and list what would break it. Cite every financial number.`), 80); } }, svgUse("i-spark"), "Stress-test with AI")));
+      el("div", { style: "display:flex;gap:8px" }, fb, el("button", { class: "btn", onclick: () => { requestResearch(`Stress-test this thesis on ${th.ticker}: "${th.title}". ${th.body} Pull the relevant quarterly series, say what the latest filings show, and list what would break it. Cite every financial number.`); } }, svgUse("i-spark"), "Stress-test with AI")));
     g.append(el("section", { class: "panel" }, card));
   });
   page.append(g);
@@ -2970,6 +2970,8 @@ async function pWorkbench() {
 }
 
 /* ---------- research ---------- */
+// Handoff to the global assistant panel (public/lib/assistant-panel.js): opens it and prefills the prompt for review.
+function requestResearch(prompt) { window.dispatchEvent(new CustomEvent("fu:research-request", { detail: String(prompt) })); }
 let RESEARCH = null;
 async function pResearch() {
   page.append(el("div", { class: "ph" }, el("div", {}, el("div", { class: "eyebrow" }, "Research"), el("h1", {}, "Research assistant"), el("div", { class: "sub" }, "Research companies, compare filed financials, and inspect the evidence behind each answer."))));
