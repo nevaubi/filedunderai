@@ -107,6 +107,31 @@ REPORTED_TOTAL_REVENUE_CIKS = {
     1662991: "SEZL: interest and fee income on receivables is part of total revenues",
     873303: "SRPT: collaboration and royalty revenue is part of total revenues",
     1497770: "WD: servicing and loan income is part of total revenues",
+    # Existing issuers found by scanning every tracked issuer's latest 10-K (2026-11-06); each total checked
+    # against the issuer's reported consolidated revenue. RSG, HAS and COP were left unchanged (their larger
+    # "Revenues" contexts do not read as plain consolidated revenue).
+    314808: "VAL: reimbursable and other revenues are part of total operating revenues",
+    1051470: "CCI: site rental revenues are lease income outside contract revenue",
+    39263: "CFR: net interest income is part of total revenue",
+    927628: "COF: net interest income is part of total net revenue",
+    1592386: "VIRT: trading income is part of total revenues",
+    1067701: "URI: equipment rental revenue is lease income outside contract revenue",
+    1996862: "BG: commodity sales are outside contract revenue",
+    7084: "ADM: commodity merchandising revenue is outside contract revenue",
+    840489: "FCFS: pawn loan fees are outside contract revenue",
+    1309108: "WEX: finance fee revenue is part of total revenues",
+    1609253: "CRC: oil, gas and NGL sales are part of total operating revenues",
+    1057706: "FBP: net interest income is part of total revenue",
+    793952: "HOG: financial services revenue is part of consolidated revenue",
+    1094831: "BGC: principal transactions and interest income are part of total revenues",
+    1567094: "CNH: financial services revenue is part of total revenues",
+    1868275: "CEG: derivative and other revenues are part of operating revenues",
+    1071739: "CNC: premium revenue is outside contract revenue",
+    1674168: "HGV: financing and rental revenues are part of total revenues",
+    91440: "SNA: financial services revenue is part of total revenues",
+    1591698: "PCTY: interest income on funds held for clients is part of total revenues",
+    1759509: "LYFT: rental revenue is part of total revenue",
+    73756: "OII: lease revenue is part of total revenue",
 }
 
 

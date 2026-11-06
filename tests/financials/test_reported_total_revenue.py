@@ -36,3 +36,28 @@ class ReportedTotalRevenueTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class RevenueScopeReplacementTests(unittest.TestCase):
+    def check(self, ticker, prior_concept, new_concept, label='Revenue'):
+        from etl import jobs
+        prior = {'ticker': ticker, 'statement': 'income', 'label': label, 'kind': 'A', 'period_end': '2025-12-31',
+                 'period_start': '2025-01-01', 'concept': prior_concept, 'unit': 'USD', 'value': 1, 'filed': '2026-02-20', 'derived': False}
+        candidate = dict(prior, concept=new_concept, value=5)
+        class Store:
+            def select(self, table, query):
+                return [prior]
+        jobs.check_reported_fact_replacements(Store(), ticker, [candidate])
+
+    def test_reviewed_issuer_may_move_component_to_reported_total(self):
+        self.check('ADM', 'RevenueFromContractWithCustomerExcludingAssessedTax', 'Revenues')
+
+    def test_unreviewed_issuer_scope_change_still_blocks(self):
+        with self.assertRaisesRegex(ValueError, 'reported_accounting_scope_changed'):
+            self.check('AAPL', 'RevenueFromContractWithCustomerExcludingAssessedTax', 'Revenues')
+
+    def test_reviewed_issuer_reverse_or_other_label_still_blocks(self):
+        with self.assertRaisesRegex(ValueError, 'reported_accounting_scope_changed'):
+            self.check('ADM', 'Revenues', 'RevenueFromContractWithCustomerExcludingAssessedTax')
+        with self.assertRaisesRegex(ValueError, 'reported_accounting_scope_changed'):
+            self.check('ADM', 'CostOfRevenue', 'CostOfGoodsAndServicesSold', label='Cost of revenue')

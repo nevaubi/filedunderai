@@ -171,6 +171,10 @@ def check_reported_fact_replacements(sb, ticker, rows):
             changed = any(prior.get(key) != candidate.get(key) for key in ("value", "unit", "period_start", "concept"))
             if old_date and (not new_date or new_date < old_date):
                 reason = "older_reported_filing"
+            elif (candidate.get("label") == "Revenue" and prior.get("concept") == "RevenueFromContractWithCustomerExcludingAssessedTax"
+                  and candidate.get("concept") == "Revenues" and BY_TICKER[ticker]["cik"] in sec.REPORTED_TOTAL_REVENUE_CIKS
+                  and all(prior.get(key) == candidate.get(key) for key in ("unit", "period_start"))):
+                pass  # Reviewed revenue-scope correction (sec.REPORTED_TOTAL_REVENUE_CIKS): component -> reported total.
             elif any(prior.get(key) != candidate.get(key) for key in ("concept", "unit", "period_start")):
                 # A newer source date does not establish equal accounting scope.
                 reason = "reported_accounting_scope_changed"
