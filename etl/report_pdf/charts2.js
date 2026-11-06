@@ -184,7 +184,7 @@
       f.g.append("line").attr("x1", x(r.avg)).attr("x2", x(r.avg)).attr("y1", cy).attr("y2", cy + h).attr("stroke", C.navy).attr("stroke-width", 2.4);
       f.g.append("text").attr("class", "vl").attr("x", x(r.avg)).attr("y", cy - 6).attr("text-anchor", "end").attr("dx", -3).text("mean " + bn(r.avg));
     });
-    legend(f, [["Consensus low–high", C.accXL], ["Consensus mean", C.navy, "line"], ["Implied by 8-qtr avg beat", C.teal, "dot"]], -f.m.l + 2, -14);
+    legend(f, W < 420 ? [["Cons. range", C.accXL], ["Mean", C.navy, "line"], ["Implied by avg beat", C.teal, "dot"]] : [["Consensus low–high", C.accXL], ["Consensus mean", C.navy, "line"], ["Implied by 8-qtr avg beat", C.teal, "dot"]], -f.m.l + 2, -14);
   };
 
   /* Dumbbell: guided midpoint vs reported */
@@ -370,6 +370,58 @@
     f.g.append("text").attr("x", 0).attr("y", f.ih + 12).text(mon(rows[0].k));
     f.g.append("text").attr("x", f.iw).attr("y", f.ih + 12).attr("text-anchor", "end").text("Q3 FY27 guide $" + (g.mid / 1e9).toFixed(0) + "B");
     f.g.append("text").attr("x", 0).attr("y", -6).text("Quarterly revenue, $B");
+  };
+
+
+  /* Candlesticks with 20/50-day averages, volume pane and earnings markers */
+  K.candles = (el, W, H) => {
+    const r = D.ohlc.map(([d, o, h, l, c, v]) => ({ d, o, h, l, c, v }));
+    const f = frame(el, W, H, { t: 14, r: 46, b: 22, l: 6 });
+    const vh = f.ih * .2, ph = f.ih - vh - 8;
+    const x = d3.scaleBand().domain(r.map(d => d.d)).range([0, f.iw]).padding(.25);
+    const y = d3.scaleLinear().domain([d3.min(r, d => d.l) * .96, d3.max(r, d => d.h) * 1.03]).range([ph, 0]).nice();
+    const yv = d3.scaleLinear().domain([0, d3.max(r, d => d.v)]).range([f.ih, f.ih - vh]);
+    const g = f.g.append("g").attr("class", "grid").attr("transform", `translate(${f.iw},0)`).call(d3.axisRight(y).ticks(6).tickSize(-f.iw).tickFormat(v => "$" + v));
+    g.selectAll("text").attr("x", 6);
+    const months = r.filter((d, i) => i && d.d.slice(5, 7) !== r[i - 1].d.slice(5, 7));
+    months.forEach(m => f.g.append("text").attr("x", x(m.d)).attr("y", f.ih + 12).text(mon(m.d).split(" ")[0]));
+    f.g.append("line").attr("x1", 0).attr("x2", f.iw).attr("y1", f.ih).attr("y2", f.ih).attr("stroke", C.ink2).attr("stroke-width", .6);
+    r.forEach(d => {
+      const cx = x(d.d) + x.bandwidth() / 2, up = d.c >= d.o, col = up ? C.up : C.dn;
+      f.g.append("line").attr("x1", cx).attr("x2", cx).attr("y1", y(d.h)).attr("y2", y(d.l)).attr("stroke", col).attr("stroke-width", .6);
+      f.g.append("rect").attr("x", x(d.d)).attr("width", Math.max(.8, x.bandwidth())).attr("y", y(Math.max(d.o, d.c))).attr("height", Math.max(.6, Math.abs(y(d.o) - y(d.c)))).attr("fill", up ? "#fff" : col).attr("stroke", col).attr("stroke-width", .5);
+      f.g.append("rect").attr("x", x(d.d)).attr("width", Math.max(.8, x.bandwidth())).attr("y", yv(d.v)).attr("height", f.ih - yv(d.v)).attr("fill", up ? C.tealL : "#F3C3C5");
+    });
+    const ma = n => r.map((d, i) => i < n - 1 ? null : { d: d.d, v: d3.mean(r.slice(i - n + 1, i + 1), z => z.c) }).filter(Boolean);
+    [[20, C.acc, null], [50, C.amber, "4 2"]].forEach(([n, c, dash]) => f.g.append("path").datum(ma(n)).attr("fill", "none").attr("stroke", c).attr("stroke-width", 1.2).attr("stroke-dasharray", dash)
+      .attr("d", d3.line().x(d => x(d.d) + x.bandwidth() / 2).y(d => y(d.v))));
+    const ev = D.react.filter(e => e.d >= r[0].d);
+    ev.forEach(e => {
+      const k = r.find(d => d.d >= e.d); if (!k) return;
+      const cx = x(k.d) + x.bandwidth() / 2;
+      f.g.append("line").attr("x1", cx).attr("x2", cx).attr("y1", 0).attr("y2", ph).attr("stroke", C.faint).attr("stroke-dasharray", "2 2");
+      f.g.append("text").attr("class", "vl").attr("x", cx + 3).attr("y", 8).style("fill", e.cc >= 0 ? C.up : C.dn).text("Results " + pct(e.cc));
+    });
+    const L = r[r.length - 1];
+    f.g.append("text").attr("class", "vl").attr("x", f.iw + 6).attr("y", y(L.c) + 3).style("fill", C.navy).text("$" + L.c.toFixed(2));
+    legend(f, [["Up day", C.up], ["Down day", C.dn], ["20-day avg", C.acc, "line"], ["50-day avg", C.amber, "line"]], 0, -4);
+  };
+
+  /* Trailing P/E history with median and band */
+  K.pehist = (el, W, H) => {
+    const r = D.pe_hist, vs = r.map(d => d.pe).sort(d3.ascending), med = d3.median(vs), q1 = d3.quantile(vs, .25), q3 = d3.quantile(vs, .75);
+    const f = frame(el, W, H, { t: 12, r: 52, b: 22, l: 28 });
+    const x = d3.scalePoint().domain(r.map(d => d.m)).range([0, f.iw]);
+    const y = d3.scaleLinear().domain([0, d3.max(vs) * 1.1]).range([f.ih, 0]).nice();
+    yGrid(f, y, 4, v => v + "×");
+    xAxis(f, x, d => mon(d + "-01"), 6);
+    f.g.append("rect").attr("x", 0).attr("width", f.iw).attr("y", y(q3)).attr("height", y(q1) - y(q3)).attr("fill", C.soft);
+    f.g.append("line").attr("x1", 0).attr("x2", f.iw).attr("y1", y(med)).attr("y2", y(med)).attr("stroke", C.muted).attr("stroke-dasharray", "3 2");
+    f.g.append("text").attr("x", f.iw + 4).attr("y", y(med) + 3).text("median " + med.toFixed(0) + "×");
+    f.g.append("path").datum(r).attr("fill", "none").attr("stroke", C.navy).attr("stroke-width", 1.6).attr("d", d3.line().x(d => x(d.m)).y(d => y(d.pe)));
+    const L = r[r.length - 1];
+    f.g.append("circle").attr("cx", x(L.m)).attr("cy", y(L.pe)).attr("r", 3).attr("fill", C.amber);
+    f.g.append("text").attr("class", "vl").attr("x", f.iw + 4).attr("y", y(L.pe) + 12).style("fill", C.amber).text("now " + L.pe.toFixed(1) + "×");
   };
 
   document.querySelectorAll(".chart[data-kind]").forEach(el => {

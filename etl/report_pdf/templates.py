@@ -4,7 +4,7 @@ text, kp, exhibit, table, callout, two (list of block lists), cols (main blocks 
 
 HEAD = """<!doctype html><html><head><meta charset="utf-8"><title>{{ meta.title }}</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Instrument+Serif&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<style>{{ css }}</style></head><body>"""
+<style>{{ css }}</style></head><body class="{{ meta.density or '' }}">"""
 
 TAIL = """<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>window.__D = {{ data_json }};</script><script>{{ charts }}</script></body></html>"""
@@ -21,6 +21,12 @@ MACROS = """
 {% elif b.t == 'callout' %}<div class="callout"><h3>{{ b.title }}</h3>{{ b.html }}</div>
 {% elif b.t == 'two' %}<div class="two">{% for col in b.cols %}<div>{% for x in col %}{{ block(x) }}{% endfor %}</div>{% endfor %}</div>
 {% elif b.t == 'cols' %}<div class="cols"><div>{% for x in b.main %}{{ block(x) }}{% endfor %}</div><aside class="side">{% for x in b.side %}{{ block(x) }}{% endfor %}</aside></div>
+{% elif b.t == 'metrics' %}<div class="metrics" style="--n:{{ b.n or 8 }}">{% for m in b.its %}<div><div class="k">{{ m[0] }}</div><div class="v {{ m[3] if m|length > 3 else '' }}">{{ m[1] }}</div><div class="s">{{ m[2] }}</div></div>{% endfor %}</div>
+{% elif b.t == 'secnav' %}<div class="secnav">{% for s in b.its %}<span><b>{{ loop.index }}</b>{{ s }}</span>{% endfor %}</div>
+{% elif b.t == 'pair' %}<div class="pair"><div><h3>{{ b.left[0] }}</h3><ol>{% for x in b.left[1] %}<li>{{ x }}</li>{% endfor %}</ol></div><div class="r"><h3>{{ b.right[0] }}</h3><ol>{% for x in b.right[1] %}<li>{{ x }}</li>{% endfor %}</ol></div></div>
+{% elif b.t == 'facts' %}<div class="facts"><h3>{{ b.title }}</h3>{{ table(b.table) }}{% if b.note %}<div class="src" style="font-size:6.8pt;color:var(--faint);margin-top:3px">{{ b.note }}</div>{% endif %}</div>
+{% elif b.t == 'split' %}<div class="{{ b.cls or 'split' }}">{% for col in b.cols %}<div>{% for x in col %}{{ block(x) }}{% endfor %}</div>{% endfor %}</div>
+{% elif b.t == 'keep' %}<div style="break-inside:avoid;page-break-inside:avoid">{% for x in b.kids %}{{ block(x) }}{% endfor %}</div>
 {% elif b.t == 'disc' %}<p class="disc">{{ b.html }}</p>
 {% elif b.t == 'feature' %}<div class="feature"><div class="rail">{% for s in b.stats %}<div class="big">{{ s[0] }}</div><div class="cap">{{ s[1] }}</div>{% endfor %}{% for x in b.rail %}{{ block(x) }}{% endfor %}</div><div>{% for x in b.main %}{{ block(x) }}{% endfor %}</div></div>
 {% elif b.t == 'grid' %}<div class="grid2">{% for x in b.cells %}<div>{{ block(x) }}</div>{% endfor %}</div>
@@ -33,8 +39,8 @@ MACROS = """
 {% endif %}
 {%- endmacro %}
 {% macro table(tb) -%}
-<table>{% if tb.head %}<tr>{% for h in tb.head %}<th class="{{ 'n' if loop.index0 >= (tb.lcols or 1) else '' }}">{{ h }}</th>{% endfor %}</tr>{% endif %}
-{% for r in tb.rows %}<tr>{% for c in r %}{% if c is mapping %}<td class="{{ c.cls or '' }}" {% if c.span %}colspan="{{ c.span }}"{% endif %}>{{ c.v }}</td>{% else %}<td class="{{ 'n' if loop.index0 >= (tb.lcols or 1) else '' }}">{{ c }}</td>{% endif %}{% endfor %}</tr>{% endfor %}</table>
+<table class="{{ tb.cls or '' }}">{% if tb.group %}<tr>{% for g in tb.group %}<th colspan="{{ g[1] }}" class="{{ g[2] if g|length > 2 else '' }}" style="text-align:center;border-bottom:1px solid var(--line)">{{ g[0] }}</th>{% endfor %}</tr>{% endif %}{% if tb.head %}<tr>{% for h in tb.head %}<th class="{{ 'n' if loop.index0 >= (tb.lcols or 1) else '' }} {{ (tb.hcls or {}).get(loop.index0, '') }}">{{ h }}</th>{% endfor %}</tr>{% endif %}
+{% for r in tb.rows %}{% set rc = (tb.rcls or {}).get(loop.index0, '') %}<tr class="{{ rc }}">{% for c in r %}{% if c is mapping %}<td class="{{ c.cls or '' }}" {% if c.span %}colspan="{{ c.span }}"{% endif %} {% if c.bg %}style="background:{{ c.bg }};{{ 'color:#fff' if c.dark else '' }}"{% endif %}>{{ c.v }}</td>{% else %}<td class="{{ 'n' if loop.index0 >= (tb.lcols or 1) else '' }}">{{ c }}</td>{% endif %}{% endfor %}</tr>{% endfor %}</table>
 {%- endmacro %}
 """
 
