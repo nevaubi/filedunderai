@@ -188,6 +188,18 @@
       "schedule": "10 23 * * 1-5"
     },
     {
+      "path": "/api/cron/quant?part=0&parts=2",
+      "schedule": "40 23 * * 1-5"
+    },
+    {
+      "path": "/api/cron/quant?part=1&parts=2",
+      "schedule": "55 23 * * 1-5"
+    },
+    {
+      "path": "/api/cron/quant?step=cross&parts=2",
+      "schedule": "20 0 * * 2-6"
+    },
+    {
       "path": "/api/cron/mdata?source=calendar",
       "schedule": "15 6 * * *"
     },
