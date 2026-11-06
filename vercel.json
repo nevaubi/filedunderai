@@ -272,8 +272,8 @@
       "schedule": "45 1 * * *"
     },
     {
-      "path": "/api/cron/supply",
-      "schedule": "*/20 * * * *"
+      "path": "/api/cron/supply?shard=0&shards=3",
+      "schedule": "0,20,40 * * * *"
     },
     {
       "path": "/api/cron/supply?step=intel",
@@ -342,6 +342,14 @@
     {
       "path": "/api/cron/quant?step=cross&parts=2&once=1",
       "schedule": "45 16 6 11 *"
+    },
+    {
+      "path": "/api/cron/supply?shard=1&shards=3",
+      "schedule": "7,27,47 * * * *"
+    },
+    {
+      "path": "/api/cron/supply?shard=2&shards=3",
+      "schedule": "14,34,54 * * * *"
     }
   ],
   "headers": [

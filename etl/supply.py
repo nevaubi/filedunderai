@@ -328,21 +328,27 @@ def latest_periodic(t):
     return k, q
 
 
-def rotate_job(sb, time_budget=680, workers=8, check=150):
-    """Processes companies never read, then companies with a new 10-K or 10-Q, within the time budget."""
+def rotate_job(sb, time_budget=680, workers=8, check=150, shard=0, shards=1):
+    """Processes companies never read, then companies with a new 10-K or 10-Q, within the time budget.
+
+    shard/shards split the universe by position so parallel cron entries never take the same company;
+    each run merges only its own ticker updates into supply/state.json under a short lease."""
     t0 = time.time()
     deadline = t0 + time_budget - 60
     if not os.environ.get("FIREWORKS_API_KEY") and not os.environ.get("SUPPLY_RULES_FALLBACK"):
         return {"skipped": "FIREWORKS_API_KEY is not set; extraction needs the model (set SUPPLY_RULES_FALLBACK=1 for the rule extractor)"}
     mode = "llm" if os.environ.get("FIREWORKS_API_KEY") else "rules"
     state = public_get(sb, "supply/state.json") or {"tickers": {}, "cursor": 0}
-    order = [u[0] for u in UNIVERSE]
+    full_order = [u[0] for u in UNIVERSE]
+    order = [t for i, t in enumerate(full_order) if i % shards == shard]
     todo = [t for t in order if t not in state["tickers"]]
+    cursor_key = "cursor" if shards == 1 else f"cursor_{shard}_{shards}"
+    mine = {}
     stats = {"processed": [], "failed": {}, "checked": 0, "mode": mode}
     if len(todo) < workers * 3:
-        cur = state.get("cursor", 0)
+        cur = state.get(cursor_key, 0) % max(1, len(order))
         sl = (order[cur:] + order[:cur])[:check]
-        state["cursor"] = (cur + check) % len(order)
+        state[cursor_key] = (cur + check) % max(1, len(order))
         for t in sl:
             if time.time() > deadline - 120:
                 break
@@ -350,7 +356,7 @@ def rotate_job(sb, time_budget=680, workers=8, check=150):
                 k, q = latest_periodic(t)
                 stats["checked"] += 1
                 s = state["tickers"].get(t, {})
-                if (k and k != s.get("k")) or (q and q != s.get("q")):
+                if ((k and k != s.get("k")) or (q and q != s.get("q"))) and t not in todo:
                     todo.append(t)
             except Exception as e:
                 stats["failed"][t] = "check: " + str(e)[:120]
@@ -381,7 +387,7 @@ def rotate_job(sb, time_budget=680, workers=8, check=150):
             updates[t] = (links, co)
             k = next((f["accn"] for f in p["filings"] if f["form"] == "10-K"), None)
             q = next((f["accn"] for f in p["filings"] if f["form"] == "10-Q"), None)
-            state["tickers"][t] = {"k": k, "q": q, "at": now_iso(), "m": co["method"], "links": len(links), "intel": None}
+            state["tickers"][t] = mine[t] = {"k": k, "q": q, "at": now_iso(), "m": co["method"], "links": len(links), "intel": None}
             stats["processed"].append(t)
     if updates:
         try:
@@ -390,19 +396,34 @@ def rotate_job(sb, time_budget=680, workers=8, check=150):
             stats["failed"]["graph"] = "graph lease busy; links kept in supply/co and merged next run"
             for t in updates:
                 state["tickers"][t]["pending_graph"] = True
+                mine[t] = state["tickers"][t]
     pending = [t for t, s in state["tickers"].items() if s.get("pending_graph") and t not in updates]
     if pending and "graph" in stats:
         try:
             merge_graph(sb, {t: (co["links"], co) for t in pending for co in [public_get(sb, f"supply/co/{t}.json")] if co})
             for t in pending:
                 state["tickers"][t].pop("pending_graph", None)
+                mine[t] = state["tickers"][t]
         except Exception as e:
             stats["failed"]["pending"] = str(e)[:120]
-    state["generated"] = now_iso()
-    state["remaining"] = len([t for t in order if t not in state["tickers"]])
-    public_put(sb, "supply/state.json", state, cache="max-age=60")
+    for attempt in range(6):
+        try:
+            with AggregateLease(sb, name="supply-state", seconds=120):
+                latest = public_get(sb, "supply/state.json") or {"tickers": {}}
+                latest.setdefault("tickers", {}).update(mine)
+                latest[cursor_key] = state.get(cursor_key, 0)
+                latest["generated"] = now_iso()
+                latest["remaining"] = len([t for t in full_order if t not in latest["tickers"]])
+                public_put(sb, "supply/state.json", latest, cache="max-age=60")
+                state = latest
+            break
+        except LeaseBusy:
+            time.sleep(5)
+    else:
+        stats["failed"]["state"] = "state lease busy; this run's companies are re-read next run"
     stats["done"] = len(stats["processed"])
-    stats["remaining"] = state["remaining"]
+    stats["remaining"] = state.get("remaining")
+    stats["shard"] = f"{shard}/{shards}"
     return stats
 
 
@@ -548,7 +569,7 @@ def intel_job(sb, time_budget=680, per_run=80, news_links=4, force_regions=False
     return stats
 
 
-def run(sb, step="rotate"):
+def run(sb, step="rotate", shard=0, shards=1):
     with Run(sb, f"supply:{step}") as r:
-        r.stats = rotate_job(sb) if step == "rotate" else intel_job(sb)
+        r.stats = rotate_job(sb, shard=shard, shards=shards) if step == "rotate" else intel_job(sb)
         return r.stats
