@@ -377,5 +377,14 @@ details.ks-det>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-siz
     slot.append(panel("Standardized KPIs", el("a", { class: "chip acc", href: "#kpis" }, "All measures"), el("div", { class: "scroll" }, t),
       el("div", { class: "src" }, `${rows.length} of this company's current KPIs map to a standard measure${old ? ` (${old} more the company no longer reports are on the peer pages)` : ""}. Each one is a single series as the company reports it; click a value for the source page, a measure for the peer comparison.`)));
   }
-  window.FU_KPISTD = { companyPanel };
+  // Opens the source of one company's value for a canonical KPI (used by the KPI matrix page).
+  async function openAt(tk, cid, K, end) {
+    const S = await loadT(tk);
+    const s = S?.series?.[cid];
+    const pts = s?.[K] || [];
+    const p = pts.find(x => x[0] === end) || pts[pts.length - 1];
+    if (!s || !p) { toast("The source for this value is not available."); return; }
+    return openPoint(S, tk, s, p, K);
+  }
+  window.FU_KPISTD = { companyPanel, openAt, fmtV, loadTax, loadLatest };
 })();

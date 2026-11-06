@@ -1067,6 +1067,7 @@ const PAGES = [
   { id: "screener", name: "Screener", hub: "screen", icon: "i-cmp", key: "e" },
   { id: "compare", name: "Compare", hub: "screen", icon: "i-cmp", key: "o" },
   { id: "kpis", name: "KPI peers", hub: "screen", icon: "i-cmp", key: "k" },
+  { id: "matrix", name: "KPI matrix", hub: "screen", icon: "i-cmp", key: "j" },
   { id: "ideas", name: "Research ideas", hub: "screen", icon: "i-spark", key: "i" },
   { id: "technicals", name: "Technicals", hub: "technicals", icon: "i-ta", key: "t" },
   { id: "supply", name: "Supply chain", hub: "supply", icon: "i-chain", key: "p" },

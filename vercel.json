@@ -24,6 +24,10 @@
     },
     "api/cron/analyst.js": {
       "maxDuration": 300
+    },
+    "api/export.py": {
+      "maxDuration": 60,
+      "includeFiles": "{etl/__init__.py,etl/matrix_export.py}"
     }
   },
   "crons": [

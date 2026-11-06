@@ -84,7 +84,7 @@ test('hub tabs: every old route resolves to its hub and tab, deep links keep the
       ['#analyst', 'home', 'analyst', 'Markets,Morning brief,Watchlist,Filings feed', null],
       ['#watchlists', 'home', 'watchlists', null, null],
       ['#feed', 'home', 'feed', null, null],
-      ['#compare', 'screen', 'compare', 'Screener,Compare,KPI peers,Research ideas', null],
+      ['#compare', 'screen', 'compare', 'Screener,Compare,KPI peers,KPI matrix,Research ideas', null],
       ['#compare-AAPL,MSFT', 'screen', 'compare', null, null, 'Compare AAPL,MSFT'],
       ['#kpis-revenue_growth/aapl', 'screen', 'kpis', null, null, 'KPIs revenue_growth/aapl'],
       ['#ideas', 'screen', 'ideas', null, null],
