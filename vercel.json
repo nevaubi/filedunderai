@@ -350,6 +350,14 @@
     {
       "path": "/api/cron/supply?shard=2&shards=3",
       "schedule": "14,34,54 * * * *"
+    },
+    {
+      "path": "/api/cron/redlines",
+      "schedule": "17 */2 * * *"
+    },
+    {
+      "path": "/api/cron/estimates?step=consensus&once=3",
+      "schedule": "5 17 6 11 *"
     }
   ],
   "headers": [
