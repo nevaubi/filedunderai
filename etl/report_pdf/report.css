@@ -185,3 +185,37 @@ table.wide tr.tot td { font-weight: 600; border-top: 1px solid var(--ink2); }
 tr.med td { font-weight: 600; background: var(--soft); border-top: 1px solid var(--ink2); }
 tr.me td { background: var(--acc-soft); }
 body.dense .metrics .v { font-size: 9.6pt; white-space: nowrap; }
+
+/* ---------- text-rich blocks ---------- */
+.brief .lead { font-size: 10pt; line-height: 1.45; color: var(--ink); margin-bottom: 8px; }
+.brief .kp li { margin-bottom: 6px; }
+.boxes { display: grid; grid-template-columns: repeat(var(--n, 3), 1fr); gap: 10px; margin: 8px 0 10px; }
+.box { border: 1px solid var(--line); border-top: 3px solid var(--acc); padding: 8px 10px 6px; background: #fff; break-inside: avoid; }
+.box.up { border-top-color: var(--up); } .box.dn { border-top-color: var(--dn); } .box.amber { border-top-color: var(--acc3); }
+.box .k { font-size: 6.8pt; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+.box .h { font-family: var(--f-disp); font-size: 15pt; line-height: 1.1; margin: 2px 0 4px; }
+.box p { font-size: 8.1pt; color: var(--ink2); margin: 0; }
+td.read { color: var(--ink2); font-size: 7.7pt; white-space: normal; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 12px; }
+.card { border: 1px solid var(--line); border-left: 3px solid var(--navy); padding: 7px 10px 5px; break-inside: avoid; }
+.card.me { border-left-color: var(--acc3); background: #FFFBF3; }
+.card .ch { display: flex; align-items: baseline; gap: 7px; border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-bottom: 5px; }
+.card .tk { font-family: var(--f-mono); font-weight: 500; font-size: 10pt; }
+.card .nm { color: var(--muted); font-size: 8pt; flex: 1; }
+.card .rk { font-family: var(--f-mono); font-size: 7pt; color: var(--acc); }
+.card .cm { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 4px; }
+.card .cm .k { font-size: 6.3pt; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.card .cm .v { font-family: var(--f-mono); font-size: 8.6pt; }
+.card ul { margin: 0; padding-left: 13px; font-size: 7.8pt; color: var(--ink2); }
+.card li { margin-bottom: 2px; }
+.qa .q { border-left: 2px solid var(--acc); padding: 1px 0 1px 9px; margin-bottom: 7px; break-inside: avoid; }
+.qa .q b { display: block; font-size: 8.6pt; margin-bottom: 1px; }
+.qa .q p { margin: 0; color: var(--ink2); font-size: 8.2pt; }
+.rlc { border-left: 3px solid var(--line); padding: 3px 0 3px 10px; margin-bottom: 7px; break-inside: avoid; }
+.rlc.added { border-left-color: var(--up); } .rlc.removed { border-left-color: var(--dn); } .rlc.modified { border-left-color: var(--acc); }
+.rlc .m { font-family: var(--f-mono); font-size: 6.8pt; color: var(--muted); letter-spacing: .04em; }
+.rlc p { margin: 2px 0; font-size: 8.1pt; }
+.rlc.removed p { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(209,47,53,.5); }
+.rlc .why { font-size: 7.8pt; color: var(--ink); background: var(--soft); padding: 3px 6px; }
+body.flow .page { page-break-after: auto; }
+td.read { width: 2.35in; min-width: 2.35in; }

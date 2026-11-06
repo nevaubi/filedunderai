@@ -424,6 +424,45 @@
     f.g.append("text").attr("class", "vl").attr("x", f.iw + 4).attr("y", y(L.pe) + 12).style("fill", C.amber).text("now " + L.pe.toFixed(1) + "×");
   };
 
+
+  /* Ranked horizontal bars across peers for one metric (data-key, data-fmt pct|x), median line, highlight data-hl */
+  K.rankbar = (el, W, H) => {
+    const key = el.dataset.key, fmt = el.dataset.fmt, hl = el.dataset.hl || "NVDA", asc = el.dataset.asc === "1";
+    const r = Object.values(D.peers).filter(p => p[key] != null).sort((a, b) => asc ? a[key] - b[key] : b[key] - a[key]);
+    const f = frame(el, W, H, { t: 14, r: 46, b: 4, l: 40 });
+    const lo = Math.min(0, d3.min(r, p => p[key])), x = d3.scaleLinear().domain([lo, d3.max(r, p => p[key])]).range([0, f.iw]).nice();
+    const y = d3.scaleBand().domain(r.map(p => p.t)).range([0, f.ih]).padding(.28);
+    const med = d3.median(r.filter(p => p.t !== hl), p => p[key]);
+    const lab = v => fmt === "pct" ? (v * 100).toFixed(0) + "%" : v.toFixed(1) + "×";
+    r.forEach(p => {
+      const cy = y(p.t), h = y.bandwidth(), x0 = x(Math.min(0, p[key])), x1 = x(Math.max(0, p[key]));
+      f.g.append("text").attr("class", "vl").attr("x", -6).attr("y", cy + h / 2 + 3).attr("text-anchor", "end").text(p.t);
+      f.g.append("rect").attr("x", x0).attr("y", cy).attr("width", Math.max(1, x1 - x0)).attr("height", h).attr("fill", p.t === hl ? C.amber : C.navy).attr("opacity", p.t === hl ? 1 : .8);
+      f.g.append("text").attr("x", x1 + 4).attr("y", cy + h / 2 + 3).text(lab(p[key]));
+    });
+    f.g.append("line").attr("x1", x(med)).attr("x2", x(med)).attr("y1", -4).attr("y2", f.ih).attr("stroke", C.muted).attr("stroke-dasharray", "3 2");
+    f.g.append("text").attr("x", x(med) + 3).attr("y", -5).text("median ex-" + hl + " " + lab(med));
+  };
+
+  /* Peer valuation scatter: FY2 revenue growth vs FY2 P/E */
+  K.peerval = (el, W, H) => {
+    const r = Object.values(D.peers).filter(p => p.g1 != null && p.pe1 != null);
+    const f = frame(el, W, H, { t: 10, r: 14, b: 26, l: 34 });
+    const x = d3.scaleLinear().domain([0, d3.max(r, p => p.g1) * 1.1]).range([0, f.iw]).nice();
+    const y = d3.scaleLinear().domain([0, d3.max(r, p => p.pe1) * 1.1]).range([f.ih, 0]).nice();
+    const s = d3.scaleSqrt().domain([0, d3.max(r, p => p.mc)]).range([3, 16]);
+    yGrid(f, y, 5, v => v + "×");
+    const xa = f.g.append("g").attr("class", "grid").attr("transform", `translate(0,${f.ih})`).call(d3.axisBottom(x).ticks(5).tickSize(-f.ih).tickFormat(v => Math.round(v * 100) + "%"));
+    xa.selectAll("text").attr("dy", 9);
+    f.g.append("text").attr("x", f.iw).attr("y", f.ih + 22).attr("text-anchor", "end").text("consensus revenue growth, next fiscal year →");
+    f.g.append("text").attr("x", 2).attr("y", 8).text("↑ P/E on next-year consensus EPS");
+    const fit = d3.least([0]) ;
+    r.sort((a, b) => b.mc - a.mc).forEach(p => {
+      f.g.append("circle").attr("cx", x(p.g1)).attr("cy", y(p.pe1)).attr("r", s(p.mc)).attr("fill", p.t === "NVDA" ? C.amber : C.acc).attr("fill-opacity", .75).attr("stroke", "#fff");
+      f.g.append("text").attr("class", "vl").attr("x", x(p.g1) + s(p.mc) + 3).attr("y", y(p.pe1) + 3).text(p.t);
+    });
+  };
+
   document.querySelectorAll(".chart[data-kind]").forEach(el => {
     const fn = K[el.dataset.kind];
     try { if (fn) fn(el, +el.dataset.w, +el.dataset.h || 180); } catch (e) { console.error(el.dataset.kind, e.message); }

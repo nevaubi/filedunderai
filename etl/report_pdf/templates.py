@@ -15,7 +15,7 @@ MACROS = """
 {% elif b.t == 'kp' %}{% if b.title %}<h3>{{ b.title }}</h3>{% endif %}<ul class="kp">{% for i in b.pts %}<li><b>{{ i[0] }}.</b> {{ i[1] }}</li>{% endfor %}</ul>
 {% elif b.t == 'section' %}<div class="sec"><div class="no">{{ '%02d' % b.no }}</div><h2>{{ b.title }}</h2>{% if b.lede %}<div class="lede">{{ b.lede }}</div>{% endif %}</div>
 {% elif b.t == 'exhibit' %}<div class="exh"><div class="no">Exhibit {{ b.no }}</div><div class="tt">{{ b.title }}</div>{% if b.sub %}<div class="st">{{ b.sub }}</div>{% endif %}
-  {% if b.chart %}<div class="chart" data-kind="{{ b.chart }}" data-w="{{ b.w }}" data-h="{{ b.h or '' }}"></div>{% endif %}
+  {% if b.chart %}<div class="chart" data-kind="{{ b.chart }}" data-w="{{ b.w }}" data-h="{{ b.h or '' }}"{% for k, v in (b.attrs or {}).items() %} data-{{ k }}="{{ v }}"{% endfor %}></div>{% endif %}
   {% if b.table %}{{ table(b.table) }}{% endif %}{% if b.model %}{{ block(b.model) }}{% endif %}<div class="src">Source: {{ b.src }}</div></div>
 {% elif b.t == 'table' %}{% if b.title %}<h3>{{ b.title }}</h3>{% endif %}{{ table(b) }}
 {% elif b.t == 'callout' %}<div class="callout"><h3>{{ b.title }}</h3>{{ b.html }}</div>
@@ -27,6 +27,12 @@ MACROS = """
 {% elif b.t == 'facts' %}<div class="facts"><h3>{{ b.title }}</h3>{{ table(b.table) }}{% if b.note %}<div class="src" style="font-size:6.8pt;color:var(--faint);margin-top:3px">{{ b.note }}</div>{% endif %}</div>
 {% elif b.t == 'split' %}<div class="{{ b.cls or 'split' }}">{% for col in b.cols %}<div>{% for x in col %}{{ block(x) }}{% endfor %}</div>{% endfor %}</div>
 {% elif b.t == 'keep' %}<div style="break-inside:avoid;page-break-inside:avoid">{% for x in b.kids %}{{ block(x) }}{% endfor %}</div>
+{% elif b.t == 'brief' %}<div class="brief">{% if b.lead %}<p class="lead">{{ b.lead }}</p>{% endif %}<ul class="kp">{% for i in b.pts %}<li><b>{{ i[0] }}.</b> {{ i[1] }}</li>{% endfor %}</ul></div>
+{% elif b.t == 'boxes' %}<div class="boxes" style="--n:{{ b.bx | length }}">{% for x in b.bx %}<div class="box {{ x.tone or '' }}"><div class="k">{{ x.k }}</div><div class="h">{{ x.h }}</div><p>{{ x.body }}</p></div>{% endfor %}</div>
+{% elif b.t == 'cards' %}<div class="cards">{% for c in b.cs %}<div class="card {{ 'me' if c.me else '' }}"><div class="ch"><span class="tk">{{ c.t }}</span><span class="nm">{{ c.name }}</span><span class="rk">{{ c.rank }}</span></div>
+  <div class="cm">{% for m in c.m %}<div><div class="k">{{ m[0] }}</div><div class="v">{{ m[1] }}</div></div>{% endfor %}</div><ul>{% for x in c.pts %}<li>{{ x }}</li>{% endfor %}</ul></div>{% endfor %}</div>
+{% elif b.t == 'qa' %}<div class="qa">{% if b.title %}<h3>{{ b.title }}</h3>{% endif %}{% for q in b.qs %}<div class="q"><b>{{ q[0] }}</b><p>{{ q[1] }}</p></div>{% endfor %}</div>
+{% elif b.t == 'redline' %}<div class="rl">{% if b.title %}<h3>{{ b.title }}</h3>{% endif %}{% for x in b.xs %}<div class="rlc {{ x.kind }}"><div class="m">{{ x.kind | upper }} · {{ x.where }}{% if x.tags %} · {{ x.tags }}{% endif %}</div><p>{{ x.text }}</p>{% if x.why %}<div class="why">{{ x.why }}</div>{% endif %}</div>{% endfor %}</div>
 {% elif b.t == 'disc' %}<p class="disc">{{ b.html }}</p>
 {% elif b.t == 'feature' %}<div class="feature"><div class="rail">{% for s in b.stats %}<div class="big">{{ s[0] }}</div><div class="cap">{{ s[1] }}</div>{% endfor %}{% for x in b.rail %}{{ block(x) }}{% endfor %}</div><div>{% for x in b.main %}{{ block(x) }}{% endfor %}</div></div>
 {% elif b.t == 'grid' %}<div class="grid2">{% for x in b.cells %}<div>{{ block(x) }}</div>{% endfor %}</div>
