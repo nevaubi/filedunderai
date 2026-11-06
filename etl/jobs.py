@@ -1186,7 +1186,15 @@ def _ir_rotation_job(sb, per_run, time_budget, started, fresh_only=False):
         hot = []
     # Newly activated issuers with no IR coverage entry take up to half the remaining slots, so a cohort's first
     # document pass finishes in days instead of one full cursor cycle. The cursor still advances only over `rest`.
-    covered = set(((_cache(sb, "meta/coverage_ir.json", {}) or {}).get("companies") or {}))
+    # An issuer counts as covered once an IR pass has recorded a scoped coverage result for it. Rows seeded at zero for
+    # newly activated issuers (no "scope") are still fresh.
+    cov_rows = (_cache(sb, "meta/coverage_ir.json", {}) or {}).get("companies") or {}
+    covered = {t for t, row in cov_rows.items() if isinstance((row or {}).get("coverage"), dict) and (row["coverage"].get("scope") or row.get("docs"))}
+    if fresh_only:
+        # Catch-up runs also continue first passes that stopped part way (partial, still pending work).
+        new_partial = [t for t in retry if t in tickers and not (cov_rows.get(t) or {}).get("docs")
+                       and (((cov_rows.get(t) or {}).get("coverage") or {}).get("status") == "partial" or (pending.get(t) or {}).get("status") == "partial")]
+        picked_retry = new_partial[:per_run // 2]
     slots = max(0, per_run - len(hot) - len(picked_retry))
     fresh = [t for t in tickers if t not in covered and t not in pending and t not in hot and t not in picked_retry][:slots if fresh_only else slots // 2]
     start = state.get("cursor", 0) % len(tickers)
@@ -1200,7 +1208,7 @@ def _ir_rotation_job(sb, per_run, time_budget, started, fresh_only=False):
     remaining = max(0, time_budget - (time.monotonic() - started)) if time_budget is not None else None
     if remaining is not None:
         remaining = max(0, remaining - min(IR_ROTATION_RESERVE, remaining * 0.25))
-    done, failed = ir_job(sb, selected, workers=4, time_budget=remaining)
+    done, failed = ir_job(sb, selected, workers=6 if fresh_only else 4, time_budget=remaining)
     for tk, result in done.items():
         if tk not in tickers:
             raise ValueError("IR coverage result outside the current universe")

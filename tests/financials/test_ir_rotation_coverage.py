@@ -20,7 +20,7 @@ class SnapshotStore:
                         'companies_with_docs': 0, 'companies_with_kpis': 0, 'companies_with_segments': 0, 'segment_tables': 0},
             'companies': {ticker: {'docs': 0, 'bytes': 0, 'types': {}, 'kpis': 0, 'kpi_values': 0,
                                     'segment_tables': 0, 'segment_ties': 0,
-                                    'coverage': {'status': 'unverified', 'total_documents': 0}}
+                                    'coverage': {'status': 'unverified', 'total_documents': 0, 'scope': {'sec': True}}}
                           for ticker in tickers}}}
 
     def rpc(self, fn, args):
@@ -139,6 +139,24 @@ class RotationCoverageReplayTests(unittest.TestCase):
         self.assertEqual(companies['NEW2']['coverage']['status'], 'unverified')
         with patch('etl.universe.UNIVERSE', [(t,) for t in tickers]), self.assertRaises(ValueError):
             kpitools.build_index(store, coverage_updates={'ZZZ': coverage('2026-11-06T18:00:00Z', 'z')})
+
+    def test_fresh_only_continues_partial_first_passes_and_skips_seeded_rows(self):
+        tickers = ['AAA', 'NEW1', 'NEW2', 'NEW3']
+        store = SnapshotStore(['AAA'])
+        rows = store.json['meta/coverage_ir.json']['companies']
+        rows['NEW1'] = {'docs': 0, 'bytes': 0, 'kpis': 0, 'kpi_values': 0, 'types': {}, 'coverage': {'status': 'partial', 'scope': {'sec': True}}}
+        rows['NEW2'] = {'docs': 0, 'bytes': 0, 'kpis': 0, 'kpi_values': 0, 'types': {}, 'coverage': {'status': 'unverified', 'limits': ['not yet in a full coverage rebuild']}}
+        store.json['meta/ir_rotation.json'] = {'cursor': 0, 'done_hot': {}, 'retry': ['AAA', 'NEW1']}
+        seen = []
+        def process(sb, chosen, **kwargs):
+            seen.extend(chosen)
+            return ({t: {'status': 'unverified', 'coverage': coverage('2026-11-02T00:00:00Z', t)} for t in chosen}, {})
+        with patch.object(jobs, 'UNIVERSE', [(t,) for t in tickers]), \
+                patch('etl.universe.UNIVERSE', [(t,) for t in tickers]), \
+                patch.object(jobs, 'ir_job', side_effect=process), \
+                patch.object(kpitools, 'build_index', return_value=None):
+            jobs.ir_rotation_job(store, per_run=4, time_budget=640, fresh_only=True)
+        self.assertEqual(seen, ['NEW1', 'NEW2', 'NEW3'])
 
     def test_failed_aaa_aggregate_replays_with_bbb_next_rotation(self):
         tickers = ['AAA', 'BBB']; sb = SnapshotStore(tickers); calls = []
