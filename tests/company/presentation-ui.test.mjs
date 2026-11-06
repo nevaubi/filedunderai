@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 
-async function setup({ minimal = false } = {}) {
+async function setup({ minimal = false, coTab = 'overview', cotabs = null } = {}) {
   const dom = new JSDOM('<main id="page"></main>', { url: 'https://research.example/#company/TEST', runScripts: 'outside-only' });
   const w = dom.window;
   w.page = w.document.querySelector('#page');
@@ -23,7 +23,8 @@ async function setup({ minimal = false } = {}) {
   w.IR = minimal ? {} : { TEST: 'https://ir.example/' };
   w.WEB = minimal ? {} : { TEST: 'example.com' };
   w.PX = {};
-  w.STATE = { coTab: 'overview' };
+  w.STATE = { coTab };
+  w.keepInStrip = () => {};
   w.store = { set: (key, value) => { w.persisted = [key, value]; } };
   w.ensureCompany = async () => {};
   const record = { tk: 'TEST', label: 'Revenue', v: 120000000, rec: { accn: 'source-10q', end: '2026-09-30' } };
@@ -50,10 +51,10 @@ async function setup({ minimal = false } = {}) {
   w.svgUse = () => w.el('svg');
   w.RESEARCH = { ask: prompt => { w.briefPrompt = prompt; } };
   w.setTimeout = callback => callback();
-  for (const id of ['Overview', 'Financials', 'Segments', 'News', 'Filings', 'Earnings', 'Insiders']) {
+  for (const id of ['Overview', 'Financials', 'Segments', 'News', 'Filings', 'Insiders']) {
     w['co' + id] = (body, ticker) => { body.append(w.el('div', {}, id + ' ' + ticker)); };
   }
-  w.FU_COTABS = [{ id: 'valuation', name: 'Valuation', after: 'financials', render: (body, ticker) => { body.textContent = 'Valuation ' + ticker; } }];
+  w.FU_COTABS = cotabs || [{ id: 'valuation', name: 'Valuation', after: 'financials', render: (body, ticker) => { body.textContent = 'Valuation ' + ticker; } }];
   const app = readFileSync('public/app.js', 'utf8');
   w.eval(app.slice(app.indexOf('pCompany.prep = null;'), app.indexOf('function coNews(body, tk)')) + '\nwindow.renderCompany = pCompany;');
   await w.renderCompany('TEST');
@@ -95,7 +96,8 @@ test('company metric buttons retain exact source records and extension tabs reta
     assert.equal(w.openedSource, record);
     assert.equal(w.openedSource.rec.accn, 'source-10q');
     const tabs = [...w.document.querySelectorAll('[role="tab"]')];
-    assert.deepEqual(tabs.map(node => node.dataset.id), ['overview', 'financials', 'valuation', 'segments', 'news', 'earnings', 'filings', 'insiders']);
+    assert.deepEqual(tabs.map(node => node.dataset.id), ['overview', 'financials', 'valuation', 'segments', 'news', 'filings', 'insiders']);
+    assert.equal(tabs[5].textContent, 'Filings & IR', 'Earnings & IR is merged into one Filings & IR tab');
     tabs[2].click();
     assert.equal(w.STATE.coTab, 'valuation');
     assert.deepEqual(w.persisted, ['coTab', 'valuation']);
@@ -119,7 +121,37 @@ test('company profile handles absent optional metadata and filings without losin
     assert.match(w.document.querySelector('.co-profile').textContent, /Unavailable/);
     assert.equal(w.document.querySelectorAll('.co-actions a[href^="https://filings.example/"]').length, 0);
     assert.ok(w.document.querySelector('#star'));
-    assert.equal(w.document.querySelectorAll('[role="tab"]').length, 8);
+    assert.equal(w.document.querySelectorAll('[role="tab"]').length, 7);
     assert.match(w.document.querySelector('.co-body').textContent, /Overview TEST$/);
   } finally { h.close(); }
 });
+
+test('a registered tab with a built-in id replaces that tab in place instead of adding a duplicate', async () => {
+  const cotabs = [
+    { id: 'insiders', name: 'Insider activity', after: 'overview', render: (body, ticker) => { body.textContent = 'New insiders ' + ticker; } },
+    { id: 'estimates', name: 'Estimates', after: 'financials', render: (body, ticker) => { body.textContent = 'Estimates ' + ticker; } },
+    { id: 'filings', render: (body, ticker) => { body.textContent = 'Replacement filings ' + ticker; } },
+  ];
+  const h = await setup({ cotabs, coTab: 'insiders' });
+  try {
+    const { w } = h;
+    const tabs = [...w.document.querySelectorAll('[role="tab"]')];
+    assert.deepEqual(tabs.map(node => node.dataset.id), ['overview', 'financials', 'estimates', 'segments', 'news', 'filings', 'insiders']);
+    assert.deepEqual(tabs.map(node => node.textContent), ['Overview', 'Financials', 'Estimates', 'Segments & KPIs', 'News & narratives', 'Filings & IR', 'Insider activity']);
+    assert.equal(w.document.querySelector('.co-body').textContent, 'New insiders TEST', 'the override renders for a saved selection');
+    tabs[5].click();
+    assert.equal(w.document.querySelector('.co-body').textContent, 'Replacement filings TEST', 'an override without a name keeps the built-in label');
+  } finally { h.close(); }
+});
+
+for (const [saved, expected] of [['earnings', 'filings'], ['changes', 'overview'], ['retired-tab', 'overview']]) {
+  test(`a saved "${saved}" company tab opens ${expected}`, async () => {
+    const h = await setup({ coTab: saved });
+    try {
+      const { w } = h;
+      assert.equal(w.document.querySelector('[role="tab"].on').dataset.id, expected);
+      assert.equal(w.STATE.coTab, expected);
+      assert.deepEqual(w.persisted, ['coTab', expected]);
+    } finally { h.close(); }
+  });
+}
