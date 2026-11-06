@@ -1131,7 +1131,7 @@ def segments_changed_job(sb, time_budget=240, workers=4):
 IR_ROTATION_RESERVE = 90  # seconds kept back from IR workers for checkpoint and index persistence
 
 
-def ir_rotation_job(sb, per_run=8, time_budget=240):
+def ir_rotation_job(sb, per_run=8, time_budget=240, fresh_only=False):
     """Start the total I/O budget before acquiring the distributed aggregate lease."""
     from .ir import IRClient, _timeout, bounded_client
     started = time.monotonic()
@@ -1139,11 +1139,11 @@ def ir_rotation_job(sb, per_run=8, time_budget=240):
     client = bounded_client(sb, deadline)
     if isinstance(client, IRClient):
         _timeout(client.io_deadline)
-    return _ir_rotation_job(client, per_run, time_budget, started)
+    return _ir_rotation_job(client, per_run, time_budget, started, fresh_only)
 
 
 @serialized_aggregates
-def _ir_rotation_job(sb, per_run, time_budget, started):
+def _ir_rotation_job(sb, per_run, time_budget, started, fresh_only=False):
     """Resume failed/skipped companies fairly alongside recent earnings and the rolling universe."""
     import copy
     state = _cache(sb, "meta/ir_rotation.json", {"cursor": 0, "done_hot": {}, "retry": []}, strict=True)
@@ -1173,17 +1173,21 @@ def _ir_rotation_job(sb, per_run, time_budget, started):
         return {}, {}
     retry = [t for t in dict.fromkeys(state.get("retry", [])) if t in tickers]
     # Retries get at most a quarter of the slots so a stubborn backlog cannot starve hot or newly added issuers.
-    picked_retry = retry[:max(1, per_run // 4)]
+    picked_retry = [] if fresh_only else retry[:max(1, per_run // 4)]
     hot = [r["ticker"] for r in recent if "2.02" in (r.get("items") or "")]
     hot = [t for t in dict.fromkeys(hot) if t in tickers and t not in picked_retry and state["done_hot"].get(t) != dt.date.today().isoformat()][:max(0, per_run - len(picked_retry))]
+    if fresh_only:
+        hot = []
     # Newly activated issuers with no IR coverage entry take up to half the remaining slots, so a cohort's first
     # document pass finishes in days instead of one full cursor cycle. The cursor still advances only over `rest`.
     covered = set(((_cache(sb, "meta/coverage_ir.json", {}) or {}).get("companies") or {}))
     slots = max(0, per_run - len(hot) - len(picked_retry))
-    fresh = [t for t in tickers if t not in covered and t not in pending and t not in hot and t not in picked_retry][:slots // 2]
+    fresh = [t for t in tickers if t not in covered and t not in pending and t not in hot and t not in picked_retry][:slots if fresh_only else slots // 2]
     start = state.get("cursor", 0) % len(tickers)
-    rest = [t for t in tickers[start:] + tickers[:start]
-            if t not in hot and t not in picked_retry and t not in fresh][:max(0, slots - len(fresh))]
+    rest = [] if fresh_only else [t for t in tickers[start:] + tickers[:start]
+                                  if t not in hot and t not in picked_retry and t not in fresh][:max(0, slots - len(fresh))]
+    if fresh_only and not fresh:
+        return {}, {}
     selected = picked_retry + hot + fresh + rest
     # Workers stop early enough to leave time for the rotation checkpoint and coverage index writes; without the
     # reserve the checkpoint write hits the I/O deadline, the run dies and the cursor and retry list never advance.

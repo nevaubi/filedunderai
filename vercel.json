@@ -328,8 +328,8 @@
       "schedule": "25 15 6 11 *"
     },
     {
-      "path": "/api/cron/ir?run=burst",
-      "schedule": "10,30,50 15-22 6-8 11 *"
+      "path": "/api/cron/ir?run=fresh",
+      "schedule": "10,30,50 * 6-8 11 *"
     },
     {
       "path": "/api/cron/estimates?step=consensus&once=2",
