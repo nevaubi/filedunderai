@@ -132,6 +132,13 @@ REPORTED_TOTAL_REVENUE_CIKS = {
     1591698: "PCTY: interest income on funds held for clients is part of total revenues",
     1759509: "LYFT: rental revenue is part of total revenue",
     73756: "OII: lease revenue is part of total revenue",
+    # Cohort 4 (2026-11-06), reviewed the same way.
+    1820953: "AFRM: merchant network and interest income are part of total revenue",
+    1937926: "BAM: carried interest and other revenues are part of total revenues",
+    1876042: "CRCL: reserve income is part of total revenue",
+    1693736: "EQPT: equipment rental revenue is lease income outside contract revenue",
+    1690680: "NMRK: leasing and servicing revenues are part of total revenues",
+    1880661: "TPG: capital allocation-based income is part of total revenues",
 }
 
 
