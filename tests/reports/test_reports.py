@@ -64,3 +64,24 @@ class ReportTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ModelReplyParsing(unittest.TestCase):
+    def test_parses_fenced_and_reasoning_wrapped_json(self):
+        from etl import reports
+        self.assertEqual(reports.parse_model_json('<think>plan</think>\n```json\n{"title": "x"}\n```'), {"title": "x"})
+
+    def test_empty_reply_raises_a_clear_error(self):
+        from etl import reports
+        with self.assertRaises(ValueError) as cm:
+            reports.parse_model_json("")
+        self.assertIn("no JSON object", str(cm.exception))
+
+    def test_truncated_reply_is_reported_and_next_model_tried(self):
+        from unittest.mock import patch
+        from etl import reports
+        replies = iter(['{"choices":[{"finish_reason":"length","message":{"content":"{\\"title\\": \\"x"}}]}',
+                        '{"choices":[{"finish_reason":"stop","message":{"content":"{\\"title\\": \\"ok\\"}"}}]}'])
+        with patch.object(reports, "request", side_effect=lambda *a, **k: next(replies)):
+            out, model = reports.complete("p", "k", models=["m1", "m2"])
+        self.assertEqual((out, model), ({"title": "ok"}, "m2"))

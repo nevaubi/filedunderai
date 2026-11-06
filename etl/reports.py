@@ -18,7 +18,39 @@ import re
 import time
 
 from .common import AggregateLease, LeaseBusy, Run, Supabase, now_iso
-from .estimates_ai import complete, number_tokens, supported, values_in
+from .common import request
+from .estimates_ai import URL, number_tokens, supported, values_in
+
+# Reports need far more output than the estimates summaries: a full document with cited sections. The shared
+# estimates completer caps output at 1,800 tokens, which truncated every report (empty or unterminated JSON).
+REPORT_MODELS = [m for m in (os.environ.get("FU_REPORTS_MODEL", "kimi-k3"), os.environ.get("FU_REPORTS_FALLBACK", "deepseek-v4p1-flash")) if m]
+REPORT_MAX_TOKENS = int(os.environ.get("FU_REPORTS_MAX_TOKENS", "12000"))
+
+
+def parse_model_json(txt):
+    """The JSON object in a model reply: drops reasoning blocks and code fences, then takes the outermost braces."""
+    txt = re.sub(r"(?s)<think>.*?</think>", "", txt or "").strip()
+    txt = re.sub(r"^```(?:json)?\s*|\s*```$", "", txt).strip()
+    a, b = txt.find("{"), txt.rfind("}")
+    if a < 0 or b <= a:
+        raise ValueError(f"no JSON object in model reply ({len(txt)} chars): {txt[:80]!r}")
+    return json.loads(txt[a:b + 1])
+
+
+def complete(prompt, key, models=None):
+    last = None
+    for model in models or REPORT_MODELS:
+        try:
+            d = json.loads(request(URL, method="POST", data={"model": f"accounts/fireworks/models/{model}", "messages": [{"role": "user", "content": prompt}],
+                                                         "max_tokens": REPORT_MAX_TOKENS, "temperature": 0.2, "response_format": {"type": "json_object"}},
+                                   headers={"Authorization": f"Bearer {key}"}, timeout=240, retries=1))
+            choice = d["choices"][0]
+            if choice.get("finish_reason") == "length":
+                raise ValueError(f"output truncated at {REPORT_MAX_TOKENS} tokens")
+            return parse_model_json(choice["message"].get("content")), model
+        except Exception as e:
+            last = ValueError(f"{model}: {str(e)[:160]}")
+    raise last
 from .universe import BY_TICKER, UNIVERSE
 
 KINDS = {"preview": "Earnings preview", "recap": "Earnings recap", "primer": "Company primer"}
