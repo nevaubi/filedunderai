@@ -234,6 +234,18 @@
     {
       "path": "/api/cron/analyst",
       "schedule": "5 * * * *"
+    },
+    {
+      "path": "/api/cron/estimates?step=consensus",
+      "schedule": "35 10 * * *"
+    },
+    {
+      "path": "/api/cron/estimates?step=ratings",
+      "schedule": "25 0 * * 2-6"
+    },
+    {
+      "path": "/api/cron/estimates?step=build",
+      "schedule": "45 1 * * *"
     }
   ],
   "headers": [
