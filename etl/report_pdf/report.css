@@ -1,0 +1,99 @@
+/* Filed Under research report template. Letter, print-first.
+   Structure: optional cover (separate PDF, merged) -> first page with full masthead and key-data strip ->
+   section pages with a slim running head -> sources and disclosures. */
+@page { size: Letter; margin: 0.5in 0.6in 0.62in; }
+:root {
+  --ink: #0B0C0F; --ink2: #2A2E36; --muted: #5F6673; --faint: #959BA6; --line: #E3E5EA; --soft: #F4F5F8;
+  --navy: #0F1830; --navy2: #1B2850; --acc: #2B4ACB; --acc-soft: #E9EDFB; --acc2: #0E9384; --acc3: #D97706; --warm: #FFF8EC;
+  --up: #0A8754; --dn: #D12F35;
+  --f-body: Figtree, system-ui, sans-serif; --f-disp: "Instrument Serif", Georgia, serif; --f-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; color: var(--ink); font-family: var(--f-body); font-size: 9.3pt; line-height: 1.42;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { page-break-after: always; }
+.page:last-child { page-break-after: auto; }
+p { margin: 0 0 7px; }
+b { font-weight: 600; }
+
+/* ---------- first-page masthead ---------- */
+.band { background: var(--navy); color: #fff; margin: -0.02in 0 0; padding: 9px 12px 8px; display: flex; justify-content: space-between; align-items: center; }
+.band .brand { font-weight: 700; letter-spacing: .14em; font-size: 8.6pt; }
+.band .brand i { font-style: normal; color: #8FA4FF; }
+.band .meta { font-family: var(--f-mono); font-size: 7.2pt; letter-spacing: .08em; text-transform: uppercase; color: #C4CCE4; display: flex; gap: 14px; }
+.band .type { background: var(--acc); color: #fff; padding: 2px 7px; border-radius: 2px; }
+.titleblock { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: end; padding: 14px 0 10px; border-bottom: 1px solid var(--ink); }
+.co { font-family: var(--f-mono); font-size: 7.6pt; letter-spacing: .08em; text-transform: uppercase; color: var(--acc); margin-bottom: 4px; }
+h1 { font-family: var(--f-disp); font-weight: 400; font-size: 26pt; line-height: 1.04; margin: 0; letter-spacing: -.005em; text-wrap: balance; }
+.tick { text-align: right; }
+.tick .sym { font-family: var(--f-mono); font-size: 18pt; font-weight: 500; letter-spacing: .02em; }
+.tick .ex { font-size: 7.4pt; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+.strip { display: grid; grid-template-columns: repeat(5, 1fr); border-bottom: 1px solid var(--line); margin-bottom: 11px; }
+.strip > div { padding: 7px 10px 7px 0; border-right: 1px solid var(--line); margin-right: 10px; }
+.strip > div:last-child { border-right: 0; margin-right: 0; }
+.strip .k { font-size: 6.8pt; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.strip .v { font-family: var(--f-mono); font-size: 13pt; font-weight: 500; line-height: 1.2; }
+.strip .s { font-size: 7pt; color: var(--faint); }
+.dek { font-size: 11pt; line-height: 1.38; color: var(--ink2); margin: 0 0 12px; }
+
+/* ---------- running head on later pages ---------- */
+.rh { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--ink); padding-bottom: 4px; margin-bottom: 12px; }
+.rh .l { font-weight: 700; letter-spacing: .14em; font-size: 7.6pt; }
+.rh .l i { font-style: normal; color: var(--acc); }
+.rh .l span { font-weight: 400; letter-spacing: .04em; color: var(--muted); margin-left: 8px; }
+.rh .r { font-family: var(--f-mono); font-size: 7pt; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+
+/* ---------- section openers ---------- */
+.sec { display: grid; grid-template-columns: 30px 1fr; gap: 0 8px; align-items: baseline; margin: 2px 0 6px; }
+.sec .no { font-family: var(--f-mono); font-size: 9pt; color: var(--acc); border-top: 2px solid var(--acc); padding-top: 3px; }
+.sec h2 { font-family: var(--f-disp); font-weight: 400; font-size: 17pt; line-height: 1.1; margin: 0; border-top: 1px solid var(--line); padding-top: 3px; }
+.sec .lede { grid-column: 2; color: var(--ink2); font-size: 9.6pt; margin-top: 4px; }
+
+/* ---------- body pieces ---------- */
+.cols { display: grid; grid-template-columns: 1fr 2.2in; gap: 18px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.side { background: var(--soft); padding: 9px 11px; border-top: 2px solid var(--navy); align-self: start; }
+h3 { font-size: 7.6pt; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 5px; font-weight: 600; }
+.kp { margin: 0; padding: 0; list-style: none; }
+.kp li { position: relative; padding-left: 13px; margin-bottom: 7px; }
+.kp li::before { content: ""; position: absolute; left: 0; top: .5em; width: 6px; height: 6px; background: var(--acc); }
+table { width: 100%; border-collapse: collapse; font-size: 8.2pt; }
+th { text-align: left; font-weight: 600; font-size: 7pt; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); border-bottom: 1px solid var(--ink); padding: 3px 4px; }
+td { padding: 3px 4px; border-bottom: 1px solid var(--line); }
+td:first-child { white-space: nowrap; }
+.n { text-align: right; font-family: var(--f-mono); font-size: 7.8pt; white-space: nowrap; }
+th.n { font-family: var(--f-body); }
+.up { color: var(--up); } .dn { color: var(--dn); }
+.exh { margin: 9px 0 6px; break-inside: avoid; }
+.exh .no { font-family: var(--f-mono); font-size: 7pt; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.exh .tt { font-weight: 600; font-size: 9.5pt; margin: 1px 0; }
+.exh .st { color: var(--muted); font-size: 7.9pt; margin-bottom: 3px; }
+.exh .src { font-size: 6.9pt; color: var(--faint); border-top: 1px solid var(--line); padding-top: 3px; margin-top: 2px; }
+.callout { border-left: 3px solid var(--acc3); padding: 6px 0 6px 10px; margin: 8px 0; background: var(--warm); break-inside: avoid; }
+.callout h3 { color: var(--acc3); margin-bottom: 2px; }
+.disc { font-size: 7.1pt; color: var(--muted); }
+.toc { margin: 0; padding: 0; list-style: none; }
+svg text { font-family: var(--f-mono); font-size: 7.1pt; fill: var(--muted); }
+svg .vl { fill: var(--ink2); font-weight: 500; }
+svg .grid line { stroke: var(--line); } svg .grid .domain { display: none; }
+
+/* ---------- cover (premium) ---------- */
+.cover { height: 11in; width: 8.5in; background: var(--navy); color: #fff; position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 0.6in 0.65in 0.55in; }
+.cover .top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,.18); padding-bottom: 10px; }
+.cover .brand { font-weight: 700; letter-spacing: .16em; font-size: 10pt; }
+.cover .brand i { font-style: normal; color: #8FA4FF; }
+.cover .tier { font-family: var(--f-mono); font-size: 7.4pt; letter-spacing: .12em; text-transform: uppercase; border: 1px solid #8FA4FF; color: #C9D3FF; padding: 3px 8px; }
+.cover .kick { margin-top: 0.9in; font-family: var(--f-mono); font-size: 8.6pt; letter-spacing: .12em; text-transform: uppercase; color: #8FA4FF; }
+.cover h1 { color: #fff; font-size: 44pt; line-height: 1.0; margin: 10px 0 14px; max-width: 6.6in; }
+.cover .dek { color: #C4CCE4; font-size: 12.5pt; max-width: 6in; }
+.cover .who { margin-top: 18px; display: flex; gap: 26px; font-size: 8.4pt; color: #C4CCE4; }
+.cover .who b { display: block; color: #fff; font-family: var(--f-mono); font-size: 11pt; font-weight: 500; }
+.cover .hero { margin-top: 0.75in; }
+.cover .bottom { margin-top: auto !important; }
+.cover .bottom { display: grid; grid-template-columns: 1.2fr 1fr; gap: 28px; border-top: 1px solid rgba(255,255,255,.18); padding-top: 12px; margin-top: 16px; }
+.cover .toc li { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; border-bottom: 1px dotted rgba(255,255,255,.18); font-size: 8.6pt; color: #DDE2F2; }
+.cover .toc li span:first-child { font-family: var(--f-mono); color: #8FA4FF; width: 22px; flex: none; }
+.cover .toc li span:nth-child(2) { flex: 1; }
+.cover .toc li span:last-child { font-family: var(--f-mono); color: #8FA4FF; }
+.cover .note { font-size: 7.4pt; color: #9AA5C4; line-height: 1.45; }
+.cover svg text { fill: #8FA4FF; }
