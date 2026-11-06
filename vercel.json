@@ -234,6 +234,14 @@
     {
       "path": "/api/cron/analyst",
       "schedule": "5 * * * *"
+    },
+    {
+      "path": "/api/cron/supply",
+      "schedule": "*/20 * * * *"
+    },
+    {
+      "path": "/api/cron/supply?step=intel",
+      "schedule": "40 */2 * * *"
     }
   ],
   "headers": [
