@@ -294,6 +294,34 @@
     {
       "path": "/api/cron/govflows?step=holders",
       "schedule": "53 5 * * *"
+    },
+    {
+      "path": "/api/cron/estimates?step=consensus&once=1",
+      "schedule": "25 14 6 11 *"
+    },
+    {
+      "path": "/api/cron/estimates?step=ratings&once=1",
+      "schedule": "45 14 6 11 *"
+    },
+    {
+      "path": "/api/cron/estimates?step=build&once=1",
+      "schedule": "5 15 6 11 *"
+    },
+    {
+      "path": "/api/cron/ir?run=once1",
+      "schedule": "15 14 6 11 *"
+    },
+    {
+      "path": "/api/cron/ir?run=once2",
+      "schedule": "35 14 6 11 *"
+    },
+    {
+      "path": "/api/cron/ir?run=once3",
+      "schedule": "55 14 6 11 *"
+    },
+    {
+      "path": "/api/cron/govflows?step=holders&once=1",
+      "schedule": "25 15 6 11 *"
     }
   ],
   "headers": [
