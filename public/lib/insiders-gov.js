@@ -185,7 +185,7 @@
     svg.append("path").datum(bars).attr("fill", "none").attr("stroke", css("--ink") || "#222").attr("stroke-width", 1.3).attr("d", d3.line().x(b => x(b.t)).y(b => y(b.c)));
     const near = t => { const i = d3.bisector(b => b.t).left(bars, t); return bars[Math.min(i, bars.length - 1)]; };
     const pts = items.filter(i => i.t >= bars[0].t);
-    svg.append("g").selectAll("circle").data(pts).join("circle").attr("cx", d => x(d.t)).attr("cy", d => y(near(d.t).c)).attr("r", d => d.r || 4)
+    svg.append("g").selectAll("circle").data(pts).join("circle").attr("cx", d => x(d.t)).attr("cy", d => y(near(d.t).c)).attr("r", d => Math.max(2.5, (d.r || 4) * Math.min(1, W / 900)))
       .attr("fill", d => color(d)).attr("fill-opacity", .35).attr("stroke", d => color(d)).attr("stroke-width", 1).style("cursor", "pointer")
       .on("mousemove", (ev, d) => showTip(ev, d.tip)).on("mouseleave", () => { tip.hidden = true; }).on("click", (ev, d) => d.open && d.open());
   }
@@ -359,7 +359,7 @@
       stat("Median disclosure lag", lag.length ? `${lag[Math.floor(lag.length / 2)]} days` : "–", "trade to filing"),
       stat("Latest trade", rows[0] ? dt(rows[0].tx_date) : "–", rows[0] ? short(rows[0].member, 24) : "none", "", rows[0] ? () => tradeRecord(tk, rows[0]) : null)));
     const ch = el("div", { class: "bd" });
-    host.append(panel("Member trades on the price chart", el("span", { class: "faint ig-hint" }, "green = purchase · red = sale · ringed = overseeing committee"), ch));
+    host.append(panel("Member trades on the price chart", el("span", { class: "faint ig-hint" }, "green = purchase · red = sale · amber = overseeing committee"), ch));
     requestAnimationFrame(() => priceDots(ch, tk, rows.filter(r => r.tx_date).map(r => ({ t: pd(r.tx_date), r: Math.max(3.5, Math.min(12, Math.log10((r.amax || r.amin || 1000)) * 2)), r0: r,
       tip: `<b>${esc(r.member)}</b> (${esc(party(r.party))})<br>${esc(r.type)} · ${esc(r.amount)}<br>${fdate(r.tx_date)}${r.committee_flag ? "<br>Overseeing committee" : ""}`, open: () => tradeRecord(tk, r) })),
       { color: d => d.r0.committee_flag ? css("--warn") : /Sale/.test(d.r0.type) ? css("--down") : css("--up"), label: "Congressional trades" }));
