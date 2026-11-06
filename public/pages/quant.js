@@ -50,6 +50,7 @@ window.FU_QUANT = (function () {
   const PV = v => v == null ? "–" : v < 0.001 ? "<0.001" : v.toFixed(3);
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const WD = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+  const ORD = v => { const n = Math.round(v * 100), t = n % 100; return n + (t >= 11 && t <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] || "th"); };
 
   /* ---------- explanation drawer ---------- */
   // cfg: {k: methods key, title, value, sub, window, n, asof, notes, cols, rows, hit, file}
@@ -151,15 +152,15 @@ window.FU_QUANT = (function () {
     const R = await loadRead(env.sym);
     if (R) body.append(aiRead(env, R));
     const v = s.vol, p1 = s.perf["1y"] || {}, p3 = s.perf["3y"], dd0 = s.dd.top[0], var1 = s.var["1y"];
-    const vt = n => v[n] ? N(env, P(v[n].now), { k: "vol", title: `${n}-day realized volatility`, value: P(v[n].now), sub: `${Math.round(v[n].pct * 100)}th percentile of ${v[n].count.toLocaleString()} rolling windows since ${fdate(v[n].since)}`, window: `${n} trading days`, n: v[n].count,
+    const vt = n => v[n] ? N(env, P(v[n].now), { k: "vol", title: `${n}-day realized volatility`, value: P(v[n].now), sub: `${ORD(v[n].pct)} percentile of ${v[n].count.toLocaleString()} rolling windows since ${fdate(v[n].since)}`, window: `${n} trading days`, n: v[n].count,
       cols: [["Statistic", r => r[0]], ["Value", r => r[1]]].map(([l, f]) => [l, i => f(i)]), rows: [["Now", P(v[n].now)], ["Percentile vs own history", P(v[n].pct, 0)], ["10th pct", P(v[n].p10)], ["Median", P(v[n].p50)], ["90th pct", P(v[n].p90)], ["Min", P(v[n].min)], ["Max", P(v[n].max)]] }) : "–";
     body.append(el("div", { class: "ql-tiles" },
-      tile("Realized vol 20d", vt("20"), v["20"] ? `${Math.round(v["20"].pct * 100)}th pctile` : ""), tile("Realized vol 60d", vt("60"), v["60"] ? `${Math.round(v["60"].pct * 100)}th pctile` : ""), tile("Realized vol 252d", vt("252"), v["252"] ? `${Math.round(v["252"].pct * 100)}th pctile` : ""),
+      tile("Realized vol 20d", vt("20"), v["20"] ? `${ORD(v["20"].pct)} pctile` : ""), tile("Realized vol 60d", vt("60"), v["60"] ? `${ORD(v["60"].pct)} pctile` : ""), tile("Realized vol 252d", vt("252"), v["252"] ? `${ORD(v["252"].pct)} pctile` : ""),
       tile("Sharpe 1y", p1.sharpe != null ? N(env, F(p1.sharpe), perfCfg(env, "1y")) : "–", p3 ? `3y ${F(p3.sharpe)}` : ""), tile("Sortino 1y", p1.sortino != null ? N(env, F(p1.sortino), perfCfg(env, "1y")) : "–", p3 ? `3y ${F(p3.sortino)}` : ""),
       tile("Max drawdown", dd0 ? N(env, P(dd0.depth), ddCfg(env)) : "–", dd0 ? `${dd0.peak.slice(0, 7)} → ${dd0.trough.slice(0, 7)}` : ""),
       tile("1-day VaR 95%, 1y", var1["95"][0] != null ? N(env, P(var1["95"][0], 2), varCfg(env)) : "–", `CVaR ${P(var1["95"][1], 2)}`),
       tile("Hurst (R/S)", s.hurst ? N(env, F(s.hurst.h), hurstCfg(env)) : "–", s.hurst ? `R² ${F(s.hurst.r2)}` : "")));
-    if (Q.history && !/^long/.test(Q.history)) body.append(el("div", { class: "ql-warn" }, `Only ${Q.bars.toLocaleString()} daily bars (since ${fdate(Q.first)}) are stored for ${env.sym}: ${Q.history}. Long-window statistics use what is available and say so.`));
+    if (Q.history && !/^long/.test(Q.history)) body.append(el("div", { class: "ql-warn" }, `${Q.bars.toLocaleString()} daily bars since ${fdate(Q.first)} for ${env.sym}: ${Q.history}. Statistics use the stored sample; windows longer than it are omitted.`));
     // distribution + vol
     const g1 = el("div", { class: "grid g2" });
     const hist = el("div", { class: "ql-chart bd" });
@@ -365,11 +366,11 @@ window.FU_QUANT = (function () {
     const Q = env.Q, rg = Q.regimes, bt = Q.backtests, cur = rg.current;
     const rc = (title, val, extra = {}) => ({ k: "regimes", title, value: val, window: "daily closes", n: Q.bars, ...extra });
     body.append(el("div", { class: "ql-tiles" }, tile("Trend regime", N(env, cur.trend || "–", rc("trend regime", cur.trend, { sub: `close ${F(cur.close)} · 50d ${F(cur.sma50)} · 200d ${F(cur.sma200)}` })), cur.trend_since ? `since ${fdate(cur.trend_since)}` : ""),
-      tile("Volatility regime", N(env, cur.vol || "–", rc("volatility regime", cur.vol, { sub: `20d vol ${P(cur.v20)} at the ${Math.round((cur.vol_pct || 0) * 100)}th percentile of the trailing 756 days` })), cur.vol_since ? `since ${fdate(cur.vol_since)}` : ""), tile("20d realized vol", P(cur.v20), cur.vol_pct != null ? `${Math.round(cur.vol_pct * 100)}th pctile, 3y` : ""), tile("vs 200-day", S(cur.close / cur.sma200 - 1), `50d vs 200d ${S(cur.sma50 / cur.sma200 - 1)}`)));
+      tile("Volatility regime", N(env, cur.vol || "–", rc("volatility regime", cur.vol, { sub: `20d vol ${P(cur.v20)} at the ${ORD(cur.vol_pct || 0)} percentile of the trailing 756 days` })), cur.vol_since ? `since ${fdate(cur.vol_since)}` : ""), tile("20d realized vol", P(cur.v20), cur.vol_pct != null ? `${ORD(cur.vol_pct)} pctile, 3y` : ""), tile("vs 200-day", S(cur.close / cur.sma200 - 1), `50d vs 200d ${S(cur.sma50 / cur.sma200 - 1)}`)));
     const band = el("div", { class: "ql-chart bd" });
     const cell = (t, v) => { const x = rg.table.find(r => r.key === `${t}|${v}`); return x ? N(env, `${P(x.share, 0)} · ${S(x.fwd20, 1)}`, rc(`${t === "*" ? "all trends" : t + " trend"}, ${v === "*" ? "all volatility" : v + " volatility"}`, `${x.days.toLocaleString()} days`, { sub: `share ${P(x.share, 1)}; average forward 20-day total return ${S(x.fwd20, 2)}; positive ${P(x.hit, 0)}`, n: x.days })) : "–"; };
     const rt = table(["Trend \\ volatility", "Low", "Normal", "High", "All"], ["up", "transition", "down", "*"].map(t => tr([t === "*" ? "All" : t, ...["low", "normal", "high", "*"].map(v => cell(t, v))])));
-    body.append(panel2("Regimes", el("div", { class: "legend" }, el("span", {}, el("i", { style: `background:${C("--up")}` }), "up"), el("span", {}, el("i", { style: `background:${C("--c6")}` }), "transition"), el("span", {}, el("i", { style: `background:${C("--down")}` }), "down"), el("span", {}, el("i", { style: `background:${C("--c2")}` }), "low vol"), el("span", {}, el("i", { style: `background:${C("--c3")}` }), "high vol")), band,
+    body.append(panel2("Regimes", el("div", { class: "legend" }, el("span", {}, el("i", { style: `background:${C("--up")}` }), "up"), el("span", {}, el("i", { style: `background:${C("--c6")}` }), "transition"), el("span", {}, el("i", { style: `background:${C("--down")}` }), "down"), el("span", {}, el("i", { style: `background:${C("--c1")}` }), "low vol"), el("span", {}, el("i", { style: `background:${C("--c3")}` }), "high vol")), band,
       el("div", { class: "bd", style: "padding-top:0" }, el("div", { class: "faint", style: "font-size:11.5px;margin-bottom:4px" }, "Each cell: share of days · average forward 20-day total return"), rt), src((METH || {}).regimes || "")));
     if (bt) {
       const names = { sma_cross: "50/200 SMA cross", rsi_mr: "RSI(14) mean reversion", breakout: "20-day breakout", bh: "Buy and hold" };
@@ -385,7 +386,7 @@ window.FU_QUANT = (function () {
       const all = [...rg.trend_runs, ...rg.vol_runs]; if (!all.length) return;
       const x = d3.scaleUtc().domain([new Date(d3.min(all, r => r[0])), new Date(d3.max(all, r => r[1]))]).range([m.l, W - m.r]);
       const svg = d3.select(band).append("svg").attr("width", W).attr("height", H);
-      const tc = { up: C("--up"), down: C("--down"), transition: C("--c6") }, vc = { low: C("--c2"), normal: C("--line2"), high: C("--c3") };
+      const tc = { up: C("--up"), down: C("--down"), transition: C("--c6") }, vc = { low: C("--c1"), normal: C("--line2"), high: C("--c3") };
       svg.append("text").attr("x", W - m.r + 4).attr("y", 15).text("trend");
       svg.append("text").attr("x", W - m.r + 4).attr("y", 39).text("vol");
       svg.selectAll(null).data(rg.trend_runs).join("rect").attr("x", r => x(new Date(r[0]))).attr("width", r => Math.max(1, x(new Date(r[1])) - x(new Date(r[0])) + 1)).attr("y", 4).attr("height", 18).attr("fill", r => tc[r[2]]).attr("opacity", .65).on("mousemove", (ev, r) => showTip(ev, `${r[2]} trend<br>${fdate(r[0])} to ${fdate(r[1])}`)).on("mouseleave", hideTip);

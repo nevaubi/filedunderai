@@ -100,6 +100,20 @@ class Backtest(unittest.TestCase):
         self.assertEqual(eq["last_trades"][0][0], H["d"][first])
 
 
+class ShortHistory(unittest.TestCase):
+    def test_statistics_with_fewer_than_252_bars(self):
+        import random
+        rnd = random.Random(1)
+        c = [100.0]
+        for _ in range(119):
+            c.append(c[-1] * (1 + rnd.gauss(0, 0.02)))
+        H = hist(c, days=[f"2026-{1 + k // 28:02d}-{1 + k % 28:02d}" for k in range(120)])
+        out = QN.statistics(H, None, [0.0001] * 120, {})
+        self.assertIsNone(out["vol"]["252"])
+        self.assertIn("vov", out)
+        self.assertEqual(out["daily"]["n"], 119)
+
+
 class Regimes(unittest.TestCase):
     def test_trend_rule(self):
         c = [100 + 0.2 * k for k in range(400)]

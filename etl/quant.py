@@ -137,11 +137,14 @@ class Context:
             self.calendar = None
         spy = self.H["SPY"]
         self.mkt_days = spy["d"]
+        self.as_of = spy["d"][-1]
         self.pre_hol, self.post_hol = Q.holidays_from_calendar(spy["d"])
         self.pre_hol_d = {spy["d"][i] for i in self.pre_hol}
         self.post_hol_d = {spy["d"][i] for i in self.post_hol}
         self.cross_days = spy["d"][-253:]
         self.fidx = {d: i for i, d in enumerate(self.factors["d"])} if self.factors else {}
+        self.recent = None      # set by run_part: accessions recorded in the filings table, to top up stale caches
+        self.fstats = {}
 
 
 # ---------------------------------------------------------------- helpers
@@ -237,7 +240,7 @@ def statistics(H, ctx, rf, benches):
     v20 = [x for x in series[20][-252:] if x is not None]
     if len(v20) >= 60:
         mv, sv = Q.mean(v20), Q.sd(v20)
-        chg = [math.log(series[20][i] / series[20][i - 1]) for i in range(L - 251, L) if series[20][i] and series[20][i - 1]]
+        chg = [math.log(series[20][i] / series[20][i - 1]) for i in range(max(1, L - 251), L) if series[20][i] and series[20][i - 1]]
         out["vov"] = {"sd": R(sv, 4), "mean": R(mv, 4), "rel": R(sv / mv, 4) if mv else None, "chg_sd_ann": R(Q.sd(chg) * math.sqrt(252), 4) if len(chg) > 20 else None, "n": len(v20)}
     # drawdowns
     dd, top, cur = Q.drawdowns(H["tr"], days)
@@ -376,13 +379,39 @@ def factor_model(H, ctx):
 
 
 # ---------------------------------------------------------------- events
-def filings_rows(sb, tk):
-    """Normalised filing dicts. Prefers quant/filings (with acceptance times), else tech/events."""
+def recent_filings(sb, days=12, log=print):
+    """{ticker: {accession}} of 8-K/10-K/10-Q filings the companies job recorded in the last `days` days."""
+    cut = (dt.date.today() - dt.timedelta(days=days)).isoformat()
+    out = {}
+    try:
+        for r in sb.select("filings", f"select=ticker,accession&filed=gte.{cut}&form=in.(\"8-K\",\"10-Q\",\"10-K\",\"8-K/A\",\"10-Q/A\",\"10-K/A\")"):
+            out.setdefault(r["ticker"], set()).add(r["accession"])
+    except Exception as e:
+        log("filings table read failed: " + str(e)[:160])
+    return out
+
+
+def filings_rows(sb, tk, recent=None, stats=None):
+    """Normalised filing dicts. Prefers quant/filings (with acceptance times), else tech/events. With `recent`
+    (accessions the filings table knows for this ticker), a stale cache is topped up from the EDGAR submissions API
+    ('recent' block only) and saved; a missing cache is fetched in full."""
     src = None
     try:
         j = sb.get_json(f"quant/filings/{tk}.json")
     except Exception:
         j = None
+    if recent is not None and tk in BY_TICKER:
+        have = {r[2] for r in (j or {}).get("rows", [])}
+        if not j or (recent - have):
+            try:
+                from .quant_sources import filings_doc
+                j = filings_doc(tk, BY_TICKER[tk]["cik"], PREDECESSORS.get(tk, []), full=not j, prior=j)
+                sb.put_json(f"quant/filings/{tk}.json", j, cache="max-age=3600")
+                if stats is not None:
+                    stats["refreshed"] = stats.get("refreshed", 0) + 1
+            except Exception as e:
+                if stats is not None:
+                    stats.setdefault("failed", {})[tk] = str(e)[:160]
     rows = []
     if j and j.get("rows"):
         src = "quant/filings/%s.json (SEC EDGAR submissions API, with acceptance times)" % tk
@@ -863,6 +892,14 @@ def cross_inputs(H, ctx, corr_out, stats):
 def analyze(sb, sym, ctx, H=None):
     t0 = time.time()
     H = H or load_bars(sb, sym)
+    if H and ctx.as_of and H["d"] and H["d"][-1] > ctx.as_of:
+        # align every symbol to the market as-of date (SPY's latest stored bar) so benchmarks and the cross-section
+        # compare the same days; a prices/ file can be a day ahead of the long-history files between jobs
+        k = bisect.bisect_right(H["d"], ctx.as_of)
+        for f in ("d", "o", "h", "l", "c", "v"):
+            H[f] = H[f][:k]
+        H["div"] = [x for x in H["div"] if x[0] <= ctx.as_of]
+        H["aligned"] = True
     if not H or len(H["d"]) < 80:
         return None, None
     H["sym"] = sym
@@ -882,13 +919,13 @@ def analyze(sb, sym, ctx, H=None):
     corr_out = correlation(H, ctx, benches)
     ev = None
     if info:
-        rows, src = filings_rows(sb, sym)
+        rows, src = filings_rows(sb, sym, ctx.recent.get(sym, set()) if ctx.recent is not None else None, ctx.fstats)
         ev = events(H, ctx, rows, src, benches)
     else:
         rb = bench_returns(H, ctx.H["SPY"]) if sym != "SPY" else [None] + [x for x in H["r"][1:]]
         ev = {"macro": macro_events(H, ctx, rb), "note": "filing events apply to companies only"}
     doc = {"v": VERSION, "sym": sym, "name": info["name"] if info else sym, "kind": "stock" if info else "etf", "sector": sector, "sector_etf": se, "benchmarks": list(benches),
-           "as_of": H["d"][-1], "first": H["d"][0], "bars": len(H["d"]), "history": "long" if H["long"] else "two years (long history not yet stored for this symbol)",
+           "as_of": H["d"][-1], "first": H["d"][0], "bars": len(H["d"]), "history": "long" if H["long"] else f"from the prices job file ({len(H['d'])} bars since {H['d'][0]}); the 2008+ history file is not stored for this symbol yet",
            "generated": now_iso(), "bars_file": H["file"], "bars_source": (H["meta"] or {}).get("source") or "Yahoo Finance chart API, split-adjusted daily bars",
            "rf_source": RF_SOURCE, "stats": stats, "corr": corr_out, "events": ev, "season": seasonality(H, ctx), "regimes": regimes(H), "backtests": backtests(H, rf)}
     cx, rets = cross_inputs(H, ctx, corr_out, stats)
@@ -936,10 +973,13 @@ def refresh_filings(sb, tickers, deadline=None, log=print, force=False):
             recent.setdefault(r["ticker"], set()).add(r["accession"])
     except Exception as e:
         log("filings table read failed: " + str(e)[:160])
-    done, failed = 0, {}
+    cached = list_names(sb, "quant/filings/")
+    if cached is not None and not force:
+        tickers = [t for t in tickers if f"{t}.json" not in cached or t in recent]
+    done, failed, pending = 0, {}, 0
     for tk in tickers:
         if deadline and time.time() > deadline:
-            failed[tk] = "skipped: deadline"
+            pending += 1
             continue
         try:
             cur = sb.get_json(f"quant/filings/{tk}.json")
@@ -956,18 +996,32 @@ def refresh_filings(sb, tickers, deadline=None, log=print, force=False):
         except Exception as e:
             failed[tk] = str(e)[:160]
             log(f"filings {tk}: {failed[tk]}")
+    if pending:
+        log(f"filings: {pending} left for the next run (time budget)")
     return done, failed
 
 
-def run_part(sb, part=0, parts=2, deadline=None, log=print, symbols=None, filings_budget=90):
+def list_names(sb, prefix):
+    """Object names directly under a storage prefix of the public bucket (None when listing fails)."""
+    from .common import request
+    names, off = set(), 0
+    try:
+        while True:
+            page = json.loads(request(f"{sb.url}/storage/v1/object/list/public-data", method="POST", data={"prefix": prefix, "limit": 1000, "offset": off},
+                                      headers=sb._h({"Content-Type": "application/json"}), timeout=60, retries=3))
+            names.update(o["name"] for o in page)
+            if len(page) < 1000:
+                return names
+            off += 1000
+    except Exception:
+        return None
+
+
+def run_part(sb, part=0, parts=2, deadline=None, log=print, symbols=None):
     syms = symbols or all_symbols()[part::parts]
     ctx = Context(sb, log)
-    stocks = [s for s in syms if s in BY_TICKER]
-    fdl = time.time() + filings_budget
-    if deadline:
-        fdl = min(fdl, deadline)
-    nf, ff = refresh_filings(sb, stocks, deadline=fdl, log=log)
-    out = {"part": part, "parts": parts, "generated": now_iso(), "cross_days": ctx.cross_days, "rows": {}, "rets": {}}
+    ctx.recent = recent_filings(sb, log=log)
+    out = {"part": part, "parts": parts, "generated": now_iso(), "cross_days": ctx.cross_days, "rows": {}, "rets": {}, "nodata": []}
     errors = {}
 
     def one(s):
@@ -986,7 +1040,9 @@ def run_part(sb, part=0, parts=2, deadline=None, log=print, symbols=None, filing
 
     with ThreadPoolExecutor(int(os.environ.get("QUANT_WORKERS", "4"))) as ex:
         for k, (s, cx, err) in enumerate(ex.map(one, syms)):
-            if err:
+            if err == "no bars":
+                out["nodata"].append(s)
+            elif err:
                 errors[s] = err
             if cx:
                 out["rows"][s], out["rets"][s] = cx
@@ -1001,15 +1057,15 @@ def run_part(sb, part=0, parts=2, deadline=None, log=print, symbols=None, filing
     except Exception:
         pass
     out["errors"] = errors
-    out["filings"] = {"refreshed": nf, "failed": ff}
+    out["filings"] = ctx.fstats
     sb.put_json(f"quant/parts/part{part}.json", out, cache="no-store")
-    log(f"part {part}/{parts}: {len(out['rows'])} symbols, {len(errors)} errors, filings refreshed {nf}")
+    log(f"part {part}/{parts}: {len(out['rows'])} symbols, {len(errors)} errors, no bars {out['nodata']}, filings {ctx.fstats}")
     return out
 
 
 def catch_up(sb, parts=2, deadline=None, log=print):
-    """Recomputes symbols that the part runs skipped (deadline, transient errors) or that are older than the latest
-    market day, and patches them into the part files, so the cross-section stays complete."""
+    """Recomputes symbols that the part runs skipped (deadline, transient errors) and patches them into the part
+    files, so the cross-section stays complete. Symbols without stored bars are left alone."""
     ctx = None
     fixed = 0
     for k in range(parts):
@@ -1020,8 +1076,7 @@ def catch_up(sb, parts=2, deadline=None, log=print):
         if not p:
             continue
         syms = all_symbols()[k::parts]
-        newest = max(((r.get("as_of") or "") for r in p["rows"].values()), default="")
-        todo = [s for s in syms if s not in p["rows"] or (p["rows"][s].get("as_of") or "") < newest]
+        todo = [s for s in syms if s not in p["rows"] and s not in (p.get("nodata") or [])]
         if not todo:
             continue
         ctx = ctx or Context(sb, log)
@@ -1284,7 +1339,7 @@ def quant_read(doc, api_key=None, request_fn=None):
 
 def run_reads(sb, symbols, deadline=None, limit=150, log=print):
     if not os.environ.get("FIREWORKS_API_KEY"):
-        return {"skipped": "no FIREWORKS_API_KEY"}
+        return {"note": "no FIREWORKS_API_KEY; AI reads not generated"}
     try:
         cur = sb.get_json("quant/read_cursor.json") or {}
     except Exception:
@@ -1362,7 +1417,7 @@ def quant_job(sb, part=None, parts=2, step=None, time_budget=None, log=print):
             except LeaseBusy:
                 run.stats["skipped"] = 1
                 return run.stats
-            run.stats.update({"part": part, "symbols": len(out["rows"]), "errors": out["errors"], "filings": out["filings"]})
+            run.stats.update({"part": part, "symbols": len(out["rows"]), "errors": out["errors"], "no_bars": out["nodata"], "filings": out["filings"]})
             return run.stats
         run.stats["inputs"] = refresh_inputs(sb, log=log)
         for k in range(parts):
