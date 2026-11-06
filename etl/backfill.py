@@ -120,7 +120,7 @@ class StageStore:
         return receipt
 
 
-def stage_company(root, ticker):
+def stage_company(root, ticker, retain_reported_conflicts=False):
     root = Path(root)
     manifest = json.loads((root / "sec-manifests" / f"{ticker}.json").read_bytes())
     if manifest["status"] != "collected" or manifest["cik"] != BY_TICKER[ticker]["cik"]:
@@ -137,7 +137,7 @@ def stage_company(root, ticker):
     stage = StageStore(root / "staged" / ticker, ticker)
     fundamental = jobs.process_company(stage, ticker, facts_only=True, fetch_docs=False, source_inputs=bodies,
                                       source_retrieved_at={k:v["retrieved_at"] for k,v in manifest["sources"].items()},
-                                      log=lambda *_: None)
+                                      log=lambda *_: None, retain_reported_conflicts=retain_reported_conflicts)
     receipt = stage.seal(fundamental, manifest["sources"])
     validate_stage(stage.root)
     return {"ticker": ticker, "status": "verified_stage", "tables": {m["table"]: m["rows"] for m in receipt["tables"]}}
@@ -478,6 +478,8 @@ def main(argv=None):
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--budget", type=float)
     parser.add_argument("--cohort-id", help="default ticker scope when --tickers is omitted (default: the first cohort)")
+    parser.add_argument("--retain-reported-conflicts", action="store_true",
+                        help="stage new issuers whose only current conflicts are reported-vs-derived (reported value published, conflict retained)")
     args = parser.parse_args(argv)
     registry = registry_by_id(args.cohort_id) if args.cohort_id else ADDITIONAL_REGISTRIES[0]
     tickers = args.tickers or [r["ticker"] for r in registry["companies"]]
@@ -493,7 +495,7 @@ def main(argv=None):
     def one(ticker):
         try:
             if args.action == "stage":
-                return stage_company(args.root, ticker)
+                return stage_company(args.root, ticker, retain_reported_conflicts=args.retain_reported_conflicts)
             receipt = validate_stage(args.root / "staged" / ticker)
             return {"ticker": ticker, "status": "verified_stage", "tables": {m["table"]:m["rows"] for m in receipt["tables"]}}
         except Exception as error:

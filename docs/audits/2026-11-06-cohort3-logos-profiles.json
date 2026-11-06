@@ -1,0 +1,1380 @@
+{
+ "generated_at": "2026-11-06T05:00:00Z",
+ "cohort_id": "additional-399-spsm-2026-11-04-r1",
+ "tickers": 399,
+ "logos": {
+  "method": "etl.logos.fetch_logo provider order (parqet, fmp, nvstly) with _png_size validation, staged locally, every image reviewed on labeled contact sheets against the issuer name before publication; rejected provider images replaced from the issuer official website where one could be verified; published with etl.logos.publish_logo_assets via scripts/publish_logo_manifest.py (create-only objects, company-logos lease, exact registry readback).",
+  "provider_candidates_fetched": 398,
+  "provider_fetch_failed": [
+   "ADIG"
+  ],
+  "provider_images_rejected_after_review": {
+   "BBT": "BB&T (Truist predecessor) mark, a different company",
+   "CALY": "unrelated \"BR\" mark",
+   "PPLI": "superseded IAC mark (issuer renamed People Inc.)",
+   "MD": "superseded MEDNAX mark (issuer renamed Pediatrix)",
+   "PENG": "superseded SMART mark (issuer renamed Penguin Solutions)",
+   "NOG": "photograph of an oil pumpjack, not a logo",
+   "MSGR": "New York Rangers sports-team mark; skipped by policy",
+   "WKC": "superseded World Fuel Services mark; replaced with the current mark from the official site",
+   "BLKB": "#bbcon conference mark, not the corporate logo",
+   "MFP": "Middleby (former parent) mark, a different company",
+   "ZD": "superseded J2 Global mark",
+   "CASH": "superseded Meta Financial Group mark (issuer renamed Pathward)",
+   "GTY": "cropped and blurred fragment",
+   "LKFN": "generic red/black placeholder bar",
+   "TRMK": "generic red/black placeholder bar",
+   "BKE": "photograph of a belt buckle, not a logo",
+   "ACT": "AdvisorShares mark, a different company (ticker collision)",
+   "MSEX": "contains photographs of people",
+   "PRSU": "superseded Viad mark (issuer renamed Pursuit)",
+   "DCH": "superseded AAM mark (issuer renamed Dauch)",
+   "STAA": "near-black unreadable image",
+   "FUN": "blurred unidentifiable mark",
+   "ADAM": "superseded NYMT mark (issuer renamed Adamas Trust)",
+   "HTLD": "photograph of a truck",
+   "PRKS": "SeaWorld brand mark rather than the United Parks & Resorts corporate mark",
+   "PAHC": "regional \"Europe\" sub-brand variant",
+   "VYX": "superseded NCR mark (issuer renamed NCR Voyix)",
+   "KWR": "superseded Quaker Chemical mark (now Quaker Houghton)",
+   "DMC": "replaced with the official freshdelmonte.com asset (provider image unverified)",
+   "AAT": "unidentified gray triangle; does not match the official mark",
+   "VTOL": "red star; does not match the official Bristow mark",
+   "AOSL": "does not match the official mark",
+   "LPG": "cropped wordmark",
+   "USLM": "stock globe image; official site shows no logo to verify against",
+   "VGNT": "replaced with the official versigent.com asset",
+   "EFOR": "superseded ASGN mark (issuer renamed Everforth)",
+   "AGNT": "unverified mark; replaced with the official agnt.inc asset"
+  },
+  "kept_provider_image_after_official_site_check": [
+   "AXTI",
+   "HTH"
+  ],
+  "published": {
+   "total": 396,
+   "by_source": {
+    "parqet": 357,
+    "official": 35,
+    "fmp": 4
+   }
+  },
+  "publication_receipts": [
+   {
+    "status": "published",
+    "counts": {
+     "requested": 2,
+     "added": 2,
+     "skipped": 0,
+     "conflicts": 0,
+     "registered": 1101,
+     "active_registered": 1101,
+     "missing": 398
+    },
+    "backup_path": "logo-backfills/20261106T045341.947623Z/logos-before.json",
+    "verified_at": "2026-11-06T04:53:43Z",
+    "note": "2-ticker dry run (BNL, ADIG)"
+   },
+   {
+    "status": "published",
+    "counts": {
+     "requested": 396,
+     "added": 394,
+     "skipped": 2,
+     "conflicts": 0,
+     "registered": 1495,
+     "active_registered": 1495,
+     "missing": 4
+    },
+    "backup_path": "logo-backfills/20261106T045355.762573Z/logos-before.json",
+    "verified_at": "2026-11-06T04:54:17Z"
+   }
+  ],
+  "readback": {
+   "cohort_ok": 396,
+   "cohort_missing": [
+    "MSGR",
+    "USLM",
+    "ADAM"
+   ],
+   "registry_tickers": 1495,
+   "registry_assets": 998,
+   "registry_missing": [
+    "ADAM",
+    "MSGK",
+    "MSGR",
+    "USLM"
+   ],
+   "check": "public object SHA-256 equals registry asset sha256 equals the reviewed local PNG"
+  },
+  "still_missing": {
+   "MSGR": "New York Rangers sports-team mark; skipped by policy; no verified official replacement",
+   "USLM": "stock globe image; official site shows no logo to verify against; no verified official replacement",
+   "ADAM": "superseded NYMT mark (issuer renamed Adamas Trust); no verified official replacement"
+  },
+  "manually_sourced_official": [
+   {
+    "ticker": "VGNT",
+    "source_url": "https://www.versigent.com/img/logo.svg",
+    "source_page": "https://www.versigent.com",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Light logo on dark canvas for contrast.",
+    "source_sha256": "45bc533e34919f5ba1c8ecd19d4817734df475e45fbc38fec65f004f8ece57b9",
+    "retrieved_at": "2026-11-06T04:52:02Z"
+   },
+   {
+    "ticker": "TRMK",
+    "source_url": "https://www.trustmark.com/content/experience-fragments/trustmark/us/en/site/header-experience-fragment/master/_jcr_content/root/responsivegrid/header/logo.coreimg.svg/1660821237218/trustmark-blue-grey-200x35-01.svg",
+    "source_page": "https://www.trustmark.com",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "55b2c9a8f980554f452526f231559097fbfcf1182072cb8a5c4bdf754d5c9a8c",
+    "retrieved_at": "2026-11-06T04:52:07Z"
+   },
+   {
+    "ticker": "BBT",
+    "source_url": "https://www.beaconbank.com/",
+    "source_page": "https://www.beaconbank.com/",
+    "source_element": "site header logo element",
+    "method": "headless Chrome screenshot of the site header logo element (transparent background)",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "10823b67f8397532861c62c54bde18a6216149c9e14a1a71b502fb649ff0594c",
+    "retrieved_at": "2026-11-06T04:52:11Z"
+   },
+   {
+    "ticker": "PPLI",
+    "source_url": "https://www.people.inc/",
+    "source_page": "https://www.people.inc/",
+    "source_element": "site header logo element",
+    "method": "headless Chrome screenshot of the site header logo element (transparent background)",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "0289761addeb5e04fec87cb69b18eca9179de40ec54e1006aa26382ddeaaef61",
+    "retrieved_at": "2026-11-06T04:52:11Z"
+   },
+   {
+    "ticker": "MD",
+    "source_url": "https://www.pediatrix.com/",
+    "source_page": "https://www.pediatrix.com/",
+    "source_element": "site header logo element",
+    "method": "headless Chrome screenshot of the site header logo element (transparent background)",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "9eaa7152297e31a3697cff921602a8a6616ae112abd2d7fb0009769976929cb8",
+    "retrieved_at": "2026-11-06T04:52:11Z"
+   },
+   {
+    "ticker": "CALY",
+    "source_url": "https://ir.callawaygolf.com/",
+    "source_page": "https://ir.callawaygolf.com/",
+    "source_element": "https://ir.callawaygolf.com/sites/g/files/knoqqb112836/themes/site/nir_pid631/dist/images/Callaway-Golf-Logo.png",
+    "method": "headless Chrome screenshot of the site header logo element (transparent background)",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "ae798fab05c04da57cce82d4dc8798cf49c9c8b03d7023ae52e835c4bb5fc659",
+    "retrieved_at": "2026-11-06T04:52:50Z"
+   },
+   {
+    "ticker": "PENG",
+    "source_url": "https://www.penguinsolutions.com/en-us",
+    "source_page": "https://www.penguinsolutions.com/en-us",
+    "source_element": "site header logo element",
+    "method": "headless Chrome screenshot of the site header logo element (transparent background)",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "9fba1c2f6240132f7aecd7adb01a1694db346b6aa4f07eb74cd850ffa5418efd",
+    "retrieved_at": "2026-11-06T04:52:11Z"
+   },
+   {
+    "ticker": "NOG",
+    "source_url": "https://s203.q4cdn.com/492547254/files/design/logo.svg",
+    "source_page": "https://noginc.com/overview/default.aspx",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Light logo on dark canvas for contrast.",
+    "source_sha256": "fb5bb679416931891b9d83baea6f8915375e7ca012bfe948e7592eacf8a2583c",
+    "retrieved_at": "2026-11-06T04:52:03Z"
+   },
+   {
+    "ticker": "KWR",
+    "source_url": "https://home.quakerhoughton.com/wp-content/uploads/2018/05/QH_Website_Logo_232x90_EN.png",
+    "source_page": "https://home.quakerhoughton.com/",
+    "method": "official site asset, raster decoded",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "5bab771f9f23f527b2107ba063fd984b585689a930fbcd931985f20ce470e8a3",
+    "retrieved_at": "2026-11-06T04:52:10Z"
+   },
+   {
+    "ticker": "WKC",
+    "source_url": "https://www.worldfuel.com/wp-content/uploads/2026/09/WF-BLUE-TM.svg",
+    "source_page": "https://www.worldfuel.com/",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "6550472335e55d5998a2cdb59ec70b14d8a5814e7714ab6872f35a003533e2aa",
+    "retrieved_at": "2026-11-06T04:52:05Z"
+   },
+   {
+    "ticker": "BLKB",
+    "source_url": "https://www.blackbaud.com/",
+    "source_page": "https://www.blackbaud.com/",
+    "source_element": "site header logo element",
+    "method": "headless Chrome screenshot of the site header logo element (transparent background)",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "7ae5b0603eda90815c246c0d2de756725b38d8becf5b597791e224e0be28401c",
+    "retrieved_at": "2026-11-06T04:52:11Z"
+   },
+   {
+    "ticker": "LPG",
+    "source_url": "https://s204.q4cdn.com/731127281/files/design/dorian-logo.png",
+    "source_page": "https://www.dorianlpg.com",
+    "method": "official site asset, raster decoded",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "6b349a726fff2fc3ceb0d62e80a6656e5bbe9b17e0dcaed973c48dd2b9efc02e",
+    "retrieved_at": "2026-11-06T04:52:10Z"
+   },
+   {
+    "ticker": "MFP",
+    "source_url": "https://midera.com/wp-content/themes/midera/assets/images/logo.svg",
+    "source_page": "https://midera.com/",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "5c00227b6cf6ebc41d67c7b3c11c0afb02b470c9cd9df7fa4264f8d8811e4195",
+    "retrieved_at": "2026-11-06T04:52:02Z"
+   },
+   {
+    "ticker": "ZD",
+    "source_url": "https://www.ziffdavis.com/wp-content/uploads/2021/09/Ziff-Davis_White.png",
+    "source_page": "https://www.ziffdavis.com",
+    "method": "official site asset, raster decoded",
+    "rendering_note": "Light logo on dark canvas for contrast.",
+    "source_sha256": "d25e23a43b402428a84d6379c27b571128eda2b488ab8aac0f588f82997d8a76",
+    "retrieved_at": "2026-11-06T04:52:06Z"
+   },
+   {
+    "ticker": "GTY",
+    "source_url": "https://gettyrealty.com/wp-content/uploads/2021/06/white-logo.svg",
+    "source_page": "https://gettyrealty.com/",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Light logo on dark canvas for contrast.",
+    "source_sha256": "f615a60d5cd1a72c9519eb51beaaa3e89a709e74beee962c60e777c57d198512",
+    "retrieved_at": "2026-11-06T04:52:06Z"
+   },
+   {
+    "ticker": "CASH",
+    "source_url": "https://www.pathward.com/content/experience-fragments/pathward/us/en/site/header/master/_jcr_content/root/header/logo.coreimg.png/1683151128259/logo-r-transparent.png",
+    "source_page": "https://www.pathward.com",
+    "method": "official site asset, raster decoded",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "7853695591a38b41a2199c7b2786d1adb994bfef59e3b024b2f5884626138706",
+    "retrieved_at": "2026-11-06T04:52:03Z"
+   },
+   {
+    "ticker": "LKFN",
+    "source_url": "https://www.lakecitybank.com/wp-content/uploads/2025/10/logo1.png",
+    "source_page": "https://www.lakecitybank.com",
+    "method": "official site asset, raster decoded",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "7b6afb5391a505bbae28685c3c36ad915320b9089611870940029ef995fbdd24",
+    "retrieved_at": "2026-11-06T04:52:07Z"
+   },
+   {
+    "ticker": "EFOR",
+    "source_url": "https://everforth.com/wp-content/uploads/2026/01/EF-Lockup-TM-H-RGB-White-scaled.png",
+    "source_page": "https://everforth.com/",
+    "method": "official site asset, raster decoded",
+    "rendering_note": "Light logo on dark canvas for contrast.",
+    "source_sha256": "d342f174efae0a09387e31619d465b6fecb670309131fd5b01df0ebe805c4d84",
+    "retrieved_at": "2026-11-06T04:52:03Z"
+   },
+   {
+    "ticker": "BKE",
+    "source_url": "https://content.bucklecontent.com/content/Global%20Branded%20Assets/Buckle_Logo_correct.svg?contextRequest=%7B%22forceCatalogForFetch%22:false,%22forceFilterByCatalogIncludeInheritance%22:false,%22forceFilterByCatalogExcludeInheritance%22:false,%22applicationId%22:%2201HTZJW3YMAK4J0EN762E40BF5%22,%22tenantId%22:%225DF1363059675161A85F576D%22%7D",
+    "source_page": "https://www.buckle.com",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "27e9adf885d565cad224a1319f2075943dcef6ae8580b21875f4b0701a03f858",
+    "retrieved_at": "2026-11-06T04:52:07Z"
+   },
+   {
+    "ticker": "ADIG",
+    "source_url": "https://cdn.prod.website-files.com/672521f9ba00f11eb7a833b4/68e5514d839e4af0085cea58_adi-logo-blue.svg",
+    "source_page": "https://www.adiglobal.com",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "fec2c6956301f81cf8a83037facf5583ed6a5ed6911432975c086512b8d4c8bf",
+    "retrieved_at": "2026-11-06T04:52:10Z"
+   },
+   {
+    "ticker": "ACT",
+    "source_url": "https://enactmi.com:443/themes/custom/b2b_cms_theme/images/enact-logo-svg.svg",
+    "source_page": "https://enactmi.com:443/",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "2c2e6801584147ddbaa5eb250479925bb21a37306b604410fdfcf23025900792",
+    "retrieved_at": "2026-11-06T04:52:08Z"
+   },
+   {
+    "ticker": "VYX",
+    "source_url": "https://cdn.prod.website-files.com/69b1521dd603978b0f3d3f42/69c25842f0bf5f3cbe6427a0_Logo.svg",
+    "source_page": "https://www.ncrvoyix.com",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Light logo on dark canvas for contrast.",
+    "source_sha256": "ac36b48ec886b25d56c3f15f5c697b576f46cbb609a34c79a8666621e7481858",
+    "retrieved_at": "2026-11-06T04:52:09Z"
+   },
+   {
+    "ticker": "DCH",
+    "source_url": "https://www.dauch.com/images/dauchlibraries/logos/dauch-logo-tm-red-pos-rgb.svg?sfvrsn=1d4bfb32_1",
+    "source_page": "https://www.dauch.com",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "3f15111c54fb18560cb02f908fd9fd40777e5e60f0078ae7cbf992bf5af5286e",
+    "retrieved_at": "2026-11-06T04:52:04Z"
+   },
+   {
+    "ticker": "PRSU",
+    "source_url": "https://www.pursuit.com/",
+    "source_page": "https://www.pursuit.com/",
+    "source_element": "site header logo element",
+    "method": "headless Chrome screenshot of the site header logo element (transparent background)",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "e6849c578d937f53aecd083df57314eab10cb8a2d4899fa8f4dff3b6b11402be",
+    "retrieved_at": "2026-11-06T04:52:11Z"
+   },
+   {
+    "ticker": "MSEX",
+    "source_url": "https://www.middlesexwater.com/",
+    "source_page": "https://www.middlesexwater.com/",
+    "source_element": "site header logo element",
+    "method": "headless Chrome screenshot of the site header logo element (transparent background)",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "b545a8b7bfd096674655717716311b99bdeb2c551e8f2a1fdafee4be30e4f79f",
+    "retrieved_at": "2026-11-06T04:52:50Z"
+   },
+   {
+    "ticker": "AAT",
+    "source_url": "https://www.americanassetstrust.com/images/logo.png",
+    "source_page": "https://www.americanassetstrust.com/",
+    "method": "official site asset, raster decoded",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "8b4b0470cc6092dd246dc4a7636906bbedcfd9fae5cbed73e3ddb750f4cfb016",
+    "retrieved_at": "2026-11-06T04:52:05Z"
+   },
+   {
+    "ticker": "VTOL",
+    "source_url": "https://d1io3yog0oux5.cloudfront.net/_4e28390b3f7752e440c59663383e5c51/bristowgroup/files/theme/images/logo-header.svg",
+    "source_page": "https://www.bristowgroup.com",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "3e58f93039a197bedc0a08f31f800c950591571d9b50731b4b18e2b6da658619",
+    "retrieved_at": "2026-11-06T04:52:05Z"
+   },
+   {
+    "ticker": "DMC",
+    "source_url": "https://freshdelmonte.com/wp-content/uploads/2021/11/logo.svg",
+    "source_page": "https://freshdelmonte.com/",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "808255e476ec2e3f2e46d982a8e5fd3ffc0470cae3ec4be271ae9b4ca54af661",
+    "retrieved_at": "2026-11-06T04:52:04Z"
+   },
+   {
+    "ticker": "PAHC",
+    "source_url": "https://www.pahc.com/wp-content/uploads/2023/02/PNG_Phibro_AnimalHealthCorporation_Color_RGB_R.png",
+    "source_page": "https://www.pahc.com",
+    "method": "official site asset, raster decoded",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "758aacdd63b04085347889beb354596c2798936eb3e5fd1241e6e82b2ca2ee8c",
+    "retrieved_at": "2026-11-06T04:52:09Z"
+   },
+   {
+    "ticker": "STAA",
+    "source_url": "https://www.staar.com/assets/images/logo-dark.svg",
+    "source_page": "https://www.staar.com/",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "3091d81ecf0d73db134c5687a1cf6ff3937e94a2f5dd34fdbb224cb60505d41e",
+    "retrieved_at": "2026-11-06T04:52:08Z"
+   },
+   {
+    "ticker": "FUN",
+    "source_url": "https://s204.q4cdn.com/155295784/files/design/logo.svg",
+    "source_page": "https://investors.sixflags.com/overview/default.aspx",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Light logo on dark canvas for contrast.",
+    "source_sha256": "b2e1cb997974bf6fd9ff63b5b2ef313f26a1c2a55d682f8f565aa754d4473d46",
+    "retrieved_at": "2026-11-06T04:52:09Z"
+   },
+   {
+    "ticker": "PRKS",
+    "source_url": "https://unitedparks.com/-/media/migrated-media/corporate/images/logos/united-parks--resorts-stacked_logo.png?h=209&w=542&la=en&hash=7EBD51731D2822A36706689AC425215E",
+    "source_page": "https://unitedparks.com/",
+    "method": "official site asset, raster decoded",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "f6b2ac5ccbfafe4fa088423266f717c7130be5852bce88b7372ec90f47e70111",
+    "retrieved_at": "2026-11-06T04:52:04Z"
+   },
+   {
+    "ticker": "AOSL",
+    "source_url": "https://www.aosmd.com/logo.svg",
+    "source_page": "https://www.aosmd.com",
+    "method": "official site asset, SVG rendered with rsvg-convert",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "bab4fe1d132dbb5863b55620d1461f5c4148448f473678babb67f38cc4395e5b",
+    "retrieved_at": "2026-11-06T04:52:05Z"
+   },
+   {
+    "ticker": "HTLD",
+    "source_url": "https://images.squarespace-cdn.com/content/v1/55bb7b86e4b07fa7600fb97b/1600265462134-J488T32POLCYN9BY7SRT/Heartland+logo+large+with+registration+mark.png?format=1500w",
+    "source_page": "https://www.heartlandexpress.com",
+    "method": "official site asset, raster decoded",
+    "rendering_note": "Logo on transparent canvas.",
+    "source_sha256": "910a73b766e83d73bef9b35686cb68586cc1d62ac7c2ae2551ad154746e32239",
+    "retrieved_at": "2026-11-06T04:52:09Z"
+   },
+   {
+    "ticker": "AGNT",
+    "source_url": "https://www.agnt.inc:443/next/assets/images/agnt-inc/AGNT_Typeset_White.png",
+    "source_page": "https://www.agnt.inc:443/",
+    "method": "official site asset, raster decoded",
+    "rendering_note": "Light logo on dark canvas for contrast.",
+    "source_sha256": "40f9359249bf1b8a0cd58f7192e39654c431f0f71c7b39f25a07e784495d043e",
+    "retrieved_at": "2026-11-06T04:52:10Z"
+   }
+  ]
+ },
+ "profiles": {
+  "method": "scripts/assemble_cohort3_profiles.py (adapted from assemble_sec_provider_profiles.py): SEC EDGAR submissions (archived, SHA-256 checked) for headquarters and SIC industry; Data Legion companies/enrich-base via Firecrawl Alexandria by ticker_symbol for website, LinkedIn, founded year and provider size band, accepted only for an exact/high-confidence ticker match of a public record whose name agrees with the issuer, plus a per-ticker manual review of every mismatch. Published with scripts/publish_company_profiles.publish (validate, merge, backups, lease, exact readback); its bundled-fallback directory write was redirected to the working directory so the checkout stayed unchanged.",
+  "provider": {
+   "endpoint": "datalegion/companies/enrich-base",
+   "lookups": 399,
+   "requests": 41,
+   "matches_returned": 362,
+   "not_found": [
+    "AVA",
+    "VGNT",
+    "AAMI",
+    "MARA",
+    "BBT",
+    "PPLI",
+    "ACMR",
+    "CALY",
+    "LCII",
+    "PENG",
+    "NOG",
+    "NWBI",
+    "CNS",
+    "LBRT",
+    "CENTA",
+    "MSGR",
+    "HCSG",
+    "BXMT",
+    "ARR",
+    "MFP",
+    "DCOM",
+    "AMR",
+    "EFOR",
+    "ALHC",
+    "MBIN",
+    "ADIG",
+    "GIII",
+    "HFWA",
+    "DCH",
+    "MPT",
+    "UNIT",
+    "DMC",
+    "HOS",
+    "PRKS",
+    "AESI",
+    "ADAM",
+    "AGNT"
+   ],
+   "matches_used": 345,
+   "credits": 7240,
+   "credit_basis": "20 credits per successful enrichment; not-found lookups were not charged (sum of creditsCost over 41 responses)",
+   "request_fields": "legion_id,name,domain,tickers,linkedin_url,type,size,founded"
+  },
+  "name_review": [
+   {
+    "ticker": "SFNC",
+    "provider": "simmons bank",
+    "issuer": [
+     "SIMMONS FIRST NATIONAL CORP"
+    ],
+    "domain": "simmonsbank.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "NMIH",
+    "provider": "national mi",
+    "issuer": [
+     "NMI Holdings, Inc."
+    ],
+    "domain": "nationalmi.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "SBCF",
+    "provider": "seacoast investor services",
+    "issuer": [
+     "SEACOAST BANKING CORP OF FLORIDA"
+    ],
+    "domain": "seacoastbanking.com",
+    "type": "public",
+    "accepted": false,
+    "why": "manual review: provider record is \"seacoast investor services\", a 1-10 person unit, not the bank holding company"
+   },
+   {
+    "ticker": "OSW",
+    "provider": "onespaworld",
+    "issuer": [
+     "ONESPAWORLD HOLDINGS Ltd"
+    ],
+    "domain": "onespaworld.com",
+    "type": "private",
+    "accepted": false,
+    "why": "identity gate: requires exact/high ticker match of a public company record"
+   },
+   {
+    "ticker": "PFS",
+    "provider": "provident bank",
+    "issuer": [
+     "PROVIDENT FINANCIAL SERVICES INC"
+    ],
+    "domain": "provident.bank",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "BANC",
+    "provider": "pacific western bank",
+    "issuer": [
+     "BANC OF CALIFORNIA, INC."
+    ],
+    "domain": "bancofcal.com",
+    "type": "public",
+    "accepted": false,
+    "why": "manual review: provider record is named \"pacific western bank\" (the merged predecessor bank), not Banc of California"
+   },
+   {
+    "ticker": "UNFI",
+    "provider": "unfi",
+    "issuer": [
+     "UNITED NATURAL FOODS INC"
+    ],
+    "domain": "unfi.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "APAM",
+    "provider": "artisan partners",
+    "issuer": [
+     "Artisan Partners Asset Management Inc."
+    ],
+    "domain": "artisanpartners.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "CUBI",
+    "provider": "customers bank",
+    "issuer": [
+     "Customers Bancorp, Inc."
+    ],
+    "domain": "customersbank.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "FBK",
+    "provider": "firstbank",
+    "issuer": [
+     "FB Financial Corp"
+    ],
+    "domain": "firstbankonline.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "REZI",
+    "provider": "resideo",
+    "issuer": [
+     "RESIDEO TECHNOLOGIES, INC."
+    ],
+    "domain": "resideo.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "FBNC",
+    "provider": "first bank",
+    "issuer": [
+     "FIRST BANCORP /NC/"
+    ],
+    "domain": "localfirstbank.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "NTCT",
+    "provider": "netscout",
+    "issuer": [
+     "NETSCOUT SYSTEMS INC"
+    ],
+    "domain": "netscout.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "MD",
+    "provider": "mednax, national medical group",
+    "issuer": [
+     "Pediatrix Medical Group, Inc."
+    ],
+    "domain": "mednax.com",
+    "type": "public",
+    "accepted": false,
+    "why": "manual review: provider record carries the pre-rename identity (mednax.com); current Pediatrix website not established"
+   },
+   {
+    "ticker": "HURN",
+    "provider": "huron",
+    "issuer": [
+     "Huron Consulting Group Inc."
+    ],
+    "domain": "huronconsultinggroup.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "IVT",
+    "provider": "inventrust properties corp.",
+    "issuer": [
+     "InvenTrust Properties Corp."
+    ],
+    "domain": "inventrustproperties.com",
+    "type": "private",
+    "accepted": false,
+    "why": "identity gate: requires exact/high ticker match of a public company record"
+   },
+   {
+    "ticker": "HHH",
+    "provider": "howard hughes communities",
+    "issuer": [
+     "Howard Hughes Holdings Inc."
+    ],
+    "domain": "communities.howardhughes.com",
+    "type": "private",
+    "accepted": false,
+    "why": "identity gate: requires exact/high ticker match of a public company record"
+   },
+   {
+    "ticker": "BANR",
+    "provider": "banner bank",
+    "issuer": [
+     "BANNER CORP"
+    ],
+    "domain": "bannerbank.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "BHE",
+    "provider": "benchmark",
+    "issuer": [
+     "BENCHMARK ELECTRONICS INC"
+    ],
+    "domain": "bench.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "MCY",
+    "provider": "mercury insurance",
+    "issuer": [
+     "MERCURY GENERAL CORP"
+    ],
+    "domain": "mercuryinsurance.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "HTO",
+    "provider": "sjw group",
+    "issuer": [
+     "H2O AMERICA"
+    ],
+    "domain": "sjwgroup.com",
+    "type": "public",
+    "accepted": false,
+    "why": "manual review: provider record carries the pre-rename identity SJW Group (sjwgroup.com)"
+   },
+   {
+    "ticker": "WAFD",
+    "provider": "wafd bank",
+    "issuer": [
+     "WAFD INC"
+    ],
+    "domain": "wafdbank.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "VECO",
+    "provider": "veeco",
+    "issuer": [
+     "VEECO INSTRUMENTS INC"
+    ],
+    "domain": "veeco.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "FCF",
+    "provider": "first commonwealth bank",
+    "issuer": [
+     "FIRST COMMONWEALTH FINANCIAL CORP /PA/"
+    ],
+    "domain": "fcbanking.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "KWR",
+    "provider": "quaker houghton",
+    "issuer": [
+     "QUAKER CHEMICAL CORP"
+    ],
+    "domain": "quakerhoughton.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "WLY",
+    "provider": "wiley",
+    "issuer": [
+     "JOHN WILEY & SONS, INC."
+    ],
+    "domain": "wiley.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "CHCO",
+    "provider": "city national bank",
+    "issuer": [
+     "CITY HOLDING CO"
+    ],
+    "domain": "bankatcity.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "ALGT",
+    "provider": "allegiant",
+    "issuer": [
+     "Allegiant Travel CO"
+    ],
+    "domain": "allegiantair.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "PAYO",
+    "provider": "payoneer",
+    "issuer": [
+     "Payoneer Global Inc."
+    ],
+    "domain": "payoneer.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "PRDO",
+    "provider": "career education corporation",
+    "issuer": [
+     "PERDOCEO EDUCATION Corp"
+    ],
+    "domain": "careered.com",
+    "type": "public",
+    "accepted": false,
+    "why": "manual review: provider record carries the pre-rename identity Career Education Corporation (careered.com)"
+   },
+   {
+    "ticker": "LMAT",
+    "provider": "lemaitre",
+    "issuer": [
+     "LEMAITRE VASCULAR INC"
+    ],
+    "domain": "lemaitre.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "HOPE",
+    "provider": "bank of hope",
+    "issuer": [
+     "HOPE BANCORP INC"
+    ],
+    "domain": "bankofhope.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "CASH",
+    "provider": "meta financial group, inc.",
+    "issuer": [
+     "PATHWARD FINANCIAL, INC."
+    ],
+    "domain": "metafinancialgroup.com",
+    "type": "public",
+    "accepted": false,
+    "why": "manual review: provider record carries the pre-rename identity Meta Financial Group (metafinancialgroup.com)"
+   },
+   {
+    "ticker": "PRG",
+    "provider": "progressive leasing",
+    "issuer": [
+     "PROG Holdings, Inc."
+    ],
+    "domain": "progleasing.com",
+    "type": "public",
+    "accepted": false,
+    "why": "manual review: provider record is the operating subsidiary Progressive Leasing (progleasing.com), not PROG Holdings"
+   },
+   {
+    "ticker": "CBRL",
+    "provider": "cracker barrel",
+    "issuer": [
+     "CRACKER BARREL OLD COUNTRY STORE, INC"
+    ],
+    "domain": "crackerbarrel.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "LKFN",
+    "provider": "lake city bank",
+    "issuer": [
+     "LAKELAND FINANCIAL CORP"
+    ],
+    "domain": "lakecitybank.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "MBC",
+    "provider": "master brand nhb",
+    "issuer": [
+     "MasterBrand, Inc."
+    ],
+    "domain": "masterbrandcabinets.com",
+    "type": "public",
+    "accepted": false,
+    "why": "manual review: provider record is \"master brand nhb\", a 1-10 person unit, not MasterBrand, Inc."
+   },
+   {
+    "ticker": "EFC",
+    "provider": "pm financial llc",
+    "issuer": [
+     "Ellington Financial Inc."
+    ],
+    "domain": "ellingtonfinancial.com",
+    "type": "public",
+    "accepted": false,
+    "why": "manual review: provider record is \"pm financial llc\", a 1-10 person entity that only shares the issuer domain"
+   },
+   {
+    "ticker": "SNDR",
+    "provider": "schneider",
+    "issuer": [
+     "Schneider National, Inc."
+    ],
+    "domain": "schneider.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "TFIN",
+    "provider": "triumph",
+    "issuer": [
+     "Triumph Financial, Inc."
+    ],
+    "domain": "triumph.io",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "HE",
+    "provider": "hei",
+    "issuer": [
+     "HAWAIIAN ELECTRIC INDUSTRIES INC"
+    ],
+    "domain": "hei.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "STC",
+    "provider": "stewart title",
+    "issuer": [
+     "STEWART INFORMATION SERVICES CORP"
+    ],
+    "domain": "stewart.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "WABC",
+    "provider": "westamerica bank",
+    "issuer": [
+     "WESTAMERICA BANCORPORATION"
+    ],
+    "domain": "westamerica.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "USLM",
+    "provider": "arkansas lime co",
+    "issuer": [
+     "UNITED STATES LIME & MINERALS INC"
+    ],
+    "domain": "uslm.com",
+    "type": "public",
+    "accepted": false,
+    "why": "manual review: provider record is the operating subsidiary Arkansas Lime Co, not United States Lime & Minerals"
+   },
+   {
+    "ticker": "ACT",
+    "provider": "enact mortgage insurance",
+    "issuer": [
+     "Enact Holdings, Inc."
+    ],
+    "domain": "enactmi.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "INVX",
+    "provider": "dril-quip",
+    "issuer": [
+     "Innovex International, Inc."
+    ],
+    "domain": "innovex-inc.com",
+    "type": "public",
+    "accepted": false,
+    "why": "manual review: provider record is named \"dril-quip\" with the Dril-Quip LinkedIn page (merged predecessor)"
+   },
+   {
+    "ticker": "ICHR",
+    "provider": "ichor systems, inc.",
+    "issuer": [
+     "ICHOR HOLDINGS, LTD."
+    ],
+    "domain": "ichorsystems.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "UTI",
+    "provider": "universal technical institute, inc.",
+    "issuer": [
+     "UNIVERSAL TECHNICAL INSTITUTE INC"
+    ],
+    "domain": "uti.edu",
+    "type": "educational",
+    "accepted": false,
+    "why": "identity gate: requires exact/high ticker match of a public company record"
+   },
+   {
+    "ticker": "JBLU",
+    "provider": "jetblue",
+    "issuer": [
+     "JETBLUE AIRWAYS CORP"
+    ],
+    "domain": "jetblue.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "PRSU",
+    "provider": "pursuit",
+    "issuer": [
+     "Pursuit Attractions & Hospitality, Inc."
+    ],
+    "domain": "pursuit.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "UFCS",
+    "provider": "ufg insurance",
+    "issuer": [
+     "UNITED FIRE GROUP INC"
+    ],
+    "domain": "ufginsurance.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "NX",
+    "provider": "quanex",
+    "issuer": [
+     "Quanex Building Products CORP"
+    ],
+    "domain": "quanex.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "HAFC",
+    "provider": "hanmi bank",
+    "issuer": [
+     "HANMI FINANCIAL CORP"
+    ],
+    "domain": "hanmi.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "CFFN",
+    "provider": "capitol federal savings bank",
+    "issuer": [
+     "Capitol Federal Financial, Inc."
+    ],
+    "domain": "capfed.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "CPF",
+    "provider": "central pacific bank",
+    "issuer": [
+     "CENTRAL PACIFIC FINANCIAL CORP"
+    ],
+    "domain": "cpb.bank",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "SBSI",
+    "provider": "southside bank",
+    "issuer": [
+     "SOUTHSIDE BANCSHARES INC"
+    ],
+    "domain": "southside.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "UVV",
+    "provider": "universal leaf tobacco company",
+    "issuer": [
+     "UNIVERSAL CORP /VA/"
+    ],
+    "domain": "universalcorp.com",
+    "type": "public",
+    "accepted": false,
+    "why": "manual review: provider record is the operating subsidiary Universal Leaf Tobacco Company, not Universal Corporation"
+   },
+   {
+    "ticker": "GTM",
+    "provider": "zoominfo",
+    "issuer": [
+     "ZoomInfo Technologies Inc."
+    ],
+    "domain": "zoominfo.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "EGBN",
+    "provider": "eaglebank",
+    "issuer": [
+     "EAGLE BANCORP INC"
+    ],
+    "domain": "eaglebankcorp.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "WINA",
+    "provider": "winmark - the resale company",
+    "issuer": [
+     "WINMARK CORP"
+    ],
+    "domain": "winmarkcorporation.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "CRSR",
+    "provider": "corsair",
+    "issuer": [
+     "Corsair Gaming, Inc."
+    ],
+    "domain": "corsair.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   },
+   {
+    "ticker": "SAFE",
+    "provider": "istar",
+    "issuer": [
+     "Safehold Inc."
+    ],
+    "domain": "istar.com",
+    "type": "public",
+    "accepted": false,
+    "why": "manual review: provider record is iStar (istar.com), the merged predecessor, not Safehold Inc."
+   },
+   {
+    "ticker": "WRLD",
+    "provider": "world finance",
+    "issuer": [
+     "WORLD ACCEPTANCE CORP"
+    ],
+    "domain": "loansbyworld.com",
+    "type": "public",
+    "accepted": true,
+    "why": "manual review: brand, short-form or bank-subsidiary name of the same issuer, matching domain"
+   }
+  ],
+  "rejected_matches": [
+   {
+    "ticker": "SBCF",
+    "provider_name": "seacoast investor services",
+    "domain": "seacoastbanking.com",
+    "type": "public",
+    "why": "manual review: provider record is \"seacoast investor services\", a 1-10 person unit, not the bank holding company"
+   },
+   {
+    "ticker": "OSW",
+    "provider_name": "onespaworld",
+    "domain": "onespaworld.com",
+    "type": "private",
+    "why": "identity gate: requires exact/high ticker match of a public company record"
+   },
+   {
+    "ticker": "BANC",
+    "provider_name": "pacific western bank",
+    "domain": "bancofcal.com",
+    "type": "public",
+    "why": "manual review: provider record is named \"pacific western bank\" (the merged predecessor bank), not Banc of California"
+   },
+   {
+    "ticker": "MD",
+    "provider_name": "mednax, national medical group",
+    "domain": "mednax.com",
+    "type": "public",
+    "why": "manual review: provider record carries the pre-rename identity (mednax.com); current Pediatrix website not established"
+   },
+   {
+    "ticker": "IVT",
+    "provider_name": "inventrust properties corp.",
+    "domain": "inventrustproperties.com",
+    "type": "private",
+    "why": "identity gate: requires exact/high ticker match of a public company record"
+   },
+   {
+    "ticker": "HHH",
+    "provider_name": "howard hughes communities",
+    "domain": "communities.howardhughes.com",
+    "type": "private",
+    "why": "identity gate: requires exact/high ticker match of a public company record"
+   },
+   {
+    "ticker": "HTO",
+    "provider_name": "sjw group",
+    "domain": "sjwgroup.com",
+    "type": "public",
+    "why": "manual review: provider record carries the pre-rename identity SJW Group (sjwgroup.com)"
+   },
+   {
+    "ticker": "PRDO",
+    "provider_name": "career education corporation",
+    "domain": "careered.com",
+    "type": "public",
+    "why": "manual review: provider record carries the pre-rename identity Career Education Corporation (careered.com)"
+   },
+   {
+    "ticker": "CASH",
+    "provider_name": "meta financial group, inc.",
+    "domain": "metafinancialgroup.com",
+    "type": "public",
+    "why": "manual review: provider record carries the pre-rename identity Meta Financial Group (metafinancialgroup.com)"
+   },
+   {
+    "ticker": "PRG",
+    "provider_name": "progressive leasing",
+    "domain": "progleasing.com",
+    "type": "public",
+    "why": "manual review: provider record is the operating subsidiary Progressive Leasing (progleasing.com), not PROG Holdings"
+   },
+   {
+    "ticker": "MBC",
+    "provider_name": "master brand nhb",
+    "domain": "masterbrandcabinets.com",
+    "type": "public",
+    "why": "manual review: provider record is \"master brand nhb\", a 1-10 person unit, not MasterBrand, Inc."
+   },
+   {
+    "ticker": "EFC",
+    "provider_name": "pm financial llc",
+    "domain": "ellingtonfinancial.com",
+    "type": "public",
+    "why": "manual review: provider record is \"pm financial llc\", a 1-10 person entity that only shares the issuer domain"
+   },
+   {
+    "ticker": "USLM",
+    "provider_name": "arkansas lime co",
+    "domain": "uslm.com",
+    "type": "public",
+    "why": "manual review: provider record is the operating subsidiary Arkansas Lime Co, not United States Lime & Minerals"
+   },
+   {
+    "ticker": "INVX",
+    "provider_name": "dril-quip",
+    "domain": "innovex-inc.com",
+    "type": "public",
+    "why": "manual review: provider record is named \"dril-quip\" with the Dril-Quip LinkedIn page (merged predecessor)"
+   },
+   {
+    "ticker": "UTI",
+    "provider_name": "universal technical institute, inc.",
+    "domain": "uti.edu",
+    "type": "educational",
+    "why": "identity gate: requires exact/high ticker match of a public company record"
+   },
+   {
+    "ticker": "UVV",
+    "provider_name": "universal leaf tobacco company",
+    "domain": "universalcorp.com",
+    "type": "public",
+    "why": "manual review: provider record is the operating subsidiary Universal Leaf Tobacco Company, not Universal Corporation"
+   },
+   {
+    "ticker": "SAFE",
+    "provider_name": "istar",
+    "domain": "istar.com",
+    "type": "public",
+    "why": "manual review: provider record is iStar (istar.com), the merged predecessor, not Safehold Inc."
+   }
+  ],
+  "published": 399,
+  "coverage": {
+   "provider_enriched": 345,
+   "filing_metadata_only": 54,
+   "fields": {
+    "website": 345,
+    "linkedin_url": 335,
+    "headquarters": 399,
+    "industry": 399,
+    "founded": 303,
+    "employee_size_range": 345
+   }
+  },
+  "not_published": [
+   "description",
+   "leadership (no official roster sourced; provider people never used)",
+   "portraits or any photos of people",
+   "images"
+  ],
+  "publication_reports": [
+   {
+    "generated_at": "2026-11-06T04:35:28Z",
+    "published": [
+     "BNL",
+     "NIC"
+    ],
+    "readback": "all changed profiles and directory matched exactly",
+    "backup_prefix": "company-profiles/backups/2026-11-06T04-35-28Z/",
+    "note": "2-ticker dry run"
+   },
+   {
+    "generated_at": "2026-11-06T04:42:14Z",
+    "published": 397,
+    "unchanged": [
+     "BNL",
+     "NIC"
+    ],
+    "readback": "all changed profiles and directory matched exactly",
+    "backup_prefix": "company-profiles/backups/2026-11-06T04-42-14Z/"
+   },
+   {
+    "generated_at": "2026-11-06T04:55:11Z",
+    "published": [
+     "PRSU"
+    ],
+    "readback": "all changed profiles and directory matched exactly",
+    "backup_prefix": "company-profiles/backups/2026-11-06T04-55-11Z/",
+    "note": "PRSU re-published after pursuit.com was verified as the issuer website"
+   }
+  ],
+  "readback": {
+   "cohort_profiles_matching_local": 399,
+   "profile_index_tickers": 1499,
+   "directory_counts": {
+    "registered": 1499,
+    "screener_eligible": 1485,
+    "with_metadata": 1499,
+    "with_leadership": 87,
+    "leaders": 901,
+    "portraits": 673,
+    "portrait_sources": 756,
+    "cached_portraits": 663
+   }
+  }
+ },
+ "other_credits": {
+  "firecrawl_scrape_pages": "about 8 credits (blackbaud.com branding 1; ir.callawaygolf.com query 5 and image listings 2; two adamastrust.com attempts failed with a proxy tunnel error)"
+ },
+ "notes": [
+  "Company-directory.json and company-profiles/index.json were regenerated by the publisher from this checkout registry: 1,499 registered, 1,485 screener-eligible.",
+  "Public profile and logo objects were read back over the public storage URL for all 399 tickers after publication; PRSU was re-verified after its re-publication."
+ ]
+}
