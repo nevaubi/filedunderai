@@ -246,6 +246,14 @@
     {
       "path": "/api/cron/estimates?step=build",
       "schedule": "45 1 * * *"
+    },
+    {
+      "path": "/api/cron/supply",
+      "schedule": "*/20 * * * *"
+    },
+    {
+      "path": "/api/cron/supply?step=intel",
+      "schedule": "40 */2 * * *"
     }
   ],
   "headers": [
