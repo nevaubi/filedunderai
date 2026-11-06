@@ -1128,6 +1128,9 @@ def segments_changed_job(sb, time_budget=240, workers=4):
     return done, failed
 
 
+IR_ROTATION_RESERVE = 90  # seconds kept back from IR workers for checkpoint and index persistence
+
+
 def ir_rotation_job(sb, per_run=8, time_budget=240):
     """Start the total I/O budget before acquiring the distributed aggregate lease."""
     from .ir import IRClient, _timeout, bounded_client
@@ -1169,7 +1172,8 @@ def _ir_rotation_job(sb, per_run, time_budget, started):
     if not tickers or per_run <= 0:
         return {}, {}
     retry = [t for t in dict.fromkeys(state.get("retry", [])) if t in tickers]
-    picked_retry = retry[:max(1, per_run // 2)]
+    # Retries get at most a quarter of the slots so a stubborn backlog cannot starve hot or newly added issuers.
+    picked_retry = retry[:max(1, per_run // 4)]
     hot = [r["ticker"] for r in recent if "2.02" in (r.get("items") or "")]
     hot = [t for t in dict.fromkeys(hot) if t in tickers and t not in picked_retry and state["done_hot"].get(t) != dt.date.today().isoformat()][:max(0, per_run - len(picked_retry))]
     # Newly activated issuers with no IR coverage entry take up to half the remaining slots, so a cohort's first
@@ -1181,7 +1185,11 @@ def _ir_rotation_job(sb, per_run, time_budget, started):
     rest = [t for t in tickers[start:] + tickers[:start]
             if t not in hot and t not in picked_retry and t not in fresh][:max(0, slots - len(fresh))]
     selected = picked_retry + hot + fresh + rest
+    # Workers stop early enough to leave time for the rotation checkpoint and coverage index writes; without the
+    # reserve the checkpoint write hits the I/O deadline, the run dies and the cursor and retry list never advance.
     remaining = max(0, time_budget - (time.monotonic() - started)) if time_budget is not None else None
+    if remaining is not None:
+        remaining = max(0, remaining - min(IR_ROTATION_RESERVE, remaining * 0.25))
     done, failed = ir_job(sb, selected, workers=4, time_budget=remaining)
     for tk, result in done.items():
         if tk not in tickers:

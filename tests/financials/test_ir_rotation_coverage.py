@@ -92,6 +92,24 @@ class RotationCoverageReplayTests(unittest.TestCase):
         self.assertEqual(selected, ['NEW1', 'NEW2', 'AAA', 'BBB'])
         self.assertEqual(store.json['meta/ir_rotation.json']['cursor'], 2)
 
+    def test_workers_leave_time_for_the_checkpoint_and_retries_take_a_quarter(self):
+        tickers = [f'T{i}' for i in range(12)] + ['NEW1', 'NEW2', 'NEW3', 'NEW4']
+        store = SnapshotStore(tickers[:12])
+        store.json['meta/ir_rotation.json'] = {'cursor': 0, 'done_hot': {}, 'retry': tickers[:8]}
+        seen = {}
+        def process(sb, chosen, **kwargs):
+            seen['chosen'], seen['budget'] = list(chosen), kwargs.get('time_budget')
+            return ({t: {'status': 'unverified', 'coverage': coverage('2026-11-02T00:00:00Z', t)} for t in chosen}, {})
+        with patch.object(jobs, 'UNIVERSE', [(t,) for t in tickers]), \
+                patch('etl.universe.UNIVERSE', [(t,) for t in tickers]), \
+                patch.object(jobs, 'ir_job', side_effect=process), \
+                patch.object(kpitools, 'build_index', return_value=None):
+            jobs.ir_rotation_job(store, per_run=8, time_budget=640)
+        self.assertEqual(seen['chosen'][:2], ['T0', 'T1'])
+        self.assertEqual(seen['chosen'][2:5], ['NEW1', 'NEW2', 'NEW3'])
+        self.assertLessEqual(seen['budget'], 640 - jobs.IR_ROTATION_RESERVE + 1)
+        self.assertEqual(store.json['meta/ir_rotation.json']['retry'], ['T5', 'T6', 'T7'])
+
     def test_failed_aaa_aggregate_replays_with_bbb_next_rotation(self):
         tickers = ['AAA', 'BBB']; sb = SnapshotStore(tickers); calls = []
         values = {'AAA': coverage('2026-11-04T10:00:00Z', 'first'),
