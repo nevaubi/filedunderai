@@ -30,7 +30,7 @@ const PUBLIC_RX = [
   /^tech\/(bars|events)\/[A-Za-z0-9_.^=-]{1,32}\.json$/,
   /^quant\/(methods|cross)\.json$/,
   /^quant\/(t|read|peers)\/[A-Za-z0-9_.^=-]{1,64}\.json$/,
-  /^(flows|gov|altdata|insiders)\/[A-Za-z0-9_.-]{1,32}\.json$/,
+  /^(flows|gov|altdata|insiders|insights)\/[A-Za-z0-9_.-]{1,32}\.json$/,
   /^macro\/releases\.json$/,
   /^calendars\/(ipos|dividends)\.json$/,
 ];

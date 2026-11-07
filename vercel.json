@@ -394,6 +394,10 @@
     {
       "path": "/api/cron/calendars?step=ipos",
       "schedule": "41 11,23 * * 1-5"
+    },
+    {
+      "path": "/api/cron/insights",
+      "schedule": "29 */2 * * *"
     }
   ],
   "headers": [
