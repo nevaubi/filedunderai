@@ -754,6 +754,15 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(result['web'], 1)
         self.assertEqual(result['coverage']['enumeration']['web'], 'failed')
 
+    def test_web_lane_skips_sec_and_leaves_it_open(self):
+        sb = Store()
+        new = 'https://ir.example.test/q3-2026-results-web.csv'
+        with self.providers({new:'Q3 2026 earnings'}), patch.object(ir, '_enumerate_sec') as enum_sec:
+            result = ir.process_company(sb, 'TEST', 'Test', 1, sec=False)
+        enum_sec.assert_not_called()
+        self.assertEqual(result['web'], 1)
+        self.assertNotEqual(result['coverage']['enumeration']['sec'], 'complete')
+
     def test_new_documents_advance_alongside_a_repair_backlog(self):
         sb = Store()
         for i in range(3):

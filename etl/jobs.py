@@ -1105,7 +1105,7 @@ def segments_job(sb, tickers=None, workers=5, time_budget=None):
 
 # ---------------------------------------------------------------- investor relations documents
 def ir_job(sb, tickers=None, workers=4, time_budget=None, refresh_site=False, web=True, sec_years=3,
-           max_docs=90, max_pages=40, repair_existing=False, publish_only=False, backfill=False):
+           max_docs=90, max_pages=40, repair_existing=False, publish_only=False, backfill=False, sec=True):
     from . import ir
     started = time.monotonic()
     # The total deadline covers storage/leases too; providers stop early for persistence.
@@ -1135,7 +1135,8 @@ def ir_job(sb, tickers=None, workers=4, time_budget=None, refresh_site=False, we
                 del b
                 result = ir.process_company(sb, tk, BY_TICKER[tk]["name"], BY_TICKER[tk]["cik"], refresh_site=refresh_site,
                                             fye=fye, web=web, sec_years=sec_years, deadline=deadline, max_docs=max_docs,
-                                            max_pages=max_pages, repair_existing=repair_existing, publish_only=publish_only, backfill=backfill, io_deadline=io_deadline)
+                                            max_pages=max_pages, repair_existing=repair_existing, publish_only=publish_only, backfill=backfill, io_deadline=io_deadline,
+                                            sec=sec)
                 return tk, result, None
             except Exception as e:
                 return tk, None, str(e)[:300]

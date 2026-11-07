@@ -1,19 +1,27 @@
 name: IR document backfill
-# Bulk IR documents (Tavily site discovery, Firecrawl map/scrape, SEC exhibits, text extraction) on GitHub runners,
-# outside the Vercel cron's 800 s and memory limits. Same code path as the cron: etl/ir_backfill_runner.py.
+# Bulk IR documents on GitHub runners, outside the Vercel cron's 800 s and memory limits. Same code path as the cron:
+# etl/ir_backfill_runner.py.
 # Needs repository secrets: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, FIRECRAWL_API_KEY, TAVILY_API_KEY, SEC_USER_AGENT.
-# SEC's 10 requests per second applies to the whole job regardless of machine count, so each shard gets 1/SHARDS of it
-# (SEC_GAP = SHARDS x 0.11 s). Firecrawl and Tavily work runs at full width.
-# 20 shards is the concurrent-job ceiling for a personal account; shards above the "shards" input exit at once.
+#
+# Two lanes, because SEC allows 10 requests per second in total however many machines are used, while Firecrawl
+# and Tavily scale with the number of runners:
+#   web  up to 19 runners: company IR sites (Tavily discovery, Firecrawl map/scrape), no SEC requests
+#   sec  1 runner at SEC's full rate: SEC enumeration and exhibits, for indexed companies with the SEC part open and
+#        then for each company the web lane finishes
+# 20 jobs is the concurrent-job ceiling for a personal account; web shards above the "web_shards" input exit at once.
 on:
   workflow_dispatch:
     inputs:
-      shards:
-        description: "Parallel runners"
+      web_shards:
+        description: "Parallel web-lane runners (max 19)"
         required: false
-        default: "20"
+        default: "19"
       workers:
-        description: "Companies at a time per runner"
+        description: "Companies at a time per web runner"
+        required: false
+        default: "8"
+      sec_workers:
+        description: "Companies at a time on the SEC runner"
         required: false
         default: "8"
       hours:
@@ -21,7 +29,7 @@ on:
         required: false
         default: "5.5"
       tickers:
-        description: "Comma-separated tickers (blank = companies without IR documents, then partial ones)"
+        description: "Comma-separated tickers for a one-off run in the old single-lane mode (blank = the two lanes)"
         required: false
         default: ""
   schedule:
@@ -32,20 +40,22 @@ permissions:
 concurrency:
   group: ir-backfill
   cancel-in-progress: false
+env:
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+  TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+  SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+  HOURS: ${{ github.event.inputs.hours || '5.5' }}
+  TICKERS: ${{ github.event.inputs.tickers || '' }}
 jobs:
-  backfill:
+  web:
     runs-on: ubuntu-latest
     timeout-minutes: 350
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-    env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
-      TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
-      SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
     steps:
       - name: Check secrets
         run: |
@@ -57,13 +67,39 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - name: Backfill shard
+      - name: Web lane shard
         env:
-          SHARDS: ${{ github.event.inputs.shards || '20' }}
+          SHARDS: ${{ github.event.inputs.web_shards || '19' }}
           WORKERS: ${{ github.event.inputs.workers || '8' }}
-          HOURS: ${{ github.event.inputs.hours || '5.5' }}
-          TICKERS: ${{ github.event.inputs.tickers || '' }}
         run: |
+          if [ -n "$TICKERS" ]; then echo "explicit tickers run on the sec job in single-lane mode"; exit 0; fi
           if [ "${{ matrix.shard }}" -ge "$SHARDS" ]; then echo "shard not used"; exit 0; fi
-          export SEC_GAP=$(python -c "print(round(int('$SHARDS') * 0.11, 3))")
-          python -m etl.ir_backfill_runner --shard ${{ matrix.shard }} --shards "$SHARDS" --workers "$WORKERS" --hours "$HOURS" --tickers "$TICKERS"
+          python -m etl.ir_backfill_runner --lane web --shard ${{ matrix.shard }} --shards "$SHARDS" --workers "$WORKERS" --hours "$HOURS"
+  sec:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - name: Check secrets
+        run: |
+          for v in SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY SEC_USER_AGENT; do
+            if [ -z "${!v}" ]; then echo "Missing repository secret $v"; exit 1; fi
+          done
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: SEC lane
+        env:
+          WORKERS: ${{ github.event.inputs.sec_workers || '8' }}
+          # The only runner making SEC requests, so it takes SEC's whole 10 requests per second (with margin).
+          SEC_GAP: "0.11"
+        run: |
+          if [ -n "$TICKERS" ]; then
+            python -m etl.ir_backfill_runner --lane all --workers "$WORKERS" --hours "$HOURS" --tickers "$TICKERS"
+            exit 0
+          fi
+          # Follow manifests written in the last hour too, so companies from a run cancelled just before this one
+          # also get their SEC part.
+          STARTED=$(date -u -d '-60 min' +%Y-%m-%dT%H:%M:%SZ)
+          python -m etl.ir_backfill_runner --lane sec --workers "$WORKERS" --hours "$HOURS" --started "$STARTED"

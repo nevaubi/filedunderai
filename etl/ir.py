@@ -1171,7 +1171,8 @@ def _repair_dates(sb, ticker, rows):
 
 
 def process_company(sb, ticker, name, cik, since_year=None, max_docs=90, refresh_site=False, sec_years=3, log=print,
-                    fye="1231", web=True, deadline=None, repair_existing=False, max_pages=40, backfill=False, publish_only=False, io_deadline=None):
+                    fye="1231", web=True, deadline=None, repair_existing=False, max_pages=40, backfill=False, publish_only=False, io_deadline=None,
+                    sec=True):
     """Resume private discovery/download/extraction queues; cap work, never coverage.
 
     Deadline is an absolute monotonic time. Existing successes never consume max_docs.
@@ -1187,11 +1188,11 @@ def process_company(sb, ticker, name, cik, since_year=None, max_docs=90, refresh
     with AggregateLease(worker, name=f"ir-company:{ticker}") as lease:
         worker._aggregate_lease = lease
         return _process_company(worker, ticker, name, cik, since_year, max_docs, refresh_site, sec_years, log,
-                                fye, web, deadline, repair_existing, max_pages, backfill, publish_only)
+                                fye, web, deadline, repair_existing, max_pages, backfill, publish_only, sec)
 
 
 def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, sec_years, log, fye, web, deadline,
-                     repair_existing, max_pages, backfill, publish_only):
+                     repair_existing, max_pages, backfill, publish_only, sec=True):
     state = _read_checkpoint(sb, ticker)  # Fail closed before any storage or row mutation.
     requested_since = 1900 if backfill else since_year if since_year is not None else dt.date.today().year - 2
     requested_sec = "1900-01-01" if backfill else (dt.date.today() - dt.timedelta(days=int(365 * max(0, sec_years)))).isoformat()
@@ -1247,7 +1248,9 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
         # Separate page budget from document budget so large sites do not starve downloads.
         page_budget = [max(0, int(max_pages))]
         discovery_deadline = time.monotonic() + max(0, deadline - time.monotonic()) / 2 if deadline is not None else None
-        _enumerate_sec(state, ticker, cik, discovery_deadline, stats, sb, page_budget)
+        # sec=False is the web lane of the bulk backfill: SEC's request budget is spent by a separate lane.
+        if sec:
+            _enumerate_sec(state, ticker, cik, discovery_deadline, stats, sb, page_budget)
         if web and not _expired(discovery_deadline):
             if not site or not site.get("ir_url") or refresh_site:
                 task = _enqueue(state, "maps", "site-search", url="", search="site-search")
@@ -1268,6 +1271,7 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
     _save_checkpoint(sb, state)
     remaining = max(0, int(max_docs))
     pending_downloads = any(item["status"] in ACTIVE and doc_id(url) not in by_id and (web or item.get("source") == "sec")
+                            and (sec or item.get("source") != "sec")
                             for url, item in state["queues"]["documents"].items())
     download_reserve = max(1, remaining // 2) if remaining and pending_downloads and not repair_existing else 0
     repair_budget = remaining - download_reserve
@@ -1320,7 +1324,8 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
         if did in by_id:
             _complete(item)
             continue
-        if item["status"] not in ACTIVE or remaining <= 0 or _expired(deadline) or repair_existing or publish_only or (not web and item.get("source") == "web"):
+        if (item["status"] not in ACTIVE or remaining <= 0 or _expired(deadline) or repair_existing or publish_only or (not web and item.get("source") == "web")
+                or (not sec and item.get("source") == "sec")):
             continue
         remaining -= 1
         try:
