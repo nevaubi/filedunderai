@@ -1,0 +1,1647 @@
+{
+ "version": 1,
+ "built": "2026-11-07",
+ "method": "Changed passages of each filing's redline against the prior-year filing, reviewed by hand for what would change an analyst's view; outside coverage linked where it exists. Quotes are verbatim from the redline passage (new text, or old text for a removed passage).",
+ "filings": [
+  {
+   "ticker": "AAPL",
+   "accn": "0000320193-26-000026",
+   "form": "10-K",
+   "filed": "2026-11-03",
+   "doc": "aapl-20260926.htm",
+   "sector": "Information Technology",
+   "material": [
+    {
+     "type": "operations",
+     "summary": "New disclosure that Apple's AI offerings depend on securing compute and storage capacity amid an industry-wide shortage, with large data center commitments.",
+     "quote": "The Company's business, including its artificial intelligence and machine learning offerings, also depends on access to sufficient compute capacity and storage resources.",
+     "section": "Item 1. Business",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm"
+     ]
+    },
+    {
+     "type": "customer_supplier",
+     "summary": "Supply-chain risk now names concentration in advanced semiconductors, memory and storage from single or limited sources.",
+     "quote": "regions where the Company relies on single or limited sources for critical components, such as advanced semiconductors, memory and storage, or that are significant to global commodity markets such as oil, gas, rare earths, and other",
+     "section": "Item 1A. Risk factors",
+     "change": "modified",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm"
+     ]
+    },
+    {
+     "type": "litigation",
+     "summary": "Expanded litigation risk: lawsuits seeking statutory damages or significant changes to business operations.",
+     "quote": "The Company is involved in lawsuits, many of which claim statutory damages or seek significant changes to its business operations, and the Company anticipates that it will continue to be a target for such lawsuits in the future.",
+     "section": "Item 1A. Risk factors",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "MSFT",
+   "accn": "0001193125-26-436133",
+   "form": "10-Q",
+   "filed": "2026-10-28",
+   "doc": "msft-20260930.htm",
+   "sector": "Information Technology",
+   "material": [
+    {
+     "type": "customer_supplier",
+     "summary": "AI partners are also significant Azure customers; expected economic benefits from those relationships flagged as uncertain.",
+     "quote": "In some cases, these parties are significant customers of Azure and other cloud services.",
+     "section": "Item 1A. Risk factors",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/789019/000119312526436133/msft-20260930.htm"
+     ]
+    },
+    {
+     "type": "customer_supplier",
+     "summary": "Removed language describing OpenAI as Microsoft's strategic partner for AI, reflecting the restructured relationship.",
+     "quote": "This AI may be developed by Microsoft or others, including our strategic partner, OpenAI.",
+     "section": "Item 1A. Risk factors",
+     "change": "removed",
+     "side": "old",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/789019/000119312526436133/msft-20260930.htm"
+     ]
+    },
+    {
+     "type": "risk",
+     "summary": "New risk factor on the substantial AI infrastructure investments and their dependence on customer demand.",
+     "quote": "Our cloud and AI strategy requires substantial investments and depends on evolving customer demand, technological developments, competitive dynamics, and regulatory conditions, any of which could adversely affect our business, financial condition, and results of operations.",
+     "section": "Item 1A. Risk factors",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/789019/000119312526436133/msft-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "AVGO",
+   "accn": "0001730168-26-000080",
+   "form": "10-Q",
+   "filed": "2026-09-10",
+   "doc": "avgo-20260802.htm",
+   "sector": "Information Technology",
+   "material": [
+    {
+     "type": "operations",
+     "summary": "New business model: enabling customers to buy or lease AI racks or systems based on Broadcom XPUs.",
+     "quote": "to access additional compute capacity, including through the purchase and leasing of AI racks or systems based on our XPUs, based on customer requirements or estimates thereof, which may not be accurate and could rapidly change.",
+     "section": "Item 1A. Risk factors",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000080/avgo-20260802.htm"
+     ]
+    },
+    {
+     "type": "customer_supplier",
+     "summary": "New risk that semiconductor customers committed to volumes may not honor purchase commitments.",
+     "quote": "When our semiconductor customers agree to purchase specific quantities of products or source an agreed portion of their product needs from us, those customers from time to time may not or do not purchase the amount of product we expect.",
+     "section": "Item 1A. Risk factors",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000080/avgo-20260802.htm"
+     ]
+    },
+    {
+     "type": "customer_supplier",
+     "summary": "Suppliers may prioritize other customers for memory chips, a constraint that has disrupted supply.",
+     "quote": "our CMs rely on many materials, including memory chips, silicon, gallium arsenide and indium phosphide (\"InP\") wafers, copper lead frames, precious and rare earth metals, mold compound, ceramic packages, various chemicals and gases, and other components.",
+     "section": "Item 1A. Risk factors",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000080/avgo-20260802.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "AMD",
+   "accn": "0000002488-26-000191",
+   "form": "10-Q",
+   "filed": "2026-11-04",
+   "doc": "amd-20260926.htm",
+   "sector": "Information Technology",
+   "material": [
+    {
+     "type": "operations",
+     "summary": "Supply constraints could delay customers' rack-scale system deployments and reduce demand.",
+     "quote": "Certain of our products will be deployed as part of integrated, rack-scale systems that include numerous third-party rack-level components and require rack integration and qualification.",
+     "section": "Item 1A. Risk factors",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/2488/000000248826000191/amd-20260926.htm"
+     ]
+    },
+    {
+     "type": "regulation",
+     "summary": "Export controls could affect AMD's ability to serve customers in China and in other markets.",
+     "quote": "Future export control restrictions could adversely affect not only our ability to serve customers in China, but also customers in other markets.",
+     "section": "Item 1A. Risk factors",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/2488/000000248826000191/amd-20260926.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "CSCO",
+   "accn": "0000858877-26-000132",
+   "form": "10-K",
+   "filed": "2026-09-02",
+   "doc": "csco-20260725.htm",
+   "sector": "Information Technology",
+   "material": [
+    {
+     "type": "litigation",
+     "summary": "Removed reference to the August 2025 settlement with a supplier over long-term purchase obligations.",
+     "quote": "On August 26, 2025, we settled a legal dispute with a supplier relating to purchase obligations arising under long-term supply arrangements, which resulted in a charge to product cost of sales, which is described in Note",
+     "section": "Item 1A. Risk factors",
+     "change": "modified",
+     "side": "old",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/858877/000085887726000132/csco-20260725.htm"
+     ]
+    },
+    {
+     "type": "customer_supplier",
+     "summary": "AI infrastructure sales to cloud and hyperscaler customers may be large and concentrated in few buyers.",
+     "quote": "AI infrastructure solutions to cloud and hyperscaler customers may similarly involve large and concentrated purchases, and demand may depend on a limited number of customers' capital spending levels, the timing and scale of AI infrastructure deployments",
+     "section": "Item 1A. Risk factors",
+     "change": "modified",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/858877/000085887726000132/csco-20260725.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "TXN",
+   "accn": "0000097476-26-000169",
+   "form": "10-Q",
+   "filed": "2026-10-23",
+   "doc": "txn-20260930.htm",
+   "sector": "Information Technology",
+   "material": [
+    {
+     "type": "capital_allocation",
+     "summary": "Definitive agreement to acquire Silicon Labs for $231 per share in cash, about $7.5 billion enterprise value.",
+     "quote": "As announced on February 4, 2026, we have entered into a definitive agreement to acquire Silicon Labs for $231.00 per share in an all-cash transaction, representing a total enterprise value of approximately $7.5 billion.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/97476/000009747626000169/txn-20260930.htm",
+      "https://investor.ti.com/node/37826",
+      "https://news.silabs.com/2026-02-04-Texas-Instruments-to-acquire-Silicon-Labs"
+     ]
+    },
+    {
+     "type": "capital_allocation",
+     "summary": "Committed financing of up to $5 billion to fund the Silicon Labs acquisition.",
+     "quote": "In June 2026, we entered into a 364-day delayed draw term loan credit facility for borrowings up to $ 5 billion to support the Silicon Labs acquisition consideration and related transaction expenses.",
+     "section": "Note 6. Debt and lines of credit",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/97476/000009747626000169/txn-20260930.htm"
+     ]
+    },
+    {
+     "type": "guidance",
+     "summary": "Management describes a strong cyclical recovery and increased customer demand.",
+     "quote": "Secular growth of semiconductor content is continuing alongside a strong cyclical recovery.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/97476/000009747626000169/txn-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "BAC",
+   "accn": "0000070858-26-000548",
+   "form": "10-Q",
+   "filed": "2026-10-30",
+   "doc": "bac-20260930.htm",
+   "sector": "Financials",
+   "material": [
+    {
+     "type": "regulation",
+     "summary": "Consent orders with OCC and FinCEN plus an OFAC settlement; $1.2 billion non-tax-deductible charge in Q3 2026.",
+     "quote": "These resolutions included consent orders with the OCC and FinCEN and a settlement agreement with OFAC.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/70858/000007085826000548/bac-20260930.htm",
+      "https://thedailyrecord.com/2026/10/14/bank-of-america-fined-1-21b-over-anti-money-laundering-policies/",
+      "https://247wallst.com/cards/bank-of-america-q3-2026-earnings-bac-01m4x0nj8jz5wveh8jkame6x53"
+     ]
+    },
+    {
+     "type": "kpi",
+     "summary": "Net charge-off ratio fell year over year on lower commercial real estate office and card losses.",
+     "quote": "During the nine months ended September 30, 2026, our net charge-off ratio decreased compared to the same period in 2025 primarily driven by lower commercial real estate office and credit card charge-offs.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/70858/000007085826000548/bac-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "GS",
+   "accn": "0000886982-26-000532",
+   "form": "10-Q",
+   "filed": "2026-11-02",
+   "doc": "gs-20260930.htm",
+   "sector": "Financials",
+   "material": [
+    {
+     "type": "litigation",
+     "summary": "New securities class action naming Goldman as an underwriter of the Venture Global IPO.",
+     "quote": "Venture Global, Inc. GS&Co. is among the underwriters named as defendants in a putative securities class action filed on April",
+     "section": "Note 2. 0",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/886982/000088698226000532/gs-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "AXP",
+   "accn": "0000004962-26-000409",
+   "form": "10-Q",
+   "filed": "2026-10-23",
+   "doc": "axp-20260930.htm",
+   "sector": "Financials",
+   "material": [
+    {
+     "type": "litigation",
+     "summary": "New putative class action (Rivetti v. American Express) filed May 2026.",
+     "quote": "On May 15, 2026, a putative class action, captioned Rivetti v.",
+     "section": "Note 7. Contingencies",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/4962/000000496226000409/axp-20260930.htm"
+     ]
+    },
+    {
+     "type": "litigation",
+     "summary": "Removed the anti-steering trial verdict discussion, indicating that matter resolved.",
+     "quote": "After trial in August 2025, the jury returned a verdict finding in favor of us on all claims except an Illinois consumer law claim for the class of non-rewards credit card holders in Illinois for which",
+     "section": "Note 7. Contingencies",
+     "change": "removed",
+     "side": "old",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/4962/000000496226000409/axp-20260930.htm"
+     ]
+    },
+    {
+     "type": "risk",
+     "summary": "Forward-looking risks now cite wide-scale layoffs and the Middle East conflict.",
+     "quote": "and wide-scale layoffs, impacts from the Middle East conflict and other international hostilities, deteriorations in global trade and the effects of tariffs, changes in interest rates, inflation, supply chain issues, energy costs, market volatility, and fiscal",
+     "section": "Item 2. MD&A",
+     "change": "modified",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/4962/000000496226000409/axp-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "COF",
+   "accn": "0000927628-26-000152",
+   "form": "10-Q",
+   "filed": "2026-11-03",
+   "doc": "cof-20260930.htm",
+   "sector": "Financials",
+   "material": [
+    {
+     "type": "operations",
+     "summary": "Plan to exit the Discover Home Loan business acquired in the Discover transaction.",
+     "quote": "In the second quarter of 2025, the Board of Directors approved a plan to exit the Discover Home Loan business acquired as a part of the Transaction.",
+     "section": "Note 14. Commitments, Contingencies, Guarantees and Others",
+     "change": "removed",
+     "side": "old",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/927628/000092762826000152/cof-20260930.htm"
+     ]
+    },
+    {
+     "type": "litigation",
+     "summary": "Removed the settled 2025 case, closing that litigation exposure.",
+     "quote": "In April 2025, the parties reached an agreement to settle the case and, in June 2025, the court granted preliminary approval of the settlement.",
+     "section": "Note 14. Commitments, Contingencies, Guarantees and Others",
+     "change": "removed",
+     "side": "old",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/927628/000092762826000152/cof-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "BNY",
+   "accn": "0001390777-26-000120",
+   "form": "10-Q",
+   "filed": "2026-10-30",
+   "doc": "bk-20260930.htm",
+   "sector": "Financials",
+   "material": [
+    {
+     "type": "litigation",
+     "summary": "New lawsuit by ADCAP in New York claiming BNY is liable for Postalis investment losses.",
+     "quote": "26, 2025, ADCAP filed a lawsuit in New York state court against The Bank of New York Mellon Corporation, claiming that it is also liable for Postalis investment losses.",
+     "section": "Note 15. Commitments and contingent liabilities",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1390777/000139077726000120/bk-20260930.htm"
+     ]
+    },
+    {
+     "type": "litigation",
+     "summary": "New Stanford-investor lawsuit filed in New Jersey federal court repeating prior allegations.",
+     "quote": "On June 28, 2024, an unincorporated association that claims to represent the interests of Stanford investors filed a lawsuit in New Jersey federal court against The Bank of New York Mellon, making the same allegations as prior cases.",
+     "section": "Note 15. Commitments and contingent liabilities",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1390777/000139077726000120/bk-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "MET",
+   "accn": "0001099219-26-000062",
+   "form": "10-Q",
+   "filed": "2026-11-06",
+   "doc": "met-20260930.htm",
+   "sector": "Financials",
+   "material": [
+    {
+     "type": "accounting",
+     "summary": "$65 million after-tax impairment tied to an anticipated disposal in the EMEA segment.",
+     "quote": "In connection with the anticipated disposal, an impairment loss of $ 65 million, net of income tax, was recorded for the nine months ended September 30, 2026, and is reflected in net investment gains (losses).",
+     "section": "Note 3. Acquisitions and Dispositions",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1099219/000109921926000062/met-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "LLY",
+   "accn": "0000059478-26-000108",
+   "form": "10-Q",
+   "filed": "2026-10-29",
+   "doc": "lly-20260930.htm",
+   "sector": "Health Care",
+   "material": [
+    {
+     "type": "accounting",
+     "summary": "Asset impairment, restructuring and special charges of $303 million in Q3 and $1.3 billion year to date.",
+     "quote": "Asset impairment, restructuring, and other special charges recognized during the three and nine months ended September 30, 2026 were $ 303 million and $ 1.3 billion, respectively.",
+     "section": "Note 5. Asset Impairment, Restructuring, and Other Special Charges",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/59478/000005947826000108/lly-20260930.htm"
+     ]
+    },
+    {
+     "type": "litigation",
+     "summary": "New lawsuits by states and 340B providers over Lilly's 340B program policies.",
+     "quote": "Various state and 340B provider plaintiffs have filed lawsuits against us, and in some cases other manufacturers and third parties, relating to the 340B program, including our policies regarding contract pharmacies, submission of claims data, and",
+     "section": "Note 9. Contingencies",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/59478/000005947826000108/lly-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "JNJ",
+   "accn": "0000200406-26-000197",
+   "form": "10-Q",
+   "filed": "2026-10-21",
+   "doc": "jnj-20260927.htm",
+   "sector": "Health Care",
+   "material": [
+    {
+     "type": "litigation",
+     "summary": "About $5.5 billion charge for the proposed talc ovarian cancer litigation resolution.",
+     "quote": "months of 2026 includes a charge of approximately $5.5 billion related to the proposed talc ovarian litigation resolution and $1.0 billion of acquired in-process research and development expense related to the acquisition of Firefly Bio, Inc.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/200406/000020040626000197/jnj-20260927.htm",
+      "https://news.bloomberglaw.com/litigation/j-j-to-pay-5-5-billion-to-resolve-talc-related-cancer-claims"
+     ]
+    },
+    {
+     "type": "operations",
+     "summary": "New supply chain restructuring program to exit certain Innovative Medicine manufacturing sites.",
+     "quote": "In the fiscal second quarter of 2026, the Company initiated a supply chain restructuring program primarily in the Innovative Medicine segment to exit certain manufacturing locations as part of its optimization efforts to streamline operations.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/200406/000020040626000197/jnj-20260927.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "ABBV",
+   "accn": "0001551152-26-000037",
+   "form": "10-Q",
+   "filed": "2026-11-03",
+   "doc": "abbv-20260930.htm",
+   "sector": "Health Care",
+   "material": [
+    {
+     "type": "capital_allocation",
+     "summary": "$9.1 billion of acquired IPR&D intangibles from a 2026 acquisition, not yet approved products.",
+     "quote": "Intangible assets relate to $ 9.1 billion of acquired in-process research and development (IPR&D) associated with products that have not yet received regulatory approval.",
+     "section": "Note 4. Licensing, Acquisitions and Other Arrangements",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1551152/000155115226000037/abbv-20260930.htm"
+     ]
+    },
+    {
+     "type": "capital_allocation",
+     "summary": "$650 million upfront licensing payment expensed as acquired IPR&D in Q1 2026.",
+     "quote": "The upfront payment of $ 650 million was recorded in acquired IPR&D and milestones expense in the condensed consolidated statement of earnings in the first quarter of 2026.",
+     "section": "Note 4. Licensing, Acquisitions and Other Arrangements",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1551152/000155115226000037/abbv-20260930.htm"
+     ]
+    },
+    {
+     "type": "regulation",
+     "summary": "Removed the most-favored-nation drug pricing discussion from MD&A.",
+     "quote": "and Human Services (HHS) to pursue most-favored-nation (MFN) pricing, defined as the lowest price in any Organization for Economic Co-operation and Development country with a gross domestic product per capita of at least 60% of that",
+     "section": "Item 2. MD&A",
+     "change": "removed",
+     "side": "old",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1551152/000155115226000037/abbv-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "MRK",
+   "accn": "0000310158-26-000248",
+   "form": "10-Q",
+   "filed": "2026-11-04",
+   "doc": "mrk-20260930.htm",
+   "sector": "Health Care",
+   "material": [
+    {
+     "type": "regulation",
+     "summary": "Agreement with the Commerce Department delays Section 232 pharmaceutical tariffs for three years in exchange for U.S. manufacturing investment.",
+     "quote": "Department of Commerce to delay Section 232 tariffs for three years, enabling the Company to make investments in the U.S.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/310158/000031015826000248/mrk-20260930.htm",
+      "https://www.merck.com/news/merck-reaches-agreement-with-u-s-government-to-expand-access-to-medicines-and-lower-costs-for-americans/"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "UNH",
+   "accn": "0000731766-26-000266",
+   "form": "10-Q",
+   "filed": "2026-11-03",
+   "doc": "unh-20260930.htm",
+   "sector": "Health Care",
+   "material": [
+    {
+     "type": "accounting",
+     "summary": "Restructuring and other actions include releases of loss contract reserves of $95 million in Q3 and $282 million year to date.",
+     "quote": "actions included a net decrease in loss contract reserves of $95 million and $282 million, respectively, and net valuation (losses) gains on equity securities of $(21) million and $39 million, respectively, while the year-to-date results also",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/731766/000073176626000266/unh-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "AMT",
+   "accn": "0001053507-26-000157",
+   "form": "10-Q",
+   "filed": "2026-10-27",
+   "doc": "amt-20260930.htm",
+   "sector": "Real Estate",
+   "material": [
+    {
+     "type": "customer_supplier",
+     "summary": "DISH claims it is excused from its collocation agreement obligations; American Tower disputes it.",
+     "quote": "On September 24, 2025, DISH delivered a notice purporting to be excused from its contractual obligations under our Strategic Collocation Agreement entered into in March 2021 (the \"SCA\").",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1053507/000105350726000157/amt-20260930.htm"
+     ]
+    },
+    {
+     "type": "customer_supplier",
+     "summary": "DISH-related entities filed for chapter 11; American Tower is pursuing relief for unpaid obligations.",
+     "quote": "On June 30, 2026, DISH filed petitions for relief under chapter 11 of the United States Bankruptcy Code.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1053507/000105350726000157/amt-20260930.htm"
+     ]
+    },
+    {
+     "type": "litigation",
+     "summary": "Arbitration with customer AT&T Mexico updated.",
+     "quote": "AT&T Mexico Dispute . We are currently engaged in a legal dispute (the \"Arbitration\") with one of our customers in",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1053507/000105350726000157/amt-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "CCI",
+   "accn": "0001051470-26-000090",
+   "form": "10-Q",
+   "filed": "2026-11-04",
+   "doc": "cci-20260930.htm",
+   "sector": "Real Estate",
+   "material": [
+    {
+     "type": "customer_supplier",
+     "summary": "Crown Castle delivered a notice of default and termination of its master lease with DISH.",
+     "quote": "12, 2026, the Company delivered a notice of default and termination to DISH relating to the Company's Master Lease Agreement and underlying agreements with DISH (\"DISH MLA\") as a result of DISH failing to make required",
+     "section": "Note 9. Commitments and Contingencies",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1051470/000105147026000090/cci-20260930.htm",
+      "https://www.sec.gov/Archives/edgar/data/1051470/000105147026000003/cci-20260112.htm"
+     ]
+    },
+    {
+     "type": "guidance",
+     "summary": "2026 Outlook excludes any DISH contribution; DISH obligations exceed $3.5 billion.",
+     "quote": "Our 2026 Outlook does not include any contributions from DISH.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1051470/000105147026000090/cci-20260930.htm"
+     ]
+    },
+    {
+     "type": "capital_allocation",
+     "summary": "Fiber sale proceeds used to repay about $7.2 billion of debt.",
+     "quote": "proceeds received from the sale to repay approximately $7.2 billion of outstanding indebtedness, including all amounts then-outstanding under our 2016 Credit Facility and Commercial Paper Program, repayment of the 3.700% and 1.050% senior notes at maturity",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1051470/000105147026000090/cci-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "JLL",
+   "accn": "0001037976-26-000189",
+   "form": "10-Q",
+   "filed": "2026-10-28",
+   "doc": "jll-20260930.htm",
+   "sector": "Real Estate",
+   "material": [
+    {
+     "type": "kpi",
+     "summary": "Lower incentive and transaction fees drove a decline in Investment Management revenue.",
+     "quote": "Compared with the prior-year periods, lower Incentive and transaction fees drove the decline in Investment Management revenue for the third quarter and first nine months of 2026.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1037976/000103797626000189/jll-20260930.htm"
+     ]
+    },
+    {
+     "type": "accounting",
+     "summary": "Results helped by the absence of prior-year loan losses and a reduction in loan loss reserves.",
+     "quote": "Segment platform operating expenses also reflected $6.8 million in lower loan-related expenses for the quarter ($30.2 million lower for the first nine months of 2026), including the absence of prior-year loan losses and a reduction in loan loss reserves.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1037976/000103797626000189/jll-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "WPC",
+   "accn": "0001025378-26-000132",
+   "form": "10-Q",
+   "filed": "2026-10-28",
+   "doc": "wpc-20260930.htm",
+   "sector": "Real Estate",
+   "material": [
+    {
+     "type": "capital_allocation",
+     "summary": "New equity raised through forward sale agreements expected to settle within 24 months.",
+     "quote": "We expect to settle the forward sale agreements in full within 24 months of the offering date via physical delivery of the outstanding shares of common stock in exchange for cash proceeds, although we may elect",
+     "section": "Note 12. Stock-Based Compensation and Equity",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1025378/000102537826000132/wpc-20260930.htm"
+     ]
+    },
+    {
+     "type": "capital_allocation",
+     "summary": "Credit facility pricing on the unsecured revolver cut by five basis points.",
+     "quote": "due 2028\") of an equivalent notional amount and under the same terms, definitions, and extension options, and (ii) improve pricing on our Unsecured Revolving Credit Facility (as defined below) by five basis points at all levels.",
+     "section": "Note 10. Debt",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1025378/000102537826000132/wpc-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "AMZN",
+   "accn": "0001018724-26-000040",
+   "form": "10-Q",
+   "filed": "2026-10-30",
+   "doc": "amzn-20260930.htm",
+   "sector": "Consumer Discretionary",
+   "material": [
+    {
+     "type": "capital_allocation",
+     "summary": "Definitive agreement to acquire Globalstar for cash and stock.",
+     "quote": "On April 13, 2026, Amazon entered into a definitive merger agreement to acquire Globalstar, Inc.",
+     "section": "Note 4. COMMITMENTS AND CONTINGENCIES",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1018724/000101872426000040/amzn-20260930.htm",
+      "https://press.aboutamazon.com/2026/4/amazon-to-acquire-globalstar-and-expand-amazon-leo-satellite-network"
+     ]
+    },
+    {
+     "type": "capital_allocation",
+     "summary": "$5.0 billion invested in Anthropic Series G preferred stock and an amended AWS commercial arrangement.",
+     "quote": "In Q2 2026, we invested $ 5.0 billion in Anthropic Series G nonvoting preferred stock.",
+     "section": "Note 2. FINANCIAL INSTRUMENTS",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1018724/000101872426000040/amzn-20260930.htm",
+      "https://www.bloomberg.com/news/articles/2026-04-20/amazon-to-invest-an-additional-5-billion-in-anthropic",
+      "https://techcrunch.com/2026/04/20/anthropic-takes-5b-from-amazon-and-pledges-100b-in-cloud-spending-in-return/"
+     ]
+    },
+    {
+     "type": "accounting",
+     "summary": "Upward fair value adjustments of $62.8 billion year to date on nonvoting preferred stock investments.",
+     "quote": "We recorded upward adjustments of approximately $ 7.2 billion in Q3 2025, and $ 7.2 billion and $ 62.8 billion for the nine months ended September 30, 2025 and 2026 to our nonvoting preferred stock in",
+     "section": "Note 2. FINANCIAL INSTRUMENTS",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1018724/000101872426000040/amzn-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "TSLA",
+   "accn": "0001628280-26-066775",
+   "form": "10-Q",
+   "filed": "2026-10-22",
+   "doc": "tsla-20260930.htm",
+   "sector": "Consumer Discretionary",
+   "material": [
+    {
+     "type": "capital_allocation",
+     "summary": "Revolving credit facilities can be increased by up to $4.0 billion.",
+     "quote": "Commitments under the Revolving Facilities may be increased by up to $ 4.00 billion in the aggregate under certain circumstances.",
+     "section": "Note 8. Debt",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1318605/000162828026066775/tsla-20260930.htm"
+     ]
+    },
+    {
+     "type": "other",
+     "summary": "Removed the early-forfeiture terms of the 2025 CEO Interim Award.",
+     "quote": "Restricted stock under the 2025 CEO Interim Award will be immediately forfeited and returned (an \"Early Forfeiture\") to the Company to preclude a \"double dip\" or windfall if, prior to vesting, there is a final, non-appealable",
+     "section": "Note 9. Equity Incentive Plans",
+     "change": "removed",
+     "side": "old",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1318605/000162828026066775/tsla-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "HD",
+   "accn": "0001628280-26-058715",
+   "form": "10-Q",
+   "filed": "2026-08-25",
+   "doc": "hd-20260802.htm",
+   "sector": "Consumer Discretionary",
+   "material": [
+    {
+     "type": "regulation",
+     "summary": "Tariff discussion now reflects the Supreme Court decision invalidating IEEPA tariffs.",
+     "quote": "Supreme Court decision invalidating tariffs imposed under the International Emergency Economic Powers Act (\"IEEPA\"), ongoing litigation, and the implementation of additional tariffs.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/354950/000162828026058715/hd-20260802.htm",
+      "https://npr.org/2026/02/21/g-s1-110987/supreme-court-tariffs-refunds"
+     ]
+    },
+    {
+     "type": "capital_allocation",
+     "summary": "SRS completed the acquisition of HVAC distributor Mingledorff's in Q2 fiscal 2026.",
+     "quote": "In the second quarter of fiscal 2026, SRS completed the acquisition of Mingledorff's (see N ote 10 ), which distributes heating, ventilation, and air conditioning (HVAC) equipment, parts, and supplies.",
+     "section": "Note 2. SEGMENT REPORTING AND NET SALES",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/354950/000162828026058715/hd-20260802.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "MCD",
+   "accn": "0000063908-26-000083",
+   "form": "10-Q",
+   "filed": "2026-11-06",
+   "doc": "mcd-20260930.htm",
+   "sector": "Consumer Discretionary",
+   "material": [
+    {
+     "type": "risk",
+     "summary": "New risk that weight loss medications change consumer demand and menu needs.",
+     "quote": "Our McDonald's > NEXT strategy includes introducing more flexible portion sizes and expanding high-protein and other menu options to account for changes to dietary guidelines and use of weight loss medications.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/63908/000006390826000083/mcd-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "LOW",
+   "accn": "0000060667-26-000117",
+   "form": "10-Q",
+   "filed": "2026-08-27",
+   "doc": "low-20260731.htm",
+   "sector": "Consumer Discretionary",
+   "material": [
+    {
+     "type": "regulation",
+     "summary": "Agreed to a $12.5 million civil penalty and a second consent decree replacing the 2014 decree.",
+     "quote": "On November 25, 2025, the Company, without admitting liability, agreed to resolve the matter by payment of a civil penalty of $12.5 million and by entering into a second consent decree to replace the 2014 consent decree.",
+     "section": "Item 1. Legal proceedings",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/60667/000006066726000117/low-20260731.htm"
+     ]
+    },
+    {
+     "type": "regulation",
+     "summary": "Tariff environment for 2026 described as dynamic and subject to modification.",
+     "quote": "For 2026, the tariff environment remains dynamic and subject to ongoing modification, including court rulings, changes to existing tariffs and potential for additional tariffs this year.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/60667/000006066726000117/low-20260731.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "CAT",
+   "accn": "0000018230-26-000057",
+   "form": "10-Q",
+   "filed": "2026-11-04",
+   "doc": "cat-20260930.htm",
+   "sector": "Industrials",
+   "material": [
+    {
+     "type": "guidance",
+     "summary": "Power Generation demand strong with backlog growing on order rates; growth anticipated.",
+     "quote": "Backlog continues to grow due to strong order rates.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/18230/000001823026000057/cat-20260930.htm"
+     ]
+    },
+    {
+     "type": "guidance",
+     "summary": "Outlook now reflects lower tariff costs.",
+     "quote": "In Construction Industries, we anticipate favorable price realization to be partially offset by the profit impact of lower sales volume, unfavorable manufacturing costs, excluding the impact of lower tariff costs, and higher SG&A/R&D expenses.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/18230/000001823026000057/cat-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "DE",
+   "accn": "0001104659-26-102213",
+   "form": "10-Q",
+   "filed": "2026-08-27",
+   "doc": "de-20260802x10q.htm",
+   "sector": "Industrials",
+   "material": [
+    {
+     "type": "litigation",
+     "summary": "State attorneys general of Illinois and Minnesota lawsuit over repair restrictions now in Legal Proceedings.",
+     "quote": "On January 15, 2025, the Federal Trade Commission (FTC), along with the Attorneys General of the States of Illinois and Minnesota, filed a lawsuit against us in the United States District Court for the Northern District of Illinois Western Division.",
+     "section": "Item 1. Legal proceedings",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/315189/000110465926102213/de-20260802x10q.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "UNP",
+   "accn": "0000100885-26-000321",
+   "form": "10-Q",
+   "filed": "2026-10-22",
+   "doc": "unp-20260930.htm",
+   "sector": "Industrials",
+   "material": [
+    {
+     "type": "kpi",
+     "summary": "Freight revenue grew on 6% carload growth, fuel surcharge and core pricing.",
+     "quote": "same period in 2025 driven by higher fuel surcharge revenues, 6% carload growth, and core pricing gains, which more than offset an unfavorable business mix (from an increase in shipments with lower ARC, such as intermodal).",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/100885/000010088526000321/unp-20260930.htm"
+     ]
+    },
+    {
+     "type": "kpi",
+     "summary": "Quarter revenue growth on essentially flat volume, with lower grain and coal shipments.",
+     "quote": "Freight revenues from bulk shipments increased 10% in the third quarter of 2026 compared to 2025 driven by higher fuel surcharge revenues and core pricing gains on essentially flat volume.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/100885/000010088526000321/unp-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "UBER",
+   "accn": "0001543151-26-000041",
+   "form": "10-Q",
+   "filed": "2026-11-04",
+   "doc": "uber-20260930.htm",
+   "sector": "Industrials",
+   "material": [
+    {
+     "type": "capital_allocation",
+     "summary": "Term loan financing for a Delivery Hero transaction, including refinancing Delivery Hero debt.",
+     "quote": "The proceeds of any loans under the term loan credit agreement will be used to finance the takeover offer, to provide funding for related transactions, to refinance certain indebtedness of Delivery Hero and for the payment of related transaction costs.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1543151/000154315126000041/uber-20260930.htm"
+     ]
+    },
+    {
+     "type": "risk",
+     "summary": "New risk that declines in air travel reduce airport Mobility trips.",
+     "quote": "Sustained declines in air travel have in the past, and may in the future, suppress demand for airport-related Mobility and reduce our Mobility Gross Bookings from airport trips.",
+     "section": "Item 1A. Risk factors",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1543151/000154315126000041/uber-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "BA",
+   "accn": "0001628280-26-067508",
+   "form": "10-Q",
+   "filed": "2026-10-27",
+   "doc": "ba-20260930.htm",
+   "sector": "Industrials",
+   "material": [
+    {
+     "type": "capital_allocation",
+     "summary": "Spirit AeroSystems merger agreement terms removed, consistent with the acquisition having closed.",
+     "quote": "The Merger Agreement contains certain termination rights, including that either Boeing or Spirit may terminate the Merger Agreement if, subject to certain limitations, the Boeing-Spirit Merger has not been consummated by March 31, 2025 (subject to",
+     "section": "Note 2. Spirit Acquisition",
+     "change": "removed",
+     "side": "old",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/12927/000162828026067508/ba-20260930.htm"
+     ]
+    },
+    {
+     "type": "operations",
+     "summary": "New human-capital risk on union work stoppages at Boeing and its suppliers.",
+     "quote": "Work stoppages and instability in our and our suppliers' union relationships have in the past and could in the future disrupt and/or delay the production, delivery and/or development of our products and services, which could strain",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/12927/000162828026067508/ba-20260930.htm"
+     ]
+    },
+    {
+     "type": "litigation",
+     "summary": "737 MAX accident litigation narrowed to fewer than five civil lawsuits; securities suits pending.",
+     "quote": "Certain legal actions and investigations arising out of the MAX accidents and subsequent grounding of the 737 MAX are still pending, including fewer than five civil lawsuits by family members of those who died in the MAX accidents.",
+     "section": "Note 19. Legal Proceedings",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/12927/000162828026067508/ba-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "NFLX",
+   "accn": "0001065280-26-000291",
+   "form": "10-Q",
+   "filed": "2026-10-21",
+   "doc": "nflx-20260930.htm",
+   "sector": "Communication Services",
+   "material": [
+    {
+     "type": "capital_allocation",
+     "summary": "Merger agreement for the proposed WBD transaction terminated and its financing arrangements ended.",
+     "quote": "On February 27, 2026, upon the termination of the Amended and Restated Merger Agreement, all related financing arrangements to fund the previously proposed WBD transaction were terminated in accordance with their respective terms.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1065280/000106528026000291/nflx-20260930.htm",
+      "https://www.emarketer.com/content/netflix-exits-warner-bros--discovery-deal-paramount-prevails",
+      "https://www.rttnews.com/3626503/netflix-receives-2-8-bln-termination-fee-from-paramount-as-warner-bros-ends-merger-deal.aspx"
+     ]
+    },
+    {
+     "type": "capital_allocation",
+     "summary": "Financing outflows driven by share repurchases year to date.",
+     "quote": "months ended September 30, 2026, primarily due to the repurchases of stock, purchases of property and equipment and cash paid for acquisitions, partially offset by cash provided by operations and proceeds from the issuance of debt.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1065280/000106528026000291/nflx-20260930.htm"
+     ]
+    },
+    {
+     "type": "capital_allocation",
+     "summary": "Swaps convert $2.4 billion of fixed-rate debt to floating rate.",
+     "quote": "a floating rate based on the Secured Overnight Financing Rate (\"SOFR\") and receive a fixed rate equal to the contractual coupon of the designated hedged debt, effectively converting $2,400 million of fixed-rate debt to floating-rate debt.",
+     "section": "Item 3. Market risk",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1065280/000106528026000291/nflx-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "DIS",
+   "accn": "0001744489-26-000057",
+   "form": "10-Q",
+   "filed": "2026-08-05",
+   "doc": "dis-20260627.htm",
+   "sector": "Communication Services",
+   "material": [
+    {
+     "type": "litigation",
+     "summary": "Antitrust claims challenge Disney's acquisition of a controlling share of Fubo.",
+     "quote": "and the Company's acquisition of a controlling share of Fubo; a claim under Clayton Act \u00a7 7 challenging the Company's acquisition of a controlling share of Fubo; and a claim under Sherman Act \u00a7 2 alleging",
+     "section": "Note 12. Commitments and Contingencies",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1744489/000174448926000057/dis-20260627.htm"
+     ]
+    },
+    {
+     "type": "litigation",
+     "summary": "New securities class action against Disney and current and former senior management.",
+     "quote": "For example, a private securities class action lawsuit was filed in federal court against the Company and certain current and former senior management on behalf of certain purchasers of securities of the Company seeking unspecified damages",
+     "section": "Item 1A. Risk factors",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1744489/000174448926000057/dis-20260627.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "TMUS",
+   "accn": "0001283699-26-000129",
+   "form": "10-Q",
+   "filed": "2026-10-28",
+   "doc": "tmus-20260930.htm",
+   "sector": "Communication Services",
+   "material": [
+    {
+     "type": "litigation",
+     "summary": "Cyberattack aftermath: mass arbitration claims, class actions and an FCC investigation.",
+     "quote": "As a result of the previously disclosed cyberattacks in August 2021 and January 2023, we incurred significant costs in connection with, among other things, responding to and resolving mass arbitration claims, multiple class action lawsuits, and an FCC investigation.",
+     "section": "Item 1A. Risk factors",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1283699/000128369926000129/tmus-20260930.htm"
+     ]
+    },
+    {
+     "type": "capital_allocation",
+     "summary": "New January 2026 credit agreement with a financial maintenance covenant.",
+     "quote": "On January 5, 2026, we entered into a Second Amended and Restated Credit Agreement (the \"January 2026 Credit Agreement\") with certain financial institutions named therein.",
+     "section": "Note 8. Debt",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1283699/000128369926000129/tmus-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "CVX",
+   "accn": "0000093410-26-000200",
+   "form": "10-Q",
+   "filed": "2026-11-05",
+   "doc": "cvx-20260930.htm",
+   "sector": "Energy",
+   "material": [
+    {
+     "type": "capital_allocation",
+     "summary": "Contributing midstream assets to Hess Midstream in exchange for restructured long-term commercial arrangements.",
+     "quote": "Delays in, or the failure to complete, the transaction with Hess Midstream LP could prevent the company from realizing all or part of the anticipated benefits of the transaction.",
+     "section": "Item 1A. Risk factors",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/93410/000009341026000200/cvx-20260930.htm"
+     ]
+    },
+    {
+     "type": "regulation",
+     "summary": "Clean Air Act inspection findings at the Pascagoula refinery, with DOJ and state involvement.",
+     "quote": "In 2021, the United States Environmental Protection Agency conducted Clean Air Act compliance inspections at Chevron's refinery in Pascagoula, Mississippi and issued an inspection report.",
+     "section": "Item 1. Legal proceedings",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/93410/000009341026000200/cvx-20260930.htm"
+     ]
+    },
+    {
+     "type": "kpi",
+     "summary": "Timing effects swung from favorable $1.5 billion in Q2 to unfavorable $1.6 billion in Q3.",
+     "quote": "as commodity prices increased in March, favorable effects of $1.5 billion in the second quarter as prices declined in June and unfavorable effects of $1.6 billion in the third quarter as commodity prices increased in September.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/93410/000009341026000200/cvx-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "COP",
+   "accn": "0001163165-26-000045",
+   "form": "10-Q",
+   "filed": "2026-11-05",
+   "doc": "cop-20260930.htm",
+   "sector": "Energy",
+   "material": [
+    {
+     "type": "capital_allocation",
+     "summary": "Agreement to acquire a 42 percent stake in a non-operated joint venture from bp.",
+     "quote": "(bp) to acquire a 42 percent direct equity holding in a non-operated joint venture, supporting the ongoing redevelopment of four large-scale, currently producing oil fields in the Kirkuk area of northern Iraq.",
+     "section": "Note 3. Acquisitions and Dispositions",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1163165/000116316526000045/cop-20260930.htm"
+     ]
+    },
+    {
+     "type": "risk",
+     "summary": "No impairment indicators yet for regional investments, but escalation could affect operations.",
+     "quote": "While production remained constrained through the third quarter of 2026, we have not identified indicators of impairment for our investments in the region as of September 30, 2026.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1163165/000116316526000045/cop-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "EPD",
+   "accn": "0001061219-26-000031",
+   "form": "10-Q",
+   "filed": "2026-11-04",
+   "doc": "epd-20260930.htm",
+   "sector": "Energy",
+   "material": [
+    {
+     "type": "capital_allocation",
+     "summary": "New credit agreement borrowings available, maturing March 26, 2027.",
+     "quote": "Amounts borrowed under the agreement mature on March 26, 2027, coinciding with the maturity date of EPO's existing March 2026 $1.5 Billion 364-Day Revolving Credit Agreement.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1061219/000106121926000031/epd-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "LNG",
+   "accn": "0000003570-26-000038",
+   "form": "10-Q",
+   "filed": "2026-10-29",
+   "doc": "lng-20260930.htm",
+   "sector": "Energy",
+   "material": [
+    {
+     "type": "capital_allocation",
+     "summary": "New $1.0 billion CCH revolving credit facility replacing the prior working capital facility.",
+     "quote": "CCH entered into the $1.0 billion CCH Revolving Credit Agreement (the \"CCH Revolving Credit Facility\" ), which amended and restated the previous working capital facility agreement (the \" CCH Working Capital Facility \") to, among other",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/3570/000000357026000038/lng-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "COST",
+   "accn": "0000909832-26-000093",
+   "form": "10-K",
+   "filed": "2026-10-07",
+   "doc": "cost-20260830.htm",
+   "sector": "Consumer Staples",
+   "material": [
+    {
+     "type": "litigation",
+     "summary": "Class actions seek refunds of IEEPA tariffs Costco passed on to members through higher prices.",
+     "quote": "In March 2026, four class actions were filed against the Company seeking a refund of tariffs paid by the Company under IEEPA that were passed on to members through higher prices.",
+     "section": "Note 10. Commitments and Contingencies",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/909832/000090983226000093/cost-20260830.htm",
+      "https://news.bloomberglaw.com/tariff-news/tariff-ruling-kicks-off-messy-fight-over-170-billion-in-refunds"
+     ]
+    },
+    {
+     "type": "litigation",
+     "summary": "New class action on behalf of Washington employees over meal and rest breaks.",
+     "quote": "In January 2026, a class action on behalf of Washington employees was filed against the Company alleging failure to provide meal periods and rest breaks and to compensate for violations, wage theft, and failure to furnish accurate wage statements.",
+     "section": "Note 10. Commitments and Contingencies",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/909832/000090983226000093/cost-20260830.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "KO",
+   "accn": "0001628280-26-067844",
+   "form": "10-Q",
+   "filed": "2026-10-28",
+   "doc": "ko-20261002.htm",
+   "sector": "Consumer Staples",
+   "material": [
+    {
+     "type": "litigation",
+     "summary": "Tax Court decision: $2.7 billion additional federal tax for 2007 to 2009, more with interest.",
+     "quote": "On August 2, 2024, the Tax Court entered a decision reflecting additional federal income tax of $2.7 billion for the 2007 through 2009 tax years.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/21344/000162828026067844/ko-20261002.htm",
+      "https://news.bloombergtax.com/financial-accounting/do-investors-understand-the-stakes-of-coca-colas-18b-tax-case"
+     ]
+    },
+    {
+     "type": "litigation",
+     "summary": "Baltimore lawsuit against the company and others now in Legal Proceedings.",
+     "quote": "the Mayor and City Council of Baltimore filed a lawsuit against the Company and several unrelated parties in the Circuit Court for Baltimore City, Maryland (\"Baltimore Circuit Court\"), concerning the environmental impacts of plastic packaging on",
+     "section": "Item 1. Legal proceedings",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/21344/000162828026067844/ko-20261002.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "MO",
+   "accn": "0000764180-26-000114",
+   "form": "10-Q",
+   "filed": "2026-10-29",
+   "doc": "mo-20260930.htm",
+   "sector": "Consumer Staples",
+   "material": [
+    {
+     "type": "regulation",
+     "summary": "May 2026 FDA guidance on enforcing premarket review for e-vapor and oral nicotine pouches with pending PMTAs.",
+     "quote": "In May 2026, the FDA issued guidance concerning how it intends to enforce premarket review requirements for certain e-vapor and oral nicotine pouch products with pending PMTAs.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/764180/000076418026000114/mo-20260930.htm"
+     ]
+    },
+    {
+     "type": "accounting",
+     "summary": "E-vapor reporting unit impairment updated after the 2025 annual test.",
+     "quote": "Based on our 2025 annual impairment test, a hypothetical 1% increase in the discount rate used to estimate the fair value of the e-vapor reporting unit would have resulted in a goodwill impairment charge of approximately $150 million.",
+     "section": "Item 2. MD&A",
+     "change": "modified",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/764180/000076418026000114/mo-20260930.htm"
+     ]
+    },
+    {
+     "type": "litigation",
+     "summary": "JUUL dropped NJOY Daily from the ITC case but still seeks injunctions on other NJOY products.",
+     "quote": "JUUL has since dropped NJOY Daily from the ITC lawsuit but continues to seek various remedies, including an injunction on sales of any other products NJOY may be developing or preparing for commercialization in the United",
+     "section": "Note 12. Contingencies",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/764180/000076418026000114/mo-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "MDLZ",
+   "accn": "0001628280-26-068256",
+   "form": "10-Q",
+   "filed": "2026-10-29",
+   "doc": "mdlz-20260930.htm",
+   "sector": "Consumer Staples",
+   "material": [
+    {
+     "type": "regulation",
+     "summary": "Supreme Court ruled IEEPA tariffs unlawful; tariff cost and refund implications discussed.",
+     "quote": "Supreme Court ruled that the tariffs imposed under the International Emergency Economic Powers Act (\"IEEPA\") were unlawful.",
+     "section": "Item 2. MD&A",
+     "change": "modified",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1103982/000162828026068256/mdlz-20260930.htm",
+      "https://npr.org/2026/02/21/g-s1-110987/supreme-court-tariffs-refunds"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "NEE",
+   "accn": "0000753308-26-000081",
+   "form": "10-Q",
+   "filed": "2026-10-21",
+   "doc": "nee-20260930.htm",
+   "sector": "Utilities",
+   "material": [
+    {
+     "type": "capital_allocation",
+     "summary": "New equity units obligating holders to buy NEE stock for $50 by February 2029.",
+     "quote": "later than February 15, 2029 (the final settlement date) for a price of $ 50 in cash, a number of shares of NEE common stock (subject to antidilution adjustments), based on a price per share range",
+     "section": "Note 9. Debt",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/753308/000075330826000081/nee-20260930.htm"
+     ]
+    },
+    {
+     "type": "litigation",
+     "summary": "June 2026 settlement would resolve the shareholder actions on final court approval.",
+     "quote": "In June 2026, the parties entered into a settlement agreement that, upon final court approval, would resolve the purported shareholder derivative actions and the related shareholder litigation demands and inspection demands.",
+     "section": "Note 12. Commitments and Contingencies",
+     "change": "modified",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/753308/000075330826000081/nee-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "DUK",
+   "accn": "0001326160-26-000051",
+   "form": "10-Q",
+   "filed": "2026-11-05",
+   "doc": "duk-20260930.htm",
+   "sector": "Utilities",
+   "material": [
+    {
+     "type": "capital_allocation",
+     "summary": "New combustion turbine peaking generation planned for Duke Energy Carolinas, construction from 2027.",
+     "quote": "The two new CTs, totaling approximately 850 MW, will provide incremental peaking generation to serve Duke Energy Carolinas customers' growing energy needs.",
+     "section": "Note 4. REGULATORY MATTERS",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1326160/000132616026000051/duk-20260930.htm"
+     ]
+    },
+    {
+     "type": "regulation",
+     "summary": "EPA proposal to change coal ash rules for legacy surface impoundments.",
+     "quote": "With respect to Legacy CCR Surface Impoundments, the EPA is proposing (i) to establish an additional pathway for owners and operators of such units to certify closure by removal of the unit under the oversight of",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1326160/000132616026000051/duk-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "CEG",
+   "accn": "0001868275-26-000104",
+   "form": "10-Q",
+   "filed": "2026-08-06",
+   "doc": "ceg-20260630.htm",
+   "sector": "Utilities",
+   "material": [
+    {
+     "type": "capital_allocation",
+     "summary": "Divestiture of PJM assets valued at $5.0 billion to meet Calpine regulatory commitments.",
+     "quote": "The transaction is valued at $5.0 billion before closing adjustments.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1868275/000186827526000104/ceg-20260630.htm",
+      "https://investors.constellationenergy.com/news-releases/news-release-details/constellation-announces-agreement-sell-pjm-generation-assets-ls"
+     ]
+    },
+    {
+     "type": "regulation",
+     "summary": "Completed the DOJ-required divestiture of Calpine's interest in the Gregory Power Plant.",
+     "quote": "In January 2026, we completed the divestiture of Calpine's minority ownership interest in the Gregory Power Plant, as required under the terms of the DOJ resolution.",
+     "section": "Note 2. Mergers, Acquisitions, and Dispositions",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1868275/000186827526000104/ceg-20260630.htm"
+     ]
+    },
+    {
+     "type": "capital_allocation",
+     "summary": "Calpine merger agreement description removed, consistent with the deal having closed.",
+     "quote": "On January 10, 2025, we entered an agreement and plan of merger (Merger Agreement) with Calpine Corporation (Calpine) under which we will acquire all the outstanding equity interests of Calpine in a cash and stock transaction.",
+     "section": "Note 2. Mergers, Acquisitions, and Dispositions",
+     "change": "removed",
+     "side": "old",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1868275/000186827526000104/ceg-20260630.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "TLN",
+   "accn": "0001622536-26-000086",
+   "form": "10-Q",
+   "filed": "2026-11-03",
+   "doc": "tln-20260930.htm",
+   "sector": "Utilities",
+   "material": [
+    {
+     "type": "regulation",
+     "summary": "EPA rescinded the 2009 GHG endangerment finding and repealed GHG standards.",
+     "quote": "In February 2026, the EPA issued a final rule rescinding its 2009 finding that GHG emissions endanger public health and welfare and repealing all GHG emissions standards for light-, medium-, and heavy-duty vehicles and engines.",
+     "section": "Note 9. Commitments and Contingencies",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1622536/000162253626000086/tln-20260930.htm",
+      "https://www.morganlewis.com/pubs/2026/02/epa-rescinds-2009-endangerment-finding-eliminates-federal-vehicle-greenhouse-gas-standards"
+     ]
+    },
+    {
+     "type": "litigation",
+     "summary": "Retained Winter Storm Uri liabilities from the Texas generation sale now disclosed.",
+     "quote": "Winter Storm Uri Lawsuits. In connection with the sale of Talen's generating facilities in Texas in May 2024, the Company",
+     "section": "Note 9. Commitments and Contingencies",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1622536/000162253626000086/tln-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "LIN",
+   "accn": "0001628280-26-068079",
+   "form": "10-Q",
+   "filed": "2026-10-29",
+   "doc": "lin-20260930.htm",
+   "sector": "Materials",
+   "material": [
+    {
+     "type": "kpi",
+     "summary": "Sales up 9% in the quarter and year to date, with 3% from price.",
+     "quote": "Sales increased by 9% both in the third quarter of 2026 and for the nine months ended September 30, 2026.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1707925/000162828026068079/lin-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "SCCO",
+   "accn": "0001104659-26-120639",
+   "form": "10-Q",
+   "filed": "2026-10-30",
+   "doc": "scco-20260930x10q.htm",
+   "sector": "Materials",
+   "material": [
+    {
+     "type": "operations",
+     "summary": "New power contract expected to cut Peruvian power costs by about 22%.",
+     "quote": "It is projected this new contract will reduce power costs for the Peruvian operations by approximately 22%.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1001838/000110465926120639/scco-20260930x10q.htm"
+     ]
+    },
+    {
+     "type": "kpi",
+     "summary": "Copper production fell on lower output at Toquepala, down 10%.",
+     "quote": "This decline was primarily attributable to lower production at Toquepala (-10.0%; due to a drop in ore grades, mineral milled, and SX-EW production), Cuajone (-8.3%; due to lower ore grades and mineral milled), and La Caridad",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/1001838/000110465926120639/scco-20260930x10q.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "RGLD",
+   "accn": "0000085535-26-000051",
+   "form": "10-Q",
+   "filed": "2026-11-05",
+   "doc": "rgld-20260930.htm",
+   "sector": "Materials",
+   "material": [
+    {
+     "type": "guidance",
+     "summary": "Andacollo 2026 copper production expected at the low end of the 45,000 to 55,000 tonne range.",
+     "quote": "Teck now expects 2026 copper production to be at the low end of the previous guidance range of 45,000 to 55,000 tonnes.",
+     "section": "Item 2. MD&A",
+     "change": "added",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/85535/000008553526000051/rgld-20260930.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "ticker": "RS",
+   "accn": "0001104659-26-119157",
+   "form": "10-Q",
+   "filed": "2026-10-27",
+   "doc": "rs-20260930x10q.htm",
+   "sector": "Materials",
+   "material": [
+    {
+     "type": "regulation",
+     "summary": "Forward-looking risks now name tariffs and trade policies affecting metal pricing.",
+     "quote": "foreign trade policies and programs, including tariffs and trade policies and programs specifically affecting metal product markets and pricing; slowing economic growth, inflation, rising unemployment or other macroeconomic factors that could materially impact us, our customers",
+     "section": "Item 2. MD&A",
+     "change": "modified",
+     "side": "new",
+     "evidence_urls": [
+      "https://www.sec.gov/Archives/edgar/data/861884/000110465926119157/rs-20260930x10q.htm"
+     ]
+    }
+   ]
+  }
+ ]
+}
