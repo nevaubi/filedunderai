@@ -4,7 +4,7 @@ import os
 import re
 import time
 
-from .common import request, now_iso
+from .common import now_iso
 from .fundamentals import series, fy_label
 
 PRIMARY = os.environ.get("FU_SUMMARY_MODEL", "deepseek-v4p1-flash")
@@ -12,24 +12,12 @@ FALLBACK = os.environ.get("FU_SUMMARY_FALLBACK", "kimi-k3p1-pro")
 
 
 def complete_json(prompt, max_tokens=9000):
-    last = None
-    for model in (PRIMARY, FALLBACK):
-        try:
-            t0 = time.time()
-            d = json.loads(request("https://api.fireworks.ai/inference/v1/chat/completions", method="POST", data={
-                "model": f"accounts/fireworks/models/{model}", "messages": [{"role": "user", "content": prompt}],
-                "max_tokens": max_tokens, "temperature": 0.3, "response_format": {"type": "json_object"}},
-                headers={"Authorization": f"Bearer {os.environ['FIREWORKS_API_KEY']}"}, timeout=240, retries=2))
-            txt = re.sub(r"(?s)<think>.*?</think>", "", d["choices"][0]["message"]["content"] or "").strip()
-            m = re.search(r"(?s)\{.*\}", txt)
-            j = json.loads(m.group(0) if m else txt)
-            j["generated_at"] = now_iso()
-            j["seconds"] = round(time.time() - t0, 1)
-            return j
-        except Exception as e:
-            last = e
-            print("summary model failed", model, str(e)[:200])
-    raise last
+    from .llm import chat_json
+    t0 = time.time()
+    j, _, _ = chat_json([PRIMARY, FALLBACK], [{"role": "user", "content": prompt}], max_tokens=max_tokens, temperature=0.3)
+    j["generated_at"] = now_iso()
+    j["seconds"] = round(time.time() - t0, 1)
+    return j
 
 
 def digest(statements, fye):

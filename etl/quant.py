@@ -1318,8 +1318,20 @@ def quant_read(doc, api_key=None, request_fn=None):
     prompt = ("Write 3 or 4 short neutral sentences describing this stock's statistical profile. Use ONLY these facts, quote each number exactly as given, "
               "no advice, no forecasts. Return JSON: {\"sentences\":[{\"text\":...,\"refs\":[fact ids]}]}.\nFacts: " +
               json.dumps({k: {"value": v, "meaning": m} for k, (v, m) in facts.items()}))
-    from .common import request
-    send = request_fn or (lambda url, body, hdr: request(url, method="POST", data=body, headers=hdr, timeout=90, retries=2))
+    if request_fn is None:
+        from .llm import chat_json
+        try:
+            obj, used, _ = chat_json([m.rsplit("/", 1)[-1] for m in READ_MODELS], [{"role": "user", "content": prompt}],
+                                     max_tokens=3000, temperature=0.2, timeout=120)
+        except Exception:
+            return None
+        sents = validate_read(obj.get("sentences", []), facts)
+        if not sents:
+            return None
+        return {"model": f"accounts/fireworks/models/{used}", "generated": now_iso(), "as_of": doc["as_of"], "sentences": sents,
+                "facts": {k: list(v) for k, v in facts.items()},
+                "label": "AI-generated from the computed statistics on this page; every number is checked against them"}
+    send = request_fn
     for model in READ_MODELS:
         try:
             raw = send("https://api.fireworks.ai/inference/v1/chat/completions",

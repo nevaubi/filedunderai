@@ -38,19 +38,10 @@ def parse_model_json(txt):
 
 
 def complete(prompt, key, models=None):
-    last = None
-    for model in models or REPORT_MODELS:
-        try:
-            d = json.loads(request(URL, method="POST", data={"model": f"accounts/fireworks/models/{model}", "messages": [{"role": "user", "content": prompt}],
-                                                         "max_tokens": REPORT_MAX_TOKENS, "temperature": 0.2, "response_format": {"type": "json_object"}},
-                                   headers={"Authorization": f"Bearer {key}"}, timeout=240, retries=1))
-            choice = d["choices"][0]
-            if choice.get("finish_reason") == "length":
-                raise ValueError(f"output truncated at {REPORT_MAX_TOKENS} tokens")
-            return parse_model_json(choice["message"].get("content")), model
-        except Exception as e:
-            last = ValueError(f"{model}: {str(e)[:160]}")
-    raise last
+    from .llm import chat_json
+    obj, model, _ = chat_json(models or REPORT_MODELS, [{"role": "user", "content": prompt}], max_tokens=REPORT_MAX_TOKENS,
+                              temperature=0.2, timeout=240, api_key=key)
+    return obj, model
 from .universe import BY_TICKER, UNIVERSE
 
 KINDS = {"preview": "Earnings preview", "recap": "Earnings recap", "primer": "Company primer"}

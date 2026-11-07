@@ -15,6 +15,9 @@ import time
 from .common import request
 
 URL = "https://api.fireworks.ai/inference/v1/chat/completions"
+# Reasoning budget per model, as the KPI job has used it in production: a low effort keeps the reasoning model
+# from spending the whole token budget thinking and returning an empty reply.
+EFFORT = {"kimi-k3p1-pro": "low", "deepseek-v4p1-flash": "none"}
 
 
 class LLMError(RuntimeError):
@@ -53,7 +56,7 @@ def parse_json(txt):
     raise ValueError("JSON object not closed (reply cut off)")
 
 
-def chat_json(models, messages, max_tokens=8000, temperature=0, deadline=None, timeout=240, post=None):
+def chat_json(models, messages, max_tokens=8000, temperature=0, deadline=None, timeout=240, post=None, effort=None, api_key=None):
     """Returns (obj, model, meta). `post` replaces the HTTP call in tests: post(model, messages, max_tokens) -> raw API dict."""
     attempts = []
     for model in models:
@@ -67,10 +70,13 @@ def chat_json(models, messages, max_tokens=8000, temperature=0, deadline=None, t
                 if post:
                     d = post(model, messages, budget)
                 else:
-                    d = json.loads(request(URL, method="POST", data={
-                        "model": f"accounts/fireworks/models/{model}", "messages": messages, "max_tokens": budget,
-                        "temperature": temperature, "response_format": {"type": "json_object"}},
-                        headers={"Authorization": f"Bearer {os.environ['FIREWORKS_API_KEY']}"},
+                    body = {"model": f"accounts/fireworks/models/{model}", "messages": messages, "max_tokens": budget,
+                            "temperature": temperature, "response_format": {"type": "json_object"}}
+                    eff = (effort or {}).get(model, EFFORT.get(model))
+                    if eff:
+                        body["reasoning_effort"] = eff
+                    d = json.loads(request(URL, method="POST", data=body,
+                        headers={"Authorization": f"Bearer {api_key or os.environ['FIREWORKS_API_KEY']}"},
                         timeout=min(timeout, remaining) if remaining else timeout, retries=1))
                 ch = (d.get("choices") or [{}])[0]
                 finish = ch.get("finish_reason")

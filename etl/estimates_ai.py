@@ -115,18 +115,9 @@ def validate(out, refs):
 
 
 def complete(prompt, key):
-    last = None
-    for model in MODELS:
-        try:
-            d = json.loads(request(URL, method="POST", data={"model": f"accounts/fireworks/models/{model}", "messages": [{"role": "user", "content": prompt}],
-                                                             "max_tokens": 1800, "temperature": 0.2, "response_format": {"type": "json_object"}},
-                                   headers={"Authorization": f"Bearer {key}"}, timeout=120, retries=2))
-            txt = re.sub(r"(?s)<think>.*?</think>", "", d["choices"][0]["message"]["content"] or "").strip()
-            m = re.search(r"(?s)\{.*\}", txt)
-            return json.loads(m.group(0) if m else txt), model
-        except Exception as e:
-            last = e
-    raise last
+    from .llm import chat_json
+    obj, model, _ = chat_json(MODELS, [{"role": "user", "content": prompt}], max_tokens=6000, temperature=0.2, timeout=150)
+    return obj, model
 
 
 def street_view(b, key, completer=complete):

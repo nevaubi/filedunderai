@@ -77,14 +77,20 @@ class ModelReplyParsing(unittest.TestCase):
             reports.parse_model_json("")
         self.assertIn("no JSON object", str(cm.exception))
 
-    def test_truncated_reply_is_reported_and_next_model_tried(self):
+    def test_truncated_reply_is_retried_then_next_model_tried(self):
         from unittest.mock import patch
-        from etl import reports
-        replies = iter(['{"choices":[{"finish_reason":"length","message":{"content":"{\\"title\\": \\"x"}}]}',
-                        '{"choices":[{"finish_reason":"stop","message":{"content":"{\\"title\\": \\"ok\\"}"}}]}'])
-        with patch.object(reports, "request", side_effect=lambda *a, **k: next(replies)):
+        from etl import llm, reports
+        cut = '{"choices":[{"finish_reason":"length","message":{"content":"{\\"title\\": \\"x"}}]}'
+        replies = iter([cut, cut, '{"choices":[{"finish_reason":"stop","message":{"content":"{\\"title\\": \\"ok\\"}"}}]}'])
+        bodies = []
+
+        def fake(url, **k):
+            bodies.append(k["data"])
+            return next(replies)
+        with patch.object(llm, "request", side_effect=fake):
             out, model = reports.complete("p", "k", models=["m1", "m2"])
         self.assertEqual((out, model), ({"title": "ok"}, "m2"))
+        self.assertEqual(bodies[1]["max_tokens"], 2 * bodies[0]["max_tokens"])  # the cut-off reply is retried with double the budget
 
 
 class TidyNumbers(unittest.TestCase):

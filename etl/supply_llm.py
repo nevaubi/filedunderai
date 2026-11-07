@@ -4,9 +4,7 @@ and insight claims are kept only when every cited id exists and every number in 
 import json
 import os
 import re
-import time
 
-from .common import request
 from .supply_core import LINK_TYPES, RELATIONS, norm, quote_ok
 
 URL = "https://api.fireworks.ai/inference/v1/chat/completions"
@@ -40,24 +38,9 @@ Return only JSON matching this schema: """ + json.dumps(LINK_SCHEMA)
 
 
 def _post(messages, max_tokens, deadline=None, schema_name=None):
-    last = None
-    for model in MODELS:
-        remaining = None if deadline is None else deadline - time.time()
-        if remaining is not None and remaining <= 5:
-            raise TimeoutError("supply model budget exhausted") from last
-        try:
-            d = json.loads(request(URL, method="POST", data={
-                "model": f"accounts/fireworks/models/{model}", "messages": messages, "max_tokens": max_tokens, "temperature": 0,
-                "response_format": {"type": "json_object"}},
-                headers={"Authorization": f"Bearer {os.environ['FIREWORKS_API_KEY']}"},
-                timeout=min(240, remaining) if remaining else 240, retries=1))
-            txt = re.sub(r"(?s)<think>.*?</think>", "", d["choices"][0]["message"]["content"] or "").strip()
-            m = re.search(r"(?s)\{.*\}", txt)
-            return json.loads(m.group(0) if m else txt), model
-        except Exception as e:
-            last = e
-            print("supply model failed", model, str(e)[:160])
-    raise last
+    from .llm import chat_json
+    obj, model, _ = chat_json(MODELS, messages, max_tokens=max_tokens, deadline=deadline)
+    return obj, model
 
 
 def extract_links(filer, name, form, excerpt, known, deadline=None, post=_post):
