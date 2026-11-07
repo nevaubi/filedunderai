@@ -11,6 +11,21 @@ const PATH_RX = [
   /^(universe|manifest)\.json$/,
 ];
 
+// Files our own site already serves from the public-data bucket, passed through for the partner
+// app so it reads them behind sign-in like everything else: as-filed statements (index, one
+// gzipped file per filing, standardized values), the template map, and company KPI files.
+const PUBLIC_RX = [
+  /^statements\/[A-Za-z0-9_.-]{1,32}\/index\.json$/,
+  /^statements\/[A-Za-z0-9_.-]{1,32}\/(std|\d{10}-\d{2}-\d{6})\.json\.gz$/,
+  /^statements\/std_map\.json$/,
+  /^kpis\/[A-Za-z0-9_.-]{1,32}\.json$/,
+];
+
+/** Which bucket a cleaned path lives in. */
+export function bucketFor(path) {
+  return PUBLIC_RX.some((rx) => rx.test(path)) ? "public-data" : BUCKET;
+}
+
 const ORIGIN_RX = [
   /^filedunder\.ai$/,
   /^www\.filedunder\.ai$/,
@@ -25,7 +40,7 @@ const ORIGIN_RX = [
 export function cleanPath(p) {
   const s = String(p || "").trim();
   if (!s || s.includes("..") || s.startsWith("/")) return null;
-  return PATH_RX.some((rx) => rx.test(s)) ? s : null;
+  return PATH_RX.some((rx) => rx.test(s)) || PUBLIC_RX.some((rx) => rx.test(s)) ? s : null;
 }
 
 export function originAllowed(origin, extra = "") {

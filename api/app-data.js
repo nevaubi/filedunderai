@@ -4,7 +4,7 @@
 // checked against APP_AUTH_URL with APP_AUTH_KEY (the partner project's publishable key).
 // The partner app's server code (report builder, scripts) sends `x-partner-key` instead, matched
 // against APP_DATA_SERVICE_KEY; browsers never see that key.
-import { BUCKET, bearer, cleanPath, corsHeaders, originAllowed, serviceKeyOk, verifyUser } from "./_lib/appdata.js";
+import { bearer, bucketFor, cleanPath, corsHeaders, originAllowed, serviceKeyOk, verifyUser } from "./_lib/appdata.js";
 
 const PER_USER_DAILY = 50000; // the shared demo account counts as one user
 
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
   if (req.headers["if-none-match"]) headers["If-None-Match"] = req.headers["if-none-match"];
   let r;
   try {
-    r = await fetch(`${url.replace(/\/$/, "")}/storage/v1/object/${BUCKET}/${path}`, { headers, signal: AbortSignal.timeout(20_000) });
+    r = await fetch(`${url.replace(/\/$/, "")}/storage/v1/object/${bucketFor(path)}/${path}`, { headers, signal: AbortSignal.timeout(20_000) });
   } catch {
     return res.status(502).json({ error: "Storage unavailable" });
   }
@@ -79,7 +79,7 @@ export default async function handler(req, res) {
   const lm = r.headers.get("last-modified");
   if (etag) res.setHeader("ETag", etag);
   if (lm) res.setHeader("Last-Modified", lm);
-  res.setHeader("Content-Type", "application/json");
+  res.setHeader("Content-Type", path.endsWith(".gz") ? "application/gzip" : "application/json");
   const buf = Buffer.from(await r.arrayBuffer());
   return res.status(200).send(buf);
 }
