@@ -35,6 +35,7 @@ const PUBLIC_RX = [
   /^kpi_insights\/[A-Za-z0-9_.-]{1,32}\.json$/,
   /^macro\/releases\.json$/,
   /^calendars\/(ipos|dividends)\.json$/,
+  /^changes\/(feed|[A-Za-z0-9_.-]{1,32})\.json$/,
 ];
 
 /** Which bucket a cleaned path lives in. */

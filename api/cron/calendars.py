@@ -13,7 +13,11 @@ def run(sb, query):
         return calendars.dividends_job(sb, time_budget=700)
     if step == "ipos":
         return calendars.ipos_job(sb, time_budget=700)
-    raise ValueError("step must be dividends or ipos")
+    if step == "changes":
+        # The "what changed" feed reads the calendars plus filings, insiders, estimates, redlines and alt data.
+        from etl import changes
+        return changes.changes_job(sb, time_budget=700)
+    raise ValueError("step must be dividends, ipos or changes")
 
 
 class handler(BaseHTTPRequestHandler):
