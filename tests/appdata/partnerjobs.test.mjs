@@ -38,3 +38,11 @@ test("drain respects worker count, deadline and stop", async () => {
   assert.equal(stopped.length, 2);
   assert.deepEqual(await drain([1, 2], 1, Date.now() - 1, async (x) => x), []);
 });
+
+test("skipSet keeps empty/no-10k for 30 days and bad tickers for a day", async () => {
+  const { skipSet } = await import("../../api/cron/partner.js");
+  const now = Date.parse("2026-11-07T00:00:00Z");
+  const at = (d) => new Date(now - d * 86400_000).toISOString();
+  const s = skipSet({ A: { state: "empty", at: at(5) }, B: { state: "empty", at: at(40) }, C: { state: "bad-ticker", at: at(0.5) }, D: { state: "bad-ticker", at: at(2) } }, now);
+  assert.deepEqual([...s].sort(), ["A", "C"]);
+});

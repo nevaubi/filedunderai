@@ -45,6 +45,26 @@ async function coveredTickers() {
   return ((await r.json()).companies || []).map((c) => c.ticker);
 }
 
+// Companies whose filings name no counterparties (banks, many REITs) or that have no 10-K come
+// back "empty"/"no-10k"; remember them for 30 days so they don't use the daily cap every run.
+const TRIED = "app-datasets/_jobs/supply-tried.json";
+async function loadTried() {
+  const s = sb();
+  const r = await fetch(`${s.url}/storage/v1/object/${TRIED}`, { headers: s.auth });
+  return r.ok ? r.json().catch(() => ({})) : {};
+}
+async function saveTried(map) {
+  const s = sb();
+  await fetch(`${s.url}/storage/v1/object/${TRIED}`, {
+    method: "POST",
+    headers: { ...s.auth, "Content-Type": "application/json", "x-upsert": "true" },
+    body: JSON.stringify(map),
+  });
+}
+export function skipSet(tried, now = Date.now()) {
+  return new Set(Object.entries(tried).filter(([, v]) => now - Date.parse(v.at) < (v.state === "bad-ticker" ? 1 : 30) * 86400_000).map(([t]) => t));
+}
+
 async function call(task, body, timeoutMs = 290_000) {
   try {
     const r = await fetch(`${APP}/api/public/partner/${task}`, {
@@ -77,8 +97,8 @@ export default async function handler(req, res) {
       let stop = null;
       const results = await drain(todo, 3, deadline, async (item) => {
         if (used >= cap) return (stop = "daily cap"), null;
-        used = await bump(`partner-reports:${day}`);
         const r = await call("report", item);
+        if (r.http !== 400) used = await bump(`partner-reports:${day}`);
         if (r.http === 429 || r.body.limit) stop = "partner writing limit";
         if (r.http === 401) stop = "partner key rejected";
         return { ...item, http: r.http, state: r.body.status ?? null, title: r.body.title ?? null, error: r.body.error ? String(r.body.error).slice(0, 160) : null, ms: r.body.ms ?? null };
@@ -89,15 +109,20 @@ export default async function handler(req, res) {
 
     const cap = Number(process.env.PARTNER_SUPPLY_DAILY || 120);
     let used = await peek(`partner-supply:${day}`);
-    const todo = planSupply(tickers, st.body.supply || {});
+    const tried = await loadTried();
+    const todo = planSupply(tickers, st.body.supply || {}, skipSet(tried));
     let stop = null;
     const results = await drain(todo, 2, deadline, async (ticker) => {
       if (used >= cap) return (stop = "daily cap"), null;
-      used = await bump(`partner-supply:${day}`);
       const r = await call("supply", { ticker });
       if (r.http === 401) stop = "partner key rejected";
+      // A ticker the deployed app doesn't cover yet (400) costs nothing; retry it tomorrow.
+      if (r.http === 400) tried[ticker] = { state: "bad-ticker", at: new Date().toISOString() };
+      else used = await bump(`partner-supply:${day}`);
+      if (r.body.status === "empty" || r.body.status === "no-10k") tried[ticker] = { state: r.body.status, at: new Date().toISOString() };
       return { ticker, http: r.http, state: r.body.status ?? null, links: r.body.links ?? 0, error: r.body.error ? String(r.body.error).slice(0, 160) : null };
     }, () => !!stop);
+    await saveTried(tried).catch(() => {});
     const done = results.filter(Boolean);
     return res.status(200).json({ task, queued: todo.length, attempted: done.length, stored: done.filter((x) => x.state === "stored").length, stop, usedToday: used, cap, sample: done.slice(0, 20) });
   } catch (e) {
