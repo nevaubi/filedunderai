@@ -13,12 +13,14 @@ const PATH_RX = [
 
 // Files our own site already serves from the public-data bucket, passed through for the partner
 // app so it reads them behind sign-in like everything else: as-filed statements (index, one
-// gzipped file per filing, standardized values), the template map, and company KPI files.
+// gzipped file per filing, standardized values), the template map, company KPI files, and the
+// estimates (consensus, analyst actions, surprises, guidance) and guidance history files.
 const PUBLIC_RX = [
   /^statements\/[A-Za-z0-9_.-]{1,32}\/index\.json$/,
   /^statements\/[A-Za-z0-9_.-]{1,32}\/(std|\d{10}-\d{2}-\d{6})\.json\.gz$/,
   /^statements\/std_map\.json$/,
   /^kpis\/[A-Za-z0-9_.-]{1,32}\.json$/,
+  /^(estimates|guidance)\/[A-Za-z0-9_.-]{1,32}\.json$/,
 ];
 
 /** Which bucket a cleaned path lives in. */
