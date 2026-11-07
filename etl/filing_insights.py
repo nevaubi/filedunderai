@@ -119,15 +119,16 @@ Return JSON: {"verdicts": [{"id": "<claim id>", "supported": true or false, "rea
 
 
 def draft(ticker, name, comp, recs, deadline=None, post=_post):
+    """Returns (proposals, model that answered)."""
     msgs = [{"role": "system", "content": DRAFT_INSTRUCTIONS.format(name=name, ticker=ticker, form=comp["form"], filed=comp["new"]["filed"],
                                                                     types=", ".join(TYPES), schema=json.dumps(DRAFT_SCHEMA))},
             {"role": "user", "content": "\n".join(_record_text(r) for r in recs)}]
     data = post(DRAFT_MODEL, msgs, 12000, deadline)
-    draft.model = data.get("_model", DRAFT_MODEL)
-    return data.get("insights") or []
+    return data.get("insights") or [], data.get("_model", DRAFT_MODEL)
 
 
-def check(claims, recs, deadline=None, post=_post):
+def check(claims, recs, deadline=None, post=_post, draft_model=DRAFT_MODEL):
+    """Returns ({claim id: verdict}, model that answered)."""
     by = {r["id"]: r for r in recs}
     blocks = []
     for c in claims:
@@ -135,10 +136,9 @@ def check(claims, recs, deadline=None, post=_post):
         blocks.append(f"CLAIM {c['id']}: {c['text']} | QUOTE: \"{c['quote']}\" | STAKE: {json.dumps(c.get('stake'))}\nCITED: {cited}")
     msgs = [{"role": "system", "content": CHECK_INSTRUCTIONS}, {"role": "user", "content": "\n\n".join(blocks)}]
     # the check runs on the model that did not draft
-    other = DRAFT_MODEL if getattr(draft, "model", DRAFT_MODEL) == CHECK_MODEL else CHECK_MODEL
+    other = DRAFT_MODEL if draft_model == CHECK_MODEL else CHECK_MODEL
     data = post(other, msgs, 6000, deadline)
-    check.model = data.get("_model", CHECK_MODEL)
-    return {v.get("id"): v for v in data.get("verdicts") or [] if isinstance(v, dict)}
+    return {v.get("id"): v for v in data.get("verdicts") or [] if isinstance(v, dict)}, data.get("_model", other)
 
 
 # ---------------------------------------------------------------- verification in code
@@ -222,9 +222,9 @@ def company(sb, ticker, name, revenue, state, deadline=None, post=_post, today=N
         return None, "too few changed passages"
     today = today or dt.date.today()
     run_id = uuid.uuid4().hex[:12]
-    proposals = draft(ticker, name, comp, recs, deadline=deadline, post=post)
+    proposals, draft_model = draft(ticker, name, comp, recs, deadline=deadline, post=post)
     kept, rejected = verify(proposals, recs)
-    verdicts = check(kept, recs, deadline=deadline, post=post) if kept else {}
+    verdicts, check_model = check(kept, recs, deadline=deadline, post=post, draft_model=draft_model) if kept else ({}, None)
     passed = []
     rejected["check"] = 0
     for c in kept:
@@ -232,7 +232,7 @@ def company(sb, ticker, name, revenue, state, deadline=None, post=_post, today=N
         if not v or v.get("supported") is not True:
             rejected["check"] += 1
             continue
-        c["check"] = {"model": getattr(check, "model", CHECK_MODEL), "reason": (v.get("reason") or "")[:200]}
+        c["check"] = {"model": check_model, "reason": (v.get("reason") or "")[:200]}
         passed.append(c)
     hist = {h["h"]: h for h in (state.get("history") or []) if h.get("date", "") >= (today - dt.timedelta(days=REPEAT_DAYS)).isoformat()}
     prev_accn = state.get("accn")
@@ -259,7 +259,7 @@ def company(sb, ticker, name, revenue, state, deadline=None, post=_post, today=N
               "filing": {k: comp["new"][k] for k in ("accn", "form", "filed", "report", "doc", "url")},
               "compared_to": {k: comp["old"][k] for k in ("accn", "form", "filed", "report", "doc", "url")},
               "kind": comp["kind"], "insights": out, "proposed": len(proposals), "rejected": rejected,
-              "models": {"draft": getattr(draft, "model", DRAFT_MODEL), "check": getattr(check, "model", CHECK_MODEL)},
+              "models": {"draft": draft_model, "check": check_model},
               "method": "Drafted from the passages that changed against the prior-year filing; each quote is verbatim in the filing and every "
                         "number appears in a cited passage; a second model rejected claims the passages do not support; ranked by a "
                         "materiality score computed in code."}
@@ -315,9 +315,11 @@ def run(sb, time_budget=640, max_companies=10, log=print):
             todo.append((filed, t, row.get("name") or t))
     todo.sort(reverse=True)
     done, failed, published = [], {}, {}
-    for filed, t, name in todo[:max_companies]:
-        if time.time() > deadline - 90:
-            break
+
+    def one(item):
+        filed, t, name = item
+        if time.time() > deadline - 150:
+            return
         s = st["tickers"].setdefault(t, {})
         try:
             res, why = company(sb, t, name, revenue.get(t), s, deadline=deadline, log=log)
@@ -325,16 +327,21 @@ def run(sb, time_budget=640, max_companies=10, log=print):
             failed[t] = str(e)[:200]
             s["error"] = failed[t]
             s["errors"] = (s.get("errors") or 0) + 1  # three failures park the company until its redline changes
-            continue
+            return
         if res is None:
             s.update({"at": now_iso(), "skipped": why, "filed": filed})
-            continue
+            return
         sb.put_json(f"insights/{t}.json", res, cache="max-age=1800")
         s.pop("error", None)
         s.pop("errors", None)
         s["filed"] = filed
         done.append({"ticker": t, "insights": len(res["insights"]), "rejected": res["rejected"]})
         published[t] = index_row(res)
+
+    # three companies at a time: each is two model calls of one to three minutes
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(3) as ex:
+        list(ex.map(one, todo[:max_companies]))
     if published:
         merge_index(sb, published)
     st["generated"] = now_iso()

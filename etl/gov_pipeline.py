@@ -408,11 +408,10 @@ def step_insights(sb, tks=None, per_run=30, deadline=None, log=print):
     if not tks:
         start = st.get("insight_cursor", 0) % len(all_t)
         tks = (all_t[start:] + all_t[:start])[:per_run]
-    done = 0
-    prev = None
-    for tk in tks:
-        if deadline and deadline.passed(60):
-            break
+    def one(tk):
+        # each read is two model calls (one to two minutes); four companies run at a time
+        if deadline and deadline.passed(150):
+            return False
         g = get_public(sb, f"gov/{tk}.json", {}) or {}
         f = get_public(sb, f"flows/{tk}.json", {}) or {}
         try:
@@ -428,10 +427,15 @@ def step_insights(sb, tks=None, per_run=30, deadline=None, log=print):
         if r and r.get("status") in ("error", "unchecked") and prev and prev.get("sentences"):
             r = dict(prev, last_attempt={"status": r.get("status"), "at": r.get("generated_at"), "error": r.get("error")})
         update_company(sb, "gov", tk, {"ai_read": r, "_sources": {"ai_read": status(r.get("status") if r else "not_collected")}})
-        done += 1
+        return True
+
+    with ThreadPoolExecutor(4) as ex:
+        results = list(ex.map(one, tks))
+    # the cursor moves past the leading run of companies that finished, so skipped ones come first next time
+    done = next((i for i, ok in enumerate(results) if not ok), len(results))
     st["insight_cursor"] = (st.get("insight_cursor", 0) + done) % len(all_t)
     _save_state(sb, st)
-    return {"done": done}
+    return {"done": done, "attempted": sum(results)}
 
 
 def step_coverage(sb, log=print):

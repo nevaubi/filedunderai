@@ -182,29 +182,36 @@ def run(sb, time_budget=640, per_run=15, log=print):
     st = sb.get_json(STATE) or {"tickers": {}, "cursor": 0}
     names = {t: n for t, c, n, *_ in UNIVERSE}
     order = sorted(names, key=lambda t: (st["tickers"].get(t) or {}).get("at", ""))
-    done, failed, skipped = [], {}, 0
-    for tk in order:
-        if len(done) >= per_run or time.time() > deadline - 60:
-            break
+    done, failed, unchanged = [], {}, []
+    cutoff = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=20)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    due = [tk for tk in order if (st["tickers"].get(tk) or {}).get("at", "") < cutoff]
+
+    def one(tk):
+        if len(done) >= per_run or time.time() > deadline - 120:
+            return
         s = st["tickers"].setdefault(tk, {})
-        if s.get("at", "") >= (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=20)).strftime("%Y-%m-%dT%H:%M:%SZ"):
-            continue
         try:
             facts = gather(sb, tk)
             if len(facts) >= 3 and facts_key(facts) == s.get("key"):
                 s["at"] = now_iso()
-                skipped += 1
-                continue
+                unchanged.append(tk)
+                return
             res, why = brief(sb, tk, names[tk], s)
         except Exception as e:
             failed[tk] = str(e)[:200]
             s["at"] = now_iso()  # move on; the next pass retries
-            continue
+            return
         if res is None:
             s.update({"at": now_iso(), "skipped": why})
-            continue
+            return
         sb.put_json(f"brief/{tk}.json", res, cache="max-age=1800")
         done.append({"ticker": tk, "sentences": len(res["sentences"]), "dropped": len(res["dropped"])})
+
+    # three companies at a time; the slice leaves room for ones that turn out unchanged or skipped
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(3) as ex:
+        list(ex.map(one, due[:per_run * 3]))
+    skipped = len(unchanged)
     st["generated"] = now_iso()
     sb.put_json(STATE, st, cache="no-store")
     log(f"company brief: {len(done)} written, {skipped} unchanged, {len(failed)} failed, {round(time.time() - t0)}s")

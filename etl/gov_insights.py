@@ -94,7 +94,8 @@ def facts_for(gov, flows, ins=None):
 PROMPT = """You write a short factual read for a professional equity research terminal about {name} ({tk}): its political
 and government exposure and who is trading or holding the stock. Use ONLY the facts below. Every sentence must cite the
 fact ids it uses. Do not add any number, name, date or claim that is not in the cited facts. No investment advice, no
-speculation about motives, no adjectives like "significant" unless a fact says so. 3 to 6 sentences.
+speculation about motives, no adjectives like "significant" unless a fact says so. 3 to 5 sentences, each under 35 words;
+name at most three records in one sentence.
 
 Facts:
 {facts}
@@ -163,7 +164,7 @@ def check(ok, facts, draft_model, post=None):
     return kept, dropped, model
 
 
-def _call(model, prompt, max_tokens=4000):
+def _call(model, prompt, max_tokens=8000):
     from .llm import chat_json
     obj, _, _ = chat_json([model], [{"role": "user", "content": prompt}], max_tokens=max_tokens, timeout=180)
     return obj
