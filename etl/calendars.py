@@ -404,8 +404,11 @@ def _etp(name, sic):
 def price_terms(text):
     """Cover-page terms: price range, final price, shares offered, proposed symbol and exchange, each with its sentence."""
     head = re.sub(r"\s+", " ", text[:60000])
-    out = {}
-    m = re.search(r"between \$\s?(\d+(?:\.\d+)?) and \$\s?(\d+(?:\.\d+)?) per (share|ADS|American Depositary Share|unit)", head, re.I)
+    out = {"blank": bool(re.search(r"\bblank[- ]check company\b", head, re.I))}
+    unit = r"per\s+((?:Class [A-C] )?(?:ordinary share|common share|share|ADS|American Depositary Share|unit|Ordinary Share))"
+    m = (re.search(r"between (?:US)?\$\s?(\d+(?:\.\d+)?) and (?:US)?\$\s?(\d+(?:\.\d+)?) " + unit, head, re.I)
+         or re.search(r"in the range of (?:US)?\$\s?(\d+(?:\.\d+)?) (?:to|and) (?:US)?\$\s?(\d+(?:\.\d+)?) " + unit, head, re.I)
+         or re.search(r"(?:US)?\$\s?(\d+(?:\.\d+)?) (?:to|and) (?:US)?\$\s?(\d+(?:\.\d+)?) " + unit + r"[^.]{0,60}(?:initial public offering|offering price)", head, re.I))
     if m:
         out["range"] = {"lo": float(m.group(1)), "hi": float(m.group(2)), "unit": m.group(3), "quote": _around(head, m)}
     m = (re.search(r"initial public offering price (?:is|of|per (?:share|ADS|unit) is)\s*(?:US)?\$\s?(\d+(?:\.\d+)?)", head, re.I)
@@ -421,7 +424,8 @@ def price_terms(text):
     m = re.search(r"([\d,]{5,})\s+(shares of (?:our )?(?:Class [A-C] )?(?:common stock|ordinary shares|common shares)|American Depositary Shares|ADSs|units)", head, re.I)
     if m:
         out["shares"] = {"value": int(m.group(1).replace(",", "")), "unit": m.group(2), "quote": _around(head, m)}
-    m = re.search(r"(?:under the|under the trading|under the ticker) symbols? [\"']\s?([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\.?\s?[\"']", head)
+    m = (re.search(r"(?:under the|under the trading|under the ticker) symbols? [\"']\s?([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\.?\s?[\"']", head)
+         or re.search(r"reserved the (?:ticker )?symbol [\"']\s?([A-Z]{1,5})\.?\s?[\"']", head))
     if m:
         ctx = _around(head, m)
         ex = re.search(r"Nasdaq Global Select|Nasdaq Global Market|Nasdaq Capital Market|Nasdaq|New York Stock Exchange|NYSE American|NYSE|Cboe", ctx)
@@ -550,7 +554,10 @@ def ipos_job(sb, today=None, time_budget=600, log=print):
                     "url": _doc_url(c, r["accn"], info["docs"][r["accn"]]) if info["docs"].get(r["accn"]) else f"https://www.sec.gov/Archives/edgar/data/{c}/{r['accn'].replace('-', '')}/"}
                    for r in rs if r["form"] in IPO_FORMS]
         rows.append({
-            "cik": c, "name": info.get("name") or rs[-1]["name"], "status": status, "spac": str(info.get("sic")) == "6770" or bool(re.search(r"\b(Acquisition Corp|Acquisition Company|SPAC)\b", info.get("name") or "", re.I)),
+            "cik": c, "name": info.get("name") or rs[-1]["name"], "status": status,
+            "spac": str(info.get("sic")) == "6770" or bool(re.search(r"\b(Acquisition Corp|Acquisition Company|SPAC)\b", info.get("name") or "", re.I))
+                    or bool(re.search(r"\bunits?\b", ((shares or {}).get("unit") or "") + " " + (sym.get("quote") or ""), re.I) and (price or {}).get("value") == 10.0)
+                    or bool((t_ or {}).get("blank")),
             "sic": info.get("sic"), "sic_desc": info.get("sic_desc"), "country": info.get("country"),
             "form": next((r["form"] for r in rs if r["form"] in INITIAL), reg[0]["form"] if reg else None),
             "first_filed": info.get("first_registration") or (reg[0]["date"] if reg else None),
