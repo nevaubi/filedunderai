@@ -1253,7 +1253,7 @@ def write_meta(sb, stats):
 
 
 # ---------------------------------------------------------------- AI "Quant read" (optional)
-READ_MODELS = ["accounts/fireworks/models/kimi-k3", "accounts/fireworks/models/deepseek-v4p1-flash"]
+READ_MODELS = ["accounts/fireworks/models/kimi-k3p1-pro", "accounts/fireworks/models/deepseek-v4p1-flash"]
 
 
 def read_facts(doc):

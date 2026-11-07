@@ -35,7 +35,7 @@ from .sectors import fetch_all, load_universe
 
 STATE_PATH = "kpistd/state.json.gz"
 # (model, reasoning effort): short reasoning keeps a 30-item batch well inside the token budget
-MODELS = [(os.environ.get("FU_KPISTD_MODEL", "kimi-k3"), "low"), (os.environ.get("FU_KPISTD_FALLBACK", "deepseek-v4p1-flash"), "none")]
+MODELS = [(os.environ.get("FU_KPISTD_MODEL", "kimi-k3p1-pro"), "low"), (os.environ.get("FU_KPISTD_FALLBACK", "deepseek-v4p1-flash"), "none")]
 MAX_Q, MAX_A = 48, 15
 # plausible ranges for the median of a mapped series (canonical units); a series outside is not a match
 RANGES = {"pct": (-100, 400), "nim": (0, 15), "efficiency_ratio": (10, 150), "cet1_ratio": (3, 40), "combined_ratio": (40, 200), "loss_ratio": (10, 150),

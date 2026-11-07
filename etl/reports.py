@@ -23,7 +23,7 @@ from .estimates_ai import URL, number_tokens, supported, values_in
 
 # Reports need far more output than the estimates summaries: a full document with cited sections. The shared
 # estimates completer caps output at 1,800 tokens, which truncated every report (empty or unterminated JSON).
-REPORT_MODELS = [m for m in (os.environ.get("FU_REPORTS_MODEL", "kimi-k3"), os.environ.get("FU_REPORTS_FALLBACK", "deepseek-v4p1-flash")) if m]
+REPORT_MODELS = [m for m in (os.environ.get("FU_REPORTS_MODEL", "kimi-k3p1-pro"), os.environ.get("FU_REPORTS_FALLBACK", "deepseek-v4p1-flash")) if m]
 REPORT_MAX_TOKENS = int(os.environ.get("FU_REPORTS_MAX_TOKENS", "12000"))
 
 

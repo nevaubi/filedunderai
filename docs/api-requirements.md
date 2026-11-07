@@ -34,10 +34,10 @@ The code currently prefixes each configured model value with `accounts/fireworks
 
 | Workflow | Primary variable and default string | Fallback variable and default string |
 |---|---|---|
-| Assistant and editor AI | `FU_ASSISTANT_MODEL` = `kimi-k3` | `FU_ASSISTANT_FALLBACK` = `deepseek-v4p1-flash` |
-| Natural-language screener | `FU_SCREEN_MODEL` = `kimi-k3` | `FU_SCREEN_FALLBACK` = `deepseek-v4p1-flash` |
-| Generated company/news/macro narratives | `FU_SUMMARY_MODEL` = `deepseek-v4p1-flash` | `FU_SUMMARY_FALLBACK` = `kimi-k3` |
-| KPI standardization | `FU_KPISTD_MODEL` = `kimi-k3` | `FU_KPISTD_FALLBACK` = `deepseek-v4p1-flash` |
+| Assistant and editor AI | `FU_ASSISTANT_MODEL` = `kimi-k3p1-pro` | `FU_ASSISTANT_FALLBACK` = `deepseek-v4p1-flash` |
+| Natural-language screener | `FU_SCREEN_MODEL` = `kimi-k3p1-pro` | `FU_SCREEN_FALLBACK` = `deepseek-v4p1-flash` |
+| Generated company/news/macro narratives | `FU_SUMMARY_MODEL` = `deepseek-v4p1-flash` | `FU_SUMMARY_FALLBACK` = `kimi-k3p1-pro` |
+| KPI standardization | `FU_KPISTD_MODEL` = `kimi-k3p1-pro` | `FU_KPISTD_FALLBACK` = `deepseek-v4p1-flash` |
 
 These are **repository defaults**, not a claim that those exact models are currently offered or enabled on the connected account. Validate the configured IDs before activating the workflows. Assistant/editor models must support the function-tool messages used by the tool loop; the screener and ETL paths request JSON output. KPI standardization also sends `reasoning_effort: "low"` to its primary and `"none"` to its fallback, so those parameters need to be supported by the chosen models. Both assistant primary and fallback currently use the same Fireworks endpoint and credential, so this is model fallback within one provider, not protection against a provider-wide outage.
 

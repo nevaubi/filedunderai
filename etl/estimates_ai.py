@@ -13,7 +13,7 @@ import time
 
 from .common import now_iso, request
 
-MODELS = [os.environ.get("FU_ESTIMATES_MODEL", "kimi-k3"), os.environ.get("FU_ESTIMATES_FALLBACK", "deepseek-v4p1-flash")]
+MODELS = [os.environ.get("FU_ESTIMATES_MODEL", "kimi-k3p1-pro"), os.environ.get("FU_ESTIMATES_FALLBACK", "deepseek-v4p1-flash")]
 URL = "https://api.fireworks.ai/inference/v1/chat/completions"
 
 

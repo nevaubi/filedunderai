@@ -1,7 +1,7 @@
 // Research tools run in the client. Only validated model messages leave this endpoint.
 import { guard, readBody } from "./_lib/guard.js";
 import "../public/lib/research.js";
-const PRIMARY = process.env.FU_ASSISTANT_MODEL || "kimi-k3";
+const PRIMARY = process.env.FU_ASSISTANT_MODEL || "kimi-k3p1-pro";
 const FALLBACK = process.env.FU_ASSISTANT_FALLBACK || "deepseek-v4p1-flash";
 const MAX_BODY = 700_000;
 export function validCompletion(d) {

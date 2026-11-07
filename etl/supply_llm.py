@@ -10,7 +10,7 @@ from .common import request
 from .supply_core import LINK_TYPES, RELATIONS, norm, quote_ok
 
 URL = "https://api.fireworks.ai/inference/v1/chat/completions"
-MODELS = [os.environ.get("FU_SUPPLY_MODEL", "kimi-k3"), os.environ.get("FU_SUPPLY_FALLBACK", "deepseek-v4p1-flash")]
+MODELS = [os.environ.get("FU_SUPPLY_MODEL", "kimi-k3p1-pro"), os.environ.get("FU_SUPPLY_FALLBACK", "deepseek-v4p1-flash")]
 
 LINK_SCHEMA = {
     "type": "object", "additionalProperties": False, "required": ["links"],

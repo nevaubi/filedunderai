@@ -16,7 +16,7 @@ import time
 
 from .common import now_iso, request
 
-PRIMARY = os.environ.get("FU_GOVREAD_MODEL", "kimi-k3")
+PRIMARY = os.environ.get("FU_GOVREAD_MODEL", "kimi-k3p1-pro")
 FALLBACK = os.environ.get("FU_GOVREAD_FALLBACK", "deepseek-v4p1-flash")
 MAX_FACTS = 60
 

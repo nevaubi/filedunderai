@@ -37,7 +37,7 @@ Files:
 - **Budget.** Each request carries `profile`, `round`, `remainingCalls`, `maxTokens`, `remainingTokens` and `timeoutMs`, validated by `FU_RESEARCH_RUNTIME.requestBudget` on the server. The final step sends no tools and asks for the best answer with gaps noted.
 - **Reasoning summaries.** `reasoning_content` / `reasoning` fields or `<think>` blocks become collapsible "thought" steps and are removed from the answer.
 
-The server stays a stateless relay: it checks the origin and daily per-IP/global caps (`guard`), body size, message roles, tool definitions (at most 64 well-formed functions) and the budget, then calls Fireworks (kimi-k3, falling back to deepseek-v4p1-flash). Keys never reach the browser. Each model step counts against the `ai` daily cap (300 per IP), so a Deep question can use up to about 34 of them.
+The server stays a stateless relay: it checks the origin and daily per-IP/global caps (`guard`), body size, message roles, tool definitions (at most 64 well-formed functions) and the budget, then calls Fireworks (kimi-k3p1-pro, Kimi K3.1 Pro, falling back to deepseek-v4p1-flash). Keys never reach the browser. Each model step counts against the `ai` daily cap (300 per IP), so a Deep question can use up to about 34 of them.
 
 ## Citations and provenance
 

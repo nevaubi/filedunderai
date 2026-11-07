@@ -8,7 +8,7 @@ from .common import request, now_iso
 from .fundamentals import series, fy_label
 
 PRIMARY = os.environ.get("FU_SUMMARY_MODEL", "deepseek-v4p1-flash")
-FALLBACK = os.environ.get("FU_SUMMARY_FALLBACK", "kimi-k3")
+FALLBACK = os.environ.get("FU_SUMMARY_FALLBACK", "kimi-k3p1-pro")
 
 
 def complete_json(prompt, max_tokens=9000):

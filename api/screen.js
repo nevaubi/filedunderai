@@ -5,7 +5,7 @@
 import { guard, readBody } from "./_lib/guard.js";
 import "../public/pages/screenspec.js";
 
-const PRIMARY = process.env.FU_SCREEN_MODEL || "kimi-k3";
+const PRIMARY = process.env.FU_SCREEN_MODEL || "kimi-k3p1-pro";
 const FALLBACK = process.env.FU_SCREEN_FALLBACK || "deepseek-v4p1-flash";
 const SPEC = globalThis.FU_SCREENSPEC;
 let CAT = null, CAT_AT = 0;
