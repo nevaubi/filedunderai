@@ -34,6 +34,13 @@ const PUBLIC_RX = [
   /^(flows|gov|altdata|insiders|insights|brief|redlines)\/[A-Za-z0-9_.-]{1,32}\.json$/,
   /^macro\/releases\.json$/,
   /^calendars\/(ipos|dividends)\.json$/,
+  // Feeds read by the partner app's assistant and agents (built by their own jobs; 404 until published).
+  /^changes\/(feed|[A-Za-z0-9_.-]{1,32})\.json$/,
+  /^situations\/(index|[A-Za-z0-9_.-]{1,32})\.json$/,
+  /^earnings\/(preview|score)\/[A-Za-z0-9_.-]{1,32}\.json$/,
+  /^earnings\/season\.json$/,
+  /^themes\/(index|[a-z0-9_-]{1,64})\.json$/,
+  /^kpi_insights\/(index|[A-Za-z0-9_.-]{1,32})\.json$/,
 ];
 
 /** Which bucket a cleaned path lives in. */

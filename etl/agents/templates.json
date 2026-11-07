@@ -1,0 +1,124 @@
+{
+  "tasks": [
+    {
+      "id": "morning_brief",
+      "name": "Morning brief",
+      "description": "Market backdrop plus what changed overnight for your watchlist: filings, insider trades, estimate moves, new IR documents, today's events.",
+      "cron": "45 6 * * 1-5",
+      "scope": {"kind": "watchlist"},
+      "deliverable": "dashboard",
+      "deep": false,
+      "prompt": "Write a morning brief for {scope}. Start with the market backdrop (market tool: index moves, breadth, macro brief). Then, for each company in scope, check what changed in the last 1-2 days: filing changes, insider trades, estimate or target moves, new IR documents, technical signals, and events today or this week (calendar). Report only companies with something material, most important first; say plainly if nothing material happened. Build a dashboard: KPI tiles for the market, a table of the changes with dates and sources."
+    },
+    {
+      "id": "earnings_preview",
+      "name": "Earnings preview pack",
+      "description": "Every Monday: a preview for each company in scope reporting in the next 7 days — consensus and revisions, the KPIs that matter from IR documents, guidance history, past reactions, what changed in the last 10-Q, questions to listen for.",
+      "cron": "0 7 * * 1",
+      "scope": {"kind": "watchlist"},
+      "deliverable": "dashboard",
+      "deep": true,
+      "prompt": "Prepare an earnings preview pack for companies in {scope} that report in the next 7 days (use calendar with kinds ['earnings']). For each: consensus EPS and revenue and recent revisions (estimates), the 3-5 company-reported KPIs that matter most with their recent trend (kpis, ir_documents), what changed in the latest 10-Q (filing_changes), last surprises, insider activity, and the earnings_preview feed if available. End each company with 3-5 specific things to listen for on the call, each tied to evidence. Build a dashboard with a table of reporters (date, consensus EPS, last surprise, key KPI trend) and one chart per company where useful. If nobody in scope reports, say so and list the next reporters."
+    },
+    {
+      "id": "weekly_changes",
+      "name": "Weekly what changed",
+      "description": "Friday afternoon: everything material that changed this week across your companies, ranked by importance.",
+      "cron": "30 16 * * 5",
+      "scope": {"kind": "watchlist"},
+      "deliverable": "dashboard",
+      "deep": false,
+      "prompt": "Summarize what changed this week for {scope}: new filings and the language they changed (filing_changes), insider buys and discretionary sells (insiders), consensus and target revisions (estimates), federal contract shifts (alt_data), new IR documents, technical signals with their base rates, and the changes feed if available. Rank by materiality, cite every item, and finish with what to watch next week (calendar). Build a dashboard: a timeline of the week's events and a table of changes by company."
+    },
+    {
+      "id": "red_flags",
+      "name": "Forensic red-flag scan",
+      "description": "Weekly scan for distress and accounting flags: material weaknesses, going-concern language, covenant or default language, restatements, auditor changes, bridge loans, discretionary insider selling.",
+      "cron": "0 8 * * 2",
+      "scope": {"kind": "watchlist"},
+      "deliverable": "report",
+      "deep": true,
+      "prompt": "Run a forensic red-flag scan over {scope}. For each company check the latest filing changes for material weakness, going concern, covenant, default, restatement, impairment, auditor change and new financing language (filing_changes), discretionary insider selling (insiders), deteriorating quality signals (company: altman_z, pio_f, accruals where present) and sudden estimate cuts. Report flags with the exact passage or figure and its source, severity (high/notable), and what would confirm or clear each flag. Companies with no flags get one line."
+    },
+    {
+      "id": "insider_watch",
+      "name": "Insider conviction watch",
+      "description": "Weekly: officer and director open-market buys across the universe, with valuation versus each company's own history.",
+      "cron": "0 9 * * 6",
+      "scope": {"kind": "universe"},
+      "deliverable": "dashboard",
+      "deep": false,
+      "prompt": "Find officer and director open-market purchases in the last 14 days across all covered companies (screen with ins_buyers_90d >= 1 sorted by ins_net_90d, then insiders for the top names). Exclude 10b5-1 plan trades, funds and 10% owners. For the top 10 by dollar value, show buyer, role, value, price, the company's valuation versus its own 5-year history (pe_p5, fcf_yield_p5), recent growth, and any recent filing changes. Build a ranked table and a short note on the most interesting 3."
+    },
+    {
+      "id": "contracts_tracker",
+      "name": "Federal contract tracker",
+      "description": "Monthly: federal obligations by company and the biggest year-over-year shifts.",
+      "cron": "0 8 2 * *",
+      "scope": {"kind": "universe"},
+      "deliverable": "dashboard",
+      "deep": false,
+      "prompt": "Track federal contract obligations for {scope}. Use alt_data for companies with meaningful federal revenue (start with defense, government IT and health names found via screen by sector Industrials/Information Technology/Health Care, or the scoped tickers). Show the latest full fiscal year vs the prior year, the biggest increases and declines, and what each company has said about government demand in its latest filing (filing_changes or supply). Note that obligations are lumpy. Build a ranked bar chart of changes and a table with amounts."
+    },
+    {
+      "id": "catalyst_digest",
+      "name": "Catalyst calendar digest",
+      "description": "Sunday evening: the next two weeks of earnings, ex-dividend dates, macro releases and IPOs for your companies.",
+      "cron": "0 18 * * 0",
+      "scope": {"kind": "watchlist"},
+      "deliverable": "dashboard",
+      "deep": false,
+      "prompt": "List upcoming catalysts for the next 14 days for {scope} (calendar with earnings, ex_dividend) plus the main macro releases and notable IPOs. For each company event add the one figure that matters (consensus EPS, dividend amount and whether it is an increase). Build a timeline view of the two weeks and a table."
+    },
+    {
+      "id": "theme_tracker",
+      "name": "Theme tracker",
+      "description": "Monthly: how a theme (tariffs, AI, GLP-1, reshoring...) is showing up in filings, KPIs and prices across covered companies.",
+      "cron": "0 9 3 * *",
+      "scope": {"kind": "universe"},
+      "deliverable": "dashboard",
+      "deep": true,
+      "prompt": "Track the theme described in the task notes across covered companies: which companies added or removed language about it in their latest filings (filing_changes for the most exposed names; themes feed if available), disclosed revenue exposure (supply, kpis), and how the most exposed names have traded (company). Separate evidence of real exposure from mentions. Build a dashboard with a ranked exposure table and a chart."
+    },
+    {
+      "id": "portfolio_risk",
+      "name": "Portfolio risk memo",
+      "description": "Monthly memo on your portfolio: concentration, shared supplier dependencies, government exposure, upcoming catalysts and red flags.",
+      "cron": "0 7 1 * *",
+      "scope": {"kind": "portfolio"},
+      "deliverable": "memo",
+      "deep": true,
+      "prompt": "Write a risk memo for {scope}. Cover: sector and factor concentration (company: beta, sector), shared single-source suppliers and customers across holdings (supply), government revenue dependence (supply concentration, alt_data), upcoming catalysts in the next 30 days (calendar), and any red flags from filing changes or insider selling. Quantify where the data allows and cite everything. End with the three risks most worth monitoring and suggest monitors for them."
+    },
+    {
+      "id": "sector_rotation",
+      "name": "Sector rotation memo",
+      "description": "First trading day of the month: sector performance, breadth and estimate trends.",
+      "cron": "30 7 1 * *",
+      "scope": {"kind": "universe"},
+      "deliverable": "dashboard",
+      "deep": false,
+      "prompt": "Write a sector rotation note: market backdrop and breadth (market), sector-level returns and relative strength (screen by sector on ret_1m, ret_3m), where estimate revisions and insider buying cluster, and the companies driving each move. Build a ranked bar chart of sector 1-month returns and a table."
+    }
+  ],
+  "monitors": [
+    {"id": "insider_conviction", "name": "Insider buying", "type": "insider", "params": {"side": "buy", "min_value": 250000, "officers_directors_only": true, "window_days": 30}, "scope": {"kind": "watchlist"}, "escalate": true,
+     "description": "Officer or director open-market purchases of $250K or more (no plan trades, funds or 10% owners)."},
+    {"id": "discretionary_selling", "name": "Discretionary insider selling", "type": "insider", "params": {"side": "sell", "min_value": 2000000, "officers_directors_only": true, "window_days": 30}, "scope": {"kind": "watchlist"}, "escalate": false,
+     "description": "Officer or director sales of $2M or more outside 10b5-1 plans."},
+    {"id": "distress_flags", "name": "Distress and accounting flags", "type": "filing_change", "params": {"tags": ["material weakness", "going concern", "covenant", "default", "restatement", "bridge loan", "auditor change"]}, "scope": {"kind": "watchlist"}, "escalate": true,
+     "description": "New filing language about material weaknesses, going concern, covenants or defaults, restatements, bridge loans or auditor changes."},
+    {"id": "new_risk_factors", "name": "New risk factors", "type": "filing_change", "params": {"tags": ["new risk factor"]}, "scope": {"kind": "watchlist"}, "escalate": false,
+     "description": "Risk factors added in the latest 10-K or 10-Q."},
+    {"id": "upcoming_events", "name": "Earnings and dividends this week", "type": "upcoming", "params": {"kinds": ["earnings", "ex_dividend"], "within_days": 7}, "scope": {"kind": "watchlist"}, "escalate": false,
+     "description": "Earnings reports and ex-dividend dates in the next 7 days."},
+    {"id": "estimate_revisions", "name": "Estimate revisions", "type": "estimates", "params": {"field": "eps_next_q", "min_pct": 0.05}, "scope": {"kind": "watchlist"}, "escalate": false,
+     "description": "Next-quarter EPS consensus moves of 5% or more."},
+    {"id": "new_ir_documents", "name": "New IR documents", "type": "ir_document", "params": {"doc_types": []}, "scope": {"kind": "watchlist"}, "escalate": false,
+     "description": "New press releases, decks, transcripts and supplements on company IR sites."},
+    {"id": "mean_reversion_signals", "name": "Signals with positive history", "type": "tech_signal", "params": {"signals": ["low_52w", "rsi_oversold", "gap_down"]}, "scope": {"kind": "watchlist"}, "escalate": false,
+     "description": "New 52-week lows, RSI oversold and gap-downs — the technical signals with positive 60-day history since 2008, shown with their base rates."},
+    {"id": "contract_shifts", "name": "Federal contract shifts", "type": "contracts", "params": {"min_change_pct": 0.25, "min_amount": 100000000}, "scope": {"kind": "watchlist"}, "escalate": false,
+     "description": "Year-over-year changes of 25% or more in federal prime contract obligations."}
+  ]
+}
