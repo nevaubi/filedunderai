@@ -397,7 +397,7 @@
     },
     {
       "path": "/api/cron/insights",
-      "schedule": "29 */2 * * *"
+      "schedule": "29 * * * *"
     },
     {
       "path": "/api/cron/govflows?step=reads",
@@ -405,7 +405,7 @@
     },
     {
       "path": "/api/cron/brief",
-      "schedule": "47 */2 * * *"
+      "schedule": "47 * * * *"
     }
   ],
   "headers": [

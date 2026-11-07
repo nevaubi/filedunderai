@@ -174,7 +174,7 @@ def brief(sb, tk, name, state, today=None, complete_fn=None, post=None):
     return res, None
 
 
-def run(sb, time_budget=640, per_run=15, log=print):
+def run(sb, time_budget=640, per_run=15, workers=3, log=print):
     """Rotation: companies whose fact set changed since their last brief, oldest brief first."""
     from .universe import UNIVERSE
     t0 = time.time()
@@ -207,9 +207,9 @@ def run(sb, time_budget=640, per_run=15, log=print):
         sb.put_json(f"brief/{tk}.json", res, cache="max-age=1800")
         done.append({"ticker": tk, "sentences": len(res["sentences"]), "dropped": len(res["dropped"])})
 
-    # three companies at a time; the slice leaves room for ones that turn out unchanged or skipped
+    # a few companies at a time; the slice leaves room for ones that turn out unchanged or skipped
     from concurrent.futures import ThreadPoolExecutor
-    with ThreadPoolExecutor(3) as ex:
+    with ThreadPoolExecutor(workers) as ex:
         list(ex.map(one, due[:per_run * 3]))
     skipped = len(unchanged)
     st["generated"] = now_iso()

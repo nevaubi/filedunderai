@@ -1349,30 +1349,62 @@ def quant_read(doc, api_key=None, request_fn=None):
     return None
 
 
-def run_reads(sb, symbols, deadline=None, limit=150, log=print):
+def run_reads(sb, symbols, deadline=None, limit=150, workers=1, only_changed=False, log=print):
+    """AI reads over the per-symbol statistics, in cursor order. With only_changed, a symbol whose statistics
+    (as_of) are the same as its last read's is skipped without a model call and does not count against the limit."""
     if not os.environ.get("FIREWORKS_API_KEY"):
         return {"note": "no FIREWORKS_API_KEY; AI reads not generated"}
+    from concurrent.futures import ThreadPoolExecutor
+    import threading
     try:
         cur = sb.get_json("quant/read_cursor.json") or {}
     except Exception:
         cur = {}
     k0 = int(cur.get("next", 0)) % max(1, len(symbols))
     order = symbols[k0:] + symbols[:k0]
-    done = 0
-    for k, s in enumerate(order[:limit]):
+    lock = threading.Lock()
+    stats = {"written": 0, "unchanged": 0, "tried": 0}
+    last = [k0]
+
+    def one(arg):
+        k, s = arg
         if deadline and time.time() > deadline:
-            break
+            return
+        with lock:
+            if stats["tried"] >= limit:
+                return
         try:
             doc = sb.get_json(qpath(s))
-            rd = quant_read(doc) if doc else None
+            if not doc:
+                return
+            if only_changed:
+                old = None
+                try:
+                    old = sb.get_json(f"quant/read/{s}.json")
+                except Exception:
+                    old = None
+                if old and old.get("as_of") == doc.get("as_of"):
+                    with lock:
+                        stats["unchanged"] += 1
+                        last[0] = max(last[0], k0 + k + 1)
+                    return
+            with lock:
+                stats["tried"] += 1
+            rd = quant_read(doc)
             if rd:
                 sb.put_json(f"quant/read/{s}.json", rd, cache="max-age=3600")
-                done += 1
+                with lock:
+                    stats["written"] += 1
         except Exception as e:
             log(f"read {s}: {str(e)[:120]}")
-        cur["next"] = (k0 + k + 1) % len(symbols)
+        with lock:
+            last[0] = max(last[0], k0 + k + 1)
+
+    with ThreadPoolExecutor(max(1, workers)) as ex:
+        list(ex.map(one, list(enumerate(order[: limit * (8 if only_changed else 1)]))))
+    cur["next"] = last[0] % len(symbols)
     sb.put_json("quant/read_cursor.json", cur, cache="no-store")
-    return {"written": done}
+    return stats
 
 
 # ---------------------------------------------------------------- methods (tooltips)
