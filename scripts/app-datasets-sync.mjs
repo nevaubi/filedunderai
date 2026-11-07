@@ -9,7 +9,7 @@
 // Two ways to authenticate:
 //   - SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (local runs): direct storage writes.
 //   - Inside GitHub Actions with `id-token: write` and no service key: the workflow's OIDC token
-//     goes to APP_DATASETS_API (default https://www.filedunder.ai/api/app-datasets-upload), which
+//     goes to APP_DATASETS_API (default https://filedunderai.vercel.app/api/app-datasets-upload), which
 //     returns signed upload URLs and runs the merge. No stored secret is needed.
 import { readFile, readdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
@@ -19,7 +19,7 @@ const BUCKET = "app-datasets";
 const AUDIENCE = "filedunder-app-datasets";
 const URL_ = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
 const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-const API = process.env.APP_DATASETS_API || "https://www.filedunder.ai/api/app-datasets-upload";
+const API = process.env.APP_DATASETS_API || "https://filedunderai.vercel.app/api/app-datasets-upload";
 const auth = { apikey: KEY, Authorization: `Bearer ${KEY}` };
 const sleep = (ms) => new Promise((s) => setTimeout(s, ms));
 
