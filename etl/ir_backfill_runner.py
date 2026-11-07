@@ -19,16 +19,34 @@ from . import jobs
 from .common import LeaseBusy, Supabase
 
 
-def plan(sb, tickers=None, include_partial=True):
+def unindexed(sb, index):
+    """Companies processed since the coverage index was last published (a run stopped before its chunk published).
+    Their per-company manifest ir/{T}.json holds the coverage the index is missing. Returns {ticker: coverage}."""
+    since = index.get("generated") or "1970-01-01T00:00:00Z"
+    rows = sb.select("ir_documents", f"select=ticker&fetched_at=gte.{since}")
+    out = {}
+    for t in sorted({r["ticker"] for r in rows if r.get("ticker")}):
+        try:
+            m = sb.get_json(f"ir/{t}.json") or {}
+        except Exception:
+            continue
+        if (m.get("generated") or "") >= since and isinstance(m.get("coverage"), dict):
+            out[t] = m["coverage"]
+    return out
+
+
+def plan(sb, tickers=None, include_partial=True, index=None, skip=()):
     from .universe import UNIVERSE
     order = [t for t, *_ in UNIVERSE]
     if tickers:
         return [t for t in tickers if t in order]
-    rows = (sb.get_json("meta/coverage_ir.json") or {}).get("companies") or {}
-    empty = [t for t in reversed(order) if not (rows.get(t) or {}).get("docs")]
+    index = index if index is not None else (sb.get_json("meta/coverage_ir.json") or {})
+    rows = index.get("companies") or {}
+    skip = set(skip)
+    empty = [t for t in reversed(order) if not (rows.get(t) or {}).get("docs") and t not in skip]
     partial = []
     if include_partial:
-        partial = [t for t in order if (rows.get(t) or {}).get("docs") and ((rows[t].get("coverage") or {}).get("status") == "partial")]
+        partial = [t for t in order if t not in skip and (rows.get(t) or {}).get("docs") and ((rows[t].get("coverage") or {}).get("status") == "partial")]
         partial.sort(key=lambda t: ((rows[t].get("coverage") or {}).get("updated_at") or ""))
     return empty + partial
 
@@ -52,7 +70,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--hours", type=float, default=5.5, help="wall-clock budget")
     ap.add_argument("--workers", type=int, default=6)
-    ap.add_argument("--chunk", type=int, default=24)
+    ap.add_argument("--chunk", type=int, default=12)
     ap.add_argument("--max-docs", type=int, default=90)
     ap.add_argument("--tickers", default="")
     ap.add_argument("--no-partial", action="store_true")
@@ -62,11 +80,17 @@ def main():
     sb = Supabase()
     t0 = time.time()
     end = t0 + a.hours * 3600
-    todo = plan(sb, [t.strip().upper() for t in a.tickers.split(",") if t.strip()] or None, include_partial=not a.no_partial)
+    explicit = [t.strip().upper() for t in a.tickers.split(",") if t.strip()] or None
+    index = sb.get_json("meta/coverage_ir.json") or {}
+    # Every shard computes the same skip set, so the split stays consistent; shard 0 alone publishes it.
+    recovered = {} if explicit else unindexed(sb, index)
+    if recovered:
+        print(f"{len(recovered)} companies processed since the last index; skipping them", flush=True)
+    todo = plan(sb, explicit, include_partial=not a.no_partial, index=index, skip=recovered)
     todo = todo[a.shard::a.shards]
     print(f"IR backfill: {len(todo)} companies, {a.workers} workers, {a.hours} h", flush=True)
     totals = {"done": 0, "failed": 0, "docs": 0}
-    unpublished = {}
+    unpublished = dict(recovered) if a.shard == 0 else {}
     for i in range(0, len(todo), a.chunk):
         left = end - time.time()
         if left < 600:
