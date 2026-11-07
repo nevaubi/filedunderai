@@ -24,6 +24,8 @@ const PUBLIC_RX = [
   /^screener\.json$/,
   /^kpistd\/(latest|taxonomy|map)\.json$/,
   /^kpistd\/(t|series)\/[A-Za-z0-9_.-]{1,64}\.json$/,
+  /^sectors\.json$/,
+  /^sectors\/(notes|[a-z0-9-]{1,80}(\.comp)?)\.json$/,
 ];
 
 /** Which bucket a cleaned path lives in. */
