@@ -1,0 +1,36 @@
+name: Partner app coverage list
+# Runs the partner app's scripts/expand-coverage.ts (Wikidata/Wikipedia/logos for every company in
+# our index) on a clean runner and uploads the regenerated coverage list and logos as an artifact.
+# The result is committed to nevaubi/company-showcase-launchpad by hand (no write token here).
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  expand:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: nevaubi/company-showcase-launchpad
+          path: app
+      - uses: oven-sh/setup-bun@v2
+      - name: Install
+        working-directory: app
+        run: bun install --frozen-lockfile || bun install
+      - name: Expand coverage
+        working-directory: app
+        run: bun scripts/expand-coverage.ts
+      - name: Collect changed files
+        working-directory: app
+        run: |
+          git add -A src/lib/coverage-extra.ts public/logos
+          git diff --cached --name-only > /tmp/changed.txt
+          wc -l /tmp/changed.txt
+          tar -czf /tmp/coverage.tgz -T /tmp/changed.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: /tmp/coverage.tgz
+          retention-days: 7
