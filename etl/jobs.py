@@ -1132,12 +1132,18 @@ def ir_job(sb, tickers=None, workers=4, time_budget=None, refresh_site=False, we
                 fye = (b.get("profile") or {}).get("fiscalYearEnd") or "1231"
                 ir.PERIOD_ENDS[tk] = sorted({dt.date.fromisoformat(x["end"]) for rows in (b.get("statements") or {}).values() for r in rows
                                              for x in r.get("quarterly", []) + r.get("annual", [])})
+                del b
                 result = ir.process_company(sb, tk, BY_TICKER[tk]["name"], BY_TICKER[tk]["cik"], refresh_site=refresh_site,
                                             fye=fye, web=web, sec_years=sec_years, deadline=deadline, max_docs=max_docs,
                                             max_pages=max_pages, repair_existing=repair_existing, publish_only=publish_only, backfill=backfill, io_deadline=io_deadline)
                 return tk, result, None
             except Exception as e:
                 return tk, None, str(e)[:300]
+            finally:
+                # document bytes and parsed pages are large; release them before the next company starts
+                ir.PERIOD_ENDS.pop(tk, None)
+                import gc
+                gc.collect()
 
         with ThreadPoolExecutor(max(1, workers)) as ex:
             for tk, res, err in ex.map(one, tickers):
@@ -1242,7 +1248,8 @@ def _ir_rotation_job(sb, per_run, time_budget, started, fresh_only=False):
     remaining = max(0, time_budget - (time.monotonic() - started)) if time_budget is not None else None
     if remaining is not None:
         remaining = max(0, remaining - min(IR_ROTATION_RESERVE, remaining * 0.25))
-    done, failed = ir_job(sb, selected, workers=6 if fresh_only else 4, time_budget=remaining)
+    # Three workers: each holds a company bundle and its documents while extracting text.
+    done, failed = ir_job(sb, selected, workers=3, time_budget=remaining, max_docs=40 if fresh_only else 90)
     for tk, result in done.items():
         if tk not in tickers:
             raise ValueError("IR coverage result outside the current universe")
