@@ -90,8 +90,12 @@ def highlights(doc, n=5):
                     continue
                 text = " ".join(t for op, t in ch.get("ops") or [] if op == "+") or ch.get("new") or ch.get("old") or \
                     " ".join(t for op, t in ch.get("ops") or [] if op == "-")
+                # the passage as it reads in the filing that holds it (the old filing for a removed passage), for the viewer's search
+                side = "old" if ch["kind"] == "removed" else "new"
+                passage = ch.get(side) or " ".join(t for op, t in ch.get("ops") or [] if op in ("=", "-" if side == "old" else "+"))
                 out.append({"kind": c["kind"], "form": c["form"], "filed": c["new"]["filed"], "section": s["title"], "section_id": s["id"],
-                            "change": ch["kind"], "score": ch["score"], "signals": ch["signals"], "excerpt": text[:280]})
+                            "change": ch["kind"], "score": ch["score"], "signals": ch["signals"], "excerpt": text[:280],
+                            "accn": c[side]["accn"], "doc": c[side]["doc"], "doc_filed": c[side]["filed"], "search": " ".join(passage.split()[:14])})
     return sorted(out, key=lambda x: -x["score"])[:n]
 
 

@@ -104,3 +104,21 @@ class FilingInsights(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class InsightsIndex(unittest.TestCase):
+    def test_run_merges_index_rows(self):
+        sb = Store({"redlines/T.json": DOC, "redlines/index.json": {"companies": {"T": {"name": "T", "generated": "g1", "comparisons": [{"filed": "2026-10-30"}]}}},
+                    "index.json": {"companies": [{"ticker": "T", "revenue_ttm": 1e10}]}, "insights/index.json": {"companies": {"OLD": {"ticker": "OLD"}}}})
+        p = fake_post([GOOD, CUST], [{"id": "c1", "supported": True}, {"id": "c2", "supported": True}])
+        orig = FI.company
+        FI.company = lambda *a, **k: orig(*a, post=p, **k)
+        try:
+            FI.run(sb, time_budget=300)
+        finally:
+            FI.company = orig
+        idx = sb.writes["insights/index.json"]
+        self.assertEqual(set(idx["companies"]), {"OLD", "T"})
+        row = idx["companies"]["T"]
+        self.assertEqual((row["form"], row["accn"], row["doc"], row["n"]), ("10-K", "0000000001-26-000001", "x.htm", 2))
+        self.assertEqual(row["top"][0]["title"], GOOD["title"])

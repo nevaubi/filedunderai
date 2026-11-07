@@ -270,6 +270,28 @@ def company(sb, ticker, name, revenue, state, deadline=None, post=_post, today=N
     return result, None
 
 
+# ---------------------------------------------------------------- coverage index
+INDEX = "insights/index.json"
+
+
+def index_row(res):
+    """The cross-company feed's row for one company: its filing and its top three insights."""
+    f = res["filing"]
+    return {"ticker": res["ticker"], "name": res.get("name"), "form": f["form"], "filed": f["filed"], "accn": f["accn"], "doc": f["doc"],
+            "generated": res["generated"], "n": len(res["insights"]),
+            "top": [{"title": i["title"], "type": i["type"], "direction": i["direction"], "score": i["score"],
+                     "quote": i["quote"], "doc": i["doc"]} for i in res["insights"][:3]]}
+
+
+def merge_index(sb, rows):
+    idx = sb.get_json(INDEX) or {"companies": {}}
+    idx.setdefault("companies", {}).update(rows)
+    idx["generated"] = now_iso()
+    idx["count"] = len(idx["companies"])
+    sb.put_json(INDEX, idx, cache="max-age=600")
+    return idx["count"]
+
+
 # ---------------------------------------------------------------- rotation
 def run(sb, time_budget=640, max_companies=10, log=print):
     t0 = time.time()
@@ -292,7 +314,7 @@ def run(sb, time_budget=640, max_companies=10, log=print):
         if s.get("filed") != filed and (s.get("errors") or 0) < 3:
             todo.append((filed, t, row.get("name") or t))
     todo.sort(reverse=True)
-    done, failed = [], {}
+    done, failed, published = [], {}, {}
     for filed, t, name in todo[:max_companies]:
         if time.time() > deadline - 90:
             break
@@ -312,6 +334,9 @@ def run(sb, time_budget=640, max_companies=10, log=print):
         s.pop("errors", None)
         s["filed"] = filed
         done.append({"ticker": t, "insights": len(res["insights"]), "rejected": res["rejected"]})
+        published[t] = index_row(res)
+    if published:
+        merge_index(sb, published)
     st["generated"] = now_iso()
     sb.put_json(STATE, st, cache="no-store")
     log(f"filing insights: {len(done)} companies, {len(failed)} failed, {len(todo)} due, {round(time.time() - t0)}s")
