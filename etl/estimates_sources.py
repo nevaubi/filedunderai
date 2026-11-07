@@ -310,12 +310,21 @@ def _calendar_entry(c, b):
     """What the earnings calendar shows for a company: the scheduled date with its provider flags, the consensus for that
     quarter, and the last reported quarter's surprise."""
     ne = c.get("next_earnings") or {}
-    last = next((s for s in reversed(b.get("surprises") or []) if s.get("eps_actual") is not None), None)
+    sur = [x for x in b.get("surprises") or [] if x.get("eps_actual") is not None]
+    last = sur[-1] if sur else None
+    moves = [abs(x["reaction"]["r1"]) for x in sur if (x.get("reaction") or {}).get("r1") is not None]
+    moves.sort()
+    med = (moves[len(moves) // 2] if len(moves) % 2 else (moves[len(moves) // 2 - 1] + moves[len(moves) // 2]) / 2) if moves else None
     return {"date": ne.get("date"), "is_estimate": ne.get("is_estimate"), "call_date": ne.get("call_date"),
             "eps": (ne.get("eps") or {}).get("avg"), "revenue": (ne.get("revenue") or {}).get("avg"),
             "provider": c.get("provider"), "url": c.get("url"), "as_of": c.get("as_of"),
             "last": last and {"quarter_end": last.get("quarter_end"), "eps_actual": last.get("eps_actual"), "eps_estimate": last.get("eps_estimate"),
-                              "surprise_pct": last.get("surprise_pct"), "beat": last.get("beat")}}
+                              "surprise_pct": last.get("surprise_pct"), "beat": last.get("beat"),
+                              "report": last.get("report"), "move": (last.get("reaction") or {}).get("r1"),
+                              "move_date": (last.get("reaction") or {}).get("date")},
+            # typical move: median absolute one-day close-to-close return after the reports on file (up to the last four)
+            "reaction": ({"median_abs_move": round(med, 6), "n": len(moves),
+                          "basis": "median absolute one-day close-to-close move after each earnings release on file"} if med is not None else None)}
 
 
 def rebuild_rosters(sb, acts):

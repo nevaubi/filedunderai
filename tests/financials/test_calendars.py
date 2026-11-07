@@ -89,5 +89,89 @@ class Terms(unittest.TestCase):
         self.assertFalse(C._etp("Janus Living, Inc.", "6798"))
 
 
+class DeclarationsLater(unittest.TestCase):
+    def test_dates_for_a_defined_term_in_a_later_paragraph(self):
+        t = ("Item 8.01. Other Events. On September 15, 2026, the Board authorized and the Company declared a dividend of $0.01 per share on the "
+             "Company's common shares of beneficial interest, $0.01 par value per share (\"Common Shares\"), for the quarter ending September 30, 2026 "
+             "(the \"Common Dividend\"). On September 15, 2026, the Board also authorized and the Company declared a quarterly dividend of $0.39844 per "
+             "share on the Company's 6.375% Series E Cumulative Redeemable Preferred Shares (the \"Series E Preferred Dividend\"). The Series E Preferred "
+             "Dividend is payable on October 15, 2026 to holders of record of Series E Preferred Shares as of October 1, 2026. The Common Dividend is "
+             "payable on October 15, 2026 to holders of record of Common Shares as of the close of business on September 30, 2026.")
+        d = C.parse_declaration(t, "2026-09-15")
+        self.assertEqual([(x["amount"], x["record"], x["payable"]) for x in d], [(0.01, "2026-09-30", "2026-10-15")])
+        self.assertIn("The Common Dividend is payable", d[0]["quote"])
+
+    def test_share_classes(self):
+        t = ("The Board declared quarterly dividends of $0.25 per share on its Class A common stock and $0.275 per share on its Class B common stock, "
+             "payable on December 10, 2026 to stockholders of record on November 20, 2026.")
+        d = C.parse_declaration(t, "2026-11-01")
+        self.assertEqual(sorted((x["share_class"], x["amount"]) for x in d), [("Class A", 0.25), ("Class B", 0.275)])
+
+
+class IpoTerms(unittest.TestCase):
+    def test_price_phrasings_and_shares(self):
+        for t, v in [("The initial public offering price per share of the Class A common stock is $18.00 . We have been approved", 18.0),
+                     ("The initial public offering price of Class A common stock will be $16.00 per share. We have", 16.0),
+                     ("The public offering price for our ordinary shares is $5.00 per ordinary share. We have been approved", 5.0)]:
+            self.assertEqual(C.price_terms(t)["price"]["value"], v, t)
+        r = C.price_terms("We are offering, on a firm commitment basis, 6,250,000 Ordinary Shares. Prior to this offering")
+        self.assertEqual(r["shares"]["value"], 6_250_000)
+
+    def test_preliminary_ranges_and_expected_price(self):
+        pre = "PRELIMINARY PROSPECTUS Subject to Completion. "
+        r = C.price_terms(pre + "We expect the initial public offering price will be between US$4.0 to US$6.0 per Ordinary Share.")
+        self.assertEqual((r["range"]["lo"], r["range"]["hi"]), (4.0, 6.0))
+        r = C.price_terms(pre + "The assumed price is the midpoint of the estimated initial public offering price range of $4.00 to $ 6.00 per ordinary share.")
+        self.assertEqual((r["range"]["lo"], r["range"]["hi"]), (4.0, 6.0))
+        r = C.price_terms(pre + "The initial public offering price for our common stock is expected to be $5.00 per share. We have applied")
+        self.assertEqual((r["range"]["lo"], r["range"].get("assumed")), (5.0, True))
+        self.assertNotIn("price", r)  # a preliminary prospectus has no final price
+        r = C.price_terms(pre + "The company is offering up to 35,000,000 shares at a fixed offering price of $0.01 per share for maximum gross proceeds")
+        self.assertEqual(r["range"]["lo"], 0.01)
+
+    def test_underwriters_block(self):
+        t = ("Any representation to the contrary is a criminal offense. The underwriters expect to deliver the shares on May 15, 2026. "
+             "MORGAN STANLEY J.P. Morgan Goldman Sachs & Co. LLC Co-Managers Keefe, Bruyette & Woods A Stifel Company Tuohy Brothers "
+             "__________________ Prospectus dated May 13, 2026 Table of Contents")
+        u = C.underwriters(t)
+        self.assertEqual(u["names"], ["Morgan Stanley", "J.P. Morgan", "Goldman Sachs & Co. LLC", "Keefe, Bruyette & Woods", "Tuohy Brothers"])
+        self.assertIn("MORGAN STANLEY", u["quote"])
+        self.assertIsNone(C.underwriters("No cover marker here."))
+
+
+class IpoStatusAndFirstDay(unittest.TestCase):
+    def test_stalled_after_thirty_days(self):
+        reg = [{"form": "S-1", "date": "2026-06-01"}]
+        eff = [{"form": "EFFECT", "date": "2026-09-01"}]
+        self.assertEqual(C.ipo_status(reg, [], eff, [], dt.date(2026, 9, 20)), "effective")
+        self.assertEqual(C.ipo_status(reg, [], eff, [], dt.date(2026, 11, 7)), "stalled")
+        self.assertEqual(C.ipo_status(reg, [{"form": "424B4"}], eff, [], dt.date(2026, 11, 7)), "priced")
+
+    def test_first_day_against_offer(self):
+        ts = lambda d: int(dt.datetime(d.year, d.month, d.day, 14, 30, tzinfo=dt.timezone.utc).timestamp())
+        bars = [[ts(dt.date(2026, 10, 30)), 14.7, 14.9, 11.6, 14.89, 1], [ts(dt.date(2026, 11, 6)), 13.0, 13.5, 12.0, 13.2, 1]]
+        row = {"priced": "2026-10-29", "symbol": "ASPE", "price": {"value": 15.0}}
+        f = C.first_day(row, dt.date(2026, 11, 7), chart=lambda s, r, i: {"bars": bars})
+        self.assertEqual(f["date"], "2026-10-30")
+        self.assertAlmostEqual(f["close_ret"], 14.89 / 15 - 1, 6)
+        self.assertAlmostEqual(f["since_ret"], 13.2 / 15 - 1, 6)
+        late = [[ts(dt.date(2026, 11, 25)), 1, 1, 1, 1, 1]]
+        self.assertIsNone(C.first_day(row, dt.date(2026, 11, 30), chart=lambda s, r, i: {"bars": late}))
+
+
+class EarningsCalendarEntry(unittest.TestCase):
+    def test_last_report_move_and_typical_reaction(self):
+        from etl.estimates_sources import _calendar_entry
+        sur = [{"quarter_end": f"2026-0{m}-30", "eps_actual": 1.0, "eps_estimate": 0.9, "surprise_pct": 0.11, "beat": 1,
+                "report": {"filed": f"2026-0{m + 1}-05", "accn": "x", "url": "u"}, "reaction": {"date": f"2026-0{m + 1}-06", "r1": r}}
+               for m, r in [(1, 0.02), (3, -0.06), (5, 0.04), (7, -0.01)]]
+        e = _calendar_entry({"next_earnings": {"date": "2026-11-05", "is_estimate": False, "eps": {"avg": 1.1}}}, {"surprises": sur})
+        self.assertEqual(e["last"]["move"], -0.01)
+        self.assertEqual(e["last"]["report"]["filed"], "2026-08-05")
+        self.assertAlmostEqual(e["reaction"]["median_abs_move"], 0.03)
+        self.assertEqual(e["reaction"]["n"], 4)
+        self.assertIsNone(_calendar_entry({}, {"surprises": []})["reaction"])
+
+
 if __name__ == "__main__":
     unittest.main()

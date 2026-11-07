@@ -192,8 +192,8 @@ def parse_declaration(text, filed):
         for j in range(i + 1, min(i + 4, len(sents))):
             nxt = sents[j]
             nl = nxt.lower()
-            if re.search(r"\bpreferred\b|\bseries [a-z]\b", nl) and _amount(nxt) is not None:
-                break
+            if re.search(r"\bpreferred\b|\bseries [a-z]\b", nl):
+                break  # dates in a preferred-stock sentence belong to that dividend
             if _amount(nxt) is not None and "dividend" in nl and re.search(r"\bdeclared\b", nl):
                 break
             window.append(nxt)
@@ -207,9 +207,26 @@ def parse_declaration(text, filed):
                 payable, end = p_, max(end, i + k)
             if record and payable:
                 break
+        later = None
+        if not record or not payable:
+            # dates stated later for a defined term: (the "Common Dividend") ... The Common Dividend is payable on ...
+            label = re.search(r"\(the [\"\u201c]([^\"\u201d]{3,40}(?:Dividend|Distribution)s?)[\"\u201d]\)", s)
+            for j in range(i + 1, min(i + 16, len(sents))):
+                nxt = sents[j]
+                nl = nxt.lower()
+                if label:
+                    if label.group(1).lower() not in nl:
+                        continue
+                elif j > i + 8 or "dividend" not in nl or re.search(r"\bpreferred\b|\bseries [a-z]\b", nl) or _amount(nxt) is not None:
+                    continue
+                r_ = _date_after(nxt, RECORD_W, ref)
+                p_ = _date_after(nxt, PAY_W, ref, 60)
+                if r_ or p_:
+                    record, payable, later = record or r_, payable or p_, j
+                    break
         if not record and not payable:
             continue
-        quote = " ".join(sents[i:end + 1])
+        quote = " ".join(sents[i:end + 1]) + (" ... " + sents[later] if later and later > end + 1 else " " + sents[later] if later else "")
         k0 = re.search(r"\b(19|20)\d{2}\s*(?:\u2013|\u2014|--|-|/PRNewswire/|/Business Wire/)\s*", s[:300])  # strip the dateline
         if k0:
             quote = quote[k0.end():]
@@ -222,7 +239,9 @@ def parse_declaration(text, filed):
             kind = ("special" if "special" in near or "one-time" in near else "monthly" if "monthly" in near or "for the month" in near else
                     "semi-annual" if "semi-annual" in near or "semiannual" in near else "annual" if re.search(r"\bannual (cash )?dividend", near) else
                     "quarterly" if "quarter" in near else "regular")
-            out.append({"amount": round(amount, 6), "kind": kind, "record": record and record.isoformat(), "payable": payable and payable.isoformat(),
+            cls = re.search(r"\bclass ([a-c])\b", s[am.start():am.end() + 60].lower()) or re.search(r"\bclass ([a-c])\b", near)
+            out.append({"amount": round(amount, 6), "kind": kind, "share_class": cls and f"Class {cls.group(1).upper()}",
+                        "record": record and record.isoformat(), "payable": payable and payable.isoformat(),
                         "ex_date": ex and ex.isoformat(), "increase": bool(re.search(r"\bincrease", " ".join(window).lower())), "quote": quote[:700]})
     return _dedupe(out)
 
@@ -404,28 +423,124 @@ def _etp(name, sic):
     return bool(re.search(r"\b(ETF|ETP|Exchange[- ]Traded|Bitcoin|Ether(eum)?|Crypto)\b", name, re.I)) or str(sic) in ("6221",)
 
 
+UNDERWRITER_ROLES = re.compile(r"\b(?:Joint |Sole |Lead |Passive |Senior )*(?:Lead )?(?:Book[- ]?Running|Bookrunning|Book-Runner|Bookrunner|Co-?Lead|Lead|Co-)?\s*(?:Managers?|Bookrunners?|Book-Runners?|Underwriters?|Placement Agents?)\b", re.I)
+# Bank names as they appear on prospectus covers; anything left over on a short cover line is kept as written.
+BANKS = sorted([
+    "Goldman Sachs & Co. LLC", "Goldman Sachs", "J.P. Morgan", "Morgan Stanley", "BofA Securities", "Citigroup", "Jefferies", "Barclays",
+    "Evercore ISI", "TD Cowen", "Cowen", "Leerink Partners", "SVB Leerink", "Piper Sandler", "Stifel", "Cantor", "Mizuho", "Wells Fargo Securities",
+    "UBS Investment Bank", "Deutsche Bank Securities", "RBC Capital Markets", "Guggenheim Securities", "William Blair", "Needham & Company",
+    "Truist Securities", "KeyBanc Capital Markets", "BMO Capital Markets", "Baird", "Raymond James", "Oppenheimer & Co.", "Wolfe | Nomura Alliance",
+    "Nomura", "Macquarie Capital", "Santander", "SMBC Nikko", "Societe Generale", "Société Générale", "BTIG", "Clear Street", "Chardan", "LifeSci Capital",
+    "Wedbush PacGrow", "Wedbush Securities", "Lake Street", "Roth Capital Partners", "Roth Capital", "Maxim Group LLC", "ThinkEquity", "EF Hutton",
+    "Aegis Capital Corp.", "Univest Securities, LLC", "Network 1 Financial Securities", "US Tiger Securities", "Prime Number Capital", "D. Boral Capital",
+    "Craft Capital Management", "Joseph Stone Capital", "The Benchmark Company", "Benchmark", "Dominari Securities", "Spartan Capital Securities",
+    "Kingswood Capital Partners", "Bancroft Capital", "R.F. Lafferty & Co.", "Boustead Securities", "Revere Securities", "Rodman & Renshaw",
+    "H.C. Wainwright & Co.", "Ladenburg Thalmann", "A.G.P.", "Alliance Global Partners", "WestPark Capital", "Brookline Capital Markets",
+    "Laidlaw & Company", "Craig-Hallum", "Northland Capital Markets", "Janney Montgomery Scott", "Keefe, Bruyette & Woods", "KBW", "Houlihan Lokey",
+    "Capital One Securities", "Stephens Inc.", "Tuohy Brothers", "Titan Partners", "Loop Capital Markets", "Siebert Williams Shank", "Academy Securities",
+    "Samuel A. Ramirez & Company", "Drexel Hamilton", "CastleOak Securities", "Tigress Financial Partners", "Blaylock Van", "Telsey Advisory Group",
+    "Moelis & Company", "Lazard", "Rothschild & Co", "Centerview Partners", "PJT Partners", "D.A. Davidson & Co.", "Hovde Group", "Piper Jaffray",
+    "Performance Trust Capital Partners", "Stephens", "Sidoti & Company", "Bernstein", "Dawson James Securities", "Cathay Securities", "Eddid Securities",
+    "Futu", "Tiger Brokers", "Citizens JMP", "Citizens Capital Markets", "JMP Securities", "Cohen & Company Capital Markets", "Mischler Financial Group",
+    "Morgan Stanley & Co. LLC", "Credit Suisse", "HSBC", "Natixis", "ING", "Scotiabank", "CIBC Capital Markets", "TD Securities", "Desjardins",
+    "Canaccord Genuity", "Cormark Securities", "Eight Capital", "National Bank Financial", "Paradigm Capital", "Haitong International", "CICC",
+    "Huatai Securities", "China Renaissance", "Valuable Capital", "AMTD", "Bocom International", "CMB International", "Freedom Capital Markets",
+    "Lucid Capital Markets", "Ladenburg", "Brean Capital", "Alexander Capital", "Kingswood", "American Trust Investment Services", "Bancroft",
+    "BBVA", "MUFG", "Rosenblatt", "Regions Securities LLC", "Regions Securities", "Strong Capital Markets", "Texas Capital Securities",
+    "Joseph Gunnar & Co., LLC", "MDB Capital", "Fortune Securities", "BOCOM International", "ICBC International", "CR Global Markets",
+    "JonesTrading", "Deutsche Bank", "Seaport Global Securities", "Wells Fargo", "Morgan Stanley & Co.", "Goldman Sachs & Co.",
+    "Fifth Third Securities", "PNC Capital Markets LLC", "Huntington Capital Markets", "Comerica Securities", "US Bancorp", "U.S. Bancorp",
+    "Credit Agricole CIB", "Crédit Agricole CIB", "First Citizens Capital Securities", "Blackstone Capital Markets", "Rabo Securities",
+    "Roberts & Ryan", "Pickering Energy Partners", "Ramirez & Co., Inc.", "R. Seelaus & Co., LLC", "AmeriVet Securities", "Penserra Securities LLC", "Guzman & Company", "Independence Point Securities",
+], key=len, reverse=True)
+BANK_RX = re.compile(r"(?<![A-Za-z])(?:" + "|".join(re.escape(b) for b in BANKS) + r")(?![A-Za-z])", re.I)
+BANK_NAME = {b.lower(): b for b in BANKS}
+
+
+def underwriters(head):
+    """Bank names on the prospectus cover: the short block between the delivery or SEC legend sentence and the
+    "Prospectus dated" / "The date of this prospectus" line. Returns the names in cover order and the block quoted."""
+    m = re.search(r"(?:The date of this prospectus is|Prospectus dated|Preliminary Prospectus dated|Subject to Completion)", head[:60000])
+    if not m:
+        return None
+    pre = head[max(0, m.start() - 1500):m.start()]
+    # the last sentence end before the bank block; "J.P. Morgan", "& Co. LLC" and "Inc. " are not sentence ends
+    ends = [x.end() for x in re.finditer(r"(?<![A-Z])(?<!\bCo)(?<!\bInc)(?<!\bCorp)(?<!\bLtd)(?<!\bNo)\.\s+(?=[A-Z_])|_{3,}\s*|offense\.\s*", pre)]
+    block = pre
+    for e in reversed(ends):
+        if pre[e:].strip(" ._\u200b\u00a0"):
+            block = pre[e:]
+            break
+    block = re.sub(r"[_\u200b\u00a0]+", " ", block).strip(" .")
+    if not block or len(block) > 1200:
+        return None
+    names = []
+    scan = re.sub(r"\bA [A-Z][A-Za-z]+ Company\b", " ", block)  # "Keefe, Bruyette & Woods A Stifel Company" names one bank
+    rest = scan
+    for x in BANK_RX.finditer(scan):
+        n = BANK_NAME.get(x.group(0).strip().lower(), x.group(0).strip())
+        if n not in names:
+            names.append(n)
+        rest = rest.replace(x.group(0), " ")
+    rest = re.sub(r"\s+", " ", UNDERWRITER_ROLES.sub(" ", rest)).strip(" |,.*")
+    # an unknown name left on a short block (e.g. a small-cap sole underwriter): keep it only when it reads as one name
+    if (rest and len(rest.split()) <= 5 and re.match(r"[A-Z]", rest) and not re.match(r"(?:LLC|Inc|Co|Corp|Ltd|A|An)\b", rest)
+            and not re.search(r"\b(?:the|and|of|our|this|we|is|are)\b|[*]", rest)):
+        names.append(rest)
+    if not names:
+        return None
+    return {"names": names, "quote": block[:1200]}
+
+
 def price_terms(text):
-    """Cover-page terms: price range, final price, shares offered, proposed symbol and exchange, each with its sentence."""
+    """Cover-page terms: price range, final price, shares offered, proposed symbol and exchange, underwriters, each with
+    the sentence it was read from."""
     head = re.sub(r"\s+", " ", text[:60000])
     out = {"blank": bool(re.search(r"\bblank[- ]check company\b", head, re.I)),
            "direct": bool(re.search(r"\bdirect listing\b", head[:20000], re.I))}
     unit = r"per\s+((?:Class [A-C] )?(?:ordinary share|common share|share|ADS|American Depositary Share|unit|Ordinary Share))"
-    m = (re.search(r"between (?:US)?\$\s?(\d+(?:\.\d+)?) and (?:US)?\$\s?(\d+(?:\.\d+)?) " + unit, head, re.I)
-         or re.search(r"in the range of (?:US)?\$\s?(\d+(?:\.\d+)?) (?:to|and) (?:US)?\$\s?(\d+(?:\.\d+)?) " + unit, head, re.I)
-         or re.search(r"(?:US)?\$\s?(\d+(?:\.\d+)?) (?:to|and) (?:US)?\$\s?(\d+(?:\.\d+)?) " + unit + r"[^.]{0,60}(?:initial public offering|offering price)", head, re.I))
+    usd = r"(?:US)?\$\s?(\d+(?:\.\d+)?)"
+    m = (re.search(r"between " + usd + r" (?:and|to) " + usd + r" " + unit, head, re.I)
+         or re.search(r"price range of " + usd + r" (?:to|and|-) " + usd + r" " + unit, head, re.I)
+         or re.search(r"in the range of " + usd + r" (?:to|and) " + usd + r" " + unit, head, re.I)
+         or re.search(usd + r" (?:to|and) " + usd + r" " + unit + r"[^.]{0,60}(?:initial public offering|offering price)", head, re.I)
+         or re.search(r"offering price[^.$]{0,60}(?:will|to) be between " + usd + r" and " + usd + r"()", head, re.I))
     if m:
-        out["range"] = {"lo": float(m.group(1)), "hi": float(m.group(2)), "unit": m.group(3), "quote": _around(head, m)}
-    m = (re.search(r"initial public offering price (?:of (?:our |the )?[A-Za-z ]{0,60}?)?(?:is|of|per (?:share|ADS|unit) is)\s*(?:US)?\$\s?(\d+(?:\.\d+)?)", head, re.I)
-         or re.search(r"public offering price (?:is|of)\s*(?:US)?\$\s?(\d+(?:\.\d+)?) per (?:share|ADS|American Depositary Share|unit|ordinary share)", head, re.I)
-         or re.search(r"offering price (?:is|of)\s*(?:US)?\$\s?(\d+(?:\.\d+)?) per (?:share|ADS|unit)", head, re.I)
-         or re.search(r"(?:US)?\$\s?(\d+(?:\.\d+)?) per (?:share|unit|ADS)[^.]{0,40}initial public offering", head, re.I))
-    assumed = re.search(r"assumed (?:initial )?public offering price of (?:US)?\$\s?(\d+(?:\.\d+)?)", head, re.I)
-    if m and not re.search(r"assumed", head[max(0, m.start() - 30):m.start()], re.I):
+        out["range"] = {"lo": float(m.group(1)), "hi": float(m.group(2)), "unit": m.group(3) or "share", "quote": _around(head, m)}
+    m = (re.search(r"initial public offering price(?: per (?:share|ordinary share|common share|ADS|unit))?(?: (?:of|for) (?:our |the |each )?[A-Za-z ]{0,60}?)?\s+(?:is|will be|of|per (?:share|ADS|unit) is)\s*" + usd, head, re.I)
+         or re.search(r"public offering price(?: (?:for|of) (?:our |the |each )?[A-Za-z ]{0,40}?)?\s+(?:is|of|will be)\s*" + usd + r" per (?:share|ADS|American Depositary Share|unit|ordinary share|common share|Ordinary Share)", head, re.I)
+         or re.search(r"offering price (?:is|of)\s*" + usd + r" per (?:share|ADS|unit)", head, re.I)
+         or re.search(usd + r" per (?:share|unit|ADS)[^.]{0,40}initial public offering", head, re.I))
+    fixed = re.search(r"(?:at|of) a fixed (?:offering |public offering )?price of " + usd + r" per", head, re.I) \
+        or re.search(r"based upon the " + usd + r" per share offering price", head, re.I)
+    assumed = re.search(r"assumed (?:initial )?public offering price of " + usd, head, re.I)
+    if m and not re.search(r"assumed|estimated", head[max(0, m.start() - 30):m.start()], re.I):
         out["price"] = {"value": float(m.group(1)), "quote": _around(head, m)}
+    elif fixed:
+        out["price"] = {"value": float(fixed.group(1)), "fixed": True, "quote": _around(head, fixed)}
+    if "range" not in out and fixed:
+        v = float(fixed.group(1))
+        out["range"] = {"lo": v, "hi": v, "unit": "share", "fixed": True, "quote": _around(head, fixed)}
     if assumed and "range" not in out:
         v = float(assumed.group(1))
         out["range"] = {"lo": v, "hi": v, "unit": "share", "assumed": True, "quote": _around(head, assumed)}
-    m = re.search(r"([\d,]{5,})\s+(shares of (?:our )?(?:Class [A-C] )?(?:common stock|ordinary shares|common shares)|American Depositary Shares|ADSs|units)", head, re.I)
+    preliminary = bool(re.search(r"subject to completion|preliminary prospectus", head[:8000], re.I))
+    if preliminary and "range" not in out:
+        # small offerings state one expected price instead of a range: "is expected to be $5.00", "is assumed to be US$4.00"
+        e = re.search(r"offering price(?: (?:of|for|per) [^.$]{0,60}?)?\s+(?:is expected to be|is anticipated to be|is assumed to be|to be|will be|is)\s*" + usd, head, re.I)
+        if e:
+            v = float(e.group(1))
+            out["range"] = {"lo": v, "hi": v, "unit": "share", "assumed": True, "quote": _around(head, e)}
+        elif out.get("price"):
+            v = out["price"]["value"]
+            out["range"] = {"lo": v, "hi": v, "unit": "share", "assumed": True, "quote": out["price"]["quote"]}
+    if preliminary:
+        out.pop("price", None)  # a preliminary prospectus has no final price
+    sh = (r"((?:Class [A-C] )?(?:shares of (?:our )?(?:Class [A-C] )?(?:common stock|ordinary shares|common shares)|ordinary shares|Ordinary Shares|"
+          r"common shares|Common Shares|American Depositary Shares|ADSs|units|Units|Shares|shares))")
+    m = (re.search(r"(?:we are|is|are) (?:offering|selling)(?:,? on a (?:firm commitment|best[- ]efforts) basis,)? (?:up to |an aggregate of )?([\d,]{5,})\s+" + sh, head, re.I)
+         or re.search(r"([\d,]{5,})\s+(shares of (?:our )?(?:Class [A-C] )?(?:common stock|ordinary shares|common shares)|American Depositary Shares|ADSs|units)", head, re.I)
+         or re.search(r"([\d,]{5,})\s+" + sh, head[:3000]))
     if m:
         out["shares"] = {"value": int(m.group(1).replace(",", "")), "unit": m.group(2), "quote": _around(head, m)}
     m = (re.search(r"(?:under the|under the trading|under the ticker) symbols? [\"']\s?([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\.?\s?[\"']", head)
@@ -434,6 +549,9 @@ def price_terms(text):
         ctx = _around(head, m)
         ex = re.search(r"Nasdaq Global Select|Nasdaq Global Market|Nasdaq Capital Market|Nasdaq|New York Stock Exchange|NYSE American|NYSE|Cboe", ctx)
         out["symbol"] = {"value": m.group(1), "exchange": ex.group(0) if ex else None, "quote": ctx}
+    uw = underwriters(head)
+    if uw:
+        out["underwriters"] = uw
     return out
 
 
@@ -447,6 +565,54 @@ def _around(s, m, pad=220):
 
 def _doc_url(cik, accn, doc):
     return f"{ARCHIVES}/{cik}/{accn.replace('-', '')}/{doc}"
+
+
+STALL_DAYS = 30
+
+
+def ipo_status(reg, final, eff, rw, today):
+    """priced > withdrawn > effective (stalled once STALL_DAYS pass with no final prospectus) > amended > filed."""
+    if final:
+        return "priced"
+    if rw:
+        return "withdrawn"
+    if eff:
+        return "stalled" if (today - dt.date.fromisoformat(eff[-1]["date"])).days > STALL_DAYS else "effective"
+    return "amended" if any("/A" in r["form"] for r in reg) else "filed"
+
+
+def first_day(row, today, cached=None, chart=None):
+    """First session after pricing from the Yahoo chart API: open and close against the offer price, and the latest
+    close. The first bar must fall within ten days of the pricing date, so a reused or wrong symbol is not matched."""
+    from . import prices
+    chart = chart or prices.chart
+    priced = dt.date.fromisoformat(row["priced"])
+    age = (today - priced).days
+    if age < 1:
+        return None
+    rng = "1mo" if age < 25 else "3mo" if age < 85 else "6mo" if age < 175 else "1y"
+    d = chart(row["symbol"], rng, "1d")
+    bars = [b for b in d.get("bars") or [] if b[4]]
+    if not bars:
+        return None
+    day = lambda b: dt.datetime.fromtimestamp(b[0], dt.timezone.utc).date()
+    if cached and cached.get("symbol") == row["symbol"]:
+        f = {"date": cached["date"], "open": cached["open"], "close": cached["close"]}
+    else:
+        b0 = bars[0]
+        if not (priced <= day(b0) <= priced + dt.timedelta(days=10)):
+            return None
+        f = {"date": day(b0).isoformat(), "open": b0[1], "close": b0[4]}
+    offer = (row.get("price") or {}).get("value")
+    last = bars[-1]
+    out = dict(f, symbol=row["symbol"], last_close=last[4], last_date=day(last).isoformat(),
+               url=f"https://finance.yahoo.com/quote/{row['symbol'].replace('.', '-')}/history/",
+               source="Yahoo Finance chart API, daily bars")
+    if offer:
+        out["open_ret"] = round(f["open"] / offer - 1, 6)
+        out["close_ret"] = round(f["close"] / offer - 1, 6)
+        out["since_ret"] = round(last[4] / offer - 1, 6)
+    return out
 
 
 def ipos_job(sb, today=None, time_budget=600, log=print):
@@ -522,7 +688,7 @@ def ipos_job(sb, today=None, time_budget=600, log=print):
         final = [r for r in rs if r["form"] in ("424B4", "424B1")][:1]  # the first final prospectus prices the IPO
         eff = [r for r in rs if r["form"] == "EFFECT" and reg and r["date"] >= reg[0]["date"]]
         rw = [r for r in rs if r["form"] == "RW" and reg and r["date"] >= reg[-1]["date"]]
-        status = "priced" if final else "withdrawn" if rw else "effective" if eff else "amended" if any("/A" in r["form"] for r in reg) else "filed"
+        status = ipo_status(reg, final, eff, rw, today)
         if not reg and not final:
             continue
         # cover terms: final prospectus if priced, otherwise the latest amendment (ranges appear only in later amendments)
@@ -562,6 +728,15 @@ def ipos_job(sb, today=None, time_budget=600, log=print):
         elif t_:
             rng = dict(rng, url=t_.get("url"), date=t_.get("date"))
         price = (t_ or {}).get("price") if final else None
+        uw = (t_ or {}).get("underwriters")
+        if not uw:
+            for r in reversed(reg):
+                tr = terms.get(r["accn"])
+                if tr and tr.get("underwriters"):
+                    uw = dict(tr["underwriters"], url=tr.get("url"), date=tr.get("date"))
+                    break
+        elif t_:
+            uw = dict(uw, url=t_.get("url"), date=t_.get("date"))
         shares = (t_ or {}).get("shares")
         sym = (t_ or {}).get("symbol") or {}
         filings = [{"form": r["form"], "date": r["date"], "accn": r["accn"], "doc": info["docs"].get(r["accn"]),
@@ -583,8 +758,22 @@ def ipos_job(sb, today=None, time_budget=600, log=print):
             "shares": shares and dict(shares, url=t_.get("url"), date=t_.get("date")),
             "proceeds": round(price["value"] * shares["value"]) if price and shares else None,
             "direct_listing": bool((t_ or {}).get("direct")),
+            "underwriters": uw,
             "filings": filings[-12:],
         })
+    first = state.setdefault("first_day", {})
+    for row in rows:
+        if row["status"] != "priced" or not row["symbol"] or time.time() > deadline:
+            continue
+        try:
+            fd = first_day(row, today, cached=first.get(str(row["cik"])))
+        except Exception as e:
+            log(f"first day {row['symbol']}: {str(e)[:120]}")
+            fd = None
+        if fd:
+            first[str(row["cik"])] = {k: fd[k] for k in ("date", "open", "close", "symbol")}
+            row["first_day"] = fd
+    state["first_day"] = {k: v for k, v in first.items() if int(k) in cands}
     live = {r["accn"] for rs in cands.values() for r in rs}
     state["terms"] = {k: v for k, v in terms.items() if k in live}
     _put_cache(sb, IPO_CACHE, state)
