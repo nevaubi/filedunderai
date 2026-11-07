@@ -155,6 +155,8 @@ class IpoStatusAndFirstDay(unittest.TestCase):
         self.assertEqual(f["date"], "2026-10-30")
         self.assertAlmostEqual(f["close_ret"], 14.89 / 15 - 1, 6)
         self.assertAlmostEqual(f["since_ret"], 13.2 / 15 - 1, 6)
+        split = C.first_day(row, dt.date(2026, 11, 7), chart=lambda s, r, i: {"bars": bars, "splits": [{"date": "2026-11-02", "numerator": 2, "denominator": 1}]})
+        self.assertAlmostEqual(split["since_ret"], 13.2 / 7.5 - 1, 6)
         late = [[ts(dt.date(2026, 11, 25)), 1, 1, 1, 1, 1]]
         self.assertIsNone(C.first_day(row, dt.date(2026, 11, 30), chart=lambda s, r, i: {"bars": late}))
 

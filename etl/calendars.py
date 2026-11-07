@@ -485,7 +485,7 @@ def underwriters(head):
     rest = re.sub(r"\s+", " ", UNDERWRITER_ROLES.sub(" ", rest)).strip(" |,.*")
     # an unknown name left on a short block (e.g. a small-cap sole underwriter): keep it only when it reads as one name
     if (rest and len(rest.split()) <= 5 and re.match(r"[A-Z]", rest) and not re.match(r"(?:LLC|Inc|Co|Corp|Ltd|A|An)\b", rest)
-            and not re.search(r"\b(?:the|and|of|our|this|we|is|are)\b|[*]", rest)):
+            and not re.search(r"\b(?:the|and|of|our|this|we|is|are)\b|[*]|Prospectus|Table|Contents|Page", rest)):
         names.append(rest)
     if not names:
         return None
@@ -581,38 +581,62 @@ def ipo_status(reg, final, eff, rw, today):
     return "amended" if any("/A" in r["form"] for r in reg) else "filed"
 
 
-def first_day(row, today, cached=None, chart=None):
+def first_day(row, today, chart=None):
     """First session after pricing from the Yahoo chart API: open and close against the offer price, and the latest
     close. The first bar must fall within ten days of the pricing date, so a reused or wrong symbol is not matched."""
-    from . import prices
-    chart = chart or prices.chart
     priced = dt.date.fromisoformat(row["priced"])
     age = (today - priced).days
     if age < 1:
         return None
     rng = "1mo" if age < 25 else "3mo" if age < 85 else "6mo" if age < 175 else "1y"
-    d = chart(row["symbol"], rng, "1d")
+    d = (chart or _chart_with_splits)(row["symbol"], rng, "1d")
     bars = [b for b in d.get("bars") or [] if b[4]]
     if not bars:
         return None
     day = lambda b: dt.datetime.fromtimestamp(b[0], dt.timezone.utc).date()
-    if cached and cached.get("symbol") == row["symbol"]:
-        f = {"date": cached["date"], "open": cached["open"], "close": cached["close"]}
-    else:
-        b0 = bars[0]
-        if not (priced <= day(b0) <= priced + dt.timedelta(days=10)):
-            return None
-        f = {"date": day(b0).isoformat(), "open": b0[1], "close": b0[4]}
+    # recomputed each run (not cached) so a later split adjusts the first session and the offer alike
+    b0 = bars[0]
+    if not (priced <= day(b0) <= priced + dt.timedelta(days=10)):
+        return None
+    f = {"date": day(b0).isoformat(), "open": b0[1], "close": b0[4]}
     offer = (row.get("price") or {}).get("value")
+    # Yahoo bars are split-adjusted; put the offer price on the same basis
+    factor = 1.0
+    for sp in d.get("splits") or []:
+        if sp["date"] > priced.isoformat() and sp.get("numerator") and sp.get("denominator"):
+            factor *= sp["numerator"] / sp["denominator"]
+    if offer and factor != 1.0:
+        offer = offer / factor
     last = bars[-1]
     out = dict(f, symbol=row["symbol"], last_close=last[4], last_date=day(last).isoformat(),
                url=f"https://finance.yahoo.com/quote/{row['symbol'].replace('.', '-')}/history/",
                source="Yahoo Finance chart API, daily bars")
+    if factor != 1.0:
+        out["split_factor"] = factor
     if offer:
         out["open_ret"] = round(f["open"] / offer - 1, 6)
         out["close_ret"] = round(f["close"] / offer - 1, 6)
         out["since_ret"] = round(last[4] / offer - 1, 6)
     return out
+
+
+def _chart_with_splits(sym, rng, interval):
+    """Daily bars plus split events from the Yahoo chart API (etl.prices.chart reads dividends only)."""
+    from .common import get_json
+    url = (f"https://query2.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(sym.replace('.', '-'))}"
+           f"?range={rng}&interval={interval}&includePrePost=false&events=split")
+    r = get_json(url, timeout=30, retries=2)["chart"]["result"][0]
+    q = r["indicators"]["quote"][0]
+    bars = []
+    for i, t in enumerate(r.get("timestamp") or []):
+        c = q["close"][i]
+        if c is None:
+            continue
+        o = q["open"][i] or c
+        bars.append([t, round(o, 4), round(q["high"][i] or c, 4), round(q["low"][i] or c, 4), round(c, 4), q["volume"][i] or 0])
+    splits = [{"date": dt.datetime.fromtimestamp(int(k), dt.timezone.utc).date().isoformat(), "numerator": v.get("numerator"),
+               "denominator": v.get("denominator")} for k, v in ((r.get("events") or {}).get("splits") or {}).items()]
+    return {"bars": bars, "splits": splits}
 
 
 def ipos_job(sb, today=None, time_budget=600, log=print):
@@ -761,19 +785,17 @@ def ipos_job(sb, today=None, time_budget=600, log=print):
             "underwriters": uw,
             "filings": filings[-12:],
         })
-    first = state.setdefault("first_day", {})
+    state.pop("first_day", None)
     for row in rows:
         if row["status"] != "priced" or not row["symbol"] or time.time() > deadline:
             continue
         try:
-            fd = first_day(row, today, cached=first.get(str(row["cik"])))
+            fd = first_day(row, today)
         except Exception as e:
             log(f"first day {row['symbol']}: {str(e)[:120]}")
             fd = None
         if fd:
-            first[str(row["cik"])] = {k: fd[k] for k in ("date", "open", "close", "symbol")}
             row["first_day"] = fd
-    state["first_day"] = {k: v for k, v in first.items() if int(k) in cands}
     live = {r["accn"] for rs in cands.values() for r in rs}
     state["terms"] = {k: v for k, v in terms.items() if k in live}
     _put_cache(sb, IPO_CACHE, state)
