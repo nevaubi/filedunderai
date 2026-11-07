@@ -136,7 +136,7 @@ AMOUNT_RX = [re.compile(r"\$\s?(\d{1,3}(?:\.\d{1,5})?)(?![\d,])\s*(?:per\s+(?:sh
              re.compile(r"dividends?\s+(?:of|in the amount of)\s+\$\s?(\d{1,3}(?:\.\d{1,5})?)(?![\d,])(?!\s*(?:million|billion|thousand))", re.I),
              re.compile(r"(\d{1,3}(?:\.\d{1,5})?)\s+cents\s+per\s+share", re.I)]
 RECORD_W = [r"of record", r"\brecord date\b", r"\brecord\b"]
-PAY_W = [r"\bpayable\b", r"\bpaid\b", r"\bpayment date\b", r"\bto be paid\b", r"\bwill be distributed\b"]
+PAY_W = [r"\bpayable\b", r"\bpaid\b", r"\bpayment date\b", r"\bto be paid\b", r"\bdistributed\b", r"\bdistribute\b"]
 
 
 def _amount_matches(s):
@@ -148,6 +148,9 @@ def _amount_matches(s):
                 continue
             before, after = s[max(0, m.start() - 60):m.start()].lower(), s[m.end():m.end() + 140].lower()
             if re.search(r"annuali[sz]ed|annual rate|per annum", before + after[:30]):
+                continue
+            # "an increase from $0.07 to $0.08 per share": the prior amount is not a declaration
+            if re.search(r"\b(from|previous(ly)?|prior)\s+(?:the\s+)?(?:quarterly\s+)?(?:dividend\s+(?:of|rate of)\s+)?$", before[-40:]) or re.search(r"\b(?:last|prior|previous) (?:quarter|year|dividend)", after[:40]):
                 continue
             if re.search(r"preferred|\bseries [a-z]\b|depositary", after[:110]) and "common" not in after[:40]:
                 continue
@@ -404,14 +407,15 @@ def _etp(name, sic):
 def price_terms(text):
     """Cover-page terms: price range, final price, shares offered, proposed symbol and exchange, each with its sentence."""
     head = re.sub(r"\s+", " ", text[:60000])
-    out = {"blank": bool(re.search(r"\bblank[- ]check company\b", head, re.I))}
+    out = {"blank": bool(re.search(r"\bblank[- ]check company\b", head, re.I)),
+           "direct": bool(re.search(r"\bdirect listing\b", head[:20000], re.I))}
     unit = r"per\s+((?:Class [A-C] )?(?:ordinary share|common share|share|ADS|American Depositary Share|unit|Ordinary Share))"
     m = (re.search(r"between (?:US)?\$\s?(\d+(?:\.\d+)?) and (?:US)?\$\s?(\d+(?:\.\d+)?) " + unit, head, re.I)
          or re.search(r"in the range of (?:US)?\$\s?(\d+(?:\.\d+)?) (?:to|and) (?:US)?\$\s?(\d+(?:\.\d+)?) " + unit, head, re.I)
          or re.search(r"(?:US)?\$\s?(\d+(?:\.\d+)?) (?:to|and) (?:US)?\$\s?(\d+(?:\.\d+)?) " + unit + r"[^.]{0,60}(?:initial public offering|offering price)", head, re.I))
     if m:
         out["range"] = {"lo": float(m.group(1)), "hi": float(m.group(2)), "unit": m.group(3), "quote": _around(head, m)}
-    m = (re.search(r"initial public offering price (?:is|of|per (?:share|ADS|unit) is)\s*(?:US)?\$\s?(\d+(?:\.\d+)?)", head, re.I)
+    m = (re.search(r"initial public offering price (?:of (?:our |the )?[A-Za-z ]{0,60}?)?(?:is|of|per (?:share|ADS|unit) is)\s*(?:US)?\$\s?(\d+(?:\.\d+)?)", head, re.I)
          or re.search(r"public offering price (?:is|of)\s*(?:US)?\$\s?(\d+(?:\.\d+)?) per (?:share|ADS|American Depositary Share|unit|ordinary share)", head, re.I)
          or re.search(r"offering price (?:is|of)\s*(?:US)?\$\s?(\d+(?:\.\d+)?) per (?:share|ADS|unit)", head, re.I)
          or re.search(r"(?:US)?\$\s?(\d+(?:\.\d+)?) per (?:share|unit|ADS)[^.]{0,40}initial public offering", head, re.I))
@@ -537,6 +541,16 @@ def ipos_job(sb, today=None, time_budget=600, log=print):
                     terms[key] = t_
                 except Exception as e:
                     log(f"terms {c} {pick['accn']}: {str(e)[:120]}")
+        if final and reg and time.time() < deadline:
+            last_reg = next((r for r in reversed(reg) if info["docs"].get(r["accn"]) and "MEF" not in r["form"]), None)
+            if last_reg and last_reg["accn"] not in terms:
+                try:
+                    tr = price_terms(html_text(_sec(_doc_url(c, last_reg["accn"], info["docs"][last_reg["accn"]]), timeout=90)))
+                    tr.update(url=_doc_url(c, last_reg["accn"], info["docs"][last_reg["accn"]]), form=last_reg["form"], date=last_reg["date"],
+                              accn=last_reg["accn"], doc=info["docs"][last_reg["accn"]])
+                    terms[last_reg["accn"]] = tr
+                except Exception as e:
+                    log(f"terms {c} {last_reg['accn']}: {str(e)[:120]}")
         # the latest range seen across amendments, if the picked document has none
         rng = (t_ or {}).get("range")
         if not rng:
@@ -568,6 +582,7 @@ def ipos_job(sb, today=None, time_budget=600, log=print):
             "price": price and dict(price, url=t_.get("url"), date=t_.get("date")),
             "shares": shares and dict(shares, url=t_.get("url"), date=t_.get("date")),
             "proceeds": round(price["value"] * shares["value"]) if price and shares else None,
+            "direct_listing": bool((t_ or {}).get("direct")),
             "filings": filings[-12:],
         })
     live = {r["accn"] for rs in cands.values() for r in rs}
