@@ -37,6 +37,8 @@ const PUBLIC_RX = [
   /^macro\/releases\.json$/,
   /^calendars\/(ipos|dividends)\.json$/,
   /^changes\/(feed|[A-Za-z0-9_.-]{1,32})\.json$/,
+  /^earnings\/(preview|score|calls)\/[A-Za-z0-9_.-]{1,32}\.json$/,
+  /^earnings\/season\.json$/,
 ];
 
 /** Which bucket a cleaned path lives in. */
