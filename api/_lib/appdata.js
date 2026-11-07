@@ -25,6 +25,7 @@ const PUBLIC_RX = [
   /^kpistd\/(latest|taxonomy|map)\.json$/,
   /^kpistd\/(t|series)\/[A-Za-z0-9_.-]{1,64}\.json$/,
   /^sectors\.json$/,
+  /^movers\.json$/,
   /^sectors\/(notes|[a-z0-9-]{1,80}(\.comp)?)\.json$/,
   /^tech\/(signals|breadth|states)\.json$/,
   /^tech\/(bars|events)\/[A-Za-z0-9_.^=-]{1,32}\.json$/,

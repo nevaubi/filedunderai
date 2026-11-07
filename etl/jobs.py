@@ -735,7 +735,28 @@ def build_index(sb, pstats=None, fundamentals_snapshot=None, return_snapshot=Fal
         sb.upsert("company_metrics", metrics, "ticker")
     snapshot = {"generated": now_iso(), "universe": UNIVERSE_METADATA, "sectors": SECTOR_ETF, "companies": rows}
     sb.put_json("index.json", snapshot, cache="max-age=120")
+    try:
+        sb.put_json("movers.json", movers(rows), cache="max-age=120")
+    except Exception as e:  # the movers list is a convenience; never fail the index over it
+        print("movers.json failed", str(e)[:200])
     return snapshot if return_snapshot else len(rows)
+
+
+MOVER_MIN_CAP = 2e9
+
+
+def movers(rows, n=10):
+    """Largest one-day and one-month moves among covered companies above $2B market cap, from the index rows."""
+    def slim(r):
+        return {k: r.get(k) for k in ("ticker", "name", "sector", "price", "chg_1d", "ret_1m", "market_cap", "as_of", "logo")}
+    big = [r for r in rows if (r.get("market_cap") or 0) >= MOVER_MIN_CAP and r.get("price")]
+    d1 = [r for r in big if isinstance(r.get("chg_1d"), (int, float))]
+    m1 = [r for r in big if isinstance(r.get("ret_1m"), (int, float))]
+    as_of = max((r.get("as_of") or "" for r in d1), default=None)
+    return {"generated": now_iso(), "as_of": as_of, "min_market_cap": MOVER_MIN_CAP, "universe": len(big),
+            "day": {"up": [slim(r) for r in sorted(d1, key=lambda r: -r["chg_1d"])[:n]], "down": [slim(r) for r in sorted(d1, key=lambda r: r["chg_1d"])[:n]]},
+            "month": {"up": [slim(r) for r in sorted(m1, key=lambda r: -r["ret_1m"])[:n]], "down": [slim(r) for r in sorted(m1, key=lambda r: r["ret_1m"])[:n]]},
+            "source": "Daily closes (Yahoo Finance chart API) and market cap from index.json"}
 
 
 def build_feed(sb, limit=400):
