@@ -782,8 +782,10 @@ def main():
 
 
 @serialized_aggregates
-def build_index(sb, coverage_updates=None):
-    """Publish IR coverage. Updates reuse a validated count snapshot; None requests a full rebuild."""
+def build_index(sb, coverage_updates=None, kpi_updates=None):
+    """Publish IR coverage. Updates reuse a validated count snapshot; None requests a full rebuild.
+    kpi_updates (with coverage_updates, possibly empty) recounts KPI definitions and values for those companies only,
+    for jobs that publish KPIs between full rebuilds."""
     import collections
     import copy
     import datetime as dt
@@ -871,6 +873,18 @@ def build_index(sb, coverage_updates=None):
             company["coverage"] = checked_coverage(coverage_updates[ticker], company["docs"])
         with ThreadPoolExecutor(8) as pool:
             list(pool.map(refresh, coverage_updates))
+        unknown_kpi = set(kpi_updates or ()) - {ticker for ticker, *_ in UNIVERSE}
+        if unknown_kpi:
+            raise ValueError(f"KPI count update outside the universe: {sorted(unknown_kpi)[:5]}")
+
+        def recount(ticker):
+            q = quote(ticker, safe='')
+            defs = sb.select("kpi_definitions", f"select=kpi_id&ticker=eq.{q}")
+            vals = sb.select("kpi_values", f"select=ticker&ticker=eq.{q}&source_kind=eq.ir")
+            out[ticker].update(kpis=len(defs), kpi_values=len(vals), kpis_as_of=now_iso())
+        if kpi_updates:
+            with ThreadPoolExecutor(8) as pool:
+                list(pool.map(recount, sorted(set(kpi_updates))))
         summary = {**prior["summary"], **summarize(out)}
         sb.put_json("meta/coverage_ir.json", {**prior, "generated": now_iso(), **as_of, "summary": summary, "companies": out}, cache="max-age=300")
         return summary

@@ -140,6 +140,29 @@ class RotationCoverageReplayTests(unittest.TestCase):
         with patch('etl.universe.UNIVERSE', [(t,) for t in tickers]), self.assertRaises(ValueError):
             kpitools.build_index(store, coverage_updates={'ZZZ': coverage('2026-11-06T18:00:00Z', 'z')})
 
+    def test_kpi_updates_recount_only_the_named_companies(self):
+        tickers = ['AAA', 'BBB']
+        store = SnapshotStore(tickers)
+        base_select = store.select
+
+        def select(table, query=''):
+            if table == 'kpi_definitions':
+                return [{'kpi_id': 'a'}, {'kpi_id': 'b'}] if 'ticker=eq.AAA' in query else []
+            if table == 'kpi_values':
+                return [{'ticker': 'AAA'}] * 5 if 'ticker=eq.AAA' in query else []
+            return base_select(table, query)
+        store.select = select
+        with patch('etl.universe.UNIVERSE', [(t,) for t in tickers]):
+            summary = kpitools.build_index(store, coverage_updates={}, kpi_updates=['AAA'])
+            companies = store.json['meta/coverage_ir.json']['companies']
+            self.assertEqual((companies['AAA']['kpis'], companies['AAA']['kpi_values']), (2, 5))
+            self.assertEqual((companies['BBB']['kpis'], companies['BBB']['kpi_values']), (0, 0))
+            self.assertEqual((summary['kpis'], summary['kpi_values'], summary['companies_with_kpis']), (2, 5, 1))
+            # the next incremental update accepts the recounted snapshot
+            kpitools.build_index(store, coverage_updates={})
+            with self.assertRaises(ValueError):
+                kpitools.build_index(store, coverage_updates={}, kpi_updates=['ZZZ'])
+
     def test_fresh_only_continues_partial_first_passes_and_skips_seeded_rows(self):
         tickers = ['AAA', 'NEW1', 'NEW2', 'NEW3']
         store = SnapshotStore(['AAA'])

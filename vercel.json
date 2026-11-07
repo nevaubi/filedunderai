@@ -324,16 +324,16 @@
       "schedule": "5 15 6 11 *"
     },
     {
-      "path": "/api/cron/ir?run=once1",
-      "schedule": "15 14 6 11 *"
+      "path": "/api/cron/ir?step=kpi&run=1",
+      "schedule": "7,27,47 * * * *"
     },
     {
-      "path": "/api/cron/ir?run=once2",
-      "schedule": "35 14 6 11 *"
+      "path": "/api/cron/ir?step=kpi&run=2",
+      "schedule": "14,34,54 * * * *"
     },
     {
-      "path": "/api/cron/ir?run=once3",
-      "schedule": "55 14 6 11 *"
+      "path": "/api/cron/ir?step=kpi&run=3",
+      "schedule": "1,21,41 * * * *"
     },
     {
       "path": "/api/cron/govflows?step=holders&once=1",

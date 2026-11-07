@@ -1,0 +1,60 @@
+name: IR KPI extraction
+# Bulk KPI extraction from stored IR earnings releases and supplements (etl/kpi_extract.py): the model proposes,
+# kpitools verifies every value against its source page, only verified values are published. The Vercel cron
+# (/api/cron/ir?step=kpi) keeps up with new releases; this workflow clears the backlog faster.
+# Needs repository secrets: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, FIREWORKS_API_KEY.
+# Runners share the work through per-company leases, so any number of them can run at once.
+on:
+  workflow_dispatch:
+    inputs:
+      runners:
+        description: "Parallel runners (max 8)"
+        required: false
+        default: "6"
+      workers:
+        description: "Companies at a time per runner"
+        required: false
+        default: "4"
+      hours:
+        description: "Hours per runner (max 5.7)"
+        required: false
+        default: "5"
+permissions:
+  contents: read
+concurrency:
+  group: ir-kpi-extract
+  cancel-in-progress: false
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [0, 1, 2, 3, 4, 5, 6, 7]
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      FIREWORKS_API_KEY: ${{ secrets.FIREWORKS_API_KEY }}
+    steps:
+      - name: Check secrets
+        run: |
+          for v in SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY FIREWORKS_API_KEY; do
+            if [ -z "${!v}" ]; then echo "Missing repository secret $v"; exit 1; fi
+          done
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Extract
+        env:
+          RUNNERS: ${{ github.event.inputs.runners || '6' }}
+          WORKERS: ${{ github.event.inputs.workers || '4' }}
+          HOURS: ${{ github.event.inputs.hours || '5' }}
+        run: |
+          if [ "${{ matrix.runner }}" -ge "$RUNNERS" ]; then echo "runner not used"; exit 0; fi
+          # stagger starts so the runners do not all read the same first companies at once
+          sleep $(( ${{ matrix.runner }} * 20 ))
+          BUDGET=$(python -c "print(int(float('$HOURS') * 3600))")
+          python -m etl.kpi_extract --budget "$BUDGET" --workers "$WORKERS"
