@@ -413,7 +413,7 @@ def _rec(r, concept):
     c = r.get("c") or concept
     rec.append(c)
     rec.append(1 if r.get("derived") else 0)
-    rec.append({k:r[k] for k in ("accessions", "available_at", "vintage", "validation_status", "derived", "selection_reason", "selection_conflict", "superseded_at") if k in r})
+    rec.append({k:r[k] for k in ("available_at", "validation_status", "derived", "selection_reason", "selection_conflict", "superseded_at") if k in r})
     return rec
 
 
@@ -424,13 +424,45 @@ def _share_observation_key(record):
     return (reported, record.get('end') or '', record.get('available_at') or record.get('filed') or '', record.get('accn') or '')
 
 
+_SOURCE_KEYS = ("v", "start", "end", "filed", "available_at", "accn", "c")
+
+
+def _compact_source(x):
+    """A derivation leg kept to what period checks and amount comparisons read; nested legs likewise."""
+    if not isinstance(x, dict):
+        return x
+    out = {k: x[k] for k in _SOURCE_KEYS if k in x}
+    if isinstance(x.get("derived"), dict):
+        out["derived"] = {k: (_compact_source(v) if k in ("from", "minus") else v) for k, v in x["derived"].items()}
+    return out
+
+
+def _compact(rec):
+    """Fund-cache record without the repeated source documents inside a derivation (the cache for ~1,400 companies
+    otherwise outgrows the function's memory)."""
+    if len(rec) > 8 and isinstance(rec[8].get("derived"), dict):
+        d = rec[8]["derived"]
+        rec[8] = dict(rec[8], derived={k: (_compact_source(v) if k in ("from", "minus") else v) for k, v in d.items()})
+    return rec
+
+
+def _dedupe_history(q, history):
+    """Filing-history rows identical to the latest-vintage row are not stored twice; Facts rebuilds the full history
+    for point-in-time reads from q plus these extra rows."""
+    out = {}
+    for lab, rows in history.items():
+        latest = {json.dumps(r, sort_keys=True, default=str) for r in q.get(lab, [])}
+        out[lab] = [r for r in rows if json.dumps(r, sort_keys=True, default=str) not in latest]
+    return out
+
+
 def extract_company(sb, tk, since):
     """Quarterly statement records since `since` for the screener labels, plus extra concepts from companyfacts."""
     b = sb.get_json(f"companies/{tk}.json") or {}
     if not fundamentals.normalized(b):
         raise ValueError(f"{tk}: company bundle is not normalized; withholding financial cache")
     st = b.get("statements") or {}
-    q, history = {}, {}
+    q, history, fy = {}, {}, {}
     for stmt in ("income", "balance", "cashflow"):
         for row in st.get(stmt, []):
             lab = row["label"]
@@ -438,11 +470,16 @@ def extract_company(sb, tk, since):
                 continue
             if STMT_OF.get(lab, "income") != stmt:
                 continue
-            q[lab] = [_rec(r, row["concept"]) for r in row["quarterly"] if r["end"] >= since]
-            history[lab] = [_rec(r, row["concept"]) for r in (row.get("filing_history") or {}).get("quarterly", []) if r["end"] >= since]
+            q[lab] = [_compact(_rec(r, row["concept"])) for r in row["quarterly"] if r["end"] >= since]
+            history[lab] = [_compact(_rec(r, row["concept"])) for r in (row.get("filing_history") or {}).get("quarterly", []) if r["end"] >= since]
+            if lab not in INSTANT and lab not in SHARE_COUNT:
+                # Annual values close the fourth fiscal quarter, which 10-Ks do not report on its own.
+                # Latest-vintage rows only (no filing history): point-in-time reads filter them by filing date.
+                fy[lab] = [_rec(r, row["concept"])[:8] for r in row.get("annual") or [] if r["end"] >= since]
     prof = b.get("profile") or {}
     shares = prof.get("sharesOutstanding") or {}
-    out = {"ticker": tk, "pipeline_version": b["pipeline_version"], "q": q, "filing_history": history, "fye": prof.get("fiscalYearEnd"),
+    out = {"ticker": tk, "pipeline_version": b["pipeline_version"], "q": q, "filing_history": history, "fy": fy,
+           "fye": prof.get("fiscalYearEnd"),
            "valuation_basis": fundamentals.valuation_hold(tk, prof.get("valuation_basis")),
            "shares": dict(shares, v=shares.get("val"))}
     cik = BY_TICKER[tk]["cik"]
@@ -478,14 +515,16 @@ def extract_company(sb, tk, since):
                                          "counts":proof["counts"],"quarantined_points":excluded}
         for rows in extra.values():
             for row in rows:
-                q[row["label"]] = [_rec(r, row["concept"]) for r in row["quarterly"] if r["end"] >= since]
-                history[row["label"]] = [_rec(r, row["concept"]) for r in row["filing_history"]["quarterly"] if r["end"] >= since]
+                q[row["label"]] = [_compact(_rec(r, row["concept"])) for r in row["quarterly"] if r["end"] >= since]
+                history[row["label"]] = [_compact(_rec(r, row["concept"])) for r in row["filing_history"]["quarterly"] if r["end"] >= since]
         # A newer filing/iXBRL profile count may precede its DEI appearance in
         # Company Facts. Do not regress it to an older archived observation.
         reported = sec.shares_outstanding(facts) or {}
         if _share_observation_key(reported) > _share_observation_key(shares):
             shares = reported
         out["shares"] = dict(shares, v=shares.get("val"))
+    out["filing_history"] = _dedupe_history(q, history)
+    out["history_dedup"] = 1
     return out
 
 
@@ -507,6 +546,10 @@ def update_fund(sb, fundmeta, closes, full=False, workers=6, log=print, deadline
                           fm.get("shares_metadata")], sort_keys=True, separators=(",", ":"))
         if (cache.get(tk) or {}).get("key") != key or not fundamentals.normalized(cache.get(tk)):
             invalidated = cache.pop(tk, None) is not None or invalidated
+            todo.append((tk, key))
+        elif "fy" not in cache[tk]:
+            # Entries extracted before annual rows were kept ("fy") are re-read from the same bundle; the current
+            # entry stays in use until the re-read lands, so a run that hits its deadline loses nothing.
             todo.append((tk, key))
     log(f"fund cache: {len(todo)} companies to (re)extract")
 
@@ -558,17 +601,32 @@ class Prov:
         self.f[fid] = d
 
 
+def _contiguous_start(r):
+    """A quarter derived as year-to-date minus the earlier year-to-date starts the day after the earlier period ends.
+    Some company bundles carry the earlier period's end date as the start instead, which breaks the four-consecutive-
+    quarter check behind every trailing-twelve-month figure; restore the real start."""
+    meta = r[8] if len(r) > 8 and isinstance(r[8], dict) else {}
+    minus = (meta.get("derived") or {}).get("minus") if isinstance(meta.get("derived"), dict) else None
+    if r[7] and r[1] and minus and minus.get("end") == r[1]:
+        r = list(r)
+        r[1] = (D(r[1]) + dt.timedelta(days=1)).isoformat()
+    return r
+
+
 class Facts:
     def __init__(self, data, splits, as_of=None):
         self.data, self.as_of = data, as_of
         self.valuation_basis = fundamentals.valuation_hold(data.get("ticker"), data.get("valuation_basis"), as_of)
         source = data.get("filing_history") if as_of else data.get("q")
+        if as_of and data.get("history_dedup"):
+            hist = data.get("filing_history") or {}
+            source = {lab: list((data.get("q") or {}).get(lab, [])) + list(hist.get(lab, [])) for lab in set(data.get("q") or {}) | set(hist)}
         self.q = {}
         self.comparability_holds = []
         visible_ends = set()
         for lab, records in (source or {}).items():
             picked, visible = {}, {}
-            for r in records:
+            for r in map(_contiguous_start, records):
                 if (lab in SHARE_COUNT or lab in PER_SHARE) and r[7]:
                     continue
                 available = (r[8].get("available_at") if len(r)>8 else None) or r[4]
@@ -604,6 +662,48 @@ class Facts:
             self.q[lab] = sorted(picked.values(), key=lambda r:r[0])
         self.splits = splits or []
         self.ends = sorted(visible_ends)
+        self.fy = {}
+        for lab, records in (data.get("fy") or {}).items():
+            picked = {}
+            for r in records:
+                available = (r[8].get("available_at") if len(r) > 8 else None) or r[4]
+                if r[7] or (as_of and (not available or available > as_of)):
+                    continue
+                if r[0] not in picked or available > ((picked[r[0]][8].get("available_at") if len(picked[r[0]]) > 8 else None) or picked[r[0]][4]):
+                    picked[r[0]] = r
+            self.fy[lab] = sorted(picked.values(), key=lambda r: r[0])
+        self.q_aug = {lab: self._with_q4(lab) for lab in self.fy}
+
+    def _held(self, label, start, end):
+        """A quarter withheld for conflicting observations must not come back through the annual statement."""
+        return any(h["label"] == label and start <= h["point"]["end"] <= end for h in self.comparability_holds)
+
+    def _with_q4(self, label):
+        """Quarters plus each missing fourth quarter as the reported annual value minus the three quarters of that
+        fiscal year (the 10-K states the year, not the quarter). Kept apart from self.q so
+        quarter-on-quarter fields still use reported quarters only."""
+        quarters = list(self.q.get(label, []))
+        have = {r[0] for r in quarters}
+        if not quarters:
+            return quarters
+        for a in self.fy.get(label, []):
+            if not a[1] or any(abs(days_between(e, a[0])) <= 7 for e in have) or self._held(label, a[1], a[0]):
+                continue
+            inside = [r for r in quarters if r[1] and a[1] <= r[1] and r[0] < a[0]]
+            if len(inside) != 3 or not fundamentals.consecutive_quarters(
+                    [{"start": r[1], "end": r[0]} for r in inside] + [{"start": (D(inside[-1][0]) + dt.timedelta(days=1)).isoformat(), "end": a[0]}]) \
+                    or inside[0][1] != a[1]:
+                continue
+            parts = [self.adj(label, a)] + [self.adj(label, r) for r in inside]
+            if any(x is None for x in parts):
+                continue
+            v = parts[0] - sum(parts[1:])
+            meta = dict(a[8] if len(a) > 8 else {}, derived={"from": {"v": a[2], "start": a[1], "end": a[0], "accn": a[3], "form": a[5]},
+                                                             "minus": [{"v": r[2], "start": r[1], "end": r[0], "accn": r[3]} for r in inside],
+                                                             "basis": "annual minus three reported quarters"})
+            # stored on today's split basis already: no split date applies to it again
+            quarters.append([a[0], (D(inside[-1][0]) + dt.timedelta(days=1)).isoformat(), v, a[3], "", a[5], a[6], 1, meta])
+        return sorted(quarters, key=lambda r: r[0])
 
     def adj(self, label, rec):
         """Split-adjusted value: per-share figures and share counts filed before a split are restated to today's basis."""
@@ -643,11 +743,21 @@ class Facts:
             nearest = min(self.ends, key=lambda value: abs(days_between(value, end)))
             if abs(days_between(nearest, end)) <= 20:
                 end = nearest
+        if label in PER_SHARE:
+            # Per-share amounts do not add up across a year exactly: when the window is a fiscal year, use the
+            # annual value as reported.
+            a = next((r for r in self.fy.get(label, []) if abs(days_between(r[0], end)) <= 7 and r[1]), None)
+            if a and 350 <= days_between(a[1], a[0]) <= 380 and not self._held(label, a[1], a[0]):
+                return self.adj(label, a), [a]
         # Fiscal quarters need not be 91 days apart (retailers may report a
         # 16-week final quarter). Select actual records, then prove continuity.
-        eligible = [r for r in self.q.get(label, []) if r[0] <= end]
+        eligible = [r for r in (self.q_aug.get(label) or self.q.get(label, [])) if r[0] <= end]
         recs = list(reversed(eligible[-4:]))
         if len(recs) != 4 or recs[0][0] != end or not fundamentals.consecutive_quarters([{ "start":r[1], "end":r[0]} for r in recs]):
+            # A window that is exactly a fiscal year can still be read from the annual statement.
+            a = next((r for r in self.fy.get(label, []) if abs(days_between(r[0], end)) <= 7 and r[1]), None)
+            if a and 350 <= days_between(a[1], a[0]) <= 380 and self.adj(label, a) is not None and not self._held(label, a[1], a[0]):
+                return self.adj(label, a), [a]
             return None, []
         return sum(self.adj(label, r) for r in recs), recs
 
@@ -959,7 +1069,7 @@ def valuation_history(fx, inputs, dates, closes):
     public by then, diluted shares (split-adjusted) times that day's close as market cap."""
     if not fx.ends:
         return {}
-    if not fx.data.get("filing_history"):
+    if not fx.data.get("filing_history") and not fx.data.get("history_dedup"):
         return {}  # Latest-only bundles cannot support an honest historical reconstruction.
     def snapshot(cutoff):
         past = Facts(fx.data, fx.splits, as_of=cutoff)
@@ -1139,7 +1249,8 @@ def price_block(tk, dates, c, spy, sect, ranks):
         w = [r for _, r in rets[-k:]]
         if len(w) >= k * 0.9:
             out[fid] = statistics.stdev(w) * math.sqrt(252)
-            prov[fid] = {"x": f"Standard deviation of {len(w)} daily returns × √252", "r": [rets[-k][0], last], "n": len(w)}
+            # fewer than k returns can still meet the 90% threshold: the window starts at the first one used
+            prov[fid] = {"x": f"Standard deviation of {len(w)} daily returns × √252", "r": [rets[-len(w)][0], last], "n": len(w)}
     if spy:
         pairs = [(c[i] / c[i - 1] - 1, spy[i] / spy[i - 1] - 1) for i in range(max(1, len(c) - 252), len(c)) if None not in (c[i], c[i - 1], spy[i], spy[i - 1])]
         if len(pairs) > 120:
