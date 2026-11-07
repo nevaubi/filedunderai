@@ -17,7 +17,11 @@ def run(sb, query):
         # The "what changed" feed reads the calendars plus filings, insiders, estimates, redlines and alt data.
         from etl import changes
         return changes.changes_job(sb, time_budget=700)
-    raise ValueError("step must be dividends, ipos or changes")
+    if step == "situations":
+        # Situation screens (etl/situations.py) share this function; daily, after the screener build.
+        from etl import situations
+        return situations.situations_job(sb, time_budget=700)
+    raise ValueError("step must be dividends, ipos, changes or situations")
 
 
 class handler(BaseHTTPRequestHandler):

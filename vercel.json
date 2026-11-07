@@ -400,6 +400,10 @@
       "schedule": "41 11,23 * * 1-5"
     },
     {
+      "path": "/api/cron/calendars?step=situations",
+      "schedule": "17 23 * * *"
+    },
+    {
       "path": "/api/cron/insights",
       "schedule": "29 * * * *"
     },
