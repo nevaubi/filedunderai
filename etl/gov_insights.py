@@ -130,21 +130,10 @@ def verify(sentences, facts):
     return ok, dropped
 
 
-def complete(prompt, max_tokens=2500):
-    last = None
-    for model in (PRIMARY, FALLBACK):
-        try:
-            d = json.loads(request("https://api.fireworks.ai/inference/v1/chat/completions", method="POST", data={
-                "model": f"accounts/fireworks/models/{model}", "messages": [{"role": "user", "content": prompt}],
-                "max_tokens": max_tokens, "temperature": 0.2, "response_format": {"type": "json_object"}},
-                headers={"Authorization": f"Bearer {os.environ['FIREWORKS_API_KEY']}"}, timeout=180, retries=2))
-            txt = re.sub(r"(?s)<think>.*?</think>", "", d["choices"][0]["message"]["content"] or "").strip()
-            m = re.search(r"(?s)\{.*\}", txt)
-            return json.loads(m.group(0) if m else txt), model
-        except Exception as e:
-            last = e
-            print("govread model failed", model, str(e)[:200])
-    raise last
+def complete(prompt, max_tokens=6000):
+    from .llm import chat_json
+    obj, model, _ = chat_json([PRIMARY, FALLBACK], [{"role": "user", "content": prompt}], max_tokens=max_tokens, temperature=0.2, timeout=180)
+    return obj, model
 
 
 CHECK_PROMPT = """You audit sentences written about a company's government exposure and stock ownership. For each sentence you get
@@ -174,14 +163,10 @@ def check(ok, facts, draft_model, post=None):
     return kept, dropped, model
 
 
-def _call(model, prompt, max_tokens=1500):
-    d = json.loads(request("https://api.fireworks.ai/inference/v1/chat/completions", method="POST", data={
-        "model": f"accounts/fireworks/models/{model}", "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": max_tokens, "temperature": 0, "response_format": {"type": "json_object"}},
-        headers={"Authorization": f"Bearer {os.environ['FIREWORKS_API_KEY']}"}, timeout=180, retries=1))
-    txt = re.sub(r"(?s)<think>.*?</think>", "", d["choices"][0]["message"]["content"] or "").strip()
-    m = re.search(r"(?s)\{.*\}", txt)
-    return json.loads(m.group(0) if m else txt)
+def _call(model, prompt, max_tokens=4000):
+    from .llm import chat_json
+    obj, _, _ = chat_json([model], [{"role": "user", "content": prompt}], max_tokens=max_tokens, timeout=180)
+    return obj
 
 
 def read(tk, name, gov, flows, ins=None, complete_fn=None, post=None):

@@ -34,8 +34,8 @@ TYPE_WEIGHT = {"guidance": 15, "litigation": 12, "customer_supplier": 12, "capit
                "regulation": 8, "risk": 8, "kpi": 8, "operations": 5, "other": 0}
 NOVELTY_WEIGHT = {"new": 10, "removed": 8, "changed": 6}
 KEY_SECTIONS = re.compile(r"risk factors|md&a|management.s discussion|legal proceedings|subsequent events|commitments and contingencies", re.I)
-MAX_RECORDS = 45
-MAX_CHARS = 1400
+MAX_RECORDS = 30
+MAX_CHARS = 1100
 REPEAT_DAYS = 30
 
 
@@ -89,17 +89,12 @@ def _record_text(r):
 
 # ---------------------------------------------------------------- model calls
 def _post(model, messages, max_tokens, deadline=None):
-    remaining = None if deadline is None else deadline - time.time()
-    if remaining is not None and remaining <= 10:
-        raise TimeoutError("insight model budget exhausted")
-    d = json.loads(request(URL, method="POST", data={
-        "model": f"accounts/fireworks/models/{model}", "messages": messages, "max_tokens": max_tokens, "temperature": 0,
-        "response_format": {"type": "json_object"}},
-        headers={"Authorization": f"Bearer {os.environ['FIREWORKS_API_KEY']}"},
-        timeout=min(240, remaining) if remaining else 240, retries=1))
-    txt = re.sub(r"(?s)<think>.*?</think>", "", d["choices"][0]["message"]["content"] or "").strip()
-    m = re.search(r"(?s)\{.*\}", txt)
-    return json.loads(m.group(0) if m else txt)
+    """The named model first, the other one as fallback; the reply carries "_model" (which model answered)."""
+    from .llm import chat_json
+    order = [model] + [m for m in (DRAFT_MODEL, CHECK_MODEL) if m != model]
+    obj, used, _meta = chat_json(order, messages, max_tokens=max_tokens, deadline=deadline)
+    obj["_model"] = used
+    return obj
 
 
 DRAFT_SCHEMA = {"type": "object", "required": ["insights"], "properties": {"insights": {"type": "array", "items": {
@@ -116,7 +111,7 @@ Each numbered passage is one change: ADDED (new text), REMOVED (text dropped), R
 List the changes that could change an analyst's view of the company: new or dropped risks, guidance or outlook, customers or suppliers, accounting policies or estimates, litigation and investigations, buybacks, dividends, debt and capital allocation, disclosed KPIs, regulation, operations.
 Skip boilerplate, date roll-forwards, renumbering, and changes that only restate the period.
 For each: type (one of {types}); title of at most 12 words; text of at most 45 words saying what changed and why it matters, using only facts in the passages; quote = 8 to 40 consecutive words copied character for character from the NEW text of the passage (from the OLD text for a REMOVED passage), no ellipses; refs = the passage ids it rests on; stake = the dollar amount (unit USD, in dollars, e.g. 2100000000 for $2.1 billion) or percent (unit percent) at stake when a passage states one, otherwise null; direction for shareholders; novelty new, changed or removed; impact 1 (minor) to 3 (would move estimates or the thesis).
-At most 10 items, most important first. Never write passage ids inside text. Return only JSON matching this schema: {schema}"""
+At most 8 items, most important first. Keep your reasoning short. Never write passage ids inside text. Return only JSON matching this schema: {schema}"""
 
 CHECK_INSTRUCTIONS = """You audit analyst claims about a company filing. For each claim you get the passages it cites (old and new text of a change between two filings).
 Try to refute the claim. A claim is supported only if the cited passages state it: the change it describes really happened between the old and new text, its numbers match the passages, and its quote says what the claim relies on. Interpretation that goes beyond the passages ("this signals", "likely") is not supported unless the passage says it.
@@ -127,7 +122,8 @@ def draft(ticker, name, comp, recs, deadline=None, post=_post):
     msgs = [{"role": "system", "content": DRAFT_INSTRUCTIONS.format(name=name, ticker=ticker, form=comp["form"], filed=comp["new"]["filed"],
                                                                     types=", ".join(TYPES), schema=json.dumps(DRAFT_SCHEMA))},
             {"role": "user", "content": "\n".join(_record_text(r) for r in recs)}]
-    data = post(DRAFT_MODEL, msgs, 9000, deadline)
+    data = post(DRAFT_MODEL, msgs, 12000, deadline)
+    draft.model = data.get("_model", DRAFT_MODEL)
     return data.get("insights") or []
 
 
@@ -138,7 +134,10 @@ def check(claims, recs, deadline=None, post=_post):
         cited = " || ".join(_record_text(by[r]) for r in c["refs"])
         blocks.append(f"CLAIM {c['id']}: {c['text']} | QUOTE: \"{c['quote']}\" | STAKE: {json.dumps(c.get('stake'))}\nCITED: {cited}")
     msgs = [{"role": "system", "content": CHECK_INSTRUCTIONS}, {"role": "user", "content": "\n\n".join(blocks)}]
-    data = post(CHECK_MODEL, msgs, 4000, deadline)
+    # the check runs on the model that did not draft
+    other = DRAFT_MODEL if getattr(draft, "model", DRAFT_MODEL) == CHECK_MODEL else CHECK_MODEL
+    data = post(other, msgs, 6000, deadline)
+    check.model = data.get("_model", CHECK_MODEL)
     return {v.get("id"): v for v in data.get("verdicts") or [] if isinstance(v, dict)}
 
 
@@ -233,7 +232,7 @@ def company(sb, ticker, name, revenue, state, deadline=None, post=_post, today=N
         if not v or v.get("supported") is not True:
             rejected["check"] += 1
             continue
-        c["check"] = {"model": CHECK_MODEL, "reason": (v.get("reason") or "")[:200]}
+        c["check"] = {"model": getattr(check, "model", CHECK_MODEL), "reason": (v.get("reason") or "")[:200]}
         passed.append(c)
     hist = {h["h"]: h for h in (state.get("history") or []) if h.get("date", "") >= (today - dt.timedelta(days=REPEAT_DAYS)).isoformat()}
     prev_accn = state.get("accn")
@@ -260,7 +259,7 @@ def company(sb, ticker, name, revenue, state, deadline=None, post=_post, today=N
               "filing": {k: comp["new"][k] for k in ("accn", "form", "filed", "report", "doc", "url")},
               "compared_to": {k: comp["old"][k] for k in ("accn", "form", "filed", "report", "doc", "url")},
               "kind": comp["kind"], "insights": out, "proposed": len(proposals), "rejected": rejected,
-              "models": {"draft": DRAFT_MODEL, "check": CHECK_MODEL},
+              "models": {"draft": getattr(draft, "model", DRAFT_MODEL), "check": getattr(check, "model", CHECK_MODEL)},
               "method": "Drafted from the passages that changed against the prior-year filing; each quote is verbatim in the filing and every "
                         "number appears in a cited passage; a second model rejected claims the passages do not support; ranked by a "
                         "materiality score computed in code."}
