@@ -2,7 +2,8 @@ name: IR document backfill
 # Bulk IR documents (Tavily site discovery, Firecrawl map/scrape, SEC exhibits, text extraction) on GitHub runners,
 # outside the Vercel cron's 800 s and memory limits. Same code path as the cron: etl/ir_backfill_runner.py.
 # Needs repository secrets: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, FIRECRAWL_API_KEY, TAVILY_API_KEY, SEC_USER_AGENT.
-# Each shard is a separate runner (its own IP), so SEC's 10 requests per second applies per shard.
+# SEC's 10 requests per second applies to the whole job regardless of machine count, so each shard gets 1/SHARDS of it
+# (SEC_GAP = SHARDS x 0.11 s). Firecrawl and Tavily work runs at full width.
 # 20 shards is the concurrent-job ceiling for a personal account; shards above the "shards" input exit at once.
 on:
   workflow_dispatch:
@@ -64,4 +65,5 @@ jobs:
           TICKERS: ${{ github.event.inputs.tickers || '' }}
         run: |
           if [ "${{ matrix.shard }}" -ge "$SHARDS" ]; then echo "shard not used"; exit 0; fi
+          export SEC_GAP=$(python -c "print(round(int('$SHARDS') * 0.11, 3))")
           python -m etl.ir_backfill_runner --shard ${{ matrix.shard }} --shards "$SHARDS" --workers "$WORKERS" --hours "$HOURS" --tickers "$TICKERS"
