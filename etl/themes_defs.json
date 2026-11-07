@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "notes": "Phrase sets are Python regular expressions, matched case-insensitively unless a pattern starts with (?-i). A sentence counts for a theme when any include pattern matches and no exclude pattern matches. Sentences that are negated or hedged ('did not have a material impact') still count as mentions but are flagged; sentences that appear word-for-word (digits masked) in many companies' filings are treated as shared boilerplate and do not count. Basket rules rank companies by disclosed exposure: revenue share from reported geography/customer data, segment names, and named counterparties in the supply graph.",
+  "themes": [
+    {
+      "id": "tariffs",
+      "name": "Tariffs and trade policy",
+      "description": "Import tariffs, duties, Section 232/301 actions, reciprocal tariffs, trade restrictions and their cost or demand effects.",
+      "include": [
+        "\\btariffs?\\b",
+        "\\bsection\\s+(232|301)\\b",
+        "\\b(anti-?dumping|countervailing)\\s+dut",
+        "\\bimport\\s+dut(y|ies)\\b",
+        "\\btrade\\s+(war|tensions?|restrictions?|barriers?|polic(y|ies)|disputes?)\\b",
+        "\\bretaliatory\\s+(measures|dut|tariff)"
+      ],
+      "exclude": [
+        "\\b(rate|transmission|tariff\\s+filings?|open\\s+access|ferc|public\\s+utilit|utility\\s+commission|feed-?in)\\b.{0,40}\\btariff",
+        "\\btariff.{0,40}\\b(ferc|rate\\s+case|transmission|utility\\s+commission|regulated\\s+rates)\\b",
+        "\\btariff\\s+(rates?\\s+approved|schedules?)\\b"
+      ],
+      "basket": {
+        "counterparty_regions": ["China", "Mexico", "Vietnam", "Taiwan", "Canada"],
+        "geo_terms": "\\b(china|greater\\s+china|prc|mainland|hong\\s+kong|mexico|canada)\\b",
+        "segment_terms": null,
+        "counterparties": []
+      }
+    },
+    {
+      "id": "ai",
+      "name": "Artificial intelligence",
+      "description": "AI products, AI infrastructure and demand, generative AI, machine learning and large language models.",
+      "include": [
+        "artificial\\s+intelligence",
+        "(?-i)\\bA\\.?I\\.?\\b(?!\\s*Group)",
+        "\\bgen(erative)?[- ]?ai\\b",
+        "large\\s+language\\s+models?",
+        "(?-i)\\bLLMs?\\b",
+        "machine\\s+learning",
+        "\\bagentic\\b",
+        "\\bAI[- ](enabled|powered|driven|native|infrastructure|workloads?|accelerators?|servers?|data\\s+cent)"
+      ],
+      "exclude": [],
+      "basket": {
+        "counterparty_regions": [],
+        "geo_terms": null,
+        "segment_terms": "\\b(data\\s+cent(er|re)|ai\\b|artificial\\s+intelligence|cloud|accelerat|compute|networking|semiconductor\\s+solutions)",
+        "counterparties": ["NVIDIA", "NVDA", "OpenAI", "Anthropic", "AMD", "Microsoft Azure", "CoreWeave", "CRWV", "AVGO", "Broadcom", "TSM", "TSMC", "xAI"]
+      }
+    },
+    {
+      "id": "glp1",
+      "name": "GLP-1 and obesity drugs",
+      "description": "GLP-1 receptor agonists and anti-obesity medicines: supply, demand effects on food, medtech, insurers and retailers.",
+      "include": [
+        "\\bglp-?1\\b",
+        "glucagon-like\\s+peptide",
+        "\\b(semaglutide|tirzepatide|retatrutide|orforglipron|ozempic|wegovy|mounjaro|zepbound|saxenda)\\b",
+        "\\b(anti-?obesity|weight[- ]loss|weight[- ]management)\\s+(drugs?|medications?|medicines?|therap(y|ies)|treatments?)\\b",
+        "\\bobesity\\s+(drugs?|medications?|medicines?|therap(y|ies)|treatments?)\\b"
+      ],
+      "exclude": [],
+      "basket": {
+        "counterparty_regions": [],
+        "geo_terms": null,
+        "segment_terms": "\\b(obesity|diabet|cardiometabolic|metabolic)\\b",
+        "counterparties": ["Novo Nordisk", "NVO", "Eli Lilly", "LLY"]
+      }
+    },
+    {
+      "id": "reshoring",
+      "name": "Reshoring and nearshoring",
+      "description": "Moving production or sourcing closer to the U.S. or out of China: reshoring, nearshoring, China+1, new domestic capacity tied to CHIPS/IRA incentives.",
+      "include": [
+        "\\b(re|on|near|friend)-?shor(e|ed|es|ing)\\b",
+        "\\bchina\\s*(\\+|plus)\\s*(1|one)\\b",
+        "\\b(relocat|shift|mov|transition|diversif)\\w*\\s+(of\\s+)?(our\\s+|certain\\s+|some\\s+)?(production|manufacturing|sourcing|supply\\s+chain|assembly)\\b.{0,60}\\b(mexico|united\\s+states|u\\.s\\.|north\\s+america|vietnam|india|thailand|malaysia|out\\s+of\\s+china|outside\\s+(of\\s+)?china)",
+        "\\bchips\\s+(and\\s+science\\s+)?act\\b",
+        "\\bdomestic\\s+(manufacturing|production)\\s+(capacity|footprint|investment|facilit)"
+      ],
+      "exclude": [
+        "\\boffshore\\s+(wind|drilling|rig|platform)",
+        "\\bshoring\\s+(up|of\\s+excavation)"
+      ],
+      "basket": {
+        "counterparty_regions": ["Mexico", "Vietnam", "India"],
+        "geo_terms": "\\b(mexico)\\b",
+        "segment_terms": null,
+        "counterparties": []
+      }
+    },
+    {
+      "id": "dc_power",
+      "name": "Data center power demand",
+      "description": "Electricity demand and supply for data centers: large-load customers, interconnection, generation and grid investment tied to data centers or hyperscalers.",
+      "include": [
+        "data\\s+cent(er|re)s?.{0,120}\\b(power|electric|energy|megawatts?|gigawatts?|\\bmw\\b|\\bgw\\b|load|interconnect|generation|grid|utility|utilities)",
+        "\\b(power|electricity|electric|energy|load)\\s+(demand|growth|requirements?|needs?|consumption).{0,120}data\\s+cent(er|re)",
+        "\\bhyperscal(e|er|ers)\\b.{0,100}\\b(power|load|energy|electric|megawatts?|gigawatts?|generation)",
+        "\\blarge[- ]load\\s+(customers?|tariff|interconnection|additions)",
+        "\\bbehind[- ]the[- ]meter\\b"
+      ],
+      "exclude": [],
+      "basket": {
+        "counterparty_regions": [],
+        "geo_terms": null,
+        "segment_terms": "\\b(data\\s+cent(er|re)|power\\s+(solutions|systems|generation)|electrical|thermal|cooling|grid|generation|transmission|nuclear)",
+        "counterparties": ["AMZN", "Amazon", "MSFT", "Microsoft", "Google", "GOOGL", "META", "Meta", "Oracle", "ORCL", "CoreWeave", "CRWV", "Equinix", "EQIX", "Digital Realty", "DLR"]
+      }
+    },
+    {
+      "id": "china",
+      "name": "China exposure",
+      "description": "Sales, operations, suppliers, regulation and geopolitical risk tied to China, Hong Kong and the PRC.",
+      "include": [
+        "(?-i)\\bChina\\b",
+        "(?-i)\\bChinese\\b",
+        "(?-i)\\bPRC\\b",
+        "people['’]?s\\s+republic\\s+of\\s+china",
+        "greater\\s+china"
+      ],
+      "exclude": [
+        "\\bchina\\s+(cabinet|dishes|dinnerware|clay)\\b",
+        "\\bfine\\s+china\\b"
+      ],
+      "basket": {
+        "counterparty_regions": ["China", "Hong Kong", "Greater China"],
+        "geo_terms": "\\b(china|greater\\s+china|prc|mainland|hong\\s+kong)\\b",
+        "segment_terms": "\\b(china|greater\\s+china)\\b",
+        "counterparties": []
+      }
+    },
+    {
+      "id": "cyber_incidents",
+      "name": "Cybersecurity incidents",
+      "description": "Cyber incidents a company says actually happened to it (detected, experienced, disclosed), not generic cyber-risk language.",
+      "include": [
+        "\\b(we|the\\s+company|company)\\s+(recently\\s+)?(experienced|identified|detected|discovered|became\\s+aware\\s+of|were\\s+(the\\s+)?(subject|target|victim)\\s+of|was\\s+(the\\s+)?(subject|target|victim)\\s+of|suffered|incurred)\\b.{0,100}\\b(cyber|ransomware|unauthori[sz]ed\\s+(access|third\\s+part)|breach|intrusion|threat\\s+actor|malicious|security\\s+incident)",
+        "\\b(on|in)\\s+(january|february|march|april|may|june|july|august|september|october|november|december)\\b.{0,60}\\b(cyber(security)?\\s+incident|ransomware\\s+attack|unauthori[sz]ed\\s+access)",
+        "\\bitem\\s+1\\.05\\b",
+        "\\b(the|this)\\s+(cyber(security)?|ransomware|security)\\s+(incident|attack)\\s+(resulted|caused|disrupted|impacted|affected)"
+      ],
+      "exclude": [
+        "\\b(could|may|might|would)\\s+(experience|suffer|be\\s+(the\\s+)?(subject|target))",
+        "\\bnot\\s+(experienced|identified|detected|aware)\\b.{0,60}\\b(material|cyber|incident)",
+        "\\bto\\s+date\\b.{0,60}\\bnot\\b"
+      ],
+      "basket": {
+        "counterparty_regions": [],
+        "geo_terms": null,
+        "segment_terms": null,
+        "counterparties": []
+      }
+    },
+    {
+      "id": "labor",
+      "name": "Labor, unions and wages",
+      "description": "Unions and collective bargaining, strikes and work stoppages, labor shortages and wage inflation.",
+      "include": [
+        "\\bunion(s|i[sz]ed|i[sz]ation)?\\b",
+        "collective\\s+bargaining",
+        "\\bwork\\s+stoppages?\\b",
+        "\\b(labor|labour)\\s+(strikes?|stoppages?|disputes?|shortages?|unrest|actions?)\\b",
+        "\\bstrikes?\\b.{0,40}\\b(workers|employees|union|members)\\b",
+        "\\b(uaw|teamsters|nlrb|machinists|longshore(men)?|ilwu|ilaa?)\\b",
+        "\\bwage\\s+(inflation|increases|pressures?|rates\\s+increased)\\b",
+        "\\b(labor|labour)\\s+costs?\\s+(increased|rose|inflation|pressures?)\\b"
+      ],
+      "exclude": [
+        "\\beuropean\\s+union\\b",
+        "\\bcredit\\s+union",
+        "\\b(union\\s+pacific|western\\s+union|union\\s+bank|union\\s+square|union\\s+carbide|soviet\\s+union|unionpay)\\b",
+        "\\bstrike\\s+price\\b"
+      ],
+      "basket": {
+        "counterparty_regions": [],
+        "geo_terms": null,
+        "segment_terms": null,
+        "counterparties": []
+      }
+    },
+    {
+      "id": "rates",
+      "name": "Interest-rate sensitivity",
+      "description": "How higher or lower interest rates affect demand, funding costs, net interest income and valuations, beyond the standard market-risk table.",
+      "include": [
+        "\\b(higher|rising|elevated|increas(e|es|ed|ing)\\s+in|lower|declining|falling|reductions?\\s+in)\\s+interest\\s+rates\\b",
+        "\\b(rate|fed)\\s+(cuts?|hikes?|increases)\\b",
+        "\\binterest\\s+rate\\s+(environment|volatility|sensitivity)\\b",
+        "\\bnet\\s+interest\\s+(income|margin)\\b.{0,80}\\b(sensitiv|increase|decrease|rates)",
+        "\\bfloating[- ]rate\\s+(debt|borrowings|loans|notes)\\b",
+        "\\bmortgage\\s+rates\\b"
+      ],
+      "exclude": [],
+      "basket": {
+        "counterparty_regions": [],
+        "geo_terms": null,
+        "segment_terms": "\\b(mortgage|lending|banking|homebuild|real\\s+estate|consumer\\s+finance)\\b",
+        "counterparties": []
+      }
+    },
+    {
+      "id": "consumer_weakness",
+      "name": "Consumer weakness",
+      "description": "Softer or more cautious consumer demand: trade-down, value-seeking, lower-income pressure, discretionary pullback, heavier promotions.",
+      "include": [
+        "\\b(consumer|customer|shopper)s?['’]?\\s+(spending|demand|confidence|sentiment|behavior|behaviour)\\b.{0,60}\\b(weak|soft|declin|pressur|slow|cautious|uncertain|deteriorat|reduc)",
+        "\\b(weak|weaker|soft|softer|softening|cautious|pressured|challenged|deteriorating)\\b.{0,30}\\b(consumer|shopper|discretionary|spending|demand|traffic)\\b",
+        "\\b(trade[- ]down|trading\\s+down|value[- ](seeking|conscious)|deal[- ]seeking)\\b",
+        "\\blower[- ]income\\s+(consumers?|households?|customers?|guests?)\\b",
+        "\\bdiscretionary\\s+(spending|purchases?|income)\\b.{0,40}\\b(declin|pressur|weak|reduc|lower)",
+        "\\b(elevated|heightened|increased|aggressive)\\s+(promotional|promotions)\\b",
+        "\\bpromotional\\s+environment\\b"
+      ],
+      "exclude": [],
+      "basket": {
+        "counterparty_regions": [],
+        "geo_terms": null,
+        "segment_terms": "\\b(retail|stores|restaurants?|apparel|consumer|leisure|travel)\\b",
+        "counterparties": []
+      }
+    }
+  ],
+  "negation": "\\b(not|no|never|neither|nor|without)\\b.{0,50}\\b(material|significant|meaningful|substantial|expect|anticipate|experienced|impact|affect)|\\bimmaterial\\b|\\b(did|does|do|has|have|had)\\s+not\\b|\\bno\\s+(significant|material)\\b",
+  "safe_harbor": "forward-looking\\s+statements?|private\\s+securities\\s+litigation\\s+reform|factors\\s+that\\s+could\\s+cause|cautionary\\s+(statement|note)"
+}

@@ -34,6 +34,8 @@ const PUBLIC_RX = [
   /^(flows|gov|altdata|insiders|insights|brief|redlines)\/[A-Za-z0-9_.-]{1,32}\.json$/,
   /^macro\/releases\.json$/,
   /^calendars\/(ipos|dividends)\.json$/,
+  /^themes\/(index|[a-z0-9_-]{1,40})\.json$/,
+  /^themes\/co\/[A-Za-z0-9_.-]{1,32}\.json$/,
 ];
 
 /** Which bucket a cleaned path lives in. */
