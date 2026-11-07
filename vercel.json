@@ -402,6 +402,10 @@
     {
       "path": "/api/cron/govflows?step=reads",
       "schedule": "7 1-23/2 * * *"
+    },
+    {
+      "path": "/api/cron/brief",
+      "schedule": "47 */2 * * *"
     }
   ],
   "headers": [
