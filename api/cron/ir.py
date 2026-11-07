@@ -8,6 +8,12 @@ from _common import serve  # noqa: E402
 
 def run(sb, query=None):
     from etl import jobs
+    if (query or {}).get("step") == "calls":
+        # Earnings-call transcripts and prepared remarks among the stored IR documents: deterministic parse, one
+        # quote-verified model analysis per call, calls/*.json bundles and cross-company theme/people files.
+        from etl import calls
+        calls.LLM_DOWN.clear()  # module state survives warm invocations
+        return calls.calls_job(sb, workers=4, time_budget=540)
     if (query or {}).get("step") == "kpi":
         # KPI extraction from stored earnings releases and supplements (model proposes, kpitools verifies each value
         # against its page, only verified values are published). Light on memory; the model calls set the pace.

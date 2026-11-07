@@ -332,8 +332,8 @@
       "schedule": "14,34,54 * * * *"
     },
     {
-      "path": "/api/cron/ir?step=kpi&run=3",
-      "schedule": "1,21,41 * * * *"
+      "path": "/api/cron/ir?step=calls",
+      "schedule": "1,31 * * * *"
     },
     {
       "path": "/api/cron/govflows?step=holders&once=1",
