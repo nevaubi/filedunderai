@@ -158,6 +158,113 @@ def published_concepts(sb, ticker):
     return out
 
 
+RETAIN_START_DAYS = 16        # an equal amount with a start this close (52/53-week calendars) is the same observation
+
+
+def _same_period_start(a, b, days=RETAIN_START_DAYS):
+    if a == b:
+        return True
+    if not a or not b:
+        return False
+    try:
+        return abs((dt.date.fromisoformat(a) - dt.date.fromisoformat(b)).days) <= days
+    except (TypeError, ValueError):
+        return False
+
+
+def _replacement_reason(ticker, prior, candidate):
+    """Why replacing a published reported fact with `candidate` needs review, or None. Shared by the publication
+    gate and the reconciliation below so the two cannot drift."""
+    if candidate.get("derived"):
+        return "reported_to_derived"
+    old_date, new_date = prior.get("filed"), candidate.get("filed")
+    changed = any(prior.get(key) != candidate.get(key) for key in ("value", "unit", "period_start", "concept"))
+    if old_date and (not new_date or new_date < old_date):
+        return "older_reported_filing"
+    if (candidate.get("label") == "Revenue" and prior.get("concept") == "RevenueFromContractWithCustomerExcludingAssessedTax"
+            and candidate.get("concept") == "Revenues" and BY_TICKER[ticker]["cik"] in sec.REPORTED_TOTAL_REVENUE_CIKS
+            and all(prior.get(key) == candidate.get(key) for key in ("unit", "period_start"))):
+        return None  # Reviewed revenue-scope correction (sec.REPORTED_TOTAL_REVENUE_CIKS): component -> reported total.
+    if any(prior.get(key) != candidate.get(key) for key in ("concept", "unit", "period_start")):
+        # A newer source date does not establish equal accounting scope.
+        return "reported_accounting_scope_changed"
+    if changed and (not old_date or not new_date):
+        return "changed_reported_value_unknown_date"
+    if changed and old_date == new_date:
+        return "changed_reported_value_same_date"
+    return None
+
+
+def _point_row(ticker, statement, line, kind, point):
+    return {"ticker": ticker, "statement": statement, "label": line["label"], "kind": kind, "period_end": point["end"],
+            "period_start": point.get("start"), "concept": point.get("c") or line["concept"], "unit": line["unit"],
+            "value": point["v"], "accession": point.get("accn"), "form": point.get("form"), "filed": point.get("filed"),
+            "derived": bool(point.get("derived"))}
+
+
+def _use_published(point, prior, reason):
+    for k in ("derived", "superseded_at", "selection_conflict"):
+        point.pop(k, None)
+    point.update(v=prior["value"], c=prior["concept"], accn=prior["accession"], form=prior.get("form") or point.get("form"),
+                 filed=prior["filed"], accessions=[prior["accession"]], validation_status="reported", selection_reason=reason)
+    if prior.get("period_start"):
+        point["start"] = prior["period_start"]
+    else:
+        point.pop("start", None)
+    if "available_at" in point:
+        point["available_at"] = prior["filed"]
+
+
+def reconcile_with_published(sb, ticker, statements, existing=None, hold_conflicts=False):
+    """Align a rebuilt company with its published reported facts before the replacement gate.
+
+    1. Same observation (always): the candidate equals the published reported amount in the same unit and concept
+       but differs only in a derived flag (e.g. Q4 = year minus nine months) or a start up to RETAIN_START_DAYS apart. The published reported observation stays; nothing changes for readers.
+    2. Real disagreement (only with hold_conflicts, the scheduled companies job): a different amount, a derived
+       replacement of a reported value, a changed accounting scope or an older filing. The published observation
+       stays for that one period, the alternative is kept on the point under `review`, and the rest of the company
+       updates. Without hold_conflicts the gate still blocks the whole company, as before.
+    Returns (kept, held) where held lists [statement, label, kind, period_end, reason]."""
+    if existing is None:
+        if getattr(sb, "stage_only", False) is True or not callable(getattr(sb, "select", None)):
+            return 0, []
+        existing = sb.select("facts", f"select=*&ticker=eq.{quote(ticker, safe='')}&derived=is.false"
+                             "&order=statement.asc,label.asc,kind.asc,period_end.asc")
+    if not isinstance(existing, list):
+        return 0, []
+    before = {(r.get("statement"), r.get("label"), r.get("kind"), r.get("period_end")): r for r in existing if r.get("derived") is False}
+    kept, held = 0, []
+    for statement, lines in statements.items():
+        allowed_by_label = dict(sec.CONCEPTS.get(statement, []))
+        for line in lines:
+            allowed = allowed_by_label.get(line["label"], ())
+            for kind, bucket in (("A", "annual"), ("Q", "quarterly")):
+                for point in line.get(bucket, []):
+                    prior = before.get((statement, line["label"], kind, point["end"]))
+                    if not prior or not prior.get("accession") or not prior.get("filed"):
+                        continue
+                    row = _point_row(ticker, statement, line, kind, point)
+                    reason = _replacement_reason(ticker, prior, row)
+                    if reason is None:
+                        continue
+                    same_amount = prior.get("unit") == line["unit"] and prior.get("value") == point["v"]
+                    # A concept switch is never "the same observation", even at an equal amount: that question goes
+                    # to review (held below in the scheduled job, blocking otherwise).
+                    same_concept = prior.get("concept") == row["concept"] or (row["derived"] and prior.get("concept") in allowed)
+                    if (same_amount and same_concept
+                            and _same_period_start(prior.get("period_start"), point.get("start"), RETAIN_START_DAYS)
+                            and reason != "older_reported_filing"):
+                        _use_published(point, prior, "Kept the published reported observation; the rebuilt value is the same amount "
+                                                     f"({reason.replace('_', ' ')})")
+                        kept += 1
+                    elif hold_conflicts:
+                        alternative = {k: row[k] for k in ("value", "concept", "period_start", "accession", "filed", "derived")}
+                        _use_published(point, prior, "Published reported observation kept pending review of a disagreeing rebuild")
+                        point["review"] = {"reason": reason, "alternative": alternative}
+                        held.append([statement, line["label"], kind, point["end"], reason])
+    return kept, held
+
+
 def check_reported_fact_replacements(sb, ticker, rows):
     """Reject unsafe overwrites; absent historical rows are never deleted here.
 
@@ -181,25 +288,7 @@ def check_reported_fact_replacements(sb, ticker, rows):
         prior = before.get(tuple(candidate[key] for key in FACT_KEY))
         if prior is None:
             continue
-        reason = None
-        if candidate.get("derived"):
-            reason = "reported_to_derived"
-        else:
-            old_date, new_date = prior.get("filed"), candidate.get("filed")
-            changed = any(prior.get(key) != candidate.get(key) for key in ("value", "unit", "period_start", "concept"))
-            if old_date and (not new_date or new_date < old_date):
-                reason = "older_reported_filing"
-            elif (candidate.get("label") == "Revenue" and prior.get("concept") == "RevenueFromContractWithCustomerExcludingAssessedTax"
-                  and candidate.get("concept") == "Revenues" and BY_TICKER[ticker]["cik"] in sec.REPORTED_TOTAL_REVENUE_CIKS
-                  and all(prior.get(key) == candidate.get(key) for key in ("unit", "period_start"))):
-                pass  # Reviewed revenue-scope correction (sec.REPORTED_TOTAL_REVENUE_CIKS): component -> reported total.
-            elif any(prior.get(key) != candidate.get(key) for key in ("concept", "unit", "period_start")):
-                # A newer source date does not establish equal accounting scope.
-                reason = "reported_accounting_scope_changed"
-            elif changed and (not old_date or not new_date):
-                reason = "changed_reported_value_unknown_date"
-            elif changed and old_date == new_date:
-                reason = "changed_reported_value_same_date"
+        reason = _replacement_reason(ticker, prior, candidate)
         if reason:
             key = "/".join(str(candidate[field]) for field in FACT_KEY)
             raise ValueError(f"Financial replacement requires review: {reason}: {key}; prior reported fact preserved")
@@ -331,6 +420,13 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
     allowed_filings = {row["accession"] for row in filing_plan}
     for alias in held_aliases:
         warn(_held_filing_message(alias))
+    # Facts-only issuers keep the strict source proof made above, so their points are not adjusted after it.
+    kept, held = (0, []) if facts_only else reconcile_with_published(sb, tk, statements, hold_conflicts=retain_reported_conflicts)
+    if kept:
+        log(f"  {tk}: kept {kept} published reported observations equal to the rebuilt amounts")
+    if held:
+        warn(f"{len(held)} published reported periods kept pending review of a disagreeing rebuild "
+             f"(e.g. {'/'.join(map(str, held[0][:4]))}: {held[0][4]}); each alternative stays on its point (review).")
     rows = statement_fact_rows(tk, statements)
     check_reported_fact_replacements(sb, tk, rows)
     # Validation precedes all mutations, including source object publication.
@@ -347,7 +443,10 @@ def process_company(sb, tk, refresh_news=False, refresh_summary=False, fetch_doc
                     "url": source_urls["submissions"], "retrieved_at": (source_retrieved_at or {}).get("submissions") or now_iso()}
     if provenance:
         sb.put_json(proof_path, proof, cache="max-age=31536000,immutable")
-    prof = sec.profile(sub, facts)
+    # Facts-only issuers and archived-source imports keep the strict archived-source profile (no provider calls);
+    # others read a current cover page when companyfacts has none (multi-class issuers) or only an old one.
+    prof = (sec.profile(sub, facts) if facts_only or staged_import
+            else sec.profile(sub, facts, shares=sec.current_shares(facts, filings, cik, ticker=tk)))
     ftables = sec.filing_tables(facts, statements, filings, cik)
     if facts_only:
         from .source_quality import retain_proved_filing_tables
@@ -887,18 +986,47 @@ def insiders_job(sb, tickers=None, days=365, per_company=120, workers=4, time_bu
                     buf = []
         if buf:
             sb.upsert("insider_transactions", list({(r["accession"], r["seq"]): r for r in buf}.values()), "accession,seq")
-        index = _cache(sb, "meta/insiders.json", {"companies": {}})
-        for tk in sorted(touched):
-            rows = sb.select("insider_transactions", f"select=*&ticker=eq.{tk}&filed=gte.{cut}&order=tx_date.desc")
-            bundle = insiders.summarize(rows)
-            bundle.update({"ticker": tk, "generated": now_iso(), "codes": insiders.CODES})
-            sb.put_json(f"insiders/{tk}.json", bundle, cache="max-age=600")
-            index["companies"][tk] = {"w90": bundle["w90"], "w365": bundle["w365"],
-                                      "last": bundle["rows"][0]["tx_date"] if bundle["rows"] else None}
-        index["generated"] = now_iso()
-        sb.put_json("meta/insiders.json", index, cache="max-age=600")
-        run.stats.update({"parsed": done, "failed": failed, "companies": len(touched)})
+        written = refresh_insider_bundles(sb, touched, days=days)
+        run.stats.update({"parsed": done, "failed": failed, "companies": len(touched), "bundles_written": written})
         return done, failed
+
+
+def refresh_insider_bundles(sb, touched=(), days=365, workers=8, today=None):
+    """Rebuilds every company's 90/365-day insider windows from insider_transactions, not only companies with a new
+    Form 4: the windows roll forward daily, so a quiet company's bundle otherwise keeps sales that left the window
+    (KO showed $2.65B of sales a year after they happened). Writes bundles that are new, touched, or whose windows
+    changed, then the index. Returns the number of bundles written."""
+    today = today or dt.date.today()
+    cut = (today - dt.timedelta(days=days)).isoformat()
+    rows = sb.select("insider_transactions", f"select=*&filed=gte.{cut}&order=ticker.asc,accession.asc,seq.asc")
+    by = {}
+    for r in rows:
+        by.setdefault(r["ticker"], []).append(r)
+    index = _cache(sb, "meta/insiders.json", {"companies": {}})
+    companies = index.setdefault("companies", {})
+    touched = set(touched or ())
+    writes = []
+    for tk in sorted(set(by) | (touched & set(BY_TICKER))):
+        bundle = insiders.summarize(by.get(tk, []), today=today)
+        entry = {"w90": bundle["w90"], "w365": bundle["w365"], "last": bundle["rows"][0]["tx_date"] if bundle["rows"] else None}
+        old = companies.get(tk)
+        if tk in touched or not old or (old.get("w90"), old.get("w365")) != (entry["w90"], entry["w365"]):
+            bundle.update({"ticker": tk, "generated": now_iso(), "codes": insiders.CODES})
+            writes.append((tk, bundle))
+        companies[tk] = entry
+    # Companies whose every row left the window keep an empty, current entry.
+    for tk in list(companies):
+        if tk not in by and tk not in touched and (companies[tk].get("w365") or {}).get("buys", 0) + (companies[tk].get("w365") or {}).get("sells", 0):
+            bundle = insiders.summarize([], today=today)
+            bundle.update({"ticker": tk, "generated": now_iso(), "codes": insiders.CODES})
+            writes.append((tk, bundle))
+            companies[tk] = {"w90": bundle["w90"], "w365": bundle["w365"], "last": None}
+    with ThreadPoolExecutor(workers) as ex:
+        list(ex.map(lambda tb: sb.put_json(f"insiders/{tb[0]}.json", tb[1], cache="max-age=600"), writes))
+    index["generated"] = now_iso()
+    index["windows_as_of"] = today.isoformat()
+    sb.put_json("meta/insiders.json", index, cache="max-age=600")
+    return len(writes)
 
 
 # ---------------------------------------------------------------- filing viewer copies

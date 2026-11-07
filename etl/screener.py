@@ -190,10 +190,10 @@ fld("corrm_n", "corr", "Correlation window (months)", "num", "Number of monthly 
 for fid, n, u, d in [
         ("ins_net_90d", "Insider net buying 90d", "usd", "Open-market purchases minus sales by insiders (Form 4, codes P and S, non-derivative), last 90 days, in dollars."),
         ("ins_net_90d_n", "Insider net transactions 90d", "num", "Number of open-market purchases minus sales by insiders, last 90 days."),
-        ("ins_buyers_90d", "Insider buyers 90d", "num", "Distinct insiders with an open-market purchase in the last 90 days."),
+        ("ins_buyers_90d", "Insider buyers 90d", "num", "Distinct individual officers and directors with an open-market purchase in the last 90 days (funds, companies and 10% holders not counted)."),
         ("ins_net_1y", "Insider net buying 1y", "usd", "Open-market purchases minus sales by insiders, last 365 days, in dollars."),
         ("ins_net_1y_n", "Insider net transactions 1y", "num", "Number of open-market purchases minus sales by insiders, last 365 days."),
-        ("ins_buyers_1y", "Insider buyers 1y", "num", "Distinct insiders with an open-market purchase in the last 365 days."),
+        ("ins_buyers_1y", "Insider buyers 1y", "num", "Distinct individual officers and directors with an open-market purchase in the last 365 days (funds, companies and 10% holders not counted)."),
         ("news_30d", "News items 30d", "num", "Stored news items about the company published in the last 30 days."),
         ("days_10k", "Days since 10-K", "days", "Days since the latest 10-K was filed."),
         ("days_10q", "Days since 10-Q", "days", "Days since the latest 10-Q was filed."),
@@ -1512,28 +1512,20 @@ def activity(sb, fundcache, today):
     for n in news:
         by_news.setdefault(n["ticker"], []).append(n)
     cut = (today - dt.timedelta(days=365)).isoformat()
-    tx = sb.select("insider_transactions", f"select=ticker,owner,code,shares,price,tx_date&tx_date=gte.{cut}&code=in.(P,S)&derivative=is.false&seq=gte.0")
+    tx = sb.select("insider_transactions", "select=ticker,accession,seq,filed,owner,owner_cik,role,tx_date,code,security,shares,price,owned_after,"
+                   f"derivative,plan_10b5&tx_date=gte.{cut}&code=in.(P,S)&derivative=is.false&seq=gte.0&order=ticker.asc,accession.asc,seq.asc")
+    from . import insiders as _ins
+    by_tk = {}
+    for r in tx:
+        by_tk.setdefault(r["ticker"], []).append(r)
     ins = {}
-    for days, key in ((90, "w90"), (365, "w365")):
-        c0 = (today - dt.timedelta(days=days)).isoformat()
-        for r in tx:
-            if r["tx_date"] < c0:
-                continue
-            w = ins.setdefault(r["ticker"], {}).setdefault(key, {"buys": 0, "sells": 0, "buy_value": 0, "sell_value": 0, "buyers": set(), "sellers": set()})
-            v = (r.get("shares") or 0) * (r.get("price") or 0)
-            if r["code"] == "P":
-                w["buys"] += 1
-                w["buy_value"] += v
-                w["buyers"].add(r["owner"])
-            else:
-                w["sells"] += 1
-                w["sell_value"] += v
-                w["sellers"].add(r["owner"])
+    for t, rows_t in by_tk.items():
+        b = _ins.summarize(rows_t, today=today)
+        # Joint filings count once; buyers are individual officers and directors (funds and 10% holders excluded).
+        ins[t] = {k: dict(b[k], buyers=b[k]["ind_buyers"]) for k in ("w90", "w365")}
     for t in TICKERS:
         for key in ("w90", "w365"):
-            w = ins.setdefault(t, {}).setdefault(key, {"buys": 0, "sells": 0, "buy_value": 0, "sell_value": 0, "buyers": set(), "sellers": set()})
-            w["buyers"], w["sellers"] = len(w["buyers"]), len(w["sellers"])
-            w["buy_value"], w["sell_value"] = round(w["buy_value"]), round(w["sell_value"])
+            ins.setdefault(t, {}).setdefault(key, {"buys": 0, "sells": 0, "buy_value": 0, "sell_value": 0, "buyers": 0, "sellers": 0})
     out, prov = {}, {}
     for tk in TICKERS:
         o, p = {}, {}
@@ -1551,7 +1543,7 @@ def activity(sb, fundcache, today):
             meta = {"r": rng, "src": "insiders", "w": {k: w.get(k) for k in ("buys", "sells", "buy_value", "sell_value", "buyers", "sellers")}}
             p[f"ins_net_{sfx}"] = dict(meta, x=f"Open-market purchases ${w.get('buy_value') or 0:,.0f} − sales ${w.get('sell_value') or 0:,.0f} (Form 4, codes P and S)")
             p[f"ins_net_{sfx}_n"] = dict(meta, x=f"{w.get('buys') or 0} purchases − {w.get('sells') or 0} sales")
-            p[f"ins_buyers_{sfx}"] = dict(meta, x=f"{w.get('buyers') or 0} distinct buyers")
+            p[f"ins_buyers_{sfx}"] = dict(meta, x=f"{w.get('buyers') or 0} distinct individual officers and directors buying")
         # Financial cache eligibility is independent of the established original
         # cohort's stored news window. Additional-company coverage stays held.
         if tk not in STRICT_SOURCE_TICKERS:

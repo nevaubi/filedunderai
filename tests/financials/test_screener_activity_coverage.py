@@ -44,7 +44,7 @@ class ScreenerActivityCoverageTests(unittest.TestCase):
 
     def test_existing_company_collected_values_and_provenance_are_unchanged(self):
         news = [{"ticker":"AAPL", "url":"https://example.test/aapl", "title":"Reported event", "published_at":"2026-11-01"}]
-        transactions = [{"ticker":"AAPL", "owner":"Officer", "code":"P", "shares":10,
+        transactions = [{"ticker":"AAPL", "owner":"Officer", "role":"Chief Executive Officer", "code":"P", "shares":10,
                          "price":50, "tx_date":"2026-11-01"}]
         out, provenance = self.activity(ActivityStore(news=news, transactions=transactions))
         self.assertEqual(out["AAPL"]["news_30d"], 1)

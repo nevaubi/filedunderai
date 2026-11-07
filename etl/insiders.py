@@ -1,5 +1,6 @@
 """Form 4 insider transactions: fetch the XML behind each filing and flatten it to rows."""
 import datetime as dt
+import re
 import xml.etree.ElementTree as ET
 
 from .common import sec_get
@@ -124,33 +125,89 @@ def dedupe_joint(rows):
     return out
 
 
+_CO_FILERS = re.compile(r"\s*\(\+\d+\)\s*$")
+_ENTITY = re.compile(r"\b(L\.?P\.?|LLC|L\.L\.C\.|INC\.?|INCORPORATED|CORP\.?|CORPORATION|CO\.|LTD\.?|LIMITED|PLC|N\.V\.|S\.A\.|AG|GMBH|"
+                     r"FUND|FUNDS|TRUST|TRUSTEES?|CAPITAL|PARTNERS|PARTNERSHIP|ADVISORS?|ADVISERS?|MANAGEMENT|HOLDINGS?|INVESTMENTS?|"
+                     r"INVESTORS|GROUP|FOUNDATION|ASSOCIATES|VENTURES|EQUITY|ASSET|ASSETS|BANK|SECURITIES|OPPORTUNITIES|MASTER|OFFSHORE|"
+                     r"ENDOWMENT|PENSION|SOVEREIGN|ESTATE OF)\b", re.I)
+
+
+def canonical_owner(name):
+    """Owner name without the "(+N)" co-filer suffix this module appends for multi-owner filings."""
+    return _CO_FILERS.sub("", name or "").strip()
+
+
+def owner_key(row):
+    """One identity per reporting owner: the owner CIK when the filing gave one, else the canonical name, so
+    "Haggart Dylan G. (+1)" and "Haggart Dylan G. (+2)" are one buyer."""
+    cik = str(row.get("owner_cik") or "").lstrip("0")
+    return f"cik:{cik}" if cik else "name:" + canonical_owner(row.get("owner")).upper()
+
+
+def owner_category(name, role):
+    """officer | director (individuals) | entity (a fund, company or trust, including one holding a board seat,
+    e.g. an investment adviser that designates a director) | ten_pct (a 10% holder that is a person) | other."""
+    role = (role or "").lower()
+    entity = bool(_ENTITY.search(canonical_owner(name)))
+    if entity:
+        return "entity"
+    if any(x in role for x in ("officer", "chief", "president", "ceo", "cfo", "coo", "vp", "vice", "treasurer", "secretary",
+                               "controller", "counsel", "chair", "head", "evp", "svp", "general manager", "principal",
+                               "remarks")):
+        return "officer"
+    if "director" in role:
+        return "director"
+    if "10%" in role:
+        return "ten_pct"
+    return "other"
+
+
+INDIVIDUAL = ("officer", "director")
+
+
 def summarize(rows, today=None):
-    """Bundle for the site: open-market activity and the latest transactions."""
+    """Bundle for the site: open-market activity and the latest transactions.
+
+    Window counts use one identity per owner (owner_key) and each joint-filed transaction once. Individual
+    officers and directors are counted separately from entities and 10% holders (`ind_*` fields): a fund buying
+    through its board designee is fund flow, not an executive's own purchase."""
     today = today or dt.date.today()
     real = dedupe_joint(r for r in rows if r.get("seq", 0) >= 0 and r.get("tx_date"))
-    real.sort(key=lambda r: (r["tx_date"], r["accession"], r["seq"]), reverse=True)
+    real.sort(key=lambda r: (r["tx_date"], r.get("accession") or "", r.get("seq") or 0), reverse=True)
+    for r in real:
+        r["category"] = owner_category(r.get("owner"), r.get("role"))
 
     def window(days):
         cut = (today - dt.timedelta(days=days)).isoformat()
-        buys = [r for r in real if r["code"] == "P" and not r["derivative"] and r["tx_date"] >= cut]
-        sells = [r for r in real if r["code"] == "S" and not r["derivative"] and r["tx_date"] >= cut]
-        val = lambda rs: sum((r["shares"] or 0) * (r["price"] or 0) for r in rs)
+        buys = [r for r in real if r["code"] == "P" and not r.get("derivative") and r["tx_date"] >= cut]
+        sells = [r for r in real if r["code"] == "S" and not r.get("derivative") and r["tx_date"] >= cut]
+        val = lambda rs: sum((r.get("shares") or 0) * (r.get("price") or 0) for r in rs)
+        ib = [r for r in buys if r["category"] in INDIVIDUAL]
+        isl = [r for r in sells if r["category"] in INDIVIDUAL]
         return {"buys": len(buys), "sells": len(sells), "buy_value": round(val(buys)), "sell_value": round(val(sells)),
-                "buyers": len({r["owner"] for r in buys}), "sellers": len({r["owner"] for r in sells}),
-                "plan_sells": sum(1 for r in sells if r["plan_10b5"])}
+                "buyers": len({owner_key(r) for r in buys}), "sellers": len({owner_key(r) for r in sells}),
+                "plan_sells": sum(1 for r in sells if r.get("plan_10b5")),
+                "plan_sell_value": round(val([r for r in sells if r.get("plan_10b5")])),
+                "ind_buys": len(ib), "ind_buy_value": round(val(ib)), "ind_buyers": len({owner_key(r) for r in ib}),
+                "ind_sells": len(isl), "ind_sell_value": round(val(isl)), "ind_sellers": len({owner_key(r) for r in isl}),
+                "ind_disc_sell_value": round(val([r for r in isl if not r.get("plan_10b5")])),
+                "entity_buy_value": round(val([r for r in buys if r["category"] not in INDIVIDUAL])),
+                "entity_sell_value": round(val([r for r in sells if r["category"] not in INDIVIDUAL]))}
 
     by_owner = {}
     for r in real:
-        if r["derivative"] or r["code"] not in ("P", "S"):
+        if r.get("derivative") or r["code"] not in ("P", "S"):
             continue
-        o = by_owner.setdefault(r["owner"], {"owner": r["owner"], "role": r["role"], "buy_value": 0, "sell_value": 0, "n": 0, "last": r["tx_date"]})
+        o = by_owner.setdefault(owner_key(r), {"owner": canonical_owner(r.get("owner")), "role": r.get("role"), "category": r["category"],
+                                               "buy_value": 0, "sell_value": 0, "n": 0, "last": r["tx_date"]})
         v = (r["shares"] or 0) * (r["price"] or 0)
         o["buy_value" if r["code"] == "P" else "sell_value"] += v
         o["n"] += 1
     owners = sorted(by_owner.values(), key=lambda o: -(o["buy_value"] + o["sell_value"]))[:15]
     for o in owners:
         o["buy_value"], o["sell_value"] = round(o["buy_value"]), round(o["sell_value"])
-    keep = ("accession", "seq", "filed", "owner", "role", "tx_date", "code", "security", "shares", "price", "acq_disp", "owned_after", "ownership", "derivative", "plan_10b5", "joint")
+    keep = ("accession", "seq", "filed", "owner", "role", "category", "tx_date", "code", "security", "shares", "price", "acq_disp",
+            "owned_after", "ownership", "derivative", "plan_10b5", "joint")
     return {
         "w90": window(90), "w365": window(365), "owners": owners,
         "rows": [{k: r.get(k) for k in keep} for r in real[:400]],

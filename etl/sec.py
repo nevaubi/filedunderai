@@ -490,8 +490,87 @@ def shares_outstanding(facts, as_of=None):
             "form": last.get("form"), "basis": "reported_outstanding" if len(values)==1 else "ambiguous_share_classes"}
 
 
-def profile(sub, facts):
+# Classes that are not one-for-one with the listed class, as multiples of one listed-class share.
+CLASS_RATIOS = {
+    "BRK-B": {"CommonClassAMember": 1500},
+}
+# Unlisted classes whose conversion terms change over time; left out of the count, which is then labeled.
+CLASS_EXCLUDE = {
+    "V": ("CommonClassB1Member", "CommonClassB2Member", "CommonClassB3Member", "CommonClassBMember", "CommonClassCMember", "SeriesAPreferredStockMember",
+          "SeriesBPreferredStockMember", "SeriesCPreferredStockMember"),
+}
+
+
+def cover_page_shares(cik, filings, ticker=None, fetch=None):
+    """Shares outstanding from the latest periodic report's own inline XBRL cover page.
+
+    Companyfacts drops the share-class dimension, so companies with several classes (GOOGL, META, BRK, MA, CMCSA)
+    have no current observation there, or only one from before they started tagging classes (V, BRK: 2010-2011).
+    The cover page tags each class's count on dei:EntityCommonStockSharesOutstanding with its
+    StatementClassOfStockAxis member. An undimensioned count is used as is; otherwise the classes are summed in
+    listed-class equivalents (CLASS_RATIOS, default one for one, CLASS_EXCLUDE left out). Returns the same shape as
+    shares_outstanding, with parts and classes, or None."""
+    periodic = [f for f in filings or [] if f.get("f") in ("10-K", "10-Q") and (f.get("p") or "").lower().endswith((".htm", ".html"))]
+    if not periodic:
+        return None
+    filing = max(periodic, key=lambda f: (f["d"], f["a"]))
+    from .segments import parse_ixbrl
+    try:
+        if fetch is None:
+            from .common import sec_get
+            fetch = lambda url: sec_get(url, timeout=90)
+        ctx, facts = parse_ixbrl(fetch(filing_url(cik, filing["a"], filing["p"])))
+    except Exception:
+        return None
+    rows = [(ctx[f["ctx"]], f["v"]) for f in facts if f["name"].endswith(":EntityCommonStockSharesOutstanding") and f["ctx"] in ctx]
+    rows = [(c, v) for c, v in rows if c.get("end")]
+    if not rows:
+        return None
+    end = max(c["end"] for c, _ in rows)
+    rows = [(c, v) for c, v in rows if c["end"] == end]
+    base = {"end": end, "accn": filing["a"], "filed": filing["d"], "available_at": filing["d"], "form": filing["f"],
+            "basis": "reported_outstanding"}
+    plain = {v for c, v in rows if not c["dims"]}
+    if len(plain) == 1 and next(iter(plain)) > 0:
+        return dict(base, val=next(iter(plain)), resolved="cover_page_inline_xbrl")
+    ratios, exclude = CLASS_RATIOS.get(ticker or "", {}), CLASS_EXCLUDE.get(ticker or "", ())
+    by_class = {}
+    for c, v in rows:
+        dims = c["dims"]
+        if set(dims) != {"us-gaap:StatementClassOfStockAxis"}:
+            continue
+        member = dims["us-gaap:StatementClassOfStockAxis"].split(":")[-1]
+        if member in exclude:
+            continue
+        if by_class.get(member, v) != v:
+            return None
+        by_class[member] = v
+    if not by_class or not any(by_class.values()):
+        return None
+    total = sum(v * ratios.get(m, 1) for m, v in by_class.items())
+    out = dict(base, val=total, parts=[by_class[m] for m in sorted(by_class)], classes=sorted(by_class),
+               resolved="class_sum_inline_xbrl")
+    if ratios:
+        out["class_ratios"] = {m: ratios[m] for m in ratios if m in by_class}
+    if exclude:
+        out["excluded_classes"] = [m for m in exclude]
+    return out
+
+
+def current_shares(facts, filings, cik, ticker=None, fetch=None, max_age_days=120):
+    """Companyfacts' cover-page count when it is current; otherwise the latest periodic report's inline cover page."""
     shares = shares_outstanding(facts)
+    periodic = [f["d"] for f in filings or [] if f.get("f") in ("10-K", "10-Q")]
+    latest = max(periodic) if periodic else None
+    stale = (not shares or not shares.get("val") or shares.get("basis") != "reported_outstanding"
+             or (latest and shares.get("filed") and (dt.date.fromisoformat(latest) - dt.date.fromisoformat(shares["filed"])).days > max_age_days))
+    if not stale:
+        return shares
+    return cover_page_shares(cik, filings, ticker=ticker, fetch=fetch) or shares
+
+
+def profile(sub, facts, shares=None):
+    shares = shares if shares is not None else shares_outstanding(facts)
     ba = sub.get("addresses", {}).get("business", {})
     return {
         "name": sub["name"], "sic": sub.get("sic"), "sicDescription": sub.get("sicDescription"), "exchanges": sub.get("exchanges") or [],
