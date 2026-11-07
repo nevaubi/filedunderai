@@ -26,6 +26,10 @@ const PUBLIC_RX = [
   /^kpistd\/(t|series)\/[A-Za-z0-9_.-]{1,64}\.json$/,
   /^sectors\.json$/,
   /^sectors\/(notes|[a-z0-9-]{1,80}(\.comp)?)\.json$/,
+  /^tech\/(signals|breadth|states)\.json$/,
+  /^tech\/(bars|events)\/[A-Za-z0-9_.^=-]{1,32}\.json$/,
+  /^quant\/(methods|cross)\.json$/,
+  /^quant\/(t|read|peers)\/[A-Za-z0-9_.^=-]{1,64}\.json$/,
 ];
 
 /** Which bucket a cleaned path lives in. */
