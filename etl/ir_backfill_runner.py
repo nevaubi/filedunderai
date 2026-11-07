@@ -134,7 +134,7 @@ class Runner:
     def run_chunk(self, chunk, web, sec):
         a = self.a
         done, failed = jobs.ir_job(self.sb, chunk, workers=a.workers, time_budget=min(self.left() - 300, 3 * 3600),
-                                   max_docs=a.max_docs, web=web, sec=sec)
+                                   max_docs=a.max_docs, max_pages=a.max_pages, web=web, sec=sec)
         self.unpublished.update({tk: r["coverage"] for tk, r in done.items() if isinstance(r.get("coverage"), dict)})
         if self.unpublished and publish_coverage(self.sb, dict(self.unpublished)):
             self.unpublished.clear()
@@ -166,6 +166,7 @@ def main():
     ap.add_argument("--workers", type=int, default=6)
     ap.add_argument("--chunk", type=int, default=12)
     ap.add_argument("--max-docs", type=int, default=90)
+    ap.add_argument("--max-pages", type=int, default=40, help="discovery pages per company per pass (SEC filing indexes, site pages)")
     ap.add_argument("--tickers", default="")
     ap.add_argument("--no-partial", action="store_true")
     ap.add_argument("--shard", type=int, default=0)

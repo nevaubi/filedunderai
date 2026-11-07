@@ -99,7 +99,8 @@ jobs:
             python -m etl.ir_backfill_runner --lane all --workers "$WORKERS" --hours "$HOURS" --tickers "$TICKERS"
             exit 0
           fi
+          # A company's SEC filing indexes take several hundred pages; 400 per pass finishes most in one pass.
           # Follow manifests written in the last hour too, so companies from a run cancelled just before this one
           # also get their SEC part.
           STARTED=$(date -u -d '-60 min' +%Y-%m-%dT%H:%M:%SZ)
-          python -m etl.ir_backfill_runner --lane sec --workers "$WORKERS" --hours "$HOURS" --started "$STARTED"
+          python -m etl.ir_backfill_runner --lane sec --workers "$WORKERS" --hours "$HOURS" --started "$STARTED" --max-pages 400 --max-docs 200
