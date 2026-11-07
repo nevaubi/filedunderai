@@ -32,6 +32,7 @@ const PUBLIC_RX = [
   /^quant\/(methods|cross)\.json$/,
   /^quant\/(t|read|peers)\/[A-Za-z0-9_.^=-]{1,64}\.json$/,
   /^(flows|gov|altdata|insiders|insights|brief|redlines)\/[A-Za-z0-9_.-]{1,32}\.json$/,
+  /^kpi_insights\/[A-Za-z0-9_.-]{1,32}\.json$/,
   /^macro\/releases\.json$/,
   /^calendars\/(ipos|dividends)\.json$/,
 ];
