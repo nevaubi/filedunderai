@@ -6,7 +6,7 @@
 // against APP_DATA_SERVICE_KEY; browsers never see that key.
 import { BUCKET, bearer, cleanPath, corsHeaders, originAllowed, serviceKeyOk, verifyUser } from "./_lib/appdata.js";
 
-const PER_USER_DAILY = 5000;
+const PER_USER_DAILY = 50000; // the shared demo account counts as one user
 
 async function bump(bucket) {
   const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -66,6 +66,11 @@ export default async function handler(req, res) {
   } catch {
     return res.status(502).json({ error: "Storage unavailable" });
   }
+  let host = "server";
+  try {
+    if (origin) host = new URL(origin).host;
+  } catch {}
+  console.log(JSON.stringify({ appdata: path, user: user === "partner-server" ? "server" : String(user).slice(0, 8), host, status: r.status }));
   res.setHeader("Cache-Control", "private, max-age=300");
   if (r.status === 304) return res.status(304).end();
   if (r.status === 400 || r.status === 404) return res.status(404).json({ error: "Not built yet" });
