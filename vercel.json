@@ -40,6 +40,10 @@
     },
     "api/app-screen.js": {
       "maxDuration": 60
+    },
+    "api/app-agents.js": {
+      "maxDuration": 60,
+      "includeFiles": "etl/agents/templates.json"
     }
   },
   "crons": [
@@ -418,6 +422,10 @@
     {
       "path": "/api/cron/estimates?step=earnings",
       "schedule": "*/10 11-23 * * 1-5"
+    },
+    {
+      "path": "/api/cron/agents",
+      "schedule": "*/10 * * * *"
     }
   ],
   "headers": [
