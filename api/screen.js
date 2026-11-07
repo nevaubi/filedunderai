@@ -113,8 +113,10 @@ async function ask(messages, signal) {
   catch (e) { if (signal?.aborted || (e.status && e.status < 500 && e.status !== 404 && e.status !== 429)) throw e; return { raw: await complete(FALLBACK, messages, signal), model: FALLBACK }; }
 }
 
-export async function buildSpec({ prompt, history = [], current = null, signal }) {
-  const cat = await catalogue();
+export async function buildSpec({ prompt, history = [], current = null, signal, extraTickers = null }) {
+  const base = await catalogue();
+  // The partner app screens a wider universe: its extra tickers are valid in tickers/similar_to.
+  const cat = extraTickers?.length ? { ...base, _ix: undefined, tickers: [...new Set([...base.tickers, ...extraTickers])] } : base;
   const messages = [{ role: "system", content: systemPrompt(cat) }];
   for (const h of history.slice(-6)) {
     if (h && typeof h.prompt === "string" && h.spec) {

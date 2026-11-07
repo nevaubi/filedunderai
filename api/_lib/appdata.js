@@ -21,6 +21,7 @@ const PUBLIC_RX = [
   /^statements\/std_map\.json$/,
   /^kpis\/[A-Za-z0-9_.-]{1,32}\.json$/,
   /^(estimates|guidance)\/[A-Za-z0-9_.-]{1,32}\.json$/,
+  /^screener\.json$/,
 ];
 
 /** Which bucket a cleaned path lives in. */

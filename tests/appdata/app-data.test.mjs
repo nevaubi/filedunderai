@@ -162,7 +162,7 @@ test("partner server key path", async () => {
 
 test("statement and KPI passthrough paths map to public-data", async () => {
   const { cleanPath, bucketFor } = await import("../../api/_lib/appdata.js");
-  for (const p of ["statements/AAPL/index.json", "statements/AAPL/std.json.gz", "statements/AAPL/0000320193-26-000020.json.gz", "statements/std_map.json", "kpis/AAPL.json", "estimates/AAPL.json", "guidance/AAPL.json", "estimates/firms.json"]) {
+  for (const p of ["statements/AAPL/index.json", "statements/AAPL/std.json.gz", "statements/AAPL/0000320193-26-000020.json.gz", "statements/std_map.json", "kpis/AAPL.json", "estimates/AAPL.json", "guidance/AAPL.json", "estimates/firms.json", "screener.json"]) {
     assert.equal(cleanPath(p), p, p);
     assert.equal(bucketFor(p), "public-data", p);
   }

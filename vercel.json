@@ -37,6 +37,9 @@
     },
     "api/cron/partner.js": {
       "maxDuration": 800
+    },
+    "api/app-screen.js": {
+      "maxDuration": 60
     }
   },
   "crons": [
