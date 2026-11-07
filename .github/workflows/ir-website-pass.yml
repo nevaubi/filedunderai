@@ -1,0 +1,65 @@
+name: IR website pass
+# Website-only IR pass (Tavily discovery, Firecrawl map/scrape; no SEC requests) for companies that still have no IR
+# documents, with a deeper page budget than the first pass. Separate concurrency group from "IR document backfill",
+# so it can run while that workflow's SEC lane is still going; the per-company lease keeps the two from working on
+# the same company at once.
+on:
+  workflow_dispatch:
+    inputs:
+      web_shards:
+        description: "Parallel runners (max 19)"
+        required: false
+        default: "19"
+      workers:
+        description: "Companies at a time per runner"
+        required: false
+        default: "8"
+      max_pages:
+        description: "Site pages per company per pass"
+        required: false
+        default: "150"
+      hours:
+        description: "Hours per runner (max 5.7)"
+        required: false
+        default: "3"
+  schedule:
+    - cron: "53 3,15 * * *"
+permissions:
+  contents: read
+concurrency:
+  group: ir-website-pass
+  cancel-in-progress: false
+env:
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+  TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+  SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+  HOURS: ${{ github.event.inputs.hours || '3' }}
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+    steps:
+      - name: Check secrets
+        run: |
+          for v in SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY FIRECRAWL_API_KEY TAVILY_API_KEY SEC_USER_AGENT; do
+            if [ -z "${!v}" ]; then echo "Missing repository secret $v"; exit 1; fi
+          done
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Web lane shard
+        env:
+          SHARDS: ${{ github.event.inputs.web_shards || '19' }}
+          WORKERS: ${{ github.event.inputs.workers || '8' }}
+          MAX_PAGES: ${{ github.event.inputs.max_pages || '150' }}
+        run: |
+          if [ "${{ matrix.shard }}" -ge "$SHARDS" ]; then echo "shard not used"; exit 0; fi
+          python -m etl.ir_backfill_runner --lane web --shard ${{ matrix.shard }} --shards "$SHARDS" --workers "$WORKERS" --hours "$HOURS" --max-pages "$MAX_PAGES"
