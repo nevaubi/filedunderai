@@ -128,3 +128,34 @@ test("mergeUniverse keeps prior entries and replaces updated ones", async () => 
   assert.deepEqual(out.companies.map((c) => [c.ticker, c.v]), [["B", 1], ["A", 2], ["C", 1]]);
   assert.deepEqual(mergeUniverse(null, { companies: [{ ticker: "Z" }, { ticker: "Y" }] }).companies.map((c) => c.ticker), ["Y", "Z"]);
 });
+
+test("partner server key path", async () => {
+  const { serviceKeyOk } = await import("../../api/_lib/appdata.js");
+  const k = "k".repeat(40);
+  assert.ok(serviceKeyOk(k, k));
+  assert.ok(!serviceKeyOk("x", k));
+  assert.ok(!serviceKeyOk(k, "short"), "short configured keys are refused");
+  assert.ok(!serviceKeyOk("", k));
+  _resetCache();
+  Object.assign(process.env, { APP_AUTH_URL: "https://p.supabase.co", APP_AUTH_KEY: "pub", SUPABASE_URL: "https://ours.supabase.co", SUPABASE_SERVICE_ROLE_KEY: "svc", APP_DATA_SERVICE_KEY: k });
+  const { default: handler } = await import("../../api/app-data.js");
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    if (url.includes("bump_usage")) return { ok: true, json: async () => 1 };
+    if (url.includes("/storage/v1/object/app-datasets/companies/NVDA.json")) return { ok: true, status: 200, headers: new Map(), arrayBuffer: async () => new TextEncoder().encode("{}").buffer };
+    throw new Error("unexpected " + url);
+  };
+  try {
+    let res = mockRes();
+    await handler({ method: "GET", headers: { "x-partner-key": k }, query: { path: "companies/NVDA.json" } }, res);
+    assert.equal(res.code, 200);
+    res = mockRes();
+    await handler({ method: "GET", headers: { "x-partner-key": "wrong" }, query: { path: "companies/NVDA.json" } }, res);
+    assert.equal(res.code, 401);
+    res = mockRes();
+    await handler({ method: "GET", headers: { "x-partner-key": k, origin: "https://company-showcase-launchpad.lovable.app" }, query: { path: "companies/NVDA.json" } }, res);
+    assert.equal(res.code, 401, "browser requests can't use the server key");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});

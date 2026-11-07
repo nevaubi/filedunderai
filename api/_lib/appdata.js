@@ -2,7 +2,7 @@
 // The app sends its signed-in user's Supabase access token; we confirm it with that project's
 // auth server, then stream the file from our private `app-datasets` bucket. Pure helpers here,
 // the HTTP handler is api/app-data.js.
-import { createHash } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 
 export const BUCKET = "app-datasets";
 
@@ -100,4 +100,12 @@ export function corsHeaders(origin) {
     "Access-Control-Max-Age": "600",
     Vary: "Origin",
   };
+}
+
+/** Server-to-server access for the partner app's own server code (APP_DATA_SERVICE_KEY). */
+export function serviceKeyOk(given, expected) {
+  if (!given || !expected || expected.length < 32) return false;
+  const a = createHash("sha256").update(String(given)).digest();
+  const b = createHash("sha256").update(String(expected)).digest();
+  return timingSafeEqual(a, b);
 }

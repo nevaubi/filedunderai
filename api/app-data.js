@@ -2,7 +2,9 @@
 // Serves the partner app's company/price datasets from the private `app-datasets` bucket to
 // users signed in to that app. Auth: `Authorization: Bearer <partner Supabase access token>`,
 // checked against APP_AUTH_URL with APP_AUTH_KEY (the partner project's publishable key).
-import { BUCKET, bearer, cleanPath, corsHeaders, originAllowed, verifyUser } from "./_lib/appdata.js";
+// The partner app's server code (report builder, scripts) sends `x-partner-key` instead, matched
+// against APP_DATA_SERVICE_KEY; browsers never see that key.
+import { BUCKET, bearer, cleanPath, corsHeaders, originAllowed, serviceKeyOk, verifyUser } from "./_lib/appdata.js";
 
 const PER_USER_DAILY = 5000;
 
@@ -33,19 +35,25 @@ export default async function handler(req, res) {
   const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!authUrl || !authKey || !url || !key) return res.status(503).json({ error: "Dataset access is not configured" });
 
-  const token = bearer(req.headers.authorization);
-  if (!token) return res.status(401).json({ error: "Sign in required" });
   let user = null;
-  try {
-    user = await verifyUser(token, { authUrl, authKey });
-  } catch {
-    return res.status(502).json({ error: "Could not confirm the session" });
+  if (req.headers["x-partner-key"] && !origin) {
+    if (!serviceKeyOk(req.headers["x-partner-key"], process.env.APP_DATA_SERVICE_KEY)) return res.status(401).json({ error: "Invalid partner key" });
+    user = "partner-server";
+  } else {
+    const token = bearer(req.headers.authorization);
+    if (!token) return res.status(401).json({ error: "Sign in required" });
+    try {
+      user = await verifyUser(token, { authUrl, authKey });
+    } catch {
+      return res.status(502).json({ error: "Could not confirm the session" });
+    }
+    if (!user) return res.status(401).json({ error: "Session expired or invalid" });
   }
-  if (!user) return res.status(401).json({ error: "Session expired or invalid" });
 
   try {
     const day = new Date().toISOString().slice(0, 10);
-    if ((await bump(`appdata:${day}:${user}`)) > PER_USER_DAILY) return res.status(429).json({ error: "Daily data limit reached" });
+    const cap = user === "partner-server" ? 200_000 : PER_USER_DAILY;
+    if ((await bump(`appdata:${day}:${user}`)) > cap) return res.status(429).json({ error: "Daily data limit reached" });
   } catch {
     // Counter unavailable: fail open.
   }
