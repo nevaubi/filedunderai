@@ -31,6 +31,8 @@ const PUBLIC_RX = [
   /^quant\/(methods|cross)\.json$/,
   /^quant\/(t|read|peers)\/[A-Za-z0-9_.^=-]{1,64}\.json$/,
   /^(flows|gov|altdata|insiders)\/[A-Za-z0-9_.-]{1,32}\.json$/,
+  /^macro\/releases\.json$/,
+  /^calendars\/(ipos|dividends)\.json$/,
 ];
 
 /** Which bucket a cleaned path lives in. */

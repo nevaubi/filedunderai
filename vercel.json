@@ -386,6 +386,14 @@
     {
       "path": "/api/cron/partner?task=supply",
       "schedule": "37 * * * *"
+    },
+    {
+      "path": "/api/cron/calendars?step=dividends",
+      "schedule": "23 12,22 * * 1-5"
+    },
+    {
+      "path": "/api/cron/calendars?step=ipos",
+      "schedule": "41 11,23 * * 1-5"
     }
   ],
   "headers": [

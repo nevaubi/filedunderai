@@ -300,9 +300,22 @@ def publish_index(sb, tickers=None):
             rows.append({"ticker": tk, "next_earnings": (c.get("next_earnings") or {}).get("date"), "consensus_as_of": c.get("as_of"),
                          "eps_0q": (q0.get("eps") or {}).get("avg"), "n_actions": len(acts[tk]), "last_action": (acts[tk][0]["date"] if acts[tk] else None),
                          "action_ids_recent": [a["id"] for a in acts[tk][:60]], "targets": (b.get("targets") or {}).get("stats"),
-                         "ratings": (b.get("ratings") or {}).get("counts"), "street_view": bool(b.get("street_view"))})
+                         "ratings": (b.get("ratings") or {}).get("counts"), "street_view": bool(b.get("street_view")),
+                         "earnings": _calendar_entry(c, b)})
     sb.put_json("estimates/index.json", {"generated": now_iso(), "companies": rows}, cache="max-age=600")
     return rows, acts
+
+
+def _calendar_entry(c, b):
+    """What the earnings calendar shows for a company: the scheduled date with its provider flags, the consensus for that
+    quarter, and the last reported quarter's surprise."""
+    ne = c.get("next_earnings") or {}
+    last = next((s for s in reversed(b.get("surprises") or []) if s.get("eps_actual") is not None), None)
+    return {"date": ne.get("date"), "is_estimate": ne.get("is_estimate"), "call_date": ne.get("call_date"),
+            "eps": (ne.get("eps") or {}).get("avg"), "revenue": (ne.get("revenue") or {}).get("avg"),
+            "provider": c.get("provider"), "url": c.get("url"), "as_of": c.get("as_of"),
+            "last": last and {"quarter_end": last.get("quarter_end"), "eps_actual": last.get("eps_actual"), "eps_estimate": last.get("eps_estimate"),
+                              "surprise_pct": last.get("surprise_pct"), "beat": last.get("beat")}}
 
 
 def rebuild_rosters(sb, acts):
