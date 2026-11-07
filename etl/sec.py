@@ -276,32 +276,38 @@ def build_series(facts, stmt, vintage="latest", as_of=None, concepts=None, insta
                 continue
             rank, reason = (_revenue_rank(facts, r, names, total_revenue_scope) if label == "Revenue"
                             else (names.index(r["c"]), "reported concept priority"))
-            # pinned: {(label, period_start or None, period_end): concept} already published for that period.
-            # While that concept is still reported for the period, it keeps the cell, so a later XBRL vintage
-            # that tags an old period under another concept cannot silently change its accounting scope.
-            if (pinned and pinned.get((label, r.get("start"), r["end"])) == r["c"]
-                    and not (total_revenue_scope and r["c"] == "RevenueFromContractWithCustomerExcludingAssessedTax")):
-                rank, reason = -100, "published concept retained for this period"
             rec = {"v": r["val"], "end": r["end"], "accn": r["accn"], "form": r["form"],
                    "filed": r["filed"], "c": r["c"], "available_at": r["filed"],
                    "accessions": [r["accn"]], "vintage": vintage, "validation_status": "reported",
                    "selection_reason": reason, "_rank": rank}
+            # pinned: {(kind, label, period_start or None, period_end): concept} already published for that
+            # cell ("A" annual, "Q" quarterly; a 3-tuple key without kind applies to both). While that concept
+            # is still reported for the period it keeps the cell, so a later XBRL vintage that tags an old
+            # period under another concept cannot silently change its accounting scope. The annual and the
+            # quarterly cell of one balance date can carry different published concepts, so each is pinned
+            # on its own copy of the observation.
+            def pinned_rec(kind, rec=rec, r=r):
+                if not pinned or (total_revenue_scope and r["c"] == "RevenueFromContractWithCustomerExcludingAssessedTax"):
+                    return rec
+                want = pinned.get((kind, label, r.get("start"), r["end"]), pinned.get((label, r.get("start"), r["end"])))
+                return dict(rec, _rank=-100, selection_reason="published concept retained for this period") if want == r["c"] else rec
             if is_instant:
                 if "start" not in r:
-                    quarterly.append(rec)
+                    quarterly.append(pinned_rec("Q"))
                     if r.get("fp") == "FY" and r["form"].startswith(("10-K", "20-F")):
-                        annual.append(rec)
+                        annual.append(pinned_rec("A"))
                 continue
             if "start" not in r:
                 continue
             rec["start"] = r["start"]
             d = days(r["start"], r["end"])
             if 350 <= d <= 380:
-                annual.append(rec); cumulative.append(rec)
+                annual.append(pinned_rec("A")); cumulative.append(pinned_rec("Q"))
             elif 80 <= d <= 120:
-                quarterly.append(rec); cumulative.append(rec)
+                q = pinned_rec("Q")
+                quarterly.append(q); cumulative.append(q)
             elif 160 <= d <= 300:
-                cumulative.append(rec)
+                cumulative.append(pinned_rec("Q"))
         if not is_instant and label not in NON_ADDITIVE:
             for big in cumulative:
                 candidates = [x for x in cumulative if x["start"] == big["start"] and x["c"] == big["c"]

@@ -147,13 +147,14 @@ def published_concepts(sb, ticker):
     if getattr(sb, "stage_only", False) is True or not callable(getattr(sb, "select", None)):
         return {}
     try:
-        rows = sb.select("facts", f"select=statement,label,period_start,period_end,concept&ticker=eq.{quote(ticker, safe='')}&derived=is.false&order=statement.asc,label.asc,kind.asc,period_end.asc")
+        rows = sb.select("facts", f"select=statement,label,kind,period_start,period_end,concept&ticker=eq.{quote(ticker, safe='')}&derived=is.false&order=statement.asc,label.asc,kind.asc,period_end.asc")
     except Exception:
         return {}
     out = {}
     for r in rows if isinstance(rows, list) else []:
-        if r.get("concept") and r.get("period_end"):
-            out.setdefault(r["statement"], {})[(r["label"], r.get("period_start"), r["period_end"])] = r["concept"]
+        if r.get("concept") and r.get("period_end") and r.get("kind") in ("A", "Q"):
+            # keyed by kind: the annual and quarterly cell of one balance date can be published under different concepts
+            out.setdefault(r["statement"], {})[(r["kind"], r["label"], r.get("period_start"), r["period_end"])] = r["concept"]
     return out
 
 
@@ -546,8 +547,12 @@ def companies_job(sb, tickers=None, workers=4, refresh_news=False, refresh_summa
         t0 = time.time()
         fund = _cache(sb, "meta/fundamentals.json", {}, strict=True)
         tickers = tickers or [t for t, *_ in UNIVERSE]
+        holds = _cache(sb, "meta/companies_review_holds.json", {}) if only_changed else {}
         if only_changed:
             tickers = detect_changes(sb, tickers, fund, deadline=t0 + (time_budget or 600) * 0.4, ownership_stats=run.stats)
+            # Companies whose last attempt stopped at a review guard go last, so a block of them cannot take
+            # every slot of every run while other companies wait.
+            tickers = [t for t in tickers if t not in holds] + [t for t in tickers if t in holds]
         if max_companies:
             tickers = tickers[:max_companies]
         done, failed, skipped, enrichment_errors = [], {}, {}, {}
@@ -579,6 +584,14 @@ def companies_job(sb, tickers=None, workers=4, refresh_news=False, refresh_summa
                         failed[tk] = err
                     print("fail", tk, err, flush=True)
         sb.put_json("meta/fundamentals.json", fund, cache="no-store")
+        if only_changed:
+            for tk in done:
+                holds.pop(tk, None)
+            for tk, err in failed.items():
+                if "review" in (err or ""):
+                    holds[tk] = {"reason": err[:300], "at": now_iso()}
+            sb.put_json("meta/companies_review_holds.json", holds, cache="no-store")
+            run.stats["review_holds"] = len(holds)
         run.stats.update({"done": len(done), "failed": failed, "skipped": skipped, "errors": enrichment_errors, "tickers": done})
         # Storage overwrites can still read as the previous object. Publish the
         # same validated snapshot that this run processed and persisted.
