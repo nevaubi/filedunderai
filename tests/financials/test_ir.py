@@ -770,6 +770,34 @@ class PipelineTests(unittest.TestCase):
                 ir.download('https://ir.example.test/q3-deck.pdf')
         sc2.assert_not_called()
 
+    def test_refused_pdf_is_stored_as_a_marked_text_only_copy(self):
+        from etl.common import HTTPError
+        sb = Store()
+        url = 'https://ir.example.test/q3-2026-earnings-presentation.pdf'
+        text = '<!doctype html>\n<html><body><pre>Q3 2026 results revenue 42</pre></body></html>'.encode()
+        with self.providers({url: 'Q3 2026 earnings presentation'}), \
+             patch.object(ir, 'download', side_effect=HTTPError(403, 'Access Denied')), \
+             patch.object(ir, 'text_copy', return_value=text) as tc:
+            result = ir.process_company(sb, 'TEST', 'Test', 1)
+        tc.assert_called_once()
+        self.assertEqual(result['web'], 1)
+        row = next(iter(sb.rows.values()))
+        self.assertTrue((row.get('title') or '').startswith(ir.TEXT_COPY_PREFIX))
+        self.assertEqual(row.get('ext'), '.html')
+
+    def test_blocked_refusals_get_one_more_attempt_once(self):
+        state = {'queues': {'documents': {
+            'https://ir.example.test/news/q3-results': {'status': 'blocked', 'source': 'web', 'ext_hint': '.html', 'attempts': 3, 'error': 'HTTP 403: Access Denied'},
+            'https://ir.example.test/q3.pdf': {'status': 'blocked', 'source': 'web', 'ext_hint': '.pdf', 'attempts': 3, 'error': 'Downloaded HTML instead of the linked document'},
+            'https://ir.example.test/q3.xlsx': {'status': 'blocked', 'source': 'web', 'ext_hint': '.xlsx', 'attempts': 3, 'error': 'HTTP 403: Access Denied'},
+            'https://ir.example.test/gone': {'status': 'blocked', 'source': 'web', 'ext_hint': '.html', 'attempts': 3, 'error': 'HTTP 404: Not Found'}}}}
+        self.assertEqual(ir.requeue_blocked(state), 2)
+        q = state['queues']['documents']
+        self.assertEqual([u for u, v in q.items() if v['status'] == 'retry'], ['https://ir.example.test/news/q3-results', 'https://ir.example.test/q3.pdf'])
+        self.assertEqual(q['https://ir.example.test/q3.pdf']['attempts'], ir.MAX_ATTEMPTS - 1)
+        q['https://ir.example.test/q3.pdf']['status'] = 'blocked'
+        self.assertEqual(ir.requeue_blocked(state), 0)
+
     def test_web_lane_skips_sec_and_leaves_it_open(self):
         sb = Store()
         new = 'https://ir.example.test/q3-2026-results-web.csv'

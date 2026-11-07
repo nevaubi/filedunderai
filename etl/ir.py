@@ -216,6 +216,31 @@ def download(url, deadline=None):
         return html.encode("utf-8")
 
 
+TEXT_COPY_PREFIX = "[Text-only copy via Firecrawl; original file not retrievable] "
+
+
+def text_copy(url, deadline=None):
+    """When a linked PDF cannot be downloaded (the host refuses datacenter IPs or answers with an HTML challenge),
+    Firecrawl's PDF parser can still return its text. That text is stored as an HTML document whose title says it is
+    a text-only copy, never as the original file. Returns HTML bytes or None."""
+    if not os.environ.get("FIRECRAWL_API_KEY"):
+        return None
+    timeout = _timeout(deadline, 90)
+    try:
+        data = json.loads(request("https://api.firecrawl.dev/v2/scrape", method="POST",
+            data={"url": url, "formats": ["markdown"], "parsers": ["pdf"], "onlyMainContent": False, "timeout": max(1, int(timeout * 900))},
+            headers={"Authorization": f"Bearer {os.environ['FIRECRAWL_API_KEY']}"}, timeout=timeout, retries=1))
+    except Exception:
+        return None
+    md = ((data or {}).get("data") or {}).get("markdown") or ""
+    ctype = (((data or {}).get("data") or {}).get("metadata") or {}).get("contentType") or ""
+    if len(md.strip()) < 400 or ("pdf" not in ctype.lower() and not url.lower().split("?")[0].endswith(".pdf")):
+        return None
+    import html as _html
+    body = "<!doctype html>\n<html><head><title>Text-only copy</title></head><body><pre>" + _html.escape(md) + "</pre></body></html>"
+    return body.encode("utf-8")
+
+
 def sniff_ext(body, url):
     if body[:5] == b"%PDF-":
         return ".pdf"
@@ -909,6 +934,30 @@ def _enqueue(state, queue, key, **values):
     return tasks[key]
 
 
+REQUEUE_VERSION = 1
+
+
+def requeue_blocked(state):
+    """Documents blocked before the Firecrawl fallbacks existed (403 on HTML pages, HTML answers or refusals for
+    PDFs) get one more attempt, once per REQUEUE_VERSION."""
+    if state.get("requeue_version", 0) >= REQUEUE_VERSION:
+        return 0
+    n = 0
+    for url, item in state["queues"]["documents"].items():
+        if item.get("status") != "blocked" or item.get("source") != "web":
+            continue
+        err = str(item.get("error") or "")
+        path = urllib.parse.urlparse(url).path.lower()
+        html_page = item.get("ext_hint") in (".html", ".htm") or not path.endswith(BINARY_EXT)
+        refused = re.match(r"HTTP (401|403|406|429|503)\b", err)
+        if (refused and (html_page or item.get("ext_hint") in (".pdf", ".pdf?"))) or (
+                err.startswith("Downloaded HTML instead") and item.get("ext_hint") in (".pdf", ".pdf?")):
+            item["status"], item["attempts"] = "retry", MAX_ATTEMPTS - 1
+            n += 1
+    state["requeue_version"] = REQUEUE_VERSION
+    return n
+
+
 def _failure(item, exc, stats, category):
     item["attempts"] += 1
     item["status"] = "blocked" if item["attempts"] >= MAX_ATTEMPTS else "retry"
@@ -1212,6 +1261,7 @@ def process_company(sb, ticker, name, cik, since_year=None, max_docs=90, refresh
 def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, sec_years, log, fye, web, deadline,
                      repair_existing, max_pages, backfill, publish_only, sec=True):
     state = _read_checkpoint(sb, ticker)  # Fail closed before any storage or row mutation.
+    requeue_blocked(state)
     requested_since = 1900 if backfill else since_year if since_year is not None else dt.date.today().year - 2
     requested_sec = "1900-01-01" if backfill else (dt.date.today() - dt.timedelta(days=int(365 * max(0, sec_years)))).isoformat()
     old_scope = state["scope"]
@@ -1347,13 +1397,24 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
             continue
         remaining -= 1
         try:
-            body = _sec_request(url, deadline=deadline, raw=True) if item["source"] == "sec" else download(url, deadline=deadline)
+            title = item.get("title")
+            pdf_hint = item.get("ext_hint") in (".pdf", ".pdf?")
+            try:
+                body = _sec_request(url, deadline=deadline, raw=True) if item["source"] == "sec" else download(url, deadline=deadline)
+            except HTTPError as e:
+                alt = text_copy(url, deadline=deadline) if item["source"] == "web" and pdf_hint and e.code in (401, 403, 406, 429, 503) else None
+                if alt is None:
+                    raise
+                body, title = alt, TEXT_COPY_PREFIX + (title or "")
             ext = sniff_ext(body, url) or item.get("ext_hint")
-            if ext in (".html", ".htm") and item.get("ext_hint") not in (".html", ".htm"):
-                raise ValueError("Downloaded HTML instead of the linked document")
+            if ext in (".html", ".htm") and item.get("ext_hint") not in (".html", ".htm") and not (title or "").startswith(TEXT_COPY_PREFIX):
+                alt = text_copy(url, deadline=deadline) if item["source"] == "web" and pdf_hint else None
+                if alt is None:
+                    raise ValueError("Downloaded HTML instead of the linked document")
+                body, title, ext = alt, TEXT_COPY_PREFIX + (title or ""), ".html"
             if not body or not ext or ext in (".zip", ".ole", ".pdf?"):
                 raise ValueError("Unsupported or empty downloaded original")
-            stored = store_document(sb, ticker, url, body, ext, item.get("title"), item.get("source_page"), have_hashes,
+            stored = store_document(sb, ticker, url, body, ext, title, item.get("source_page"), have_hashes,
                                     kind_hint=item.get("kind_hint"), log=log, fye=fye,
                                     ref_date=dt.date.fromisoformat(item["ref_date"]) if item.get("ref_date") else None,
                                     published=item.get("published"), outcomes=state["outcomes"], deadline=deadline)
