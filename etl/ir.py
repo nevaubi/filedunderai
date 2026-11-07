@@ -193,9 +193,27 @@ def keep_doc(url, title, since_year):
     return year is None or year >= since_year
 
 
+BINARY_EXT = (".pdf", ".xls", ".xlsx", ".xlsm", ".csv", ".ppt", ".pptx", ".doc", ".docx", ".zip", ".mp3", ".mp4", ".jpg", ".png")
+
+
 def download(url, deadline=None):
-    body = request(url, headers={"User-Agent": UA, "Accept": "*/*"}, timeout=_timeout(deadline, 90), retries=1, raw=True)
-    return body
+    """Original bytes of a linked document. Some IR hosts refuse plain requests from datacenter IPs (403/429/503)
+    while the same public page reads fine through Firecrawl, which the site map/scrape already uses. For HTML pages
+    the fallback is Firecrawl's copy of the page; binary originals have no fallback (a rendered copy is not the file)."""
+    try:
+        return request(url, headers={"User-Agent": UA, "Accept": "*/*"}, timeout=_timeout(deadline, 90), retries=1, raw=True)
+    except HTTPError as e:
+        path = urllib.parse.urlparse(url).path.lower()
+        if e.code not in (401, 403, 406, 429, 503) or path.endswith(BINARY_EXT) or not os.environ.get("FIRECRAWL_API_KEY"):
+            raise
+        try:
+            page = _scrape(url, deadline=deadline)
+        except Exception:
+            raise e
+        html = page.get("rawHtml") or page.get("html") or ""
+        if not html.lstrip()[:100].lower().startswith(("<!doctype html", "<html")):
+            html = "<!doctype html>\n<html>" + html + "</html>"
+        return html.encode("utf-8")
 
 
 def sniff_ext(body, url):

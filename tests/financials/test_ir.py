@@ -6,6 +6,7 @@ import io
 import json
 import struct
 import time
+import os
 import unittest
 import zipfile
 from contextlib import ExitStack
@@ -753,6 +754,21 @@ class PipelineTests(unittest.TestCase):
         self.assertIn(root, visited)
         self.assertEqual(result['web'], 1)
         self.assertEqual(result['coverage']['enumeration']['web'], 'failed')
+
+    def test_blocked_html_download_falls_back_to_firecrawl_copy(self):
+        from etl.common import HTTPError
+        with patch.object(ir, 'request', side_effect=HTTPError(403, 'Access Denied')), \
+             patch.object(ir, '_scrape', return_value={'html': '<p>Q3 results</p>'}) as sc, \
+             patch.dict(os.environ, {'FIRECRAWL_API_KEY': 'k'}):
+            body = ir.download('https://ir.example.test/news-releases/q3-results')
+        sc.assert_called_once()
+        self.assertTrue(body.startswith(b'<!doctype html>'))
+        self.assertEqual(ir.sniff_ext(body, 'https://ir.example.test/news-releases/q3-results'), '.html')
+        with patch.object(ir, 'request', side_effect=HTTPError(403, 'Access Denied')), patch.object(ir, '_scrape') as sc2, \
+             patch.dict(os.environ, {'FIRECRAWL_API_KEY': 'k'}):
+            with self.assertRaises(HTTPError):
+                ir.download('https://ir.example.test/q3-deck.pdf')
+        sc2.assert_not_called()
 
     def test_web_lane_skips_sec_and_leaves_it_open(self):
         sb = Store()
