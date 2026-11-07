@@ -33,6 +33,8 @@ and why it may matter to an investor. Use ONLY the facts below. 3 to 5 sentences
 cite the fact ids it uses. Prefer sentences that connect facts from different sources (for example a guidance change and the
 analyst actions that followed, or a filing change and the price move). Do not add any number, name, date or claim that is not
 in the cited facts. No investment advice, no predictions, no adjectives like "significant" or "strong" unless a fact says so.
+Keep each sentence under 35 words. Do not list more than two analyst actions in a sentence; use the action summary fact for the rest.
+Do not add framing such as "for context" or "for investors to weigh".
 
 Facts:
 {facts}
@@ -69,6 +71,13 @@ def gather(sb, tk, today=None):
                     {"tab": "technicals"}))
     est = sb.get_json(f"estimates/{tk}.json") or {}
     acts = [a for a in est.get("actions") or [] if (a.get("date") or "") >= since]
+    if len(acts) >= 3:
+        up = sum(1 for a in acts if (a.get("action") or "").lower().startswith("upgrade"))
+        down = sum(1 for a in acts if (a.get("action") or "").lower().startswith("downgrade"))
+        raised = sum(1 for a in acts if a.get("pt_prior") is not None and a.get("pt_current") is not None and a["pt_current"] > a["pt_prior"])
+        cut = sum(1 for a in acts if a.get("pt_prior") is not None and a.get("pt_current") is not None and a["pt_current"] < a["pt_prior"])
+        out.append(("act:summary", f"Analyst actions {since} to {today.isoformat()}: {len(acts)} in total; {up} upgrades, {down} downgrades; "
+                                   f"{raised} price-target raises and {cut} cuts.", {"tab": "estimates"}))
     for a in acts[:8]:
         pt = ""
         if a.get("pt_current") is not None:
