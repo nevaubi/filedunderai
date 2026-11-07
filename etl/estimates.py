@@ -147,6 +147,25 @@ def fix_period_ends(periods, last_reported):
     return periods
 
 
+MIN_SURPRISE_BASE = 0.05   # |consensus EPS| below this makes a percentage surprise meaningless
+MAX_SURPRISE = 10.0        # beyond ±1,000% the percentage carries no information the EPS difference does not
+
+
+def sane_surprise(actual, estimate, given=None):
+    """Percentage EPS surprise, or None when it is not meaningful: a consensus near zero (LLYVA: -3.20 against
+    0.01 reads as -32,100%), or a result beyond ±1,000%. The denominator is |estimate| so a miss on a negative
+    estimate stays negative. Without both EPS values the provider's figure is kept within the same bounds."""
+    if actual is not None and estimate is not None:
+        if abs(estimate) < MIN_SURPRISE_BASE:
+            return None
+        s = (actual - estimate) / abs(estimate)
+    else:
+        s = given
+    if s is None or not isinstance(s, (int, float)) or s != s or abs(s) > MAX_SURPRISE:
+        return None
+    return round(s, 6)
+
+
 def parse_yahoo_earnings(data, retrieved_at=None):
     """Normalize one equities/earnings payload. Returns None when it carries no usable estimates."""
     if not isinstance(data, dict):
@@ -156,8 +175,10 @@ def parse_yahoo_earnings(data, retrieved_at=None):
         q = (h.get("quarter") or {}).get("date")
         if not q:
             continue
-        hist.append({"quarter_end": q, "eps_actual": num(h.get("eps_actual")), "eps_estimate": num(h.get("eps_estimate")),
-                     "eps_difference": num(h.get("eps_difference")), "surprise_pct": num(h.get("surprise_percent")),
+        actual, estimate = num(h.get("eps_actual")), num(h.get("eps_estimate"))
+        hist.append({"quarter_end": q, "eps_actual": actual, "eps_estimate": estimate,
+                     "eps_difference": num(h.get("eps_difference")),
+                     "surprise_pct": sane_surprise(actual, estimate, num(h.get("surprise_percent"))),
                      "currency": h.get("currency") or "USD"})
     # Yahoo repeats period labels (two "-4q" rows); quarters are identified by their date only.
     seen, history = set(), []

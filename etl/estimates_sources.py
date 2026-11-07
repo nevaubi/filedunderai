@@ -319,7 +319,10 @@ def _calendar_entry(c, b):
             "eps": (ne.get("eps") or {}).get("avg"), "revenue": (ne.get("revenue") or {}).get("avg"),
             "provider": c.get("provider"), "url": c.get("url"), "as_of": c.get("as_of"),
             "last": last and {"quarter_end": last.get("quarter_end"), "eps_actual": last.get("eps_actual"), "eps_estimate": last.get("eps_estimate"),
-                              "surprise_pct": last.get("surprise_pct"), "beat": last.get("beat"),
+                              "eps_difference": (round(last["eps_actual"] - last["eps_estimate"], 6)
+                                                 if last.get("eps_actual") is not None and last.get("eps_estimate") is not None else None),
+                              "surprise_pct": E.sane_surprise(last.get("eps_actual"), last.get("eps_estimate"), last.get("surprise_pct")),
+                              "beat": last.get("beat"),
                               "report": last.get("report"), "move": (last.get("reaction") or {}).get("r1"),
                               "move_date": (last.get("reaction") or {}).get("date")},
             # typical move: median absolute one-day close-to-close return after the reports on file (up to the last four)
