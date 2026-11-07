@@ -7,11 +7,11 @@ from _common import serve  # noqa: E402
 
 
 def run(sb, query):
-    """Insiders & influence pipeline (gov/ and flows/ bundles). step = daily | hearings | company | holders."""
+    """Insiders & influence pipeline (gov/ and flows/ bundles). step = daily | hearings | company | holders | reads."""
     from etl import gov_pipeline
     step = query.get("step", "daily")
-    if step not in ("daily", "hearings", "company", "holders"):
-        raise ValueError("step must be daily, hearings, company or holders")
+    if step not in ("daily", "hearings", "company", "holders", "reads"):
+        raise ValueError("step must be daily, hearings, company, holders or reads")
     return gov_pipeline.scheduled(sb, step, time_budget=680)
 
 

@@ -147,15 +147,62 @@ def complete(prompt, max_tokens=2500):
     raise last
 
 
-def read(tk, name, gov, flows, ins=None):
-    if not os.environ.get("FIREWORKS_API_KEY"):
+CHECK_PROMPT = """You audit sentences written about a company's government exposure and stock ownership. For each sentence you get
+the facts it cites. Try to refute it. A sentence is supported only if the cited facts state everything it says: names, numbers,
+dates, direction of change and any comparison. Wording that implies a motive, a cause or an importance the facts do not state
+is not supported.
+
+Return JSON: {{"verdicts": [{{"n": <sentence number>, "supported": true or false, "reason": "at most 20 words"}}]}}
+
+{items}"""
+
+
+def check(ok, facts, draft_model, post=None):
+    """Second pass with the other model and different instructions; returns (kept, dropped, check_model)."""
+    by = dict(facts)
+    items = "\n\n".join(f"SENTENCE {n}: {s['text']}\nFACTS: " + " | ".join(f"[{r}] {by[r]}" for r in s["refs"]) for n, s in enumerate(ok, 1))
+    model = FALLBACK if draft_model == PRIMARY else PRIMARY
+    j = (post or _call)(model, CHECK_PROMPT.format(items=items))
+    verdicts = {v.get("n"): v for v in j.get("verdicts") or [] if isinstance(v, dict)}
+    kept, dropped = [], []
+    for n, s in enumerate(ok, 1):
+        v = verdicts.get(n)
+        if v and v.get("supported") is True:
+            kept.append(s)
+        else:
+            dropped.append({"text": s["text"], "reason": "check: " + ((v or {}).get("reason") or "no verdict")[:160]})
+    return kept, dropped, model
+
+
+def _call(model, prompt, max_tokens=1500):
+    d = json.loads(request("https://api.fireworks.ai/inference/v1/chat/completions", method="POST", data={
+        "model": f"accounts/fireworks/models/{model}", "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": max_tokens, "temperature": 0, "response_format": {"type": "json_object"}},
+        headers={"Authorization": f"Bearer {os.environ['FIREWORKS_API_KEY']}"}, timeout=180, retries=1))
+    txt = re.sub(r"(?s)<think>.*?</think>", "", d["choices"][0]["message"]["content"] or "").strip()
+    m = re.search(r"(?s)\{.*\}", txt)
+    return json.loads(m.group(0) if m else txt)
+
+
+def read(tk, name, gov, flows, ins=None, complete_fn=None, post=None):
+    """Draft, verify in code, then a second model must support each sentence. Only sentences that pass are published;
+    if the check cannot run, the result carries status "unchecked" and no sentences."""
+    if not os.environ.get("FIREWORKS_API_KEY") and complete_fn is None:
         return None
     facts = facts_for(gov, flows, ins)
     if len(facts) < 3:
         return {"status": "insufficient", "generated_at": now_iso(), "facts": len(facts)}
     t0 = time.time()
-    j, model = complete(PROMPT.format(name=name, tk=tk, facts="\n".join(f"[{i}] {t}" for i, t in facts)))
+    j, model = (complete_fn or complete)(PROMPT.format(name=name, tk=tk, facts="\n".join(f"[{i}] {t}" for i, t in facts)))
     ok, dropped = verify(j.get("sentences"), facts)
-    return {"status": "ok" if ok else "all_dropped", "generated_at": now_iso(), "model": model, "seconds": round(time.time() - t0, 1),
-            "sentences": ok, "dropped": dropped, "facts": [{"id": i, "text": t} for i, t in facts if any(i in s["refs"] for s in ok)],
-            "label": "AI-generated from the records on this tab; each sentence links to its records."}
+    check_model = None
+    if ok:
+        try:
+            ok, more, check_model = check(ok, facts, model, post=post)
+            dropped += more
+        except Exception as e:
+            return {"status": "unchecked", "generated_at": now_iso(), "model": model, "error": str(e)[:200], "sentences": [], "dropped": dropped}
+    return {"status": "ok" if ok else "all_dropped", "generated_at": now_iso(), "model": model, "check_model": check_model,
+            "seconds": round(time.time() - t0, 1), "sentences": ok, "dropped": dropped,
+            "facts": [{"id": i, "text": t} for i, t in facts if any(i in s["refs"] for s in ok)],
+            "label": "AI-generated from the records on this tab, checked by a second model; each sentence links to its records."}

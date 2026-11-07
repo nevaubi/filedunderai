@@ -409,6 +409,7 @@ def step_insights(sb, tks=None, per_run=30, deadline=None, log=print):
         start = st.get("insight_cursor", 0) % len(all_t)
         tks = (all_t[start:] + all_t[:start])[:per_run]
     done = 0
+    prev = None
     for tk in tks:
         if deadline and deadline.passed(60):
             break
@@ -422,6 +423,10 @@ def step_insights(sb, tks=None, per_run=30, deadline=None, log=print):
             r = gov_insights.read(tk, BY_TICKER[tk]["name"], g, f, ins)
         except Exception as ex:
             r = {"status": "error", "error": str(ex)[:200], "generated_at": now_iso()}
+        prev = g.get("ai_read")
+        # a failed or unchecked run never replaces a published read
+        if r and r.get("status") in ("error", "unchecked") and prev and prev.get("sentences"):
+            r = dict(prev, last_attempt={"status": r.get("status"), "at": r.get("generated_at"), "error": r.get("error")})
         update_company(sb, "gov", tk, {"ai_read": r, "_sources": {"ai_read": status(r.get("status") if r else "not_collected")}})
         done += 1
     st["insight_cursor"] = (st.get("insight_cursor", 0) + done) % len(all_t)
@@ -553,6 +558,8 @@ def scheduled(sb, step, time_budget=680, log=print):
                 if stale:
                     gov_entities.refresh(sb, stale, workers=3, log=log)
                 out["company"] = step_company(sb, per_run=20, deadline=dl, workers=4, log=log)
+            elif step == "reads":
+                out["insights"] = step_insights(sb, per_run=40, deadline=dl, log=log)
             elif step == "holders":
                 out["holders"] = step_holders(sb, deadline=dl, log=log); _mark(sb, "holders")
                 if dl.left() > 400:
@@ -563,7 +570,7 @@ def scheduled(sb, step, time_budget=680, log=print):
                     cov = step_coverage(sb, log=log)
                     out["coverage"] = {"companies": cov["companies"]}
             else:
-                raise ValueError("step must be daily, hearings, company or holders")
+                raise ValueError("step must be daily, hearings, company, holders or reads")
             run.stats.update({k: v for k, v in out.items() if k != "step"})
     finally:
         lease.__exit__(None, None, None)

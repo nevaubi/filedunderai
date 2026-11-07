@@ -398,6 +398,10 @@
     {
       "path": "/api/cron/insights",
       "schedule": "29 */2 * * *"
+    },
+    {
+      "path": "/api/cron/govflows?step=reads",
+      "schedule": "7 1-23/2 * * *"
     }
   ],
   "headers": [

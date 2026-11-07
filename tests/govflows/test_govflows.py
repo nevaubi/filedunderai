@@ -211,3 +211,30 @@ class InsightTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class GovReadCheck(unittest.TestCase):
+    def test_second_model_must_support_each_sentence(self):
+        gov = {"congress_trades": [], "lobbying": {"quarters": [{"year": 2026, "quarter": q, "amount": 1e6 * q, "basis": "in-house"} for q in (1, 2, 3)]}}
+        draft = {"sentences": [{"text": "Federal lobbying spend was $3.0M in 2026 Q3.", "refs": ["lda:q:2026Q3"]},
+                               {"text": "Lobbying spend rose because of new regulation.", "refs": ["lda:q:2026Q2"]}]}
+        seen = {}
+
+        def post(model, prompt):
+            seen["model"] = model
+            return {"verdicts": [{"n": 1, "supported": True}, {"n": 2, "supported": False, "reason": "cause not stated"}]}
+        r = gov_insights.read("T", "T Corp", gov, {}, complete_fn=lambda p: (draft, gov_insights.PRIMARY), post=post)
+        self.assertEqual([s["text"] for s in r["sentences"]], ["Federal lobbying spend was $3.0M in 2026 Q3."])
+        self.assertEqual(seen["model"], gov_insights.FALLBACK)
+        self.assertEqual(r["check_model"], gov_insights.FALLBACK)
+        self.assertTrue(any(d["reason"].startswith("check:") for d in r["dropped"]))
+
+    def test_unchecked_publishes_nothing(self):
+        gov = {"lobbying": {"quarters": [{"year": 2026, "quarter": q, "amount": 1e6, "basis": "in-house"} for q in (1, 2, 3)]}}
+        draft = {"sentences": [{"text": "Federal lobbying spend was $1.0M in 2026 Q3.", "refs": ["lda:q:2026Q3"]}]}
+
+        def post(model, prompt):
+            raise RuntimeError("down")
+        r = gov_insights.read("T", "T Corp", gov, {}, complete_fn=lambda p: (draft, gov_insights.PRIMARY), post=post)
+        self.assertEqual(r["status"], "unchecked")
+        self.assertEqual(r["sentences"], [])
