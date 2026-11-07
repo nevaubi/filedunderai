@@ -22,6 +22,8 @@ const PUBLIC_RX = [
   /^kpis\/[A-Za-z0-9_.-]{1,32}\.json$/,
   /^(estimates|guidance)\/[A-Za-z0-9_.-]{1,32}\.json$/,
   /^screener\.json$/,
+  /^kpistd\/(latest|taxonomy|map)\.json$/,
+  /^kpistd\/(t|series)\/[A-Za-z0-9_.-]{1,64}\.json$/,
 ];
 
 /** Which bucket a cleaned path lives in. */
