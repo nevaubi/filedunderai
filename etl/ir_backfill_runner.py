@@ -49,6 +49,14 @@ def unindexed(sb, index):
     return out
 
 
+def shard_of(ticker, shards):
+    """Stable shard for a ticker. Shards start a few seconds apart and may see different skip sets or a newer
+    index, so position in the planned list cannot decide ownership: two shards would share a company (one then fails
+    on its per-company lease) and another company would land in none."""
+    import zlib
+    return zlib.crc32(ticker.encode()) % max(1, shards)
+
+
 def _cov(rows, t):
     return (rows.get(t) or {}).get("coverage") or {}
 
@@ -205,7 +213,7 @@ def main():
         todo = plan(sb, explicit, include_partial=False, index=index, skip=recovered)
     else:
         todo = plan(sb, explicit, include_partial=not a.no_partial, index=index, skip=recovered)
-    todo = todo[a.shard::a.shards]
+    todo = [t for t in todo if shard_of(t, a.shards) == a.shard]
     print(f"IR backfill {a.lane} lane: {len(todo)} companies, {a.workers} workers, {a.hours} h", flush=True)
     r.run_list(todo, web=True, sec=a.lane == "all")
     r.finish()
