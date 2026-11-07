@@ -101,10 +101,33 @@ def fetch(ticker, cik, filing):
     return out
 
 
+def dedupe_joint(rows):
+    """One economic transaction reported on separate Forms 4 by related owners (a holding company and the trust or
+    family member that controls it, e.g. LOR Inc and the R. Randall Rollins Voting Trust) appears once per filer with
+    the same date, code, shares, price and shares owned afterwards. Count it once; the other filers are kept as
+    `joint` on the surviving row."""
+    out, seen = [], {}
+    for r in sorted(rows, key=lambda r: (r.get("filed") or "", r.get("accession") or "", r.get("seq") or 0)):
+        if r.get("shares") is None or r.get("owned_after") is None:
+            out.append(r)
+            continue
+        key = (r.get("tx_date"), r.get("code"), r.get("security"), bool(r.get("derivative")), float(r["shares"]),
+               round(float(r.get("price") or 0), 4), float(r["owned_after"]))
+        first = seen.get(key)
+        if first is not None and first.get("owner") != r.get("owner"):
+            first.setdefault("joint", [])
+            if r.get("owner") not in first["joint"]:
+                first["joint"].append(r.get("owner"))
+            continue
+        seen[key] = r
+        out.append(r)
+    return out
+
+
 def summarize(rows, today=None):
     """Bundle for the site: open-market activity and the latest transactions."""
     today = today or dt.date.today()
-    real = [r for r in rows if r.get("seq", 0) >= 0 and r.get("tx_date")]
+    real = dedupe_joint(r for r in rows if r.get("seq", 0) >= 0 and r.get("tx_date"))
     real.sort(key=lambda r: (r["tx_date"], r["accession"], r["seq"]), reverse=True)
 
     def window(days):
@@ -127,7 +150,7 @@ def summarize(rows, today=None):
     owners = sorted(by_owner.values(), key=lambda o: -(o["buy_value"] + o["sell_value"]))[:15]
     for o in owners:
         o["buy_value"], o["sell_value"] = round(o["buy_value"]), round(o["sell_value"])
-    keep = ("accession", "seq", "filed", "owner", "role", "tx_date", "code", "security", "shares", "price", "acq_disp", "owned_after", "ownership", "derivative", "plan_10b5")
+    keep = ("accession", "seq", "filed", "owner", "role", "tx_date", "code", "security", "shares", "price", "acq_disp", "owned_after", "ownership", "derivative", "plan_10b5", "joint")
     return {
         "w90": window(90), "w365": window(365), "owners": owners,
         "rows": [{k: r.get(k) for k in keep} for r in real[:400]],
