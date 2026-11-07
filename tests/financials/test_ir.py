@@ -797,6 +797,22 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(q['https://ir.example.test/q3.pdf']['attempts'], ir.MAX_ATTEMPTS - 1)
         q['https://ir.example.test/q3.pdf']['status'] = 'blocked'
         self.assertEqual(ir.requeue_blocked(state), 0)
+        # v2 only reopens the site search; documents already had their extra attempt
+        state2 = {'requeue_version': 1, 'queues': {'maps': {'site-search': {'status': 'blocked', 'attempts': 3}}, 'documents': dict(q)}}
+        self.assertEqual(ir.requeue_blocked(state2), 1)
+        self.assertEqual(state2['queues']['maps']['site-search']['status'], 'retry')
+        self.assertEqual(q['https://ir.example.test/q3.pdf']['status'], 'blocked')
+
+    def test_short_brand_investor_host_is_a_fallback_only_when_the_page_names_the_company(self):
+        res = [{'url': 'https://investor.kns.com/news', 'title': 'Kulicke & Soffa Investor Relations', 'content': 'Kulicke and Soffa Industries (NASDAQ: KLIC)'},
+               {'url': 'https://www.marketbeat.com/stocks/NASDAQ/KLIC/', 'title': 'KLIC', 'content': 'Kulicke'},
+               {'url': 'https://ir.random.com/', 'title': 'Other company', 'content': 'nothing here'}]
+        with patch.object(ir, 'tavily', return_value=res):
+            self.assertEqual(ir.ir_candidates('KULICKE & SOFFA INDUSTRIES INC', 'KLIC'), ['https://investor.kns.com'])
+        with patch.object(ir, 'tavily', return_value=[{'url': 'https://www.kulicke.com/investors', 'title': 'x', 'content': ''}] + res):
+            self.assertEqual(ir.ir_candidates('KULICKE & SOFFA INDUSTRIES INC', 'KLIC'), ['https://www.kulicke.com/investors'])
+        with patch.object(ir, 'tavily', return_value=res[2:]):
+            self.assertEqual(ir.ir_candidates('KULICKE & SOFFA INDUSTRIES INC', 'KLIC'), [])
 
     def test_web_lane_skips_sec_and_leaves_it_open(self):
         sb = Store()
@@ -903,7 +919,7 @@ class SiteDiscoveryTests(unittest.TestCase):
             self.assertEqual(ir.ir_candidates("Okta, Inc.", "OKTA")[0], "https://investor.okta.com")
 
     def test_asset_hosts_are_never_sites_and_main_site_is_last_resort(self):
-        with patch.object(ir, "tavily", side_effect=[[{"url": "https://image.roku.com/x/4Q25-Shareholder-Letter.pdf"}], []]):
+        with patch.object(ir, "tavily", side_effect=[[{"url": "https://image.roku.com/x/4Q25-Shareholder-Letter.pdf"}], [], []]):
             self.assertEqual(ir.ir_candidates("Roku, Inc.", "ROKU"), [])
         with patch.object(ir, "tavily", side_effect=[[{"url": "https://www.cintas.com/about/"}], []]):
             self.assertEqual(ir.ir_candidates("Cintas Corporation", "CTAS"), ["https://www.cintas.com"])

@@ -69,9 +69,17 @@ def _site_tier(host, path, ticker="", brand=()):
 def ir_candidates(name, ticker, deadline=None):
     """Searches for the company's investor relations site. Returns root URLs whose host names the company or ticker,
     investor sites first, then company subdomains, then the main site; within a tier by search evidence."""
-    res = tavily(f"{name} ({ticker}) investor relations quarterly results", max_results=10, deadline=deadline)
-    res += tavily(f"{name} investor relations website", max_results=8, deadline=deadline)
-    score, tier = {}, {}
+    res = list(tavily(f"{name} ({ticker}) investor relations quarterly results", max_results=10, deadline=deadline))
+    res += list(tavily(f"{name} investor relations website", max_results=8, deadline=deadline))
+    out = _rank_candidates(res, name, ticker)
+    if not out:
+        # one more query by ticker, which finds investor hosts whose name does not spell out the company
+        out = _rank_candidates(tavily(f"{ticker} stock investor relations press releases quarterly results", max_results=6, deadline=deadline), name, ticker)
+    return out
+
+
+def _rank_candidates(res, name, ticker):
+    score, tier, fallback = {}, {}, {}
     for i, r in enumerate(res):
         u = urllib.parse.urlparse(r["url"])
         host = u.netloc.lower()
@@ -88,7 +96,14 @@ def ir_candidates(name, ticker, deadline=None):
         if ticker.lower().replace("-", "") in host.replace("-", "") or any(w in host.replace("-", "") for w in brand[:2]):
             s += 25
         else:
-            continue  # a host that names neither the company nor its ticker is a third party (aggregator, data vendor)
+            # A host that names neither the company nor its ticker is usually a third party. Investor hosts with a
+            # short brand (ir.bench.com for Benchmark Electronics, investor.kns.com for Kulicke & Soffa) are kept as
+            # a fallback when the page itself names the company or shows its ticker, and used only if nothing else
+            # qualifies.
+            if level == 0 and _names_company(r, name, ticker, brand):
+                froot = f"{u.scheme}://{host}"
+                fallback[froot] = fallback.get(froot, 0) + s
+            continue
         if level == 0:
             s += 15
         root = f"{u.scheme}://{host}"
@@ -98,7 +113,21 @@ def ir_candidates(name, ticker, deadline=None):
         score[root] = score.get(root, 0) + s
         tier[root] = min(tier.get(root, level), level)
     ranked = sorted(score, key=lambda k: (tier[k], -score[k]))
-    return [r for r in ranked if score[r] > 0]
+    out = [r for r in ranked if score[r] > 0]
+    if not out and fallback:
+        out = sorted(fallback, key=lambda k: -fallback[k])
+    return out
+
+
+def _names_company(result, name, ticker, brand):
+    """The search result's own title or text names the company (all of its first two distinctive words) or prints
+    its ticker as a listing ("NASDAQ: KLIC", "(NYSE: GPI)")."""
+    text = f"{result.get('title') or ''} {result.get('content') or ''}".lower()
+    words = [w for w in brand[:2] if len(w) >= 4]
+    if words and all(re.search(r"\b" + re.escape(w), text) for w in words):
+        return True
+    sym = re.escape(ticker.lower())
+    return bool(re.search(r"(nasdaq|nyse|nyse american|nyse arca)\s*[:\-]\s*" + sym + r"\b", text))
 
 
 def _ext(url):
@@ -934,25 +963,33 @@ def _enqueue(state, queue, key, **values):
     return tasks[key]
 
 
-REQUEUE_VERSION = 1
+REQUEUE_VERSION = 2
 
 
 def requeue_blocked(state):
-    """Documents blocked before the Firecrawl fallbacks existed (403 on HTML pages, HTML answers or refusals for
-    PDFs) get one more attempt, once per REQUEUE_VERSION."""
-    if state.get("requeue_version", 0) >= REQUEUE_VERSION:
+    """One more attempt, once per change, for work blocked before a fix existed:
+    v1: documents refused before the Firecrawl fallbacks (403 on HTML pages, HTML answers or refusals for PDFs);
+    v2: the IR site search, before short-brand investor hosts (ir.bench.com, investor.kns.com) were accepted."""
+    version = state.get("requeue_version", 0)
+    if version >= REQUEUE_VERSION:
         return 0
     n = 0
-    for url, item in state["queues"]["documents"].items():
-        if item.get("status") != "blocked" or item.get("source") != "web":
-            continue
-        err = str(item.get("error") or "")
-        path = urllib.parse.urlparse(url).path.lower()
-        html_page = item.get("ext_hint") in (".html", ".htm") or not path.endswith(BINARY_EXT)
-        refused = re.match(r"HTTP (401|403|406|429|503)\b", err)
-        if (refused and (html_page or item.get("ext_hint") in (".pdf", ".pdf?"))) or (
-                err.startswith("Downloaded HTML instead") and item.get("ext_hint") in (".pdf", ".pdf?")):
-            item["status"], item["attempts"] = "retry", MAX_ATTEMPTS - 1
+    if version < 1:
+        for url, item in state["queues"]["documents"].items():
+            if item.get("status") != "blocked" or item.get("source") != "web":
+                continue
+            err = str(item.get("error") or "")
+            path = urllib.parse.urlparse(url).path.lower()
+            html_page = item.get("ext_hint") in (".html", ".htm") or not path.endswith(BINARY_EXT)
+            refused = re.match(r"HTTP (401|403|406|429|503)\b", err)
+            if (refused and (html_page or item.get("ext_hint") in (".pdf", ".pdf?"))) or (
+                    err.startswith("Downloaded HTML instead") and item.get("ext_hint") in (".pdf", ".pdf?")):
+                item["status"], item["attempts"] = "retry", MAX_ATTEMPTS - 1
+                n += 1
+    if version < 2:
+        task = state["queues"].get("maps", {}).get("site-search")
+        if task and task.get("status") == "blocked":
+            task["status"], task["attempts"] = "retry", MAX_ATTEMPTS - 1
             n += 1
     state["requeue_version"] = REQUEUE_VERSION
     return n
