@@ -129,6 +129,10 @@ ITEMS = {
     "5.01": ("high", "Change in control of the company"),
     "5.02": ("low", "Director or officer departure, election or appointment, or compensation arrangement"),
     "5.03": ("low", "Amendment to articles or bylaws, or change in fiscal year"),
+    "1.05": ("high", "Material cybersecurity incident"),
+    "5.07": ("low", "Shareholder vote results"),
+    "1.04": ("low", "Mine safety violation or order"),
+    "5.05": ("low", "Amendment to or waiver of the code of ethics"),
 }
 
 
@@ -149,6 +153,36 @@ def filing_8k_events(rows, since):
                              (r.get("accession"), it), evidence=[sec_url(r.get("url"))],
                              detail=clip(r.get("description"), 160) if r.get("description") else None,
                              metrics={"items": items}, tags=["8-K", f"Item {it}"]))
+    return out
+
+
+def form144_events(rows, mcap, since):
+    """Notices of proposed sales (Form 144) not yet matched to a Form 4 sale. Executed notices are left to the Form 4
+    events. Plan sales need a larger size to show, since their timing was fixed months earlier."""
+    out = []
+    for r in rows or []:
+        t, filed = r.get("ticker"), _d(r.get("filed"))
+        if t not in BY_TICKER or not filed or filed < since or r.get("status") == "executed":
+            continue
+        val = _num(r.get("value")) or 0
+        bps = val / mcap[t] * 1e4 if mcap.get(t) else None
+        scale = 4 if r.get("plan") else 1
+        tier = ("high" if val >= 2.5e7 * scale or (bps or 0) >= 25 * scale else
+                "medium" if val >= 5e6 * scale or (bps or 0) >= 5 * scale else
+                "low" if val >= 1e6 * scale else None)
+        if not tier:
+            continue
+        who = (r.get("person") or "An insider").strip()
+        role = r.get("relationship") or "affiliate"
+        plan = f"under a 10b5-1 plan adopted {r['plan_adopted'][0]}" if r.get("plan") and r.get("plan_adopted") else "with no 10b5-1 plan stated"
+        size = money(val) + (f" ({bps:.1f} bps of market cap)" if bps is not None else "")
+        sale = f", sale expected around {r['sale_date']}" if r.get("sale_date") else ""
+        out.append(event("insider", "form144", t, filed, f"{who} ({clip(role, 40)}) filed to sell {money(val)}", tier,
+                         f"Form 144 notice of a proposed sale of {size} {plan}{sale}; no matching Form 4 sale reported yet",
+                         (r.get("accession"),), evidence=[sec_url(r.get("url")), app_link("Insiders", f"/app/companies/{t}/insiders")],
+                         metrics={"value": round(val), "bps_mcap": round(bps, 2) if bps is not None else None, "shares": r.get("shares"),
+                                  "plan": bool(r.get("plan")), "sale_date": r.get("sale_date"), "status": r.get("status")},
+                         tags=["Form 144", "10b5-1" if r.get("plan") else "discretionary"]))
     return out
 
 
@@ -800,7 +834,8 @@ def changes_job(sb, today=None, time_budget=700, log=print, tickers=None, worker
                 return None
         with ThreadPoolExecutor(8) as ex:
             names = ["screener.json", "quant/cross.json", "redlines/index.json", "estimates/index.json", "meta/insiders.json",
-                     "tech/states.json", "tech/signals.json", "calendars/dividends.json", "calendars/ipos.json", "macro/releases.json"]
+                     "tech/states.json", "tech/signals.json", "calendars/dividends.json", "calendars/ipos.json", "macro/releases.json",
+                     "form144/recent.json"]
             loaded = dict(zip(names, ex.map(pub, names)))
         mcap, corr = _screener_frame(loaded["screener.json"])
         qc = loaded["quant/cross.json"] or {}
@@ -900,6 +935,7 @@ def changes_job(sb, today=None, time_budget=700, log=print, tickers=None, worker
                     company[t] += v.get("events") or []
         extra = (filing_8k_events(filings, since_c) + results_8k_events(filings, since_c, matched) + ir_doc_events(irdocs, since_f)
                  + dividend_events((loaded["calendars/dividends.json"] or {}).get("rows"), since_c)
+                 + form144_events((loaded["form144/recent.json"] or {}).get("rows"), mcap, since_f)
                  + technical_events(loaded["tech/states.json"], loaded["tech/signals.json"], since_f))
         for e in extra:
             if e["t"] in company:

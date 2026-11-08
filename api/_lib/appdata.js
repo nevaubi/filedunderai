@@ -41,6 +41,7 @@ const PUBLIC_RX = [
   /^earnings\/season\.json$/,
   /^themes\/(index|[a-z0-9_-]{1,64})\.json$/,
   /^entities\/index\.json$/,
+  /^form144\/(recent|[A-Za-z0-9_.-]{1,32})\.json$/,
 ];
 
 /** Which bucket a cleaned path lives in. */

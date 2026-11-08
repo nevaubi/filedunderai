@@ -149,3 +149,25 @@ class RankAndIds(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_form144_events_skip_executed_and_scale_plan_sales():
+    import datetime as dt
+    from etl.changes import form144_events
+    since = dt.date(2026, 10, 1)
+    rows = [
+        {"ticker": "AAPL", "filed": "2026-11-05", "accession": "a1", "url": "https://www.sec.gov/x", "person": "Jane Doe",
+         "relationship": "Officer", "value": 3e7, "plan": False, "status": "open", "sale_date": "2026-11-06"},
+        {"ticker": "AAPL", "filed": "2026-11-05", "accession": "a2", "value": 3e7, "plan": True, "plan_adopted": ["2026-05-01"], "status": "open"},
+        {"ticker": "AAPL", "filed": "2026-11-05", "accession": "a3", "value": 9e7, "plan": False, "status": "executed"},
+        {"ticker": "AAPL", "filed": "2026-11-05", "accession": "a4", "value": 2e5, "plan": False, "status": "open"},
+    ]
+    evs = form144_events(rows, {}, since)
+    assert [e["tier"] for e in evs] == ["high", "medium"]
+    assert evs[0]["sub"] == "form144" and "no 10b5-1 plan" in evs[0]["reason"]
+    assert "2026-05-01" in evs[1]["reason"]
+
+
+def test_new_8k_items_are_tiered():
+    from etl.changes import ITEMS
+    assert ITEMS["1.05"][0] == "high" and ITEMS["5.07"][0] == "low"
