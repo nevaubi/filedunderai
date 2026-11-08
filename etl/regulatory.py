@@ -18,6 +18,7 @@ import datetime as dt
 import json
 import os
 import re
+import unicodedata
 import time
 import urllib.parse
 from concurrent.futures import ThreadPoolExecutor
@@ -43,6 +44,7 @@ FILLER = {"INC", "CORPORATION", "COMPANY", "LLC", "LTD", "LIMITED", "PLC", "AG",
 
 
 def tokens(name):
+    name = unicodedata.normalize("NFKD", name or "").encode("ascii", "ignore").decode()   # 'LABORATÓRIOS' -> 'LABORATORIOS'
     name = re.sub(r"\s*/\s*[A-Za-z]{2,3}\s*/?\s*$", "", name or "")   # SEC state tags: 'INC / MA', 'CORP /DE/'
     t = [ABBREV.get(w, w) for w in norm_name(name).replace("/", " ").split()]
     return [w for w in t if w not in FILLER and len(w) > 1]

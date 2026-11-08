@@ -29,3 +29,8 @@ def test_trial_summary():
     assert [r["nct"] for r in s["upcoming"]] == ["A"]
     assert [r["nct"] for r in s["recent_changes"]] == ["B"] and s["stopped_2y"] == 1
     assert phase_rank("P2/P3") == 2.5
+
+
+def test_accented_names_are_ascii_search_words():
+    assert tokens("Laboratórios Pfizer Ltda") == ["LABORATORIOS", "PFIZER", "LTDA"]
+    assert search_words(["Laboratórios Pfizer Ltda", "Pfizer Inc"]) == ["PFIZER"]
