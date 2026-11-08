@@ -152,7 +152,7 @@ def summarize_trials(rows, today):
     for r in act:
         by_phase[r.get("phase") or "N/A"] = by_phase.get(r.get("phase") or "N/A", 0) + 1
     return {"n": len(rows), "active": len(act), "by_phase_active": by_phase,
-            "late_stage_active": sum(1 for r in act if phase_rank(r.get("phase")) >= 2.5),
+            "late_stage_active": sum(1 for r in act if r.get("phase") in ("P3", "P2/P3")),
             "upcoming": upcoming[:40], "recent_changes": changes[:30],
             "stopped_2y": sum(1 for r in rows if r["status"] in STOPPED and (r.get("updated") or "") >= (today - dt.timedelta(days=730)).isoformat())}
 
@@ -353,7 +353,7 @@ def publish_catalysts(sb, today, log=print):
                     recent.append({"ticker": tk, "kind": "trial_stopped", "date": t["updated"], "title": t.get("title"), "detail": t.get("why_stopped"),
                                    "phase": t.get("phase"), "status": t.get("status"), "id": t.get("nct"),
                                    "url": f"https://clinicaltrials.gov/study/{t.get('nct')}"})
-    rows.sort(key=lambda r: (-(phase_rank(r.get("phase")) >= 2.5), r["primary_completion"] or ""))
+    rows.sort(key=lambda r: (r.get("phase") not in ("P3", "P2/P3"), r["primary_completion"] or ""))
     recent.sort(key=lambda r: r["date"], reverse=True)
     sb.put_json("regulatory/catalysts.json", {"generated": now_iso(), "as_of": today.isoformat(), "n": len(rows), "rows": rows[:1500]},
                 cache="max-age=3600")
