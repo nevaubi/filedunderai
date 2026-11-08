@@ -401,6 +401,31 @@ def run_outcome(stats, error=None):
     return "ok"
 
 
+# A run whose process was killed (Vercel timeout or out-of-memory) never records its finish and stays "running".
+LONG_JOBS = ("ir", "kpi_extract")  # also run on GitHub Actions lanes for up to ~6 hours
+STALE_AFTER = {"long": 7 * 3600, "default": 45 * 60}
+
+
+def reap_stale_runs(sb, now=None):
+    """Marks runs still 'running' long after any run of that job could last as errors, so status pages and
+    monitors stop treating them as live. Returns the number reaped per job."""
+    now = now or dt.datetime.now(dt.timezone.utc)
+    cutoff = (now - dt.timedelta(seconds=STALE_AFTER["default"])).strftime("%Y-%m-%dT%H:%M:%SZ")
+    rows = sb.select("etl_runs", f"select=id,job,started_at&status=eq.running&started_at=lt.{cutoff}")
+    reaped = {}
+    for r in rows:
+        long = r["job"].split(":")[0] in LONG_JOBS
+        started = dt.datetime.fromisoformat(r["started_at"].replace("Z", "+00:00"))
+        if started.tzinfo is None:
+            started = started.replace(tzinfo=dt.timezone.utc)
+        if (now - started).total_seconds() < STALE_AFTER["long" if long else "default"]:
+            continue
+        sb.update("etl_runs", {"id": r["id"]}, {"status": "error", "finished_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                                                 "error": "stale: the process ended without recording a finish (timeout or out of memory)"})
+        reaped[r["job"]] = reaped.get(r["job"], 0) + 1
+    return reaped
+
+
 class Run:
     """Records an etl_runs row for a job."""
 
@@ -429,6 +454,10 @@ class Run:
 
 def publish_status(sb):
     """Writes meta/status.json: the latest runs per job, for the Data status page."""
+    try:
+        reap_stale_runs(sb)
+    except Exception as e:
+        print("stale-run reaper failed:", e)
     try:
         rows = sb.select("etl_runs", "select=job,started_at,finished_at,status,stats,error&order=started_at.desc&limit=200")
         latest, recent = {}, []

@@ -196,10 +196,6 @@
       "schedule": "5 4 * * *"
     },
     {
-      "path": "/api/cron/screener",
-      "schedule": "55 22 * * *"
-    },
-    {
       "path": "/api/cron/technicals?part=0&parts=4",
       "schedule": "5 22 * * 1-5"
     },

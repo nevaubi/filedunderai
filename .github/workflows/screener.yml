@@ -1,0 +1,37 @@
+name: Screener build
+# screener.json (150+ sourced fields per company) outgrew the Vercel function's memory (killed at 22:55 UTC on
+# Nov 7), so it runs here. Daily after the companies, prices and segments jobs; dispatch for an immediate rebuild.
+on:
+  workflow_dispatch:
+    inputs:
+      full:
+        description: "Refetch the full close history and every company"
+        required: false
+        default: "false"
+  schedule:
+    - cron: "40 23 * * 1-5"
+    - cron: "40 13 * * 6"
+permissions:
+  contents: read
+concurrency:
+  group: screener
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Build screener
+        run: |
+          FULL=""
+          if [ "${{ github.event.inputs.full }}" = "true" ]; then FULL="--full"; fi
+          python -m etl.actions_job screener --budget 4800 --workers 8 $FULL
