@@ -45,6 +45,7 @@ const PUBLIC_RX = [
   /^comments\/(recent|[A-Za-z0-9_.-]{1,32})\.json$/,
   /^regulatory\/(recent|catalysts|[A-Za-z0-9_.-]{1,32})\.json$/,
   /^medicare\/(index|[A-Za-z0-9_.-]{1,32})\.json$/,
+  /^doctables\/[A-Za-z0-9_.-]{1,32}\/(index|[0-9a-f]{16})\.json$/,
 ];
 
 /** Which bucket a cleaned path lives in. */

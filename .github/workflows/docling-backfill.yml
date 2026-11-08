@@ -87,3 +87,16 @@ jobs:
           python -m etl.docling_ingest --shard "$SHARD" --shards "$SHARDS" \
             --limit "${{ github.event.inputs.limit || '250' }}" --hours "${{ github.event.inputs.hours || '5' }}" \
             --doc-types "${{ github.event.inputs.doc_types }}"
+  publish:
+    needs: parse
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Publish tables for the app
+        run: python -m etl.docling_ingest --publish

@@ -244,6 +244,56 @@ def run(sb, shard=0, shards=1, limit=50, hours=5.5, engine="local", doc_types=No
     return stats
 
 
+def _list(sb, bucket, prefix):
+    out, offset = [], 0
+    while True:
+        page = json.loads(request(f"{sb.url}/storage/v1/object/list/{bucket}", method="POST",
+                                  data={"prefix": prefix, "limit": 1000, "offset": offset}, headers=sb._h({"Content-Type": "application/json"})))
+        out += page
+        if len(page) < 1000:
+            return out
+        offset += 1000
+
+
+def compact_tables(rec, max_tables=80, max_rows=120):
+    return [{"page": t.get("page"), "caption": t.get("caption"), "n_rows": t.get("n_rows"), "n_cols": t.get("n_cols"),
+             "header": (t.get("header") or [])[:3], "rows": (t.get("rows") or [])[:max_rows]}
+            for t in (rec.get("tables") or [])[:max_tables]]
+
+
+def publish(sb, tickers=None, workers=8, log=print):
+    """Copies parsed tables to public-data doctables/{T}/{id}.json (tables only, capped) and writes
+    doctables/{T}/index.json, so the app can show a document's tables without reading the full parse."""
+    from concurrent.futures import ThreadPoolExecutor
+    cos = [d["name"] for d in _list(sb, BUCKET, "docling/") if not d.get("id")] if not tickers else list(tickers)
+    totals = {"companies": 0, "documents": 0}
+
+    def one(t):
+        files = [f["name"] for f in _list(sb, BUCKET, f"docling/{t}/") if f["name"].endswith(".json.gz")]
+        idx = []
+        for name in files:
+            did = name[:-8]
+            try:
+                rec = json.loads(gzip.decompress(sb.get_object(BUCKET, f"docling/{t}/{name}")))
+            except Exception:
+                continue
+            tables = compact_tables(rec)
+            sb.put_json(f"doctables/{t}/{did}.json", {"id": did, "ticker": t, "title": rec.get("title"), "doc_type": rec.get("doc_type"),
+                                                     "url": rec.get("url"), "pages": rec.get("pages"), "generated": rec.get("generated"),
+                                                     "table_mode": rec.get("table_mode"), "tables": tables}, cache="max-age=86400")
+            idx.append({"id": did, "title": rec.get("title"), "doc_type": rec.get("doc_type"), "url": rec.get("url"), "pages": rec.get("pages"),
+                        "n_tables": rec.get("n_tables"), "generated": rec.get("generated")})
+        if idx:
+            sb.put_json(f"doctables/{t}/index.json", {"ticker": t, "generated": now_iso(), "documents": sorted(idx, key=lambda x: x.get("generated") or "", reverse=True)},
+                        cache="max-age=3600")
+        return len(idx)
+    with ThreadPoolExecutor(workers) as ex:
+        for n in ex.map(one, cos):
+            totals["companies"] += bool(n)
+            totals["documents"] += n
+    return totals
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--shard", type=int, default=int(os.environ.get("SHARD", 0)))
@@ -254,7 +304,11 @@ def main(argv=None):
     ap.add_argument("--doc-types", default="")
     ap.add_argument("--tickers", default="")
     ap.add_argument("--redo", action="store_true")
+    ap.add_argument("--publish", action="store_true", help="copy parsed tables to public-data doctables/ and exit")
     a = ap.parse_args(argv)
+    if a.publish:
+        print(json.dumps(publish(Supabase(), tickers=[x for x in a.tickers.split(",") if x] or None)))
+        return 0
     stats = run(Supabase(), a.shard, a.shards, a.limit, a.hours, a.engine,
                 doc_types=[x for x in a.doc_types.split(",") if x] or DEFAULT_TYPES, tickers=[x for x in a.tickers.split(",") if x] or None, redo=a.redo)
     print(json.dumps(stats))
