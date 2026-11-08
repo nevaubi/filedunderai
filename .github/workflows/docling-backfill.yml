@@ -2,7 +2,7 @@ name: Docling document parsing
 # Parses stored IR PDFs with Docling on CPU runners (layout, reading order, table structure) and writes
 # docling/{ticker}/{id}.json.gz to the "ir" bucket. Documents already parsed are skipped, so the workflow can be
 # re-run until coverage is complete. Start with a trial (shards=4, limit=125 is about 500 documents).
-# The daily schedule picks up newly stored documents (and keeps working through the backfill) on 6 runners.
+# The daily schedule picks up newly stored documents (and keeps working through the backfill) on 8 runners.
 on:
   schedule:
     - cron: "17 6 * * *"
@@ -11,17 +11,17 @@ on:
       shards:
         description: "Parallel runners (max 20)"
         required: false
-        default: "4"
+        default: "20"
       limit:
         description: "Documents per runner"
         required: false
-        default: "125"
+        default: "2000"
       hours:
         description: "Hours per runner (max 5.6)"
         required: false
         default: "5"
       doc_types:
-        description: "Only these doc types (comma separated; empty = all)"
+        description: "Only these doc types (comma separated; empty = supplement,release,presentation,other)"
         required: false
         default: ""
       tables:
@@ -47,7 +47,7 @@ jobs:
     steps:
       - id: m
         run: |
-          n="${{ github.event.inputs.shards || '6' }}"
+          n="${{ github.event.inputs.shards || '8' }}"
           if [ "$n" -gt 20 ]; then n=20; fi
           echo "shards=$(python3 -c "import json;print(json.dumps(list(range($n))))")" >> "$GITHUB_OUTPUT"
   parse:
@@ -82,7 +82,7 @@ jobs:
       - name: Parse shard
         env:
           SHARD: ${{ matrix.shard }}
-          SHARDS: ${{ github.event.inputs.shards || '6' }}
+          SHARDS: ${{ github.event.inputs.shards || '8' }}
         run: |
           python -m etl.docling_ingest --shard "$SHARD" --shards "$SHARDS" \
             --limit "${{ github.event.inputs.limit || '250' }}" --hours "${{ github.event.inputs.hours || '5' }}" \

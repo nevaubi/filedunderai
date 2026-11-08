@@ -29,6 +29,11 @@ OUT = "docling/{ticker}/{id}.json.gz"
 EXTS = (".pdf", ".docx", ".pptx", ".xlsx", ".html", ".htm")
 MAX_PAGES = int(os.environ.get("DOCLING_MAX_PAGES", "300"))
 MAX_BYTES = 60 * 1024 * 1024
+# Table-dense documents first: financial supplements and earnings releases carry the KPI tables; decks next.
+# Transcripts and prepared remarks are prose (the existing text extraction is enough) and annual reports duplicate
+# XBRL-tagged filings, so they are parsed last and only when asked for.
+PRIORITY = {"supplement": 0, "release": 1, "presentation": 2, "other": 3, "annual_report": 4, "transcript": 5, "remarks": 6}
+DEFAULT_TYPES = ["supplement", "release", "presentation", "other"]
 
 
 def shard_of(doc_id, shards):
@@ -45,8 +50,11 @@ def candidates(sb, shard=0, shards=1, exts=(".pdf",), doc_types=None, tickers=No
         q += "&ticker=in.(" + ",".join(tickers) + ")"
     q += "&order=published.desc.nullslast,fetched_at.desc"
     rows = sb.select("ir_documents", q)
-    return [r for r in rows if shard_of(r["id"], shards) == shard and (r.get("bytes") or 0) <= MAX_BYTES
+    rows = [r for r in rows if shard_of(r["id"], shards) == shard and (r.get("bytes") or 0) <= MAX_BYTES
             and (r.get("pages") or 0) <= MAX_PAGES]
+    # stable sort keeps newest-first inside each type
+    rows.sort(key=lambda r: PRIORITY.get(r.get("doc_type") or "other", 3))
+    return rows
 
 
 def out_path(r):
@@ -238,7 +246,7 @@ def main(argv=None):
     ap.add_argument("--redo", action="store_true")
     a = ap.parse_args(argv)
     stats = run(Supabase(), a.shard, a.shards, a.limit, a.hours, a.engine,
-                doc_types=[x for x in a.doc_types.split(",") if x] or None, tickers=[x for x in a.tickers.split(",") if x] or None, redo=a.redo)
+                doc_types=[x for x in a.doc_types.split(",") if x] or DEFAULT_TYPES, tickers=[x for x in a.tickers.split(",") if x] or None, redo=a.redo)
     print(json.dumps(stats))
     return 0 if stats["done"] or not stats["failed"] else 1
 
