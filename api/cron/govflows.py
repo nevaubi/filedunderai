@@ -12,8 +12,10 @@ def run(sb, query):
     from etl import gov_pipeline
     step = query.get("step", "daily")
     if step == "registry":
-        from etl import entities
-        return entities.registry_job(sb, workers=2, time_budget=620)
+        from etl import entities, supply
+        out = entities.registry_job(sb, workers=2, time_budget=560)
+        out["supply"] = supply.normalize_graph_job(sb)
+        return out
     if step not in ("daily", "hearings", "company", "holders", "reads"):
         raise ValueError("step must be daily, hearings, company, holders, reads or registry")
     return gov_pipeline.scheduled(sb, step, time_budget=680)

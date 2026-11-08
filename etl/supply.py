@@ -288,7 +288,23 @@ def process_company(sb, t, mode="llm", deadline=None, p=None, review=False, writ
 
 # ---------------------------------------------------------------- coverage-wide graph
 
-GRAPH_KEYS = ("id", "t", "cp", "cpt", "rel", "det", "sh", "ge10", "amt", "ss", "rg", "hq", "risk", "prod", "lt", "q", "row", "accn", "doc", "form", "filed", "m")
+GRAPH_KEYS = ("id", "t", "cp", "cpt", "cpk", "cpn", "cpc", "cpm", "rel", "det", "sh", "ge10", "amt", "ss", "rg", "hq", "risk", "prod", "lt", "q",
+              "row", "accn", "doc", "form", "filed", "m")
+_NORMALIZER = []
+
+
+def normalizer(sb):
+    """Counterparty normalizer over the company registry (built once per process; works without a registry)."""
+    if not _NORMALIZER:
+        from .counterparties import Normalizer
+        matcher = None
+        try:
+            from .entities import load_matcher
+            matcher, _ = load_matcher(sb)
+        except Exception as e:
+            print(f"supply: registry unavailable, counterparties resolved without it ({e})")
+        _NORMALIZER.append(Normalizer(matcher, {t: v["name"] for t, v in BY_TICKER.items()}))
+    return _NORMALIZER[0]
 
 
 def merge_graph(sb, updates):
@@ -297,8 +313,12 @@ def merge_graph(sb, updates):
         g = public_get(sb, "supply/graph.json.gz", gz=True) or {"links": [], "companies": {}}
         drop = set(updates)
         g["links"] = [l for l in g["links"] if l["t"] not in drop]
+        norm_ = normalizer(sb)
         for t, (links, co) in updates.items():
-            g["links"] += [{k: l.get(k) for k in GRAPH_KEYS if l.get(k) not in (None, [], False)} for l in links]
+            for l in links:
+                n = norm_.apply({**l, "t": l.get("t") or t})
+                if n is not None:
+                    g["links"].append({k: n.get(k) for k in GRAPH_KEYS if n.get(k) not in (None, [], False)})
             k10 = next((f for f in co["filings"] if f["form"] == "10-K" and f["role"] == "current"), None)
             g["companies"][t] = {"n": co["name"], "c": co.get("cik"), "k": k10["filed"] if k10 else None, "at": co["generated"], "m": co["method"], "links": len(links)}
         g["generated"] = now_iso()
@@ -306,6 +326,30 @@ def merge_graph(sb, updates):
                        "with_links": len({l["t"] for l in g["links"]}), "corroborated": corroborated_count(g["links"])}
         public_put(sb, "supply/graph.json.gz", g, gz=True, cache="max-age=300")
         return g["counts"]
+
+
+def normalize_graph_job(sb):
+    """Re-normalizes every counterparty in supply/graph.json.gz (after a registry refresh) and publishes
+    supply/counterparties.json, the most-cited counterparties by class."""
+    from .counterparties import counterparty_index, normalize_links
+    _NORMALIZER.clear()
+    norm_ = normalizer(sb)
+    with AggregateLease(sb, name="supply-graph", seconds=300):
+        g = public_get(sb, "supply/graph.json.gz", gz=True) or {"links": [], "companies": {}}
+        before = len(g["links"])
+        links, dropped = normalize_links(g["links"], norm_)
+        g["links"] = [{k: l.get(k) for k in GRAPH_KEYS if l.get(k) not in (None, [], False)} for l in links]
+        g["generated"] = now_iso()
+        g["counts"] = {"companies": len(g["companies"]), "links": len(g["links"]),
+                       "with_links": len({l["t"] for l in g["links"]}), "corroborated": corroborated_count(g["links"])}
+        public_put(sb, "supply/graph.json.gz", g, gz=True, cache="max-age=300")
+    idx = counterparty_index(g["links"])
+    public_put(sb, "supply/counterparties.json", idx, cache="max-age=3600")
+    if norm_.matcher is not None and norm_.matcher.review:
+        norm_.matcher.publish_review(sb, "supply")
+    resolved = sum(1 for l in g["links"] if (l.get("cpm") or "").startswith(("alias", "registry")))
+    return {"links_before": before, "links": len(g["links"]), "self_dropped": dropped, "resolved_new": resolved,
+            "corroborated": g["counts"]["corroborated"], "classes": idx["by_class"]}
 
 
 def inverse(rel):
