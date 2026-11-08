@@ -201,10 +201,10 @@ def short_interest_events(companies, since):
         else:
             continue
         verb = "rose" if chg > 0 else "fell"
-        out.append(event("flows", "short_interest", t, si["date"], f"Short interest {verb} {pct(abs(chg), 0, sign=False)} to {si['short']:,.0f} shares",
+        out.append(event("short_interest", "si_change", t, si["date"], f"Short interest {verb} {pct(abs(chg), 0, sign=False)} to {si['short']:,.0f} shares",
                          tier, f"FINRA short interest {verb} {abs(chg) * 100:.0f}% between settlements with {dtc:.1f} days to cover; "
                                "rule: +50% with 8+ days or +100% with 4+ days is high, +30% with 4+ days or -40% with 6+ days is medium",
-                         (si["date"],), evidence=[{"label": "FINRA short interest", "url": "https://www.finra.org/finra-data/browse-catalog/equity-short-interest/data", "kind": "data"},
+                         (si["date"],), evidence=[{"label": "FINRA short interest", "url": "https://www.finra.org/finra-data/browse-catalog/equity-short-interest/data", "kind": "web"},
                                                   app_link("Flows", f"/app/companies/{t}/insiders")],
                          metrics={"short": si["short"], "prev": si["prev"], "chg": round(chg, 4), "dtc": dtc},
                          tags=["FINRA", "short interest"]))
@@ -232,7 +232,7 @@ def comment_letter_events(rows, topic_names, since):
             reason = "Corporation Finance released the letter closing its review"
         else:
             continue
-        out.append(event("filing", "comment_letter", t, filed, title, tier, reason, (r.get("accession"),),
+        out.append(event("sec_review", "comment_letter", t, filed, title, tier, reason, (r.get("accession"),),
                          evidence=[sec_url(r.get("url")), app_link("Filings", f"/app/companies/{t}/filings")],
                          metrics={"n_comments": r.get("n_comments"), "topics": r.get("topics") or [], "form": r.get("form"),
                                   "period": r.get("period"), "thread_status": r.get("thread_status")},
