@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       shards:
-        description: "Parallel runners (max 20)"
+        description: "Parallel runners (max 8; each writes at most DOC_INDEX_RUN_CHARS per run)"
         required: false
-        default: "8"
+        default: "4"
       since:
         description: "Only documents published on or after (YYYY-MM-DD; empty = all)"
         required: false
@@ -28,6 +28,7 @@ env:
   SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
   SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
   SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+  DOC_INDEX_RUN_CHARS: "250000000"
 jobs:
   plan:
     runs-on: ubuntu-latest
@@ -36,8 +37,8 @@ jobs:
     steps:
       - id: m
         run: |
-          n="${{ github.event.inputs.shards || '4' }}"
-          if [ "$n" -gt 20 ]; then n=20; fi
+          n="${{ github.event.inputs.shards || '2' }}"
+          if [ "$n" -gt 8 ]; then n=8; fi
           echo "shards=$(python3 -c "import json;print(json.dumps(list(range($n))))")" >> "$GITHUB_OUTPUT"
   index:
     needs: plan
@@ -57,7 +58,7 @@ jobs:
       - name: Index shard
         env:
           SHARD: ${{ matrix.shard }}
-          SHARDS: ${{ github.event.inputs.shards || '4' }}
+          SHARDS: ${{ github.event.inputs.shards || '2' }}
         run: |
           python -m etl.doc_index --shard "$SHARD" --shards "$SHARDS" \
             --since "${{ github.event.inputs.since || '2021-01-01' }}" --hours "${{ github.event.inputs.hours || '5' }}"

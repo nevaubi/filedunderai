@@ -26,6 +26,9 @@ from .common import HTTPError, Supabase, now_iso, request
 CHUNK = 1800
 MAX_CHARS = int(os.environ.get("DOC_INDEX_MAX_CHARS", "60000"))
 MAX_TABLE_CHUNKS = 40
+# Per-runner cap on text written in one run (characters), so a fill never outruns the database's disk growth.
+# Supabase grows the disk at most once every 6 hours and turns the database read-only near full.
+RUN_CHARS = int(os.environ.get("DOC_INDEX_RUN_CHARS", "250000000"))
 TYPES = ["release", "supplement", "presentation", "transcript", "remarks", "other"]
 SINCE = "2021-01-01"
 
@@ -136,7 +139,7 @@ def index_doc(sb, r, with_tables):
         sb.upsert("doc_chunks", rows[i:i + 400], on_conflict="doc_id,kind,chunk")
     sb.upsert("doc_index_state", [{"doc_id": r["id"], "ticker": r["ticker"], "source": source, "chunks": len(rows),
                                    "chars": sum(len(x["content"]) for x in rows), "indexed_at": now_iso()}], on_conflict="doc_id")
-    return len(rows)
+    return len(rows), sum(len(x["content"]) for x in rows)
 
 
 def run(sb, shard=0, shards=1, hours=5.5, workers=6, types=TYPES, since=SINCE, tickers=None, log=print):
@@ -162,15 +165,23 @@ def run(sb, shard=0, shards=1, hours=5.5, workers=6, types=TYPES, since=SINCE, t
             todo.append((r, has_tables))
     log(f"doc index shard {shard}/{shards}: {len(rows)} in scope, {len(todo)} to index")
     done = chunks = failed = 0
+    stop = {"why": None, "chars": 0}
 
     def one(item):
         r, tables = item
-        if time.time() > deadline:
+        if stop["why"] or time.time() > deadline:
             return None
         try:
-            return index_doc(sb, r, tables)
+            n, chars = index_doc(sb, r, tables)
+            stop["chars"] += chars
+            if stop["chars"] >= RUN_CHARS:
+                stop["why"] = f"run cap of {RUN_CHARS:,} characters reached"
+            return n
         except Exception as e:
-            log(f"  failed {r['ticker']} {r['id']}: {str(e)[:160]}")
+            msg = str(e)
+            if "ReadOnly" in msg or "read-only" in msg or "read only" in msg:
+                stop["why"] = "database is read-only (disk full); stopped"
+            log(f"  failed {r['ticker']} {r['id']}: {msg[:160]}")
             return -1
     with ThreadPoolExecutor(workers) as ex:
         for n in ex.map(one, todo):
@@ -183,7 +194,10 @@ def run(sb, shard=0, shards=1, hours=5.5, workers=6, types=TYPES, since=SINCE, t
                 chunks += n
                 if done % 500 == 0:
                     log(f"  {done} documents, {chunks} chunks")
-    return {"shard": shard, "in_scope": len(rows), "indexed": done, "chunks": chunks, "failed": failed, "remaining": len(todo) - done - failed}
+    if stop["why"]:
+        log(f"  stopped early: {stop['why']}")
+    return {"shard": shard, "in_scope": len(rows), "indexed": done, "chunks": chunks, "chars": stop["chars"], "failed": failed,
+            "remaining": len(todo) - done - failed, "stopped": stop["why"]}
 
 
 def main(argv=None):
