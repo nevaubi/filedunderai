@@ -210,6 +210,8 @@ def comments_job(sb, days=1100, workers=4, time_budget=600, log=print):
             if rec:
                 cache[r["accession"]] = {**base, **rec}
                 n += 1
+                if n % 200 == 0:
+                    put_raw_json(sb, CACHE_PATH, cache)
             elif err != "budget":
                 cache[r["accession"]] = {**base, "error": err}
     put_raw_json(sb, CACHE_PATH, cache)
