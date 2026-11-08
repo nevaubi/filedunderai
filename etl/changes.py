@@ -186,6 +186,31 @@ def form144_events(rows, mcap, since):
     return out
 
 
+def short_interest_events(companies, since):
+    """Large moves in short interest between FINRA settlement dates, sized by days to cover."""
+    out = []
+    for t, si in (companies or {}).items():
+        d = _d((si or {}).get("date"))
+        if t not in BY_TICKER or not d or d < since or si.get("chg") is None or not si.get("prev"):
+            continue
+        chg, dtc = si["chg"], si.get("dtc") or 0
+        if chg >= 0.5 and dtc >= 8 or chg >= 1.0 and dtc >= 4:
+            tier = "high"
+        elif chg >= 0.3 and dtc >= 4 or chg <= -0.4 and dtc >= 6:
+            tier = "medium"
+        else:
+            continue
+        verb = "rose" if chg > 0 else "fell"
+        out.append(event("flows", "short_interest", t, si["date"], f"Short interest {verb} {pct(abs(chg), 0, sign=False)} to {si['short']:,.0f} shares",
+                         tier, f"FINRA short interest {verb} {abs(chg) * 100:.0f}% between settlements with {dtc:.1f} days to cover; "
+                               "rule: +50% with 8+ days or +100% with 4+ days is high, +30% with 4+ days or -40% with 6+ days is medium",
+                         (si["date"],), evidence=[{"label": "FINRA short interest", "url": "https://www.finra.org/finra-data/browse-catalog/equity-short-interest/data", "kind": "data"},
+                                                  app_link("Flows", f"/app/companies/{t}/insiders")],
+                         metrics={"short": si["short"], "prev": si["prev"], "chg": round(chg, 4), "dtc": dtc},
+                         tags=["FINRA", "short interest"]))
+    return out
+
+
 def results_8k_events(rows, since, have_earnings):
     """Item 2.02 filings without a matched consensus surprise: results filed, low tier."""
     out = []
@@ -835,7 +860,7 @@ def changes_job(sb, today=None, time_budget=700, log=print, tickers=None, worker
         with ThreadPoolExecutor(8) as ex:
             names = ["screener.json", "quant/cross.json", "redlines/index.json", "estimates/index.json", "meta/insiders.json",
                      "tech/states.json", "tech/signals.json", "calendars/dividends.json", "calendars/ipos.json", "macro/releases.json",
-                     "form144/recent.json"]
+                     "form144/recent.json", "flows/short_interest.json"]
             loaded = dict(zip(names, ex.map(pub, names)))
         mcap, corr = _screener_frame(loaded["screener.json"])
         qc = loaded["quant/cross.json"] or {}
@@ -936,6 +961,7 @@ def changes_job(sb, today=None, time_budget=700, log=print, tickers=None, worker
         extra = (filing_8k_events(filings, since_c) + results_8k_events(filings, since_c, matched) + ir_doc_events(irdocs, since_f)
                  + dividend_events((loaded["calendars/dividends.json"] or {}).get("rows"), since_c)
                  + form144_events((loaded["form144/recent.json"] or {}).get("rows"), mcap, since_f)
+                 + short_interest_events((loaded["flows/short_interest.json"] or {}).get("companies"), since_c)
                  + technical_events(loaded["tech/states.json"], loaded["tech/signals.json"], since_f))
         for e in extra:
             if e["t"] in company:

@@ -185,3 +185,17 @@ def test_short_interest_summary_and_block():
     out, prov = short_interest_block(s, {"v": 1000, "end": "2026-09-30"})
     assert out["si_pct_shares"] == 0.2 and out["si_dtc"] == 2.5 and "si_chg_3m" in prov
     assert short_interest_block(None, {"v": 1}) == ({}, {})
+
+
+def test_short_interest_events_tiers():
+    import datetime as dt
+    from etl.changes import short_interest_events
+    since = dt.date(2026, 10, 1)
+    cos = {"AAPL": {"date": "2026-10-15", "short": 300, "prev": 100, "chg": 2.0, "dtc": 5},
+           "MSFT": {"date": "2026-10-15", "short": 135, "prev": 100, "chg": 0.35, "dtc": 4.5},
+           "NVDA": {"date": "2026-10-15", "short": 110, "prev": 100, "chg": 0.1, "dtc": 9},
+           "AMZN": {"date": "2026-09-15", "short": 300, "prev": 100, "chg": 2.0, "dtc": 9}}
+    evs = {e["t"]: e for e in short_interest_events(cos, since)}
+    assert evs["AAPL"]["tier"] == "high" and evs["MSFT"]["tier"] == "medium"
+    assert "NVDA" not in evs and "AMZN" not in evs
+    assert evs["AAPL"]["title"].startswith("Short interest rose 200%")
