@@ -169,3 +169,19 @@ test("statement and KPI passthrough paths map to public-data", async () => {
   assert.equal(bucketFor("companies/AAPL.json"), "app-datasets");
   for (const bad of ["statements/AAPL/../x.json", "statements/AAPL/raw.json.gz", "kpis/AAPL.json.gz", "statements/AAPL/index.json.gz", "estimates/AAPL/x.json", "estraw/backfill/x.json", "kpistd/other.json", "kpistd/t/../x.json", "sectors/Software.json", "sectors/a/b.json", "tech/bars/../x.json", "quant/other.json", "macro/registry.json", "calendars/div_docs.json", "calendars/ipo_state.json.gz", "redlines/state.json.gz", "redlines/a/b.json", "changes/state.json.gz", "changes/a/b.json", "earnings/state.json", "earnings/preview/../x.json", "meta/earnings_state.json"]) assert.equal(cleanPath(bad), null, bad);
 });
+
+test("stored IR documents resolve to the ir bucket and are signed", async () => {
+  const { cleanPath, resolvePath } = await import("../../api/_lib/appdata.js");
+  const orig = "irstore/AAPL/32d9a99e210cb699-a8-kex991q4202609262026.htm";
+  const text = "irstore/AAPL/text/32d9a99e210cb699-v2-2c6caf098b26d296.json";
+  for (const p of [orig, text]) {
+    assert.equal(cleanPath(p), p);
+    assert.equal(resolvePath(p).bucket, "ir");
+    assert.equal(resolvePath(p).sign, true);
+  }
+  assert.equal(resolvePath(orig).object, "AAPL/32d9a99e210cb699-a8-kex991q4202609262026.htm");
+  assert.equal(cleanPath("irstore/AAPL/../secrets.json"), null);
+  assert.equal(cleanPath("irstore/AAPL/notanid.pdf"), null);
+  assert.equal(cleanPath("ir/AAPL.json"), "ir/AAPL.json");
+  assert.equal(resolvePath("ir/AAPL.json").bucket, "public-data");
+});

@@ -4,7 +4,7 @@
 // checked against APP_AUTH_URL with APP_AUTH_KEY (the partner project's publishable key).
 // The partner app's server code (report builder, scripts) sends `x-partner-key` instead, matched
 // against APP_DATA_SERVICE_KEY; browsers never see that key.
-import { bearer, bucketFor, cleanPath, corsHeaders, originAllowed, serviceKeyOk, verifyUser } from "./_lib/appdata.js";
+import { bearer, cleanPath, corsHeaders, originAllowed, resolvePath, serviceKeyOk, verifyUser } from "./_lib/appdata.js";
 
 const PER_USER_DAILY = 50000; // the shared demo account counts as one user
 
@@ -58,11 +58,35 @@ export default async function handler(req, res) {
     // Counter unavailable: fail open.
   }
 
+  const base = url.replace(/\/$/, "");
+  const { bucket, object, sign } = resolvePath(path);
+  if (sign) {
+    // Stored IR document: return a 10-minute signed URL instead of the bytes.
+    let s;
+    try {
+      s = await fetch(`${base}/storage/v1/object/sign/${bucket}/${object.split("/").map(encodeURIComponent).join("/")}`, {
+        method: "POST",
+        headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ expiresIn: 600 }),
+        signal: AbortSignal.timeout(15_000),
+      });
+    } catch {
+      return res.status(502).json({ error: "Storage unavailable" });
+    }
+    if (s.status === 400 || s.status === 404) return res.status(404).json({ error: "Document not stored" });
+    if (!s.ok) return res.status(502).json({ error: "Storage error" });
+    const j = await s.json().catch(() => ({}));
+    const signed = j.signedURL || j.signedUrl;
+    if (!signed) return res.status(502).json({ error: "Storage error" });
+    res.setHeader("Cache-Control", "private, max-age=300");
+    return res.status(200).json({ url: `${base}/storage/v1${signed.startsWith("/") ? "" : "/"}${signed}`, expires_in: 600 });
+  }
+
   const headers = { apikey: key, Authorization: `Bearer ${key}` };
   if (req.headers["if-none-match"]) headers["If-None-Match"] = req.headers["if-none-match"];
   let r;
   try {
-    r = await fetch(`${url.replace(/\/$/, "")}/storage/v1/object/${bucketFor(path)}/${path}`, { headers, signal: AbortSignal.timeout(20_000) });
+    r = await fetch(`${base}/storage/v1/object/${bucket}/${object}`, { headers, signal: AbortSignal.timeout(20_000) });
   } catch {
     return res.status(502).json({ error: "Storage unavailable" });
   }

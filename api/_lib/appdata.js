@@ -46,7 +46,19 @@ const PUBLIC_RX = [
   /^regulatory\/(recent|catalysts|[A-Za-z0-9_.-]{1,32})\.json$/,
   /^medicare\/(index|[A-Za-z0-9_.-]{1,32})\.json$/,
   /^doctables\/[A-Za-z0-9_.-]{1,32}\/(index|[0-9a-f]{16})\.json$/,
+  /^ir\/[A-Za-z0-9_.-]{1,32}\.json$/,
 ];
+
+// Stored IR documents (pipeline "ir" bucket): originals at {T}/{id}-{file} and extracted text at {T}/text/{id}...json.
+// Requested as irstore/<object path>; answered with a short-lived signed URL, so large PDFs never pass through the
+// function (Vercel caps response bodies) and the browser downloads straight from storage.
+const IRSTORE_RX = /^irstore\/[A-Za-z0-9_.-]{1,32}\/(text\/)?[0-9a-f]{16}[\w.\-()~%+, ]{0,220}$/;
+
+/** {bucket, object, sign} for a cleaned path. */
+export function resolvePath(path) {
+  if (IRSTORE_RX.test(path)) return { bucket: "ir", object: path.slice("irstore/".length), sign: true };
+  return { bucket: bucketFor(path), object: path, sign: false };
+}
 
 /** Which bucket a cleaned path lives in. */
 export function bucketFor(path) {
@@ -67,7 +79,7 @@ const ORIGIN_RX = [
 export function cleanPath(p) {
   const s = String(p || "").trim();
   if (!s || s.includes("..") || s.startsWith("/")) return null;
-  return PATH_RX.some((rx) => rx.test(s)) || PUBLIC_RX.some((rx) => rx.test(s)) ? s : null;
+  return PATH_RX.some((rx) => rx.test(s)) || PUBLIC_RX.some((rx) => rx.test(s)) || IRSTORE_RX.test(s) ? s : null;
 }
 
 export function originAllowed(origin, extra = "") {
