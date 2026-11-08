@@ -211,3 +211,20 @@ def test_comment_letter_events():
     evs = comment_letter_events(rows, {"non_gaap": "Non-GAAP measures", "segments": "Segment reporting"}, dt.date(2026, 10, 1))
     assert [e["tier"] for e in evs] == ["medium", "low"]
     assert "Non-GAAP measures" in evs[0]["title"] and "3 comments" in evs[0]["reason"]
+
+
+def test_regulatory_events():
+    import datetime as dt
+    from etl.changes import regulatory_events
+    today = dt.date(2026, 11, 8)
+    recent = {"rows": [
+        {"ticker": "LLY", "kind": "approval", "date": "2026-11-01", "title": "NEWDRUG", "detail": "Type 1", "priority": "PRIORITY", "url": "https://x", "id": "1"},
+        {"ticker": "MDT", "kind": "recall", "date": "2026-10-20", "title": "Pump", "detail": "Battery", "recall_kind": "device", "id": "Z-1", "url": "https://y"},
+        {"ticker": "PFE", "kind": "trial_stopped", "date": "2026-10-15", "title": "Study", "detail": "Futility", "phase": "P3", "status": "TERMINATED", "id": "NCT1", "url": "https://z"},
+    ]}
+    cats = {"rows": [{"ticker": "MRK", "nct": "NCT2", "title": "Big trial", "phase": "P3", "primary_completion": "2026-11-20"},
+                     {"ticker": "MRK", "nct": "NCT3", "title": "Later", "phase": "P3", "primary_completion": "2027-06-01"}]}
+    evs = regulatory_events(recent, cats, dt.date(2026, 8, 10), today)
+    tiers = {e["sub"]: e["tier"] for e in evs}
+    assert tiers == {"fda_approval": "high", "fda_recall": "medium", "trial_stopped": "high", "readout_due": "low"}
+    assert [e for e in evs if e["sub"] == "readout_due"][0]["upcoming"]

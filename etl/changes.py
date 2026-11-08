@@ -240,6 +240,45 @@ def comment_letter_events(rows, topic_names, since):
     return out
 
 
+def regulatory_events(recent, catalysts, since, today):
+    """FDA original approvals and Class I recalls, stopped phase 2+ trials, and phase 3 primary completions due in the
+    next 30 days (upcoming)."""
+    out = []
+    for r in (recent or {}).get("rows") or []:
+        t, d = r.get("ticker"), _d(r.get("date"))
+        if t not in BY_TICKER or not d or d < since:
+            continue
+        ev = [{"label": "Source", "url": r.get("url"), "kind": "web"}, app_link("Regulatory", f"/app/companies/{t}/regulatory")]
+        if r["kind"] == "approval":
+            tier = "high" if r.get("priority") == "PRIORITY" else "medium"
+            out.append(event("regulatory", "fda_approval", t, r["date"], f"FDA approved {clip(r.get('title'), 80)}", tier,
+                             f"Original application approval ({r.get('detail') or 'new drug application'}"
+                             + (", priority review" if r.get("priority") == "PRIORITY" else "") + ") in openFDA Drugs@FDA",
+                             (r.get("id"),), evidence=ev, metrics={"class": r.get("detail"), "priority": r.get("priority")}, tags=["FDA", "approval"]))
+        elif r["kind"] == "recall":
+            out.append(event("regulatory", "fda_recall", t, r["date"], f"Class I {r.get('recall_kind') or ''} recall: {clip(r.get('title'), 90)}".replace("  ", " "),
+                             "medium", "FDA Class I recall (reasonable probability of serious adverse health consequences): " + clip(r.get("detail"), 160),
+                             (r.get("id"),), evidence=ev, metrics={"kind": r.get("recall_kind")}, tags=["FDA", "recall"]))
+        elif r["kind"] == "trial_stopped":
+            tier = "high" if (r.get("phase") or "").startswith("P3") else "medium"
+            out.append(event("regulatory", "trial_stopped", t, r["date"], f"{r.get('phase')} trial {r.get('status', '').lower()}: {clip(r.get('title'), 90)}",
+                             tier, f"ClinicalTrials.gov status changed to {r.get('status')}" + (f"; reason given: {clip(r.get('detail'), 140)}" if r.get("detail") else ""),
+                             (r.get("id"),), evidence=ev, metrics={"phase": r.get("phase"), "status": r.get("status")}, tags=["ClinicalTrials.gov"]))
+    soon = (today + dt.timedelta(days=30)).isoformat()
+    for r in (catalysts or {}).get("rows") or []:
+        t = r.get("ticker")
+        if t not in BY_TICKER or (r.get("phase") or "") not in ("P3", "P2/P3") or not r.get("primary_completion"):
+            continue
+        if not (today.isoformat() <= r["primary_completion"] <= soon):
+            continue
+        out.append(event("regulatory", "readout_due", t, r["primary_completion"], f"Phase 3 primary completion due: {clip(r.get('acronym') or r.get('title'), 90)}",
+                         "low", f"ClinicalTrials.gov lists the primary completion date as {r['primary_completion']} ({(r.get('primary_completion_type') or 'estimated').lower()}); "
+                                "results usually follow in weeks to months", (r.get("nct"),),
+                         evidence=[{"label": "ClinicalTrials.gov", "url": f"https://clinicaltrials.gov/study/{r.get('nct')}", "kind": "web"}],
+                         metrics={"enrollment": r.get("enrollment"), "conditions": r.get("conditions")}, tags=["ClinicalTrials.gov", "catalyst"], upcoming=True))
+    return out
+
+
 def results_8k_events(rows, since, have_earnings):
     """Item 2.02 filings without a matched consensus surprise: results filed, low tier."""
     out = []
@@ -889,7 +928,8 @@ def changes_job(sb, today=None, time_budget=700, log=print, tickers=None, worker
         with ThreadPoolExecutor(8) as ex:
             names = ["screener.json", "quant/cross.json", "redlines/index.json", "estimates/index.json", "meta/insiders.json",
                      "tech/states.json", "tech/signals.json", "calendars/dividends.json", "calendars/ipos.json", "macro/releases.json",
-                     "form144/recent.json", "flows/short_interest.json", "comments/recent.json"]
+                     "form144/recent.json", "flows/short_interest.json", "comments/recent.json", "regulatory/recent.json",
+                     "regulatory/catalysts.json"]
             loaded = dict(zip(names, ex.map(pub, names)))
         mcap, corr = _screener_frame(loaded["screener.json"])
         qc = loaded["quant/cross.json"] or {}
@@ -992,6 +1032,7 @@ def changes_job(sb, today=None, time_budget=700, log=print, tickers=None, worker
                  + form144_events((loaded["form144/recent.json"] or {}).get("rows"), mcap, since_f)
                  + short_interest_events((loaded["flows/short_interest.json"] or {}).get("companies"), since_c)
                  + comment_letter_events((loaded["comments/recent.json"] or {}).get("rows"), (loaded["comments/recent.json"] or {}).get("topics") or {}, since_c)
+                 + regulatory_events(loaded["regulatory/recent.json"], loaded["regulatory/catalysts.json"], since_c, today)
                  + technical_events(loaded["tech/states.json"], loaded["tech/signals.json"], since_f))
         for e in extra:
             if e["t"] in company:
