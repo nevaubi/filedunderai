@@ -134,26 +134,35 @@ def shape_tables_from_json(doc_json):
 
 # ---------------------------------------------------------------- engines
 
-_CONVERTER = []
+_CONVERTERS = {}
 
 
-def local_converter():
-    if not _CONVERTER:
+def table_mode(doc_type):
+    """ACCURATE TableFormer for financial supplements (dense, multi-level tables); FAST elsewhere, which is about
+    twice as quick on CPU. DOCLING_TABLES=accurate|fast forces one mode for every document."""
+    forced = os.environ.get("DOCLING_TABLES", "").lower()
+    if forced in ("accurate", "fast"):
+        return forced
+    return "accurate" if doc_type == "supplement" else "fast"
+
+
+def local_converter(mode="accurate"):
+    if mode not in _CONVERTERS:
         from docling.datamodel.base_models import InputFormat
         from docling.datamodel.pipeline_options import PdfPipelineOptions, TableFormerMode
         from docling.document_converter import DocumentConverter, PdfFormatOption
         opts = PdfPipelineOptions()
         opts.do_ocr = os.environ.get("DOCLING_OCR", "0") == "1"   # IR documents are born digital; OCR only on request
         opts.do_table_structure = True
-        opts.table_structure_options.mode = TableFormerMode.ACCURATE if os.environ.get("DOCLING_TABLES", "accurate") == "accurate" else TableFormerMode.FAST
+        opts.table_structure_options.mode = TableFormerMode.ACCURATE if mode == "accurate" else TableFormerMode.FAST
         opts.generate_page_images = False
-        _CONVERTER.append(DocumentConverter(format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=opts)}))
-    return _CONVERTER[0]
+        _CONVERTERS[mode] = DocumentConverter(format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=opts)})
+    return _CONVERTERS[mode]
 
 
-def convert_local(body, name):
+def convert_local(body, name, mode="accurate"):
     from docling.datamodel.base_models import DocumentStream
-    res = local_converter().convert(DocumentStream(name=name, stream=io.BytesIO(body)), max_num_pages=MAX_PAGES, raises_on_error=True)
+    res = local_converter(mode).convert(DocumentStream(name=name, stream=io.BytesIO(body)), max_num_pages=MAX_PAGES, raises_on_error=True)
     doc = res.document
     return {"markdown": doc.export_to_markdown(), "tables": shape_tables_from_doc(doc), "pages": len(getattr(doc, "pages", {}) or {})}
 
@@ -193,9 +202,10 @@ def process(sb, r, engine="local"):
         raise ValueError("stored original missing")
     name = r["storage_path"].split("/")[-1]
     t0 = time.time()
-    out = convert_local(body, name) if engine == "local" else convert_serve(body, name)
+    mode = table_mode(r.get("doc_type"))
+    out = convert_local(body, name, mode) if engine == "local" else convert_serve(body, name)
     rec = {"id": r["id"], "ticker": r["ticker"], "url": r.get("url"), "title": r.get("title"), "doc_type": r.get("doc_type"),
-           "engine": engine, "generated": now_iso(), "seconds": round(time.time() - t0, 1), "pages": out["pages"] or r.get("pages"),
+           "engine": engine, "table_mode": mode, "generated": now_iso(), "seconds": round(time.time() - t0, 1), "pages": out["pages"] or r.get("pages"),
            "n_tables": len(out["tables"]), "markdown": out["markdown"], "tables": out["tables"]}
     gz = gzip.compress(json.dumps(rec, separators=(",", ":"), ensure_ascii=False).encode(), 6)
     sb.put_object(BUCKET, out_path(r), gz, "application/gzip", "public, max-age=31536000, immutable")

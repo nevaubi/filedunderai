@@ -25,9 +25,9 @@ on:
         required: false
         default: ""
       tables:
-        description: "Table model: accurate or fast"
+        description: "Table model: auto (accurate for supplements, fast otherwise), accurate or fast"
         required: false
-        default: "accurate"
+        default: "auto"
 permissions:
   contents: read
 concurrency:
@@ -37,7 +37,7 @@ env:
   SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
   SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
   SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
-  DOCLING_TABLES: ${{ github.event.inputs.tables || 'accurate' }}
+  DOCLING_TABLES: ${{ github.event.inputs.tables || 'auto' }}
   OMP_NUM_THREADS: "4"
 jobs:
   plan:
