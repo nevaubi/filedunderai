@@ -700,6 +700,9 @@ def companies_job(sb, tickers=None, workers=4, refresh_news=False, refresh_summa
 
 
 # ---------------------------------------------------------------- prices
+PRICES_DB_BARS = 10
+
+
 @serialized_aggregates
 def prices_job(sb, intraday=True, full_history=False, part=None, parts=1, time_budget=None):
     """Daily and 5-minute bars. With parts > 1 the stock list is split so each run fits a function time limit;
@@ -723,8 +726,10 @@ def prices_job(sb, intraday=True, full_history=False, part=None, parts=1, time_b
         for s_, d in daily.items():
             pstats[s_] = prices.stats(d["bars"], spy if s_ != "SPY" else None)
             pstats[s_]["spark"] = [round(b[4], 2) for b in d["bars"][-63:]]
-            # Providers revise all adjusted prices after splits; replace the full fetched window.
-            rows = d["bars"]
+            # Only the latest bars go to prices_daily: the published prices/{T}.json files carry the full window and
+            # nothing reads the table back, while rewriting two years for every symbol each run left millions of dead
+            # rows. Deep history in the table comes from etl/backfill_prices.py.
+            rows = d["bars"][-PRICES_DB_BARS:]
             db_rows += [{"symbol": s_, "d": dt.datetime.fromtimestamp(b[0], dt.timezone.utc).date().isoformat(), "o": b[1], "h": b[2], "l": b[3], "c": b[4], "v": b[5]} for b in rows]
 
         def put(item):
