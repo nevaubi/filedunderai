@@ -25,6 +25,12 @@ def load_env(path=None):
 
 load_env()
 
+# Model spend switch. While True, scheduled jobs run without the Fireworks key: every model step skips the way it does
+# when the key is unset (rule-only outputs, previous AI text kept). Flip to False to resume.
+LLM_PAUSED = True
+if LLM_PAUSED and os.environ.pop("FIREWORKS_API_KEY", None) is not None:
+    os.environ["FIREWORKS_PAUSED"] = "1"
+
 SEC_UA = os.environ.get("SEC_USER_AGENT") or "FiledUnder research contact@filedunder.ai"
 if "@" not in SEC_UA:
     # sec.gov Archives rejects agents without a contact address.

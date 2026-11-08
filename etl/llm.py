@@ -59,6 +59,8 @@ def parse_json(txt):
 def chat_json(models, messages, max_tokens=8000, temperature=0, deadline=None, timeout=240, post=None, effort=None, api_key=None):
     """Returns (obj, model, meta). `post` replaces the HTTP call in tests: post(model, messages, max_tokens) -> raw API dict."""
     attempts = []
+    if post is None and api_key is None and not os.environ.get("FIREWORKS_API_KEY"):
+        raise LLMError("model calls are paused or FIREWORKS_API_KEY is not set", attempts)
     for model in models:
         budget = max_tokens
         for _ in range(2):
