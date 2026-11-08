@@ -389,7 +389,13 @@ def run_outcome(stats, error=None):
             if key in ("failed", "errors"):
                 count(value)
             elif key == "skipped":
-                skipped += len(value) if isinstance(value, (dict,list)) else int(value or 0)
+                # a count, a list/dict of skipped items, or a reason string ("FIREWORKS_API_KEY is not set ...")
+                if isinstance(value, (dict, list, tuple)):
+                    skipped += len(value)
+                elif isinstance(value, (int, float)):
+                    skipped += int(value)
+                elif value:
+                    skipped += 1
             elif isinstance(value, dict):
                 inspect(value)
     inspect(stats)
@@ -397,6 +403,8 @@ def run_outcome(stats, error=None):
     if failures:
         return "error" if completed == 0 else "partial"
     if skipped:
+        if completed is None and isinstance(stats.get("skipped"), str):
+            return "skipped"   # the whole job declined to run, with its reason
         return "skipped" if completed == 0 else "partial"
     return "ok"
 

@@ -34,3 +34,10 @@ class ReaperTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_run_outcome_accepts_skip_reason_strings():
+    from etl.common import run_outcome
+    assert run_outcome({"skipped": "FIREWORKS_API_KEY is not set; extraction needs the model"}) == "skipped"
+    assert run_outcome({"skipped": 3, "done": 2}) == "partial"
+    assert run_outcome({"skipped": ["a"], "done": 0}) == "skipped"
