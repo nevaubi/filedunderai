@@ -15,6 +15,8 @@ Caches (raw bucket): screener/closes.json.gz, screener/fund.json.gz, screener/kp
 import base64
 import datetime as dt
 import gzip
+import io
+import zlib
 import json
 import math
 import re
@@ -528,10 +530,143 @@ def extract_company(sb, tk, since):
     return out
 
 
+class CompactCache:
+    """The fund cache (one entry per company, ~760 MB as JSON) held as zlib-compressed JSON per company, decoded only
+    when a company is used, so the screener runs in well under 1 GB instead of ~5 GB. Same file format on storage:
+    one gzip JSON object {"_v": version, TICKER: entry, ...}, read and written without materializing it whole."""
+
+    META = ("key", "pipeline_version", "source_provenance")
+
+    def __init__(self, version=None):
+        self.v, self._d, self._meta = version, {}, {}
+
+    def __contains__(self, k):
+        return k == "_v" or k in self._d
+
+    def __len__(self):
+        return len(self._d)
+
+    def keys(self):
+        return self._d.keys()
+
+    def get(self, k, default=None):
+        if k == "_v":
+            return self.v
+        b = self._d.get(k)
+        return json.loads(zlib.decompress(b)) if b is not None else default
+
+    def __getitem__(self, k):
+        v = self.get(k)
+        if v is None:
+            raise KeyError(k)
+        return v
+
+    def meta(self, k):
+        """Small fields of an entry (key, pipeline_version, fy present, source provenance) without decoding it."""
+        return self._meta.get(k)
+
+    def __setitem__(self, k, v):
+        if k == "_v":
+            self.v = v
+            return
+        self.set_raw(k, json.dumps(v, separators=(",", ":")).encode(), v)
+
+    def set_raw(self, k, js, obj=None):
+        obj = obj if obj is not None else json.loads(js)
+        self._d[k] = zlib.compress(js, 6)
+        self._meta[k] = {**{m: obj.get(m) for m in self.META if m in obj}, "fy": "fy" in obj}
+
+    def pop(self, k, default=None):
+        self._meta.pop(k, None)
+        return self._d.pop(k, default)
+
+    def items(self):
+        for k in list(self._d):
+            yield k, self.get(k)
+
+    @classmethod
+    def from_gz(cls, raw):
+        """Parses the stored object one company at a time (raw_decode over the text), compressing each entry."""
+        text = gzip.decompress(raw).decode()
+        del raw
+        out, dec, i, n = cls(), json.JSONDecoder(), 0, len(text)
+        ws = " \t\r\n"
+        while i < n and text[i] in ws:
+            i += 1
+        if i >= n or text[i] != "{":
+            raise ValueError("fund cache is not a JSON object")
+        i += 1
+        while True:
+            while i < n and text[i] in ws + ",":
+                i += 1
+            if i >= n or text[i] == "}":
+                break
+            key, i = dec.raw_decode(text, i)
+            while text[i] in ws:
+                i += 1
+            if text[i] != ":":
+                raise ValueError("fund cache: expected ':'")
+            i += 1
+            while text[i] in ws:
+                i += 1
+            start = i
+            val, i = dec.raw_decode(text, i)
+            if key == "_v":
+                out.v = val
+            else:
+                out.set_raw(key, text[start:i].encode(), val)
+            del val
+        return out
+
+    def to_gz(self):
+        buf = io.BytesIO()
+        with gzip.GzipFile(fileobj=buf, mode="wb", compresslevel=6) as gz:
+            gz.write(b'{"_v":' + json.dumps(self.v).encode())
+            for k, b in self._d.items():
+                gz.write(b"," + json.dumps(k).encode() + b":" + zlib.decompress(b))
+            gz.write(b"}")
+        return buf.getvalue()
+
+    @classmethod
+    def from_dict(cls, d):
+        out = cls((d or {}).get("_v"))
+        for k, v in (d or {}).items():
+            if k != "_v":
+                out[k] = v
+        return out
+
+
+def load_fund_cache(sb):
+    if not hasattr(sb, "get_object"):
+        d = gz_json(sb, FUND_PATH)
+        return CompactCache.from_dict(d) if d is not None else None
+    raw = sb.get_object("raw", FUND_PATH)
+    if not raw:
+        return None
+    try:
+        return CompactCache.from_gz(raw)
+    except (OSError, ValueError, json.JSONDecodeError):
+        return None
+
+
+def put_fund_cache(sb, cache):
+    if not hasattr(sb, "put_object"):
+        return put_gz(sb, FUND_PATH, {"_v": cache.v, **dict(cache.items())})
+    sb.put_object("raw", FUND_PATH, cache.to_gz(), "application/gzip", cache="no-store")
+
+
+def fund_meta(cache, tk):
+    """Small fields of a fund-cache entry from a CompactCache or (tests) a plain dict."""
+    if isinstance(cache, CompactCache):
+        return cache.meta(tk)
+    e = (cache or {}).get(tk)
+    return e and {**{m: e.get(m) for m in CompactCache.META if m in e}, "fy": "fy" in e}
+
+
 def update_fund(sb, fundmeta, closes, full=False, workers=6, log=print, deadline=None):
-    cache = (None if full else gz_json(sb, FUND_PATH)) or {}
-    if cache.get("_v") != FUND_VERSION:
-        cache = {"_v": FUND_VERSION}
+    cache = None if full else load_fund_cache(sb)
+    if cache is None or cache.get("_v") != FUND_VERSION:
+        cache = CompactCache(FUND_VERSION)
     since = (dt.date.today() - dt.timedelta(days=int(365.25 * 7.3))).isoformat()
     todo, invalidated = [], False
     for tk in TICKERS:
@@ -544,10 +679,11 @@ def update_fund(sb, fundmeta, closes, full=False, workers=6, log=print, deadline
         key = json.dumps([fm["pipeline_version"], fm.get("material_accession"),
                           (fm.get("fund") or {}).get("latest_quarter_end"),
                           fm.get("shares_metadata")], sort_keys=True, separators=(",", ":"))
-        if (cache.get(tk) or {}).get("key") != key or not fundamentals.normalized(cache.get(tk)):
+        meta = cache.meta(tk)
+        if (meta or {}).get("key") != key or not fundamentals.normalized(meta):
             invalidated = cache.pop(tk, None) is not None or invalidated
             todo.append((tk, key))
-        elif "fy" not in cache[tk]:
+        elif not meta.get("fy"):
             # Entries extracted before annual rows were kept ("fy") are re-read from the same bundle; the current
             # entry stays in use until the re-read lands, so a run that hits its deadline loses nothing.
             todo.append((tk, key))
@@ -565,17 +701,37 @@ def update_fund(sb, fundmeta, closes, full=False, workers=6, log=print, deadline
             return tk, None, str(e)[:200]
 
     done = 0
-    with ThreadPoolExecutor(workers) as ex:
-        for tk, x, err in ex.map(one, todo):
-            if x:
-                cache[tk] = x
-                done += 1
-            elif err != "deadline":
-                log("fund extract failed", tk, err)
+    # In chunks, saving the cache after each: a run killed for memory (a Vercel function at 22:55 UTC Nov 7, after
+    # 530 bundles changed in one day) keeps what it extracted, and memory is returned between chunks.
+    chunk = 60
+    for i in range(0, len(todo), chunk):
+        with ThreadPoolExecutor(workers) as ex:
+            for tk, x, err in ex.map(one, todo[i:i + chunk]):
+                if x:
+                    cache[tk] = x
+                    done += 1
+                elif err != "deadline":
+                    log("fund extract failed", tk, err)
+        if len(todo) > chunk:
+            put_fund_cache(sb, cache)
+            _release_memory()
+            log(f"fund cache: {min(i + chunk, len(todo))}/{len(todo)} read, {done} extracted")
+        if deadline and time.time() > deadline:
+            break
     if todo or invalidated:
-        put_gz(sb, FUND_PATH, cache)
+        put_fund_cache(sb, cache)
     log(f"fund cache: extracted {done}")
     return cache
+
+
+def _release_memory():
+    import gc
+    gc.collect()
+    try:
+        import ctypes
+        ctypes.CDLL("libc.so.6").malloc_trim(0)
+    except Exception:
+        pass
 
 
 # ------------------------------------------------------------------ company calculations
@@ -1616,8 +1772,9 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
             fm = fundmeta.get(tk) or {}
             c = S.get(tk) or []
             out, prov = {}, Prov()
-            if fundc.get(tk):
-                fo, prov, fx, inp = fundamentals_for(tk, fundc[tk], splits.get(tk), c[-1] if c else None, sector)
+            fentry = fundc.get(tk)
+            if fentry:
+                fo, prov, fx, inp = fundamentals_for(tk, fentry, splits.get(tk), c[-1] if c else None, sector)
                 out.update(fo)
             else:
                 fx, inp = None, None
@@ -1801,8 +1958,8 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
         def put_src(tk):
             p = provs[tk]
             body = {"tk": tk, "generated": doc["generated"], "asof": dates[-1], "refs": p.refs, "f": p.f}
-            if (fundc.get(tk) or {}).get("source_provenance"):
-                body["source_provenance"] = fundc[tk]["source_provenance"]
+            if (fund_meta(fundc, tk) or {}).get("source_provenance"):
+                body["source_provenance"] = fund_meta(fundc, tk)["source_provenance"]
             sb.put_json(f"screener/src/{tk}.json", body, cache="max-age=300")
             return len(json.dumps(body))
         with ThreadPoolExecutor(12) as ex:
