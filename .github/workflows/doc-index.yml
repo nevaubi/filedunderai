@@ -1,0 +1,63 @@
+name: Document search index
+# Fills public.doc_chunks (Postgres full-text search) from stored IR document text and Docling tables.
+# Documents already indexed are skipped; documents indexed from text alone are re-indexed once their Docling tables
+# exist. Needs supabase/migrations/20261108060000_doc_search.sql applied.
+on:
+  workflow_dispatch:
+    inputs:
+      shards:
+        description: "Parallel runners (max 20)"
+        required: false
+        default: "8"
+      since:
+        description: "Only documents published on or after (YYYY-MM-DD; empty = all)"
+        required: false
+        default: "2021-01-01"
+      hours:
+        description: "Hours per runner (max 5.6)"
+        required: false
+        default: "5"
+  schedule:
+    - cron: "37 11 * * *"
+permissions:
+  contents: read
+concurrency:
+  group: doc-index
+  cancel-in-progress: false
+env:
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.m.outputs.shards }}
+    steps:
+      - id: m
+        run: |
+          n="${{ github.event.inputs.shards || '4' }}"
+          if [ "$n" -gt 20 ]; then n=20; fi
+          echo "shards=$(python3 -c "import json;print(json.dumps(list(range($n))))")" >> "$GITHUB_OUTPUT"
+  index:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJson(needs.plan.outputs.shards) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Index shard
+        env:
+          SHARD: ${{ matrix.shard }}
+          SHARDS: ${{ github.event.inputs.shards || '4' }}
+        run: |
+          python -m etl.doc_index --shard "$SHARD" --shards "$SHARDS" \
+            --since "${{ github.event.inputs.since || '2021-01-01' }}" --hours "${{ github.event.inputs.hours || '5' }}"
