@@ -312,18 +312,6 @@
       "schedule": "53 5 * * *"
     },
     {
-      "path": "/api/cron/estimates?step=consensus&once=1",
-      "schedule": "25 14 6 11 *"
-    },
-    {
-      "path": "/api/cron/estimates?step=ratings&once=1",
-      "schedule": "45 14 6 11 *"
-    },
-    {
-      "path": "/api/cron/estimates?step=build&once=1",
-      "schedule": "5 15 6 11 *"
-    },
-    {
       "path": "/api/cron/ir?step=kpi&run=1",
       "schedule": "7,27,47 * * * *"
     },
@@ -336,28 +324,8 @@
       "schedule": "1,31 * * * *"
     },
     {
-      "path": "/api/cron/govflows?step=holders&once=1",
-      "schedule": "25 15 6 11 *"
-    },
-    {
       "path": "/api/cron/ir?run=fresh",
       "schedule": "5,35 * 7-14 11 *"
-    },
-    {
-      "path": "/api/cron/estimates?step=consensus&once=2",
-      "schedule": "45 15 6 11 *"
-    },
-    {
-      "path": "/api/cron/estimates?step=build&once=2",
-      "schedule": "5 16 6 11 *"
-    },
-    {
-      "path": "/api/cron/govflows?step=holders&once=2",
-      "schedule": "25 16 6 11 *"
-    },
-    {
-      "path": "/api/cron/quant?step=cross&parts=2&once=1",
-      "schedule": "45 16 6 11 *"
     },
     {
       "path": "/api/cron/supply?shard=1&shards=3",
@@ -370,10 +338,6 @@
     {
       "path": "/api/cron/redlines",
       "schedule": "17 */2 * * *"
-    },
-    {
-      "path": "/api/cron/estimates?step=consensus&once=3",
-      "schedule": "5 17 6 11 *"
     },
     {
       "path": "/api/cron/reports",
@@ -422,6 +386,10 @@
     {
       "path": "/api/cron/agents",
       "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/govflows?step=registry",
+      "schedule": "17 4 * * *"
     }
   ],
   "headers": [

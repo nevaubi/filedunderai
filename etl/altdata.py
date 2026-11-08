@@ -95,6 +95,37 @@ def legal_names(sb, tk):
     return out
 
 
+_REGISTRY = {}
+
+
+def entity_names(sb, tk, max_phrases=8):
+    """Names to match federal awards and lobbying clients for one company: SEC legal and former names, plus the
+    subsidiaries (Exhibit 21, GLEIF children) that belong to this company alone, from the company registry
+    (etl/entities.py). Subsidiaries carry most federal awards (Raytheon Company under RTX, Electric Boat under
+    General Dynamics). Capped to `max_phrases` distinct search phrases so the API calls stay bounded. Falls back to
+    the legal names when the registry has no record."""
+    base = legal_names(sb, tk)
+    try:
+        from . import entities
+        if "m" not in _REGISTRY:
+            _REGISTRY["m"], _REGISTRY["reg"] = entities.load_matcher(sb)
+        m, reg = _REGISTRY["m"], _REGISTRY["reg"]
+        if tk not in (reg.get("companies") or {}):
+            return base
+        phrases = set(entities.search_phrases(base + m.names_for(tk, reg), max_phrases))
+        extra = [n for n in m.names_for(tk, reg) if core_name(n) in phrases]
+    except Exception as e:
+        print("altdata: registry unavailable", str(e)[:120])
+        return base
+    seen, out = set(), []
+    for n in base + extra:
+        k = norm_name(n)
+        if k and k not in seen:
+            seen.add(k)
+            out.append(n)
+    return out
+
+
 # ---------- storage helpers ----------
 
 def _get_cache(sb, path, default):
@@ -404,7 +435,7 @@ def build_company(sb, tk, short_cache, ftd_cache, refresh=True, today=None, log=
         block = prev.get(key)
         if refresh and (not block or _stale(block, today)):
             try:
-                names = names or legal_names(sb, tk)
+                names = names or entity_names(sb, tk)
                 # a complete earlier history only needs its latest two years re-fetched
                 full = not block or block.get("first") != first or sorted(map(norm_name, block.get("legal_names") or [])) != sorted(map(norm_name, names))
                 latest = today.year if key == "lobbying" else cur_fy
