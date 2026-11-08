@@ -248,7 +248,7 @@ def regulatory_events(recent, catalysts, since, today):
         t, d = r.get("ticker"), _d(r.get("date"))
         if t not in BY_TICKER or not d or d < since:
             continue
-        ev = [{"label": "Source", "url": r.get("url"), "kind": "web"}, app_link("Regulatory", f"/app/companies/{t}/regulatory")]
+        ev = [{"label": "Source", "url": r.get("url"), "kind": "web"}, app_link("Alt data", f"/app/companies/{t}/alt-data")]
         if r["kind"] == "approval":
             tier = "high" if r.get("priority") == "PRIORITY" else "medium"
             out.append(event("regulatory", "fda_approval", t, r["date"], f"FDA approved {clip(r.get('title'), 80)}", tier,
