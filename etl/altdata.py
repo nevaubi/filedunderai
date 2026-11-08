@@ -98,7 +98,7 @@ def legal_names(sb, tk):
 _REGISTRY = {}
 
 
-def entity_names(sb, tk, max_phrases=8):
+def entity_names(sb, tk, max_phrases=6):
     """Names to match federal awards and lobbying clients for one company: SEC legal and former names, plus the
     subsidiaries (Exhibit 21, GLEIF children) that belong to this company alone, from the company registry
     (etl/entities.py). Subsidiaries carry most federal awards (Raytheon Company under RTX, Electric Boat under
@@ -345,8 +345,9 @@ def contracts(names, fys, today=None, log=print):
     want = {norm_name(n) for n in names}
     phrases = list(dict.fromkeys(core_name(n) for n in names if core_name(n)))
     parents, standalone = {}, {}
-    for phrase in phrases:
-        for page in range(1, 6):
+    for i, phrase in enumerate(phrases):
+        # legal and former names get five pages of keyword results; subsidiary phrases are narrower and get two
+        for page in range(1, 6 if i < 2 else 3):
             d = _usa_post("recipient/", {"keyword": phrase, "award_type": "all", "limit": 100, "page": page, "sort": "amount", "order": "desc"})
             for r in d.get("results", []):
                 if norm_name(r.get("name")) not in want:

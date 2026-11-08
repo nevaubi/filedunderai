@@ -171,3 +171,17 @@ def test_form144_events_skip_executed_and_scale_plan_sales():
 def test_new_8k_items_are_tiered():
     from etl.changes import ITEMS
     assert ITEMS["1.05"][0] == "high" and ITEMS["5.07"][0] == "low"
+
+
+def test_short_interest_summary_and_block():
+    from etl.flows_market import si_summary
+    from etl.screener import short_interest_block
+    rows = [{"date": f"2026-0{m}-15", "short": s, "prev": p, "dtc": 2.5, "adv": 1e6}
+            for m, s, p in ((5, 100, 90), (6, 110, 100), (7, 120, 110), (8, 130, 120), (9, 140, 130), (10, 200, 140))]
+    s = si_summary(rows)
+    assert s["date"] == "2026-010-15" or s["short"] == 200
+    assert round(s["chg"], 4) == round(200 / 140 - 1, 4)
+    assert round(s["chg_3m"], 4) == 1.0
+    out, prov = short_interest_block(s, {"v": 1000, "end": "2026-09-30"})
+    assert out["si_pct_shares"] == 0.2 and out["si_dtc"] == 2.5 and "si_chg_3m" in prov
+    assert short_interest_block(None, {"v": 1}) == ({}, {})

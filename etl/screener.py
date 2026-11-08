@@ -202,6 +202,13 @@ for fid, n, u, d in [
         ("days_8k", "Days since 8-K", "days", "Days since the latest 8-K was filed."),
         ("next_earn_days", "Next earnings (estimated)", "days", "Estimated days until the next earnings release: last results 8-K (Item 2.02) plus the median gap between recent ones. Negative means overdue. An estimate, not a company date.")]:
     fld(fid, "act", n, u, d, "SEC EDGAR (Form 4, 8-K, 10-K, 10-Q)" if fid != "news_30d" else "News search results stored by Filed Under")
+FINRA_SI = "FINRA consolidated short interest (twice monthly; api.finra.org consolidatedShortInterest); shares outstanding from SEC cover pages"
+for fid, n, u, d in [
+        ("si_pct_shares", "Short interest % of shares", "pct", "Shares sold short at the latest FINRA settlement date / shares outstanding (cover page of the latest 10-K or 10-Q)."),
+        ("si_dtc", "Days to cover", "num", "Short interest / average daily volume, as published by FINRA for the latest settlement date."),
+        ("si_chg", "Short interest change", "pct", "Short interest at the latest settlement date / the previous settlement date − 1."),
+        ("si_chg_3m", "Short interest change 3M", "pct", "Short interest at the latest settlement date / five settlements earlier (about ten weeks) − 1.")]:
+    fld(fid, "act", n, u, d, FINRA_SI)
 KPI_FAM = [("units", "Unit volumes", r"units? (sold|shipped|delivered)|deliveries|shipments|unit sales|vehicles delivered"),
            ("customers", "Customers / subscribers", r"customers?\b(?! deposit)|subscribers?|members\b|memberships?|paid (seats|users)|monthly active|daily active|\bmau\b|\bdau\b|accounts\b|households"),
            ("arr", "Recurring revenue (ARR)", r"\barr\b|annual(ized)? recurring revenue|subscription revenue"),
@@ -1658,6 +1665,28 @@ def update_kpis(sb, full=False, workers=6, log=print, deadline=None):
 
 
 # ------------------------------------------------------------------ activity
+def short_interest_block(si, shares):
+    """Short interest fields from flows/short_interest.json (one company) and the cover-page share count."""
+    out, prov = {}, {}
+    if not si or si.get("short") is None:
+        return out, prov
+    src = {"src": "finra_short_interest", "d": si.get("date")}
+    sv = (shares or {}).get("v")
+    if sv and sv > 0:
+        out["si_pct_shares"] = si["short"] / sv
+        prov["si_pct_shares"] = dict(src, x=f"{si['short']:,.0f} shares short on {si['date']} / {sv:,.0f} shares outstanding (cover page, as of {(shares or {}).get('end')})")
+    if si.get("dtc") is not None:
+        out["si_dtc"] = si["dtc"]
+        prov["si_dtc"] = dict(src, x=f"FINRA days to cover on {si['date']} (average daily volume {si.get('adv') or 0:,.0f})")
+    if si.get("chg") is not None:
+        out["si_chg"] = si["chg"]
+        prov["si_chg"] = dict(src, x=f"{si['short']:,.0f} shares short on {si['date']} vs {si.get('prev') or 0:,.0f} at the prior settlement")
+    if si.get("chg_3m") is not None and si.get("trend"):
+        out["si_chg_3m"] = si["chg_3m"]
+        prov["si_chg_3m"] = dict(src, x=f"{si['short']:,.0f} shares short on {si['date']} vs {si['trend'][0][1]:,.0f} on {si['trend'][0][0]}")
+    return out, prov
+
+
 def activity(sb, fundcache, today):
     fl_rows = sb.select("filings", f"select=ticker,form,filed,accession,items,primary_doc&form=in.(10-K,10-Q,8-K)&filed=gte.{(today - dt.timedelta(days=800)).isoformat()}&order=filed.desc")
     filings = {}
@@ -1746,6 +1775,11 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
         fundc = update_fund(sb, fundmeta, hist, full=full, workers=workers, log=log, deadline=deadline)
         kpic = update_kpis(sb, full=full, workers=workers, log=log, deadline=deadline)
         act, actp = activity(sb, fundc, today)
+        try:
+            si_all = (sb.get_json("flows/short_interest.json") or {}).get("companies") or {}
+        except Exception as e:
+            log("short interest unavailable", str(e)[:120])
+            si_all = {}
         macro = macro_monthly(sb)
         log("inputs loaded", round(time.time() - t0, 1), "s")
 
@@ -1872,6 +1906,9 @@ def screener_job(sb, full=False, time_budget=None, workers=6, log=print):
                     out["corrm_n"] = mn
             out.update(act.get(tk, {}))
             prov.f.update(actp.get(tk, {}))
+            so, sp = short_interest_block(si_all.get(tk), sh)
+            out.update(so)
+            prov.f.update(sp)
             kc = kpic.get(tk) or {}
             out.update(kc.get("out") or {})
             prov.f.update(kc.get("prov") or {})

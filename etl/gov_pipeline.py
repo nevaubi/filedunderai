@@ -384,10 +384,14 @@ def _bars(tk):
 def step_market(sb, log=print, tks=None):
     per, meta = flows_market.collect(log=log)
     all_t = tks or tickers()
+    si_latest = {}
 
     def write(tk):
         raw = per.get(tk) or {}
         f = flows_market.company_flows(tk, raw, meta, _bars(tk))
+        si = f.get("short_interest") or []
+        if si:
+            si_latest[tk] = flows_market.si_summary(si)
         ok_w = sum(1 for w in f["ats_weekly"] if w.get("offex_share") is not None)
         f["_sources"] = {
             "finra_weekly": status("ok" if f["ats_weekly"] else "unavailable", count=len(f["ats_weekly"]), url=flows_market.WEEKLY_PAGE,
@@ -397,7 +401,10 @@ def step_market(sb, log=print, tks=None):
         update_company(sb, "flows", tk, f)
         return len(f["ats_weekly"])
     n = _parallel(write, all_t)
-    return {"companies_with_weekly": sum(1 for v in n.values() if v), "latest_weeks": meta["latest_weeks"]}
+    if si_latest and not tks:
+        sb.put_json("flows/short_interest.json", {"generated": now_iso(), "source": flows_market.SI_PAGE, "n": len(si_latest),
+                                                  "companies": si_latest}, cache="max-age=3600")
+    return {"companies_with_weekly": sum(1 for v in n.values() if v), "latest_weeks": meta["latest_weeks"], "short_interest": len(si_latest)}
 
 
 def step_insights(sb, tks=None, per_run=30, deadline=None, log=print):

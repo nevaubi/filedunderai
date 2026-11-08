@@ -111,6 +111,21 @@ def collect(today=None, weeks=26, si_months=12, log=print):
     return per, {"retrieved_at": retrieved, "weeks_from": start, "latest_weeks": latest_weeks}
 
 
+def si_summary(si):
+    """Latest settlement and the trend over the last six, from a company's sorted short_interest rows."""
+    si = [r for r in si if r.get("short") is not None]
+    if not si:
+        return None
+    last = si[-1]
+    hist = si[-6:]
+    prev = last.get("prev")
+    base = hist[0].get("short") if len(hist) > 1 else None
+    return {"date": last["date"], "short": last["short"], "prev": prev, "dtc": last.get("dtc"), "adv": last.get("adv"),
+            "chg": (last["short"] / prev - 1) if prev else None,
+            "chg_3m": (last["short"] / base - 1) if base else None,
+            "trend": [[r["date"], r["short"]] for r in hist]}
+
+
 def weekly_volume(bars):
     """{monday iso: [volume, n_days]} from daily bars [[t, o, h, l, c, v], ...] (t = epoch seconds)."""
     out = {}
