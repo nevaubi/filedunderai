@@ -42,7 +42,10 @@ TOOLS = {
     "gov": "gov(ticker): congressional trades, hearings mentioning the company, federal rules, lobbying",
     "supply": "supply(ticker): disclosed customers, suppliers, partners, single-source dependencies, revenue shares, regions, with verbatim quotes",
     "technicals": "technicals(ticker): trend, momentum and volatility state plus recent signals, each with its historical 60-day base rate",
-    "calendar": "calendar(days=14, kinds=['earnings','ex_dividend','macro','ipo'], tickers=None): upcoming dated events",
+    "regulatory": "regulatory(ticker): Health Care only — ClinicalTrials.gov trials (active by phase, upcoming primary completions, terminations with reasons), FDA approvals, recalls, 510(k) clearances",
+    "proposed_sales": "proposed_sales(ticker): Form 144 notices of proposed insider sales (seller, value, expected date, 10b5-1 plan), each marked executed/open by matching Form 4 sales",
+    "sec_review": "sec_review(ticker): SEC staff comment letters and company responses by reviewed filing, with topics and the comments' opening sentences",
+    "calendar": "calendar(days=14, kinds=['earnings','ex_dividend','macro','ipo','trial_readout','proposed_sale'], tickers=None): upcoming dated events",
     "market": "market(): index/commodity/rates moves, breadth (share above 50/200-day averages, new highs/lows), macro brief",
     "screen": "screen(filters=[{field, op, value}], sort={field, desc}, limit=25, fields=[...]): filter all ~1,844 covered companies. ops: > >= < <= = != in. Useful fields: mcap, pe, pe_p5 (0=cheapest vs own 5y), fcf_yield, fcf_yield_p5, rev_g_q, rev_accel, eps_g_q, gm, om, roic, nd_ebitda, altman_z, pio_f, ret_1m, ret_3m, ret_ytd, dist_hi52, dist_lo52, rsi14, beta, ins_net_90d, ins_buyers_90d, next_earn_days, sector",
     "feed": "feed(name, ticker=None): published feeds: 'changes' (what changed), 'situations', 'earnings_preview', 'earnings_score', 'earnings_season', 'themes', 'kpi_insights' (may not exist yet)",
@@ -126,6 +129,12 @@ class Run:
             return d.supply(a["ticker"])
         if name == "technicals":
             return d.technicals(a["ticker"])
+        if name == "regulatory":
+            return d.regulatory(a["ticker"])
+        if name == "proposed_sales":
+            return d.proposed_sales(a["ticker"])
+        if name == "sec_review":
+            return d.sec_review(a["ticker"])
         if name == "calendar":
             return d.calendar(a.get("days", 14), a.get("kinds"), a.get("tickers"))
         if name == "market":

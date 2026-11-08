@@ -271,7 +271,9 @@ def m_upcoming(data, mon, tickers, universe):
     for e in cal["events"]:
         who = e.get("ticker") or e.get("symbol") or e.get("release") or e.get("name")
         what = {"earnings": "reports earnings", "ex_dividend": f"goes ex-dividend (${e.get('amount')})", "macro": f"{e.get('title')}",
-                "ipo": f"IPO {e.get('status')}"}[e["kind"]]
+                "ipo": f"IPO {e.get('status')}",
+                "trial_readout": f"{e.get('phase')} trial {e.get('title')} reaches primary completion",
+                "proposed_sale": f"{e.get('person')} may sell ${(e.get('value') or 0) / 1e6:,.1f}M (Form 144{', 10b5-1 plan' if e.get('plan') else ''})"}[e["kind"]]
         hits.append({"key": f"cal:{e['kind']}:{who}:{e['date']}", "tickers": [e["ticker"]] if e.get("ticker") else [], "severity": "info",
                      "title": f"{who} {what} on {e['date']}" if e["kind"] != "macro" else f"{e['date']}: {what}",
                      "summary": f"{who} {what} on {e['date']}" + (f" ({e.get('time')})" if e.get("time") else "") +
@@ -355,7 +357,7 @@ TYPES = {
     "estimates": (m_estimates, "Consensus EPS or price-target revisions beyond a threshold"),
     "price": (m_price, "Price level, drawdown or RSI conditions"),
     "tech_signal": (m_tech_signal, "Technical signals, each with its historical base rate"),
-    "upcoming": (m_upcoming, "Upcoming earnings, ex-dividend dates, macro releases and IPOs"),
+    "upcoming": (m_upcoming, "Upcoming earnings, ex-dividend dates, macro releases, IPOs, trial readouts and proposed insider sales"),
     "ir_document": (m_ir_document, "New investor-relations documents (releases, decks, transcripts)"),
     "screen": (m_screen, "Companies entering (or leaving) a saved screen"),
     "feed": (m_feed, "Items from the change feed or situation screens"),

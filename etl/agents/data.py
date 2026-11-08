@@ -315,6 +315,46 @@ class Data:
                 "policy": [{k: p.get(k) for k in ("kind", "countries", "q")} for p in (d.get("policy") or [])[:6]],
                 "source": "Latest 10-K/10-Q text, each link with its verbatim quote and accession"}
 
+    def regulatory(self, ticker):
+        t = T(ticker)
+        d = self.get(f"regulatory/{t}.json")
+        if not d:
+            return {"ticker": t, "available": False, "note": "Only Health Care companies are covered (ClinicalTrials.gov, openFDA)"}
+        tr = d.get("trials") or {}
+        s = tr.get("summary") or {}
+        keep = ("nct", "title", "acronym", "phase", "status", "why_stopped", "primary_completion", "enrollment", "conditions", "interventions", "updated")
+        return {"ticker": t, "counts": d.get("counts"), "active_by_phase": s.get("by_phase_active"), "late_stage_active": s.get("late_stage_active"),
+                "upcoming_readouts": [{k: r.get(k) for k in keep} for r in (s.get("upcoming") or [])[:15]],
+                "recent_status_changes": [{k: r.get(k) for k in keep} for r in (s.get("recent_changes") or [])[:12]],
+                "approvals": [{k: a.get(k) for k in ("date", "type", "brands", "ingredients", "class", "priority", "application", "url")} for a in (d.get("approvals") or [])[:20]],
+                "recalls": [{k: r.get(k) for k in ("date", "kind", "class", "product", "reason", "status")} for r in (d.get("recalls") or [])[:15]],
+                "clearances_510k": [{k: c.get(k) for k in ("date", "device", "k", "url")} for c in (d.get("clearances") or [])[:10]],
+                "sources": d.get("sources")}
+
+    def proposed_sales(self, ticker):
+        t = T(ticker)
+        d = self.get(f"form144/{t}.json")
+        if not d:
+            return {"ticker": t, "available": False}
+        keep = ("filed", "person", "relationship", "value", "shares", "pct_outstanding", "sale_date", "plan", "plan_adopted", "status", "url")
+        return {"ticker": t, "summary": d.get("summary"), "notices": [{**{k: n.get(k) for k in keep},
+                                                                       "executed": (n.get("executed") or {}).get("filled_pct")} for n in (d.get("notices") or [])[:25]],
+                "source": "SEC Form 144 notices matched to Form 4 sales by the same person within 14 days"}
+
+    def sec_review(self, ticker):
+        t = T(ticker)
+        d = self.get(f"comments/{t}.json")
+        if not d:
+            return {"ticker": t, "available": False}
+        names = d.get("topics") or {}
+        out = []
+        for th in (d.get("threads") or [])[:8]:
+            out.append({"form": th.get("form"), "period": th.get("period"), "status": th.get("status"), "first": th.get("first"), "last": th.get("last"),
+                        "rounds": th.get("rounds"), "topics": [names.get(x, x) for x in th.get("topics") or []],
+                        "comments": [c for l in th.get("letters") or [] if l.get("form") == "UPLOAD" for c in (l.get("comments") or [])][:10],
+                        "letters": [{k: l.get(k) for k in ("form", "filed", "kind", "url")} for l in th.get("letters") or []]})
+        return {"ticker": t, "threads": out, "source": "SEC Corporation Finance comment letters (UPLOAD) and company responses (CORRESP)"}
+
     def calendar(self, days=14, kinds=None, tickers=None):
         kinds = set(kinds or ["earnings", "ex_dividend", "macro", "ipo"])
         today = dt.date.today().isoformat()
@@ -338,6 +378,18 @@ class Data:
                 d = r.get("release_date") or ""
                 if today <= d <= end:
                     out.append({"kind": "macro", "date": d, "release": r.get("release"), "title": r.get("title"), "time": r.get("release_time"), "url": r.get("source_url")})
+        if "trial_readout" in kinds:
+            for r in (self.get("regulatory/catalysts.json") or {}).get("rows") or []:
+                d = r.get("primary_completion") or ""
+                if today <= d <= end and (not want or r.get("ticker") in want):
+                    out.append({"kind": "trial_readout", "date": d, "ticker": r.get("ticker"), "phase": r.get("phase"), "title": r.get("acronym") or r.get("title"),
+                                "nct": r.get("nct"), "url": f"https://clinicaltrials.gov/study/{r.get('nct')}"})
+        if "proposed_sale" in kinds:
+            for r in (self.get("form144/recent.json") or {}).get("rows") or []:
+                d = r.get("sale_date") or ""
+                if r.get("status") == "open" and today <= d <= end and (not want or r.get("ticker") in want):
+                    out.append({"kind": "proposed_sale", "date": d, "ticker": r.get("ticker"), "person": r.get("person"), "value": r.get("value"),
+                                "plan": r.get("plan"), "url": r.get("url")})
         if "ipo" in kinds and not want:
             for r in (self.get("calendars/ipos.json") or {}).get("rows") or []:
                 d = r.get("priced") or r.get("effective") or ""
