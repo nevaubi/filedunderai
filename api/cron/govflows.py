@@ -9,13 +9,16 @@ from _common import serve  # noqa: E402
 def run(sb, query):
     """Insiders & influence pipeline (gov/ and flows/ bundles). step = daily | hearings | company | holders | reads
     | form144 (proposed insider sales) | comments (SEC comment letters)
-    | regulatory (ClinicalTrials.gov and openFDA for Health Care companies)
+    | regulatory (ClinicalTrials.gov and openFDA for Health Care companies) | medicare (CMS drug spending)
     | registry (company registry: GLEIF LEIs and children, FIGIs, CUSIPs; ~500 companies per run at GLEIF's rate)."""
     from etl import gov_pipeline
     step = query.get("step", "daily")
     if step == "form144":
         from etl import form144
         return form144.form144_job(sb, days=int(query.get("days", 365)), time_budget=640)
+    if step == "medicare":
+        from etl import medicare
+        return medicare.medicare_job(sb)
     if step == "regulatory":
         from etl import regulatory
         return regulatory.regulatory_job(sb, per_run=int(query.get("n", 40)), time_budget=640)
@@ -28,7 +31,7 @@ def run(sb, query):
         out["supply"] = supply.normalize_graph_job(sb)
         return out
     if step not in ("daily", "hearings", "company", "holders", "reads"):
-        raise ValueError("step must be daily, hearings, company, holders, reads, form144, comments, regulatory or registry")
+        raise ValueError("step must be daily, hearings, company, holders, reads, form144, comments, regulatory, medicare or registry")
     return gov_pipeline.scheduled(sb, step, time_budget=680)
 
 

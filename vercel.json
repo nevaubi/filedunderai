@@ -402,6 +402,10 @@
     {
       "path": "/api/cron/govflows?step=regulatory",
       "schedule": "23 9,21 * * *"
+    },
+    {
+      "path": "/api/cron/govflows?step=medicare",
+      "schedule": "41 7 3 * *"
     }
   ],
   "headers": [
