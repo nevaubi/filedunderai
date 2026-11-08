@@ -199,3 +199,15 @@ def test_short_interest_events_tiers():
     assert evs["AAPL"]["tier"] == "high" and evs["MSFT"]["tier"] == "medium"
     assert "NVDA" not in evs and "AMZN" not in evs
     assert evs["AAPL"]["title"].startswith("Short interest rose 200%")
+
+
+def test_comment_letter_events():
+    import datetime as dt
+    from etl.changes import comment_letter_events
+    rows = [{"ticker": "AAPL", "filed": "2026-10-20", "accession": "x", "url": "https://www.sec.gov/x", "kind": "comments", "form": "10-K",
+             "period": "2025-09-27", "periodic": True, "n_comments": 3, "topics": ["non_gaap", "segments"]},
+            {"ticker": "AAPL", "filed": "2026-10-21", "accession": "y", "kind": "review_complete", "form": "10-K", "periodic": True},
+            {"ticker": "AAPL", "filed": "2026-10-21", "accession": "z", "kind": "comments", "form": "S-1", "periodic": False}]
+    evs = comment_letter_events(rows, {"non_gaap": "Non-GAAP measures", "segments": "Segment reporting"}, dt.date(2026, 10, 1))
+    assert [e["tier"] for e in evs] == ["medium", "low"]
+    assert "Non-GAAP measures" in evs[0]["title"] and "3 comments" in evs[0]["reason"]

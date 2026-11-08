@@ -394,6 +394,10 @@
     {
       "path": "/api/cron/govflows?step=form144",
       "schedule": "35 1,13,22 * * *"
+    },
+    {
+      "path": "/api/cron/govflows?step=comments",
+      "schedule": "47 11 * * *"
     }
   ],
   "headers": [

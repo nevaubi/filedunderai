@@ -8,20 +8,23 @@ from _common import serve  # noqa: E402
 
 def run(sb, query):
     """Insiders & influence pipeline (gov/ and flows/ bundles). step = daily | hearings | company | holders | reads
-    | form144 (proposed insider sales)
+    | form144 (proposed insider sales) | comments (SEC comment letters)
     | registry (company registry: GLEIF LEIs and children, FIGIs, CUSIPs; ~500 companies per run at GLEIF's rate)."""
     from etl import gov_pipeline
     step = query.get("step", "daily")
     if step == "form144":
         from etl import form144
         return form144.form144_job(sb, days=int(query.get("days", 365)), time_budget=640)
+    if step == "comments":
+        from etl import comment_letters
+        return comment_letters.comments_job(sb, time_budget=600)
     if step == "registry":
         from etl import entities, supply
         out = entities.registry_job(sb, workers=2, time_budget=560)
         out["supply"] = supply.normalize_graph_job(sb)
         return out
     if step not in ("daily", "hearings", "company", "holders", "reads"):
-        raise ValueError("step must be daily, hearings, company, holders, reads, form144 or registry")
+        raise ValueError("step must be daily, hearings, company, holders, reads, form144, comments or registry")
     return gov_pipeline.scheduled(sb, step, time_budget=680)
 
 

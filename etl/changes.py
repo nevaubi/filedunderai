@@ -211,6 +211,35 @@ def short_interest_events(companies, since):
     return out
 
 
+def comment_letter_events(rows, topic_names, since):
+    """Released SEC staff letters on periodic reports and proxies: a letter with comments is medium (high after two
+    or more rounds on the same filing), a review-complete letter is low."""
+    out = []
+    for r in rows or []:
+        t, filed = r.get("ticker"), _d(r.get("filed"))
+        if t not in BY_TICKER or not filed or filed < since or not r.get("periodic"):
+            continue
+        topics = [topic_names.get(x, x) for x in (r.get("topics") or [])][:4]
+        what = f"{r.get('form') or 'filing'}" + (f" for the period ended {r['period']}" if r.get("period") else "")
+        if r.get("kind") == "comments":
+            n = r.get("n_comments") or 0
+            tier = "medium"
+            title = f"SEC staff comment letter on the {what}" + (f": {', '.join(topics)}" if topics else "")
+            reason = (f"Corporation Finance released a review letter with {n} comment{'s' if n != 1 else ''}"
+                      + (f" on {', '.join(topics).lower()}" if topics else "") + "; letters are public 20+ business days after a review closes")
+        elif r.get("kind") == "review_complete":
+            tier, title = "low", f"SEC staff completed its review of the {what}"
+            reason = "Corporation Finance released the letter closing its review"
+        else:
+            continue
+        out.append(event("filing", "comment_letter", t, filed, title, tier, reason, (r.get("accession"),),
+                         evidence=[sec_url(r.get("url")), app_link("Filings", f"/app/companies/{t}/filings")],
+                         metrics={"n_comments": r.get("n_comments"), "topics": r.get("topics") or [], "form": r.get("form"),
+                                  "period": r.get("period"), "thread_status": r.get("thread_status")},
+                         tags=["SEC review", r.get("form") or "filing"]))
+    return out
+
+
 def results_8k_events(rows, since, have_earnings):
     """Item 2.02 filings without a matched consensus surprise: results filed, low tier."""
     out = []
@@ -860,7 +889,7 @@ def changes_job(sb, today=None, time_budget=700, log=print, tickers=None, worker
         with ThreadPoolExecutor(8) as ex:
             names = ["screener.json", "quant/cross.json", "redlines/index.json", "estimates/index.json", "meta/insiders.json",
                      "tech/states.json", "tech/signals.json", "calendars/dividends.json", "calendars/ipos.json", "macro/releases.json",
-                     "form144/recent.json", "flows/short_interest.json"]
+                     "form144/recent.json", "flows/short_interest.json", "comments/recent.json"]
             loaded = dict(zip(names, ex.map(pub, names)))
         mcap, corr = _screener_frame(loaded["screener.json"])
         qc = loaded["quant/cross.json"] or {}
@@ -962,6 +991,7 @@ def changes_job(sb, today=None, time_budget=700, log=print, tickers=None, worker
                  + dividend_events((loaded["calendars/dividends.json"] or {}).get("rows"), since_c)
                  + form144_events((loaded["form144/recent.json"] or {}).get("rows"), mcap, since_f)
                  + short_interest_events((loaded["flows/short_interest.json"] or {}).get("companies"), since_c)
+                 + comment_letter_events((loaded["comments/recent.json"] or {}).get("rows"), (loaded["comments/recent.json"] or {}).get("topics") or {}, since_c)
                  + technical_events(loaded["tech/states.json"], loaded["tech/signals.json"], since_f))
         for e in extra:
             if e["t"] in company:
