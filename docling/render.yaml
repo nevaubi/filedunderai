@@ -1,0 +1,65 @@
+# Render Blueprint for an on-demand docling-serve deployment (optional).
+# The backfill and the daily pass run on GitHub Actions CPU runners (.github/workflows/docling-backfill.yml);
+# this service is for parsing a document the moment it arrives (assistant uploads, a new filing exhibit).
+#
+# Shape: an API service that accepts async jobs, one or more RQ workers that do the parsing, and a Render Key
+# Value (Redis-compatible) queue between them. Scale throughput by adding worker instances.
+# Client: etl/docling_ingest.py --engine serve with DOCLING_SERVE_URL and DOCLING_SERVE_API_KEY.
+#
+# Before deploying, confirm the image tag exists on quay.io/docling-project/docling-serve-cpu and that the image
+# ships the `docling-serve rq-worker` entry point for that tag.
+services:
+  - type: web
+    name: docling-serve
+    runtime: image
+    image:
+      url: quay.io/docling-project/docling-serve-cpu:v1.30.0
+    plan: pro
+    healthCheckPath: /health
+    envVars:
+      - key: DOCLING_SERVE_ENG_KIND
+        value: rq
+      - key: DOCLING_SERVE_ENG_RQ_REDIS_URL
+        fromService:
+          type: keyvalue
+          name: docling-queue
+          property: connectionString
+      - key: DOCLING_SERVE_ENG_RQ_RESULTS_TTL
+        value: "14400"
+      - key: DOCLING_SERVE_API_KEY
+        generateValue: true
+      - key: DOCLING_SERVE_MAX_NUM_PAGES
+        value: "300"
+      - key: DOCLING_SERVE_MAX_FILE_SIZE
+        value: "62914560"
+      - key: DOCLING_SERVE_SINGLE_USE_RESULTS
+        value: "true"
+      - key: DOCLING_SERVE_ENABLE_UI
+        value: "false"
+  - type: worker
+    name: docling-worker
+    runtime: image
+    image:
+      url: quay.io/docling-project/docling-serve-cpu:v1.30.0
+    plan: pro
+    numInstances: 2
+    dockerCommand: docling-serve rq-worker
+    envVars:
+      - key: DOCLING_SERVE_ENG_KIND
+        value: rq
+      - key: DOCLING_SERVE_ENG_RQ_REDIS_URL
+        fromService:
+          type: keyvalue
+          name: docling-queue
+          property: connectionString
+      - key: DOCLING_SERVE_ENG_RQ_RESULTS_TTL
+        value: "14400"
+      - key: DOCLING_SERVE_MAX_NUM_PAGES
+        value: "300"
+      - key: OMP_NUM_THREADS
+        value: "2"
+  - type: keyvalue
+    name: docling-queue
+    plan: starter
+    maxmemoryPolicy: noeviction
+    ipAllowList: []

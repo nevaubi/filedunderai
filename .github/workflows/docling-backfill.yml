@@ -1,0 +1,89 @@
+name: Docling document parsing
+# Parses stored IR PDFs with Docling on CPU runners (layout, reading order, table structure) and writes
+# docling/{ticker}/{id}.json.gz to the "ir" bucket. Documents already parsed are skipped, so the workflow can be
+# re-run until coverage is complete. Start with a trial (shards=4, limit=125 is about 500 documents).
+# The daily schedule picks up newly stored documents (and keeps working through the backfill) on 6 runners.
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+    inputs:
+      shards:
+        description: "Parallel runners (max 20)"
+        required: false
+        default: "4"
+      limit:
+        description: "Documents per runner"
+        required: false
+        default: "125"
+      hours:
+        description: "Hours per runner (max 5.6)"
+        required: false
+        default: "5"
+      doc_types:
+        description: "Only these doc types (comma separated; empty = all)"
+        required: false
+        default: ""
+      tables:
+        description: "Table model: accurate or fast"
+        required: false
+        default: "accurate"
+permissions:
+  contents: read
+concurrency:
+  group: docling-backfill
+  cancel-in-progress: false
+env:
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+  DOCLING_TABLES: ${{ github.event.inputs.tables || 'accurate' }}
+  OMP_NUM_THREADS: "4"
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.m.outputs.shards }}
+    steps:
+      - id: m
+        run: |
+          n="${{ github.event.inputs.shards || '6' }}"
+          if [ "$n" -gt 20 ]; then n=20; fi
+          echo "shards=$(python3 -c "import json;print(json.dumps(list(range($n))))")" >> "$GITHUB_OUTPUT"
+  parse:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJson(needs.plan.outputs.shards) }}
+    steps:
+      - name: Check secrets
+        run: |
+          for v in SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY; do
+            if [ -z "${!v}" ]; then echo "Missing repository secret $v"; exit 1; fi
+          done
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: |
+          pip install -r requirements.txt
+          pip install "docling==2.140.0" --extra-index-url https://download.pytorch.org/whl/cpu
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/huggingface
+            ~/.cache/docling
+          key: docling-models-2.140.0
+      - name: Parse shard
+        env:
+          SHARD: ${{ matrix.shard }}
+          SHARDS: ${{ github.event.inputs.shards || '6' }}
+        run: |
+          python -m etl.docling_ingest --shard "$SHARD" --shards "$SHARDS" \
+            --limit "${{ github.event.inputs.limit || '250' }}" --hours "${{ github.event.inputs.hours || '5' }}" \
+            --doc-types "${{ github.event.inputs.doc_types }}"
