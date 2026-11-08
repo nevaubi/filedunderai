@@ -12,7 +12,7 @@ on:
       since:
         description: "Only documents published on or after (YYYY-MM-DD; empty = all)"
         required: false
-        default: "2021-01-01"
+        default: "2023-01-01"
       hours:
         description: "Hours per runner (max 5.6)"
         required: false
@@ -61,4 +61,4 @@ jobs:
           SHARDS: ${{ github.event.inputs.shards || '2' }}
         run: |
           python -m etl.doc_index --shard "$SHARD" --shards "$SHARDS" \
-            --since "${{ github.event.inputs.since || '2021-01-01' }}" --hours "${{ github.event.inputs.hours || '5' }}"
+            --since "${{ github.event.inputs.since || '2023-01-01' }}" --hours "${{ github.event.inputs.hours || '5' }}"

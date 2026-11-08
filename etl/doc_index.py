@@ -5,8 +5,8 @@ and, when the Docling pass has parsed it, its tables (docling/{T}/{id}.json.gz) 
 for a KPI label finds the table that carries it. Progress lives in public.doc_index_state; a document is re-indexed
 only when Docling output appears for one indexed from text alone.
 
-Scope (default): releases, supplements, presentations, transcripts, prepared remarks and other IR documents
-published since 2021; annual reports are left to the SEC filing search. Each document is capped at MAX_CHARS of
+Scope (default): releases, supplements, transcripts and prepared remarks published (or reporting on a period) since
+2023; annual reports are left to the SEC filing search. Each document is capped at MAX_CHARS of
 text so a 200-page deck cannot dominate the table.
 
 Sharded by crc32 of the document id (parallel runners never overlap). Requires migration
@@ -24,13 +24,15 @@ from concurrent.futures import ThreadPoolExecutor
 from .common import HTTPError, Supabase, now_iso, request
 
 CHUNK = 1800
-MAX_CHARS = int(os.environ.get("DOC_INDEX_MAX_CHARS", "60000"))
+MAX_CHARS = int(os.environ.get("DOC_INDEX_MAX_CHARS", "25000"))
 MAX_TABLE_CHUNKS = 40
 # Per-runner cap on text written in one run (characters), so a fill never outruns the database's disk growth.
 # Supabase grows the disk at most once every 6 hours and turns the database read-only near full.
 RUN_CHARS = int(os.environ.get("DOC_INDEX_RUN_CHARS", "250000000"))
-TYPES = ["release", "supplement", "presentation", "transcript", "remarks", "other"]
-SINCE = "2021-01-01"
+# Decks and miscellaneous exhibits are mostly slide fragments and boilerplate; their tables still come in through
+# Docling for the types below. Measured cost before trimming: about 87 KB of database per document.
+TYPES = ["release", "supplement", "transcript", "remarks"]
+SINCE = "2023-01-01"
 
 
 def shard_of(doc_id, shards):
@@ -99,8 +101,10 @@ def candidates(sb, shard, shards, types=TYPES, since=SINCE, tickers=None):
     rows = sb.select("ir_documents", q)
     keep = []
     for r in rows:
-        when = r.get("published") or (r.get("fetched_at") or "")[:10]
-        if since and when and when < since:
+        # publish date, else the period the document reports on; a document with neither is out of scope
+        # (the fetch date says nothing about how current it is)
+        when = r.get("published") or r.get("period_end")
+        if since and (not when or when < since):
             continue
         if shard_of(r["id"], shards) == shard:
             keep.append(r)
