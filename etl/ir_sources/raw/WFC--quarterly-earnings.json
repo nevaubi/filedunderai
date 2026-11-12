@@ -1,0 +1,763 @@
+{
+  "company": "Wells Fargo & Company",
+  "investor_relations_section": "Quarterly earnings",
+  "source_page": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+  "source_page_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+  "coverage": {
+    "quarters_found": 23,
+    "quarters_found_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+    "files_found": 69,
+    "files_found_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+    "years": [
+      "2026",
+      "2025",
+      "2024",
+      "2023",
+      "2022",
+      "2021"
+    ],
+    "file_types_found": [
+      "PDF"
+    ],
+    "file_types_found_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+    "note": "The quarterly-earnings page exposes three PDF downloads per listed quarter: news release, presentation, and quarterly supplement. No PPTX, DOC/DOCX, XLS/XLSX, CSV, image, audio, or other non-PDF quarter files were linked on that page."
+  },
+  "quarters": [
+    {
+      "quarter": "Q3 2026",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q3 2026 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2026-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2026-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q3-2026-news-release.md"
+        },
+        {
+          "name": "Q3 2026 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2026-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2026-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q3-2026-presentation.md"
+        },
+        {
+          "name": "Q3 2026 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2026-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2026-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q3-2026-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q2 2026",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q2 2026 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2026-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2026-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q2-2026-news-release.md"
+        },
+        {
+          "name": "Q2 2026 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2026-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2026-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q2-2026-presentation.md"
+        },
+        {
+          "name": "Q2 2026 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2026-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2026-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q2-2026-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q1 2026",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q1 2026 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2026-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2026-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q1-2026-news-release.md"
+        },
+        {
+          "name": "Q1 2026 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2026-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2026-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q1-2026-presentation.md"
+        },
+        {
+          "name": "Q1 2026 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2026-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2026-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q1-2026-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q4 2025",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q4 2025 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2025-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2025-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q4-2025-news-release.md"
+        },
+        {
+          "name": "Q4 2025 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2025-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2025-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q4-2025-presentation.md"
+        },
+        {
+          "name": "Q4 2025 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2025-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2025-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q4-2025-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q3 2025",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q3 2025 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2025-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2025-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q3-2025-news-release.md"
+        },
+        {
+          "name": "Q3 2025 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2025-presentation.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2025-presentation.pdf",
+          "downloaded_representation": "/workspace/files/q3-2025-presentation.md"
+        },
+        {
+          "name": "Q3 2025 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2025-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2025-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q3-2025-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q2 2025",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q2 2025 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2025-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2025-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q2-2025-news-release.md"
+        },
+        {
+          "name": "Q2 2025 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2025-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2025-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q2-2025-presentation.md"
+        },
+        {
+          "name": "Q2 2025 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2025-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2025-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q2-2025-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q1 2025",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q1 2025 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2025-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2025-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q1-2025-news-release.md"
+        },
+        {
+          "name": "Q1 2025 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2025-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2025-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q1-2025-presentation.md"
+        },
+        {
+          "name": "Q1 2025 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2025-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2025-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q1-2025-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q4 2024",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q4 2024 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2024-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2024-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q4-2024-news-release.md"
+        },
+        {
+          "name": "Q4 2024 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2024-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2024-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q4-2024-presentation.md"
+        },
+        {
+          "name": "Q4 2024 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2024-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2024-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q4-2024-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q3 2024",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q3 2024 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2024-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2024-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q3-2024-news-release.md"
+        },
+        {
+          "name": "Q3 2024 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2024-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2024-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q3-2024-presentation.md"
+        },
+        {
+          "name": "Q3 2024 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2024-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2024-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q3-2024-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q2 2024",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q2 2024 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2024-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2024-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q2-2024-news-release.md"
+        },
+        {
+          "name": "Q2 2024 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2024-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2024-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q2-2024-presentation.md"
+        },
+        {
+          "name": "Q2 2024 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2024-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2024-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q2-2024-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q1 2024",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q1 2024 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2024-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2024-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q1-2024-news-release.md"
+        },
+        {
+          "name": "Q1 2024 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2024-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2024-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q1-2024-presentation.md"
+        },
+        {
+          "name": "Q1 2024 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2024-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2024-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q1-2024-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q4 2023",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q4 2023 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2023-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2023-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q4-2023-news-release.md"
+        },
+        {
+          "name": "Q4 2023 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2023-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2023-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q4-2023-presentation.md"
+        },
+        {
+          "name": "Q4 2023 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2023-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2023-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q4-2023-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q3 2023",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q3 2023 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2023-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2023-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q3-2023-news-release.md"
+        },
+        {
+          "name": "Q3 2023 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2023-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2023-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q3-2023-presentation.md"
+        },
+        {
+          "name": "Q3 2023 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2023-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2023-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q3-2023-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q2 2023",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q2 2023 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2023-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2023-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q2-2023-news-release.md"
+        },
+        {
+          "name": "Q2 2023 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2023-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2023-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q2-2023-presentation.md"
+        },
+        {
+          "name": "Q2 2023 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2023-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2023-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q2-2023-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q1 2023",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q1 2023 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2023-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2023-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q1-2023-news-release.md"
+        },
+        {
+          "name": "Q1 2023 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2023-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2023-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q1-2023-presentation.md"
+        },
+        {
+          "name": "Q1 2023 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2023-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2023-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q1-2023-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q4 2022",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q4 2022 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2022-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2022-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q4-2022-news-release.md"
+        },
+        {
+          "name": "Q4 2022 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2022-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2022-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q4-2022-presentation.md"
+        },
+        {
+          "name": "Q4 2022 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2022-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2022-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q4-2022-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q3 2022",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q3 2022 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2022-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2022-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q3-2022-news-release.md"
+        },
+        {
+          "name": "Q3 2022 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2022-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2022-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q3-2022-presentation.md"
+        },
+        {
+          "name": "Q3 2022 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2022-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2022-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q3-2022-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q2 2022",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q2 2022 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2022-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2022-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q2-2022-news-release.md"
+        },
+        {
+          "name": "Q2 2022 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2022-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2022-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q2-2022-presentation.md"
+        },
+        {
+          "name": "Q2 2022 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2022-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2022-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q2-2022-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q1 2022",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q1 2022 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2022-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2022-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q1-2022-news-release.md"
+        },
+        {
+          "name": "Q1 2022 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2022-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2022-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q1-2022-presentation.md"
+        },
+        {
+          "name": "Q1 2022 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2022-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2022-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q1-2022-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q4 2021",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q4 2021 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2021-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2021-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q4-2021-news-release.md"
+        },
+        {
+          "name": "Q4 2021 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2021-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2021-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q4-2021-presentation.md"
+        },
+        {
+          "name": "Q4 2021 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2021-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2021-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q4-2021-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q3 2021",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q3 2021 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2021-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2021-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q3-2021-news-release.md"
+        },
+        {
+          "name": "Q3 2021 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2021-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2021-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q3-2021-presentation.md"
+        },
+        {
+          "name": "Q3 2021 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2021-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2021-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q3-2021-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q2 2021",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q2 2021 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2021-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2021-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q2-2021-news-release.md"
+        },
+        {
+          "name": "Q2 2021 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2021-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2021-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q2-2021-presentation.md"
+        },
+        {
+          "name": "Q2 2021 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2021-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2021-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q2-2021-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q1 2021",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q1 2021 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2021-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2021-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q1-2021-news-release.md"
+        },
+        {
+          "name": "Q1 2021 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2021-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2021-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q1-2021-presentation.md"
+        },
+        {
+          "name": "Q1 2021 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2021-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2021-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q1-2021-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    }
+  ]
+}

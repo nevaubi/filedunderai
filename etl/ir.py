@@ -15,6 +15,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 from .common import AggregateLease, HTTPError, SEC_UA, Supabase, dedupe_conflict_rows, now_iso, request, sec_throttle
+from . import ir_official
 
 DOC_EXT = (".pdf", ".xlsx", ".xls", ".xlsm", ".csv", ".pptx", ".ppt", ".docx", ".doc")
 RESULT_HINT = re.compile(r"(quarter|earning|result|financial-?(info|data|result|report)|supplement|presentation|press-?release|news|events|reports?)", re.I)
@@ -217,6 +218,8 @@ def download(url, deadline=None):
 
 
 TEXT_COPY_PREFIX = "[Text-only copy via Firecrawl; original file not retrievable] "
+# Seconds between downloads of files from an official list: a whole archive comes from one host.
+OFFICIAL_PAUSE = float(os.environ.get("FU_IR_OFFICIAL_PAUSE", "0.6"))
 
 
 def text_copy(url, deadline=None):
@@ -1178,6 +1181,51 @@ def _enumerate_web(state, site, deadline, stats, sb, page_budget):
         state["web_checked_at"] = max((i.get("completed_at", "") for q in ("maps", "pages") for i in state["queues"][q].values()), default=None)
 
 
+def _correct_listed(sb, official, rows):
+    """Brings stored documents in line with the company's own listing (type, fiscal period, release date). Rows are
+    changed in place too, so later writes of the same row in this run keep the corrected fields."""
+    fixes = ir_official.corrections(official, rows)
+    changed = []
+    for row in rows:
+        diff = fixes.get(row["id"])
+        if diff:
+            row.update(diff)
+            changed.append(row)
+    for i in range(0, len(changed), 200):
+        sb.upsert("ir_documents", changed[i:i + 200], "id")
+    return len(changed)
+
+
+def _queue_official(state, official, rows, extended=False):
+    """Queues every listed file that is not stored yet, with the period, type and date the company states. A file
+    found earlier by crawling keeps its queue entry and takes the listed fields; one that was blocked is tried again
+    once per list version, because the list was checked against the live site."""
+    stored = {ir_official.url_key(r.get("url")) for r in rows}
+    queue = state["queues"]["documents"]
+    by_key = {ir_official.url_key(u): u for u in queue}
+    n = 0
+    for rec in ir_official.storable(official, extended=extended):
+        key = ir_official.url_key(rec["url"])
+        if key in stored:
+            continue
+        fields = ir_official.queue_item(rec)
+        url = by_key.get(key) or _url(rec["url"])
+        if not url:
+            continue
+        item = queue.get(url)
+        if item is None:
+            if _enqueue(state, "documents", url, **{**fields, "url": url}) is not None:
+                n += 1
+            continue
+        retry = item.get("status") == "blocked" and item.get("official") != fields["official"]
+        item.update({k: v for k, v in fields.items() if k not in ("url", "source") and v is not None})
+        if retry:
+            item.update(status="pending", attempts=0)
+            item.pop("error", None)
+            n += 1
+    return n
+
+
 def _coverage(state, rows):
     scope = state["scope"]
     def count(queues, statuses):
@@ -1276,6 +1324,11 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
     stats = {"sec": 0, "web": 0, "web_text_only": 0, "failed": 0, "discovery_failed": 0, "download_failed": 0,
              "extraction_failed": 0, "repaired": 0, "dates_repaired": 0, "deferred": 0}
     existing = sb.select("ir_documents", f"select=*&ticker=eq.{ticker}")
+    official = ir_official.load(ticker)
+    if official and not publish_only:
+        stats["official_corrected"] = _correct_listed(sb, official, existing)
+        if web and not repair_existing:
+            stats["official_queued"] = _queue_official(state, official, existing, extended=os.environ.get("FU_IR_EXTENDED") == "1")
     by_id = {r["id"]: r for r in existing}
     have_hashes = {r["sha256"] for r in existing if r.get("sha256")}
     site = (sb.select("ir_sites", f"select=*&ticker=eq.{ticker}") or [None])[0]
@@ -1386,7 +1439,7 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
     # Completed/known document candidates do not spend the work cap.
     def document_date(pair):
         url, item = pair
-        return item.get("published") or f"{period_hint(url, item.get('title', ''))[1] or 0:04d}-00-00"
+        return item.get("published") or item.get("period_end") or f"{period_hint(url, item.get('title', ''))[1] or 0:04d}-00-00"
     for url, item in sorted(state["queues"]["documents"].items(), key=document_date, reverse=True):
         did = doc_id(url)
         if did in by_id:
@@ -1399,16 +1452,21 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
         try:
             title = item.get("title")
             pdf_hint = item.get("ext_hint") in (".pdf", ".pdf?")
+            # A file from an official list answered when the list was checked, so a refusal is most likely the host
+            # throttling this run: it is retried on later passes, and a text-only copy stands in only on the last attempt.
+            copy_ok = item["source"] == "web" and pdf_hint and (not item.get("official") or item["attempts"] >= MAX_ATTEMPTS - 1)
+            if item.get("official") and OFFICIAL_PAUSE:
+                time.sleep(OFFICIAL_PAUSE)
             try:
                 body = _sec_request(url, deadline=deadline, raw=True) if item["source"] == "sec" else download(url, deadline=deadline)
             except HTTPError as e:
-                alt = text_copy(url, deadline=deadline) if item["source"] == "web" and pdf_hint and e.code in (401, 403, 406, 429, 503) else None
+                alt = text_copy(url, deadline=deadline) if copy_ok and e.code in (401, 403, 406, 429, 503) else None
                 if alt is None:
                     raise
                 body, title = alt, TEXT_COPY_PREFIX + (title or "")
             ext = sniff_ext(body, url) or item.get("ext_hint")
             if ext in (".html", ".htm") and item.get("ext_hint") not in (".html", ".htm") and not (title or "").startswith(TEXT_COPY_PREFIX):
-                alt = text_copy(url, deadline=deadline) if item["source"] == "web" and pdf_hint else None
+                alt = text_copy(url, deadline=deadline) if copy_ok else None
                 if alt is None:
                     raise ValueError("Downloaded HTML instead of the linked document")
                 body, title, ext = alt, TEXT_COPY_PREFIX + (title or ""), ".html"
@@ -1417,7 +1475,8 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
             stored = store_document(sb, ticker, url, body, ext, title, item.get("source_page"), have_hashes,
                                     kind_hint=item.get("kind_hint"), log=log, fye=fye,
                                     ref_date=dt.date.fromisoformat(item["ref_date"]) if item.get("ref_date") else None,
-                                    published=item.get("published"), outcomes=state["outcomes"], deadline=deadline)
+                                    published=item.get("published"), outcomes=state["outcomes"], deadline=deadline,
+                                    period=(item.get("fiscal_label"), item.get("period_end")) if item.get("official") else None)
             if stored:
                 stats[item["source"]] += 1
                 by_id[did] = {"id": did}
@@ -1444,14 +1503,27 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
         coverage["status"] = "partial"
     state["coverage"] = coverage
     _save_checkpoint(sb, state)
-    sb.put_json(f"ir/{ticker}.json", {"ticker": ticker, "generated": now_iso(), "site": site.get("ir_url") if site else None,
-                "results_page": site.get("results_url") if site else None, "documents": rows, "coverage": coverage}, cache="max-age=600")
+    index = {"ticker": ticker, "generated": now_iso(), "site": site.get("ir_url") if site else None,
+             "results_page": site.get("results_url") if site else None, "documents": rows, "coverage": coverage}
+    if official:
+        # What the company lists on its own pages, by fiscal period, and which stored document holds each file.
+        listed = ir_official.coverage(official, rows, extended=os.environ.get("FU_IR_EXTENDED") == "1")
+        # Extended material that was not requested stays a count; its files are in etl/ir_sources/{ticker}.json.
+        index["official"] = {"version": official["version"], "pages": sorted({b["page"] for b in official["built_from"] if b.get("page")}),
+                             **{**listed, "files": [f for f in listed["files"] if f["state"] != "not_collected"]}}
+        stats["official"] = {k: v for k, v in listed.items() if k != "files"}
+    sb.put_json(f"ir/{ticker}.json", index, cache="max-age=600")
     stats.update(total=len(rows), coverage=coverage, status=coverage["status"], deferred=sum(coverage["pending"].values()))
     return stats
 
 
-def store_document(sb, ticker, url, body, ext, title, source_page, have_hashes, kind_hint=None, log=print, fye=None, ref_date=None, published=None, outcomes=None, deadline=None):
-    """Stores the original file and its extracted text, classifies it and writes the ir_documents row."""
+def store_document(sb, ticker, url, body, ext, title, source_page, have_hashes, kind_hint=None, log=print, fye=None, ref_date=None, published=None, outcomes=None, deadline=None,
+                   period=None):
+    """Stores the original file and its extracted text, classifies it and writes the ir_documents row.
+
+    period is (fiscal label, period end) as the company states it on its own results page (etl/ir_official.py). When
+    given, the period and kind_hint are taken as stated: nothing is inferred from the file name, the retrieval date
+    or the first page."""
     did = doc_id(url)
     sha = hashlib.sha256(body).hexdigest()
     if sha in have_hashes:
@@ -1478,7 +1550,9 @@ def store_document(sb, ticker, url, body, ext, title, source_page, have_hashes, 
             npages = len(text["sheets"])
             first = json.dumps(list(text["sheets"].items())[:1], default=str)[:3000]
     period_end = None
-    if ref_date and fye:
+    if period is not None:
+        label, period_end = period
+    elif ref_date and fye:
         from .fundamentals import fye_at
         fye = fye_at(ticker, fye, ref_date.isoformat())
         # an 8-K exhibit belongs to the latest fiscal quarter that ended before the filing, unless its file name
@@ -1498,7 +1572,7 @@ def store_document(sb, ticker, url, body, ext, title, source_page, have_hashes, 
         if not label:
             label, _ = first_page_period(first)
     dtype = kind_hint or classify(url, title)
-    if dtype in ("other", "release") and first:
+    if dtype in ("other", "release") and first and period is None:
         c2 = classify("", first[:500])
         if c2 in ("supplement", "presentation", "remarks", "transcript"):
             dtype = c2

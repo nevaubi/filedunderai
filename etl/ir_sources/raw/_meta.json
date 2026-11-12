@@ -1,0 +1,7 @@
+{
+ "AMZN": {"company": "Amazon.com, Inc.", "fye": "1231"},
+ "C": {"company": "Citigroup Inc.", "fye": "1231"},
+ "JPM": {"company": "JPMorgan Chase & Co.", "fye": "1231"},
+ "PNC": {"company": "The PNC Financial Services Group, Inc.", "fye": "1231"},
+ "WFC": {"company": "Wells Fargo & Company", "fye": "1231"}
+}

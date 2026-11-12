@@ -1,0 +1,854 @@
+{
+  "source": "Amazon Investor Relations — Quarterly results",
+  "source_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx",
+  "coverage": "All quarter cards present on the page: 2020 Q1 through 2026 Q3 (27 quarters).",
+  "coverage_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx",
+  "quarter_count": 27,
+  "file_count": 131,
+  "quarters": [
+    {
+      "year": 2026,
+      "quarter": "Q3",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-Third-Quarter-Results/",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_earnings/2026/q3/earnings-result/AMZN-Q3-2026-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_earnings/2026/q3/Q3-2026-Amazon-Earnings-Conference-Call.mp3",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_earnings/2026/q3/presentation/Webslides_Q326.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://d18rn0p25nwr6d.cloudfront.net/CIK-0001018724/ee4fffc7-7dfe-40b1-917e-12baa11eb95f.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2026,
+      "quarter": "Q2",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-Second-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_earnings/2026/q2/earnings-result/AMZN-Q2-2026-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_earnings/2026/q2/Amazon-Quarterly-Earnings-Report-Q2-2026-Full-Call-v1.mp3",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_earnings/2026/q2/presentation/Webslides_Q226.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://d18rn0p25nwr6d.cloudfront.net/CIK-0001018724/8b65cc1d-13ba-4465-ab3b-7b408e2fcdaf.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2026,
+      "quarter": "Q1",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-First-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_earnings/2026/q1/earnings-result/AMZN-Q1-2026-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_earnings/2026/q1/generic/Amazon-Quarterly-Earnings-Report-Q1-2026-Full-Call.mp3",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_earnings/2026/q1/presentation/Webslides_Q126.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://d18rn0p25nwr6d.cloudfront.net/CIK-0001018724/e5b7de6a-55b0-4300-b981-4e5a8857972d.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2025,
+      "quarter": "Q4",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-Fourth-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_earnings/2025/q4/earnings-result/AMZN-Q4-2025-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2025/q4/Amazon-Quarterly-Earnings-Report-Q4-2025-Full-Call-v1.mp3",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2025/q4/Webslides_Q425.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-K",
+          "url": "https://d18rn0p25nwr6d.cloudfront.net/CIK-0001018724/85f3e1a7-bdb4-428e-a980-90bad4117b3d.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2025,
+      "quarter": "Q3",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2025/Amazon-com-Announces-Third-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2025/q3/AMZN-Q3-2025-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2025/q3/Amazon-Quarterly-Earnings-Report-Q3-2025-Full-Call-v1.mp3",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2025/q3/Webslides_Q325.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://d18rn0p25nwr6d.cloudfront.net/CIK-0001018724/ee1ea675-6da1-44dc-a47c-a054d403c955.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2025,
+      "quarter": "Q2",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2025/Amazon-com-Announces-Second-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2025/q2/AMZN-Q2-2025-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2025/q2/Amazon-Quarterly-Earnings-Report-Q2-2025-Full-Call.mp3",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2025/q2/Webslides_Q225.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2025/q2/ec928e37-9d69-4f96-b0ab-b40020515e03.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2025,
+      "quarter": "Q1",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "https://ir.aboutamazon.com/news-release/news-release-details/2025/Amazon-com-Announces-First-Quarter-Results/default.aspx",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2025/q1/AMZN-Q1-2025-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2025/q1/Amazon-Quarterly-Earnings-Report-Q1-2025-Full-Call.mp3",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2025/q1/Webslides_Q125-FINAL.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2025/q1/60f38b5c-f06a-41ed-8ddd-eb38eb4b8756.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2024,
+      "quarter": "Q4",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2025/Amazon-com-Announces-Fourth-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2024/q4/AMZN-Q4-2024-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://ir.aboutamazon.com/files/doc_financials/2024/q4/Amazon-Quarterly-Earnings-Report-Q4-2024-Full-Call-v1.wav",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2024/q4/Webslides_Q424_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-K",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2024/q4/e42c2068-bad5-4ab6-ae57-36ff8b2aeffd.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2024,
+      "quarter": "Q3",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2024/Amazon-com-Announces-Third-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2024/q3/AMZN-Q3-2024-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2024/q3/Amazon-Quarterly-Earnings-Report-Q3-2024-Full-Call-v2.wav",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2024/q3/Webslides_Q324_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2024/q3/76ba648c-eba4-4ec1-b571-4f5993feed2e.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2024,
+      "quarter": "Q2",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "https://ir.aboutamazon.com/news-release/news-release-details/2024/Amazon-com-Announces-Second-Quarter-Results/default.aspx",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2024/q2/AMZN-Q2-2024-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2024/q2/Amazon-Earnings-Call-Q2-2024-Full-Call-v1.wav",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2024/q2/Webslides_Q224_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2024/q2/AMAZON-10Q-20240208.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2024,
+      "quarter": "Q1",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2024/Amazon-com-Announces-First-Quarter-Results-68b9258cd",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2024/q1/AMZN-Q1-2024-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2024/q1/Amazon-Earnings-Call-Q1-2024-Full-Call-v1.wav",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2024/q1/Webslides_Q124_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2024/q1/04741924-2b6f-4934-91ab-1ccae56f0f9b.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2023,
+      "quarter": "Q4",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2024/Amazon-com-Announces-Fourth-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q4/AMZN-Q4-2023-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q4/Amazon-Earnings-Call-Q4-2023-Full-Call-v1.wav",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q4/Webslides_Q423_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-K",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q4/c7c14359-36fa-40c3-b3ca-5bf7f3fa0b96.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2023,
+      "quarter": "Q3",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2023/Amazon-com-Announces-Third-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q3/AMZN-Q3-2023-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q3/Amazon-_-Quarterly-Earnings-Call-2023-Q3-2.mp3",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q3/Webslides_Q323.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q3/64aef25f-17ea-4c46-985a-814cb89f6182.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2023,
+      "quarter": "Q2",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2023/Amazon.com-Announces-Second-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q2/Q2-2023-Amazon-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q2/Amazon-Quarterly-Earnings-Report-Q2-2023-Full-Call-v1.mp3",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q2/Webslides_Q223_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q2/004e15aa-5d50-4fb3-9e2f-0ad36639778f.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2023,
+      "quarter": "Q1",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2023/Amazon-com-Announces-First-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q1/Q1-2023-Amazon-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q1/Amazon-Quarterly-Earnings-Report-Q1-2023-Full-Call-v1.mp3",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q1/Webslides_Q123_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2023/q1/394e4b27-bf11-4bcf-b650-2ac1b9fe2a14.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2022,
+      "quarter": "Q4",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2023/Amazon-com-Announces-Fourth-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2022/q4/Q4-2022-Amazon-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2022/q4/Amazon-Quarterly-Earnings-Call-Q4-2022-Full-Call-v1.mp3",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2022/q4/Webslides_Q422_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-K",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2022/q4/d2fde7ee-05f7-419d-9ce8-186de4c96e25.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2022,
+      "quarter": "Q3",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2022/Amazon-com-Announces-Third-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2022/q3/Q3-2022-Amazon-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2022/q3/Amazon-Quarterly-Earnings-Call-Q3-2022-Full-Call-v2.wav",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2022/q3/Webslides_Q322_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2022/q3/8ee63b0f-5406-44c6-aaf2-8964e93f4c9f.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2022,
+      "quarter": "Q2",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2022/Amazon.com-Announces-Second-Quarter-Results-fe1df2b70",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2022/q2/Q2-2022-Amazon-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2022/q2/Amazon-Quarterly-Earnings-Report-Q2-2022-Full-Call-v1.mp3",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2022/q2/Webslides_Q222_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_downloads/2022/56f9e4fc-22e2-46e8-9a3d-8112bacd7568.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2022,
+      "quarter": "Q1",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2022/Amazon-com-Announces-First-Quarter-Results-f0188db95",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2022/q1/Q1-2022-Amazon-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2022/q1/Amazon-Quarterly-Earnings-Report-Q1-2022-Full-Call-v1.mp3",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2022/q1/Webslides_Q122_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2022/q1/0fcecec8-0ae1-4c23-904c-a5392f63685e.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2021,
+      "quarter": "Q4",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2022/Amazon.com-Announces-Fourth-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2021/q4/business_and_financial_update.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2021/q4/Amazon-Quarterly-Earnings-Report-Q4-2021-Full-Call-v1.wav",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2021/q4/Webslides_Q421_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-K",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2021/q4/f965e5c3-fded-45d3-bbdb-f750f156dcc9.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2021,
+      "quarter": "Q3",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2021/Amazon.com-Announces-Third-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2021/q3/Q3-2021-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2021/q3/Amazon-Quarterly-Earnings-Report-Q3-2021-Full-Call-v1.wav",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2021/q3/Webslides_Q321_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2021/q3/06c52e44-38c4-42b0-90c4-14916435e83e.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2021,
+      "quarter": "Q2",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "http://ir.aboutamazon.com/news-release/news-release-details/2021/Amazon.com-Announces-Second-Quarter-Results-2dcdc6a32",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2021/q2/AMZN-Q2-2021-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://event.webcasts.com/starthere.jsp?ei=1480787&tp_key=084386734c",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2021/q2/Webslides_Q221_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2021/q2/cbae1abf-eddb-4451-9186-6753b02cc4eb.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2021,
+      "quarter": "Q1",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "https://ir.aboutamazon.com/news-release/news-release-details/2021/Amazon.com-Announces-First-Quarter-Results/default.aspx",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2021/q1/Amazon-Q1-2021-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Webcast",
+          "url": "https://ir.aboutamazon.com/files/doc_financials/2021/q1/Amazon-Quarterly-Earnings-Report-Q1-2021-Full-Call.wav",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2021/q1/Webslides_Q121_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2021/q1/553e7af3-f707-4ef3-9f94-222888725a97.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2020,
+      "quarter": "Q4",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "https://ir.aboutamazon.com/news-release/news-release-details/2021/Amazon.com-Announces-Fourth-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2020/q4/Amazon-Q4-2020-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2020/q4/Webslides_Q420_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-K",
+          "url": "https://ir.aboutamazon.com/sec-filings/sec-filings-details/default.aspx?FilingId=14665784",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2020,
+      "quarter": "Q3",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "https://ir.aboutamazon.com/news-release/news-release-details/2020/Amazon.com-Announces-Third-Quarter-Results/default.aspx",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2020/q3/AMZN-Q3-2020-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2020/q3/Webslides_Q320_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://ir.aboutamazon.com/sec-filings/sec-filings-details/default.aspx?FilingId=14468970",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2020,
+      "quarter": "Q2",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "https://ir.aboutamazon.com/news-release/news-release-details/2020/Amazon.com-Announces-Second-Quarter-Results",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2020/q2/Q2-2020-Amazon-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2020/q2/Webslides_Q220_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://ir.aboutamazon.com/sec-filings/sec-filings-details/default.aspx?FilingId=14299009",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    },
+    {
+      "year": 2020,
+      "quarter": "Q1",
+      "files": [
+        {
+          "name": "Earnings Release",
+          "url": "https://ir.aboutamazon.com/news-release/news-release-details/2020/Amazoncom-Announces-First-Quarter",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Earnings Release (PDF)",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2020/Q1/AMZN-Q1-2020-Earnings-Release.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "Presentation",
+          "url": "https://s2.q4cdn.com/299287126/files/doc_financials/2020/Q1/Webslides_Q120_4.28.20_Final.pdf",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        },
+        {
+          "name": "10-Q",
+          "url": "https://ir.aboutamazon.com/sec-filings/sec-filings-details/default.aspx?FilingId=14112620",
+          "url_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+        }
+      ],
+      "quarter_citation": "https://ir.aboutamazon.com/quarterly-results/default.aspx"
+    }
+  ]
+}

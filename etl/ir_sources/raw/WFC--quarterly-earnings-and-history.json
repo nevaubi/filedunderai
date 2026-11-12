@@ -1,0 +1,2793 @@
+{
+  "company": "Wells Fargo & Company",
+  "investor_relations_section": "Quarterly earnings",
+  "source_page": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+  "source_page_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+  "coverage": {
+    "quarters_found": 23,
+    "quarters_found_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+    "files_found": 69,
+    "files_found_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+    "years": [
+      "2026",
+      "2025",
+      "2024",
+      "2023",
+      "2022",
+      "2021"
+    ],
+    "file_types_found": [
+      "PDF"
+    ],
+    "file_types_found_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+    "note": "The quarterly-earnings page exposes three PDF downloads per listed quarter: news release, presentation, and quarterly supplement. No PPTX, DOC/DOCX, XLS/XLSX, CSV, image, audio, or other non-PDF quarter files were linked on that page."
+  },
+  "quarters": [
+    {
+      "quarter": "Q3 2026",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q3 2026 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2026-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2026-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q3-2026-news-release.md"
+        },
+        {
+          "name": "Q3 2026 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2026-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2026-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q3-2026-presentation.md"
+        },
+        {
+          "name": "Q3 2026 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2026-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2026-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q3-2026-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q2 2026",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q2 2026 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2026-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2026-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q2-2026-news-release.md"
+        },
+        {
+          "name": "Q2 2026 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2026-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2026-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q2-2026-presentation.md"
+        },
+        {
+          "name": "Q2 2026 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2026-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2026-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q2-2026-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q1 2026",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q1 2026 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2026-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2026-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q1-2026-news-release.md"
+        },
+        {
+          "name": "Q1 2026 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2026-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2026-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q1-2026-presentation.md"
+        },
+        {
+          "name": "Q1 2026 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2026-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2026-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q1-2026-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q4 2025",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q4 2025 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2025-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2025-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q4-2025-news-release.md"
+        },
+        {
+          "name": "Q4 2025 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2025-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2025-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q4-2025-presentation.md"
+        },
+        {
+          "name": "Q4 2025 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2025-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2025-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q4-2025-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q3 2025",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q3 2025 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2025-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2025-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q3-2025-news-release.md"
+        },
+        {
+          "name": "Q3 2025 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2025-presentation.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2025-presentation.pdf",
+          "downloaded_representation": "/workspace/files/q3-2025-presentation.md"
+        },
+        {
+          "name": "Q3 2025 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2025-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2025-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q3-2025-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q2 2025",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q2 2025 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2025-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2025-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q2-2025-news-release.md"
+        },
+        {
+          "name": "Q2 2025 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2025-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2025-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q2-2025-presentation.md"
+        },
+        {
+          "name": "Q2 2025 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2025-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2025-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q2-2025-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q1 2025",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q1 2025 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2025-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2025-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q1-2025-news-release.md"
+        },
+        {
+          "name": "Q1 2025 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2025-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2025-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q1-2025-presentation.md"
+        },
+        {
+          "name": "Q1 2025 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2025-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2025-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q1-2025-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q4 2024",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q4 2024 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2024-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2024-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q4-2024-news-release.md"
+        },
+        {
+          "name": "Q4 2024 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2024-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2024-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q4-2024-presentation.md"
+        },
+        {
+          "name": "Q4 2024 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2024-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2024-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q4-2024-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q3 2024",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q3 2024 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2024-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2024-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q3-2024-news-release.md"
+        },
+        {
+          "name": "Q3 2024 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2024-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2024-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q3-2024-presentation.md"
+        },
+        {
+          "name": "Q3 2024 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2024-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2024-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q3-2024-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q2 2024",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q2 2024 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2024-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2024-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q2-2024-news-release.md"
+        },
+        {
+          "name": "Q2 2024 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2024-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2024-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q2-2024-presentation.md"
+        },
+        {
+          "name": "Q2 2024 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2024-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2024-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q2-2024-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q1 2024",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q1 2024 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2024-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2024-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q1-2024-news-release.md"
+        },
+        {
+          "name": "Q1 2024 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2024-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2024-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q1-2024-presentation.md"
+        },
+        {
+          "name": "Q1 2024 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2024-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2024-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q1-2024-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q4 2023",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q4 2023 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2023-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2023-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q4-2023-news-release.md"
+        },
+        {
+          "name": "Q4 2023 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2023-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2023-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q4-2023-presentation.md"
+        },
+        {
+          "name": "Q4 2023 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2023-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2023-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q4-2023-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q3 2023",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q3 2023 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2023-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2023-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q3-2023-news-release.md"
+        },
+        {
+          "name": "Q3 2023 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2023-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2023-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q3-2023-presentation.md"
+        },
+        {
+          "name": "Q3 2023 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2023-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2023-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q3-2023-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q2 2023",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q2 2023 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2023-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2023-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q2-2023-news-release.md"
+        },
+        {
+          "name": "Q2 2023 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2023-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2023-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q2-2023-presentation.md"
+        },
+        {
+          "name": "Q2 2023 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2023-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2023-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q2-2023-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q1 2023",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q1 2023 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2023-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2023-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q1-2023-news-release.md"
+        },
+        {
+          "name": "Q1 2023 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2023-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2023-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q1-2023-presentation.md"
+        },
+        {
+          "name": "Q1 2023 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2023-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2023-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q1-2023-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q4 2022",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q4 2022 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2022-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2022-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q4-2022-news-release.md"
+        },
+        {
+          "name": "Q4 2022 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2022-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2022-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q4-2022-presentation.md"
+        },
+        {
+          "name": "Q4 2022 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2022-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2022-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q4-2022-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q3 2022",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q3 2022 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2022-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2022-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q3-2022-news-release.md"
+        },
+        {
+          "name": "Q3 2022 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2022-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2022-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q3-2022-presentation.md"
+        },
+        {
+          "name": "Q3 2022 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2022-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2022-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q3-2022-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q2 2022",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q2 2022 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2022-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2022-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q2-2022-news-release.md"
+        },
+        {
+          "name": "Q2 2022 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2022-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2022-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q2-2022-presentation.md"
+        },
+        {
+          "name": "Q2 2022 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2022-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2022-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q2-2022-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q1 2022",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q1 2022 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2022-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2022-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q1-2022-news-release.md"
+        },
+        {
+          "name": "Q1 2022 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2022-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2022-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q1-2022-presentation.md"
+        },
+        {
+          "name": "Q1 2022 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2022-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2022-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q1-2022-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q4 2021",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q4 2021 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2021-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2021-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q4-2021-news-release.md"
+        },
+        {
+          "name": "Q4 2021 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2021-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2021-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q4-2021-presentation.md"
+        },
+        {
+          "name": "Q4 2021 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2021-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/fourth-quarter-2021-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q4-2021-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q3 2021",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q3 2021 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2021-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2021-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q3-2021-news-release.md"
+        },
+        {
+          "name": "Q3 2021 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2021-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2021-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q3-2021-presentation.md"
+        },
+        {
+          "name": "Q3 2021 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2021-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/third-quarter-2021-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q3-2021-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q2 2021",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q2 2021 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2021-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2021-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q2-2021-news-release.md"
+        },
+        {
+          "name": "Q2 2021 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2021-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2021-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q2-2021-presentation.md"
+        },
+        {
+          "name": "Q2 2021 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2021-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/second-quarter-2021-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q2-2021-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    },
+    {
+      "quarter": "Q1 2021",
+      "quarter_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/",
+      "files": [
+        {
+          "name": "Q1 2021 news release",
+          "file_type": "PDF",
+          "category": "news release",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2021-earnings.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2021-earnings.pdf",
+          "downloaded_representation": "/workspace/files/q1-2021-news-release.md"
+        },
+        {
+          "name": "Q1 2021 presentation",
+          "file_type": "PDF",
+          "category": "presentation",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2021-financial-results.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2021-financial-results.pdf",
+          "downloaded_representation": "/workspace/files/q1-2021-presentation.md"
+        },
+        {
+          "name": "Q1 2021 quarterly supplement",
+          "file_type": "PDF",
+          "category": "quarterly supplement",
+          "url": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2021-earnings-supplement.pdf",
+          "url_citation": "https://www.wellsfargo.com/assets/pdf/about/investor-relations/earnings/first-quarter-2021-earnings-supplement.pdf",
+          "downloaded_representation": "/workspace/files/q1-2021-quarterly-supplement.md"
+        }
+      ],
+      "file_count": 3,
+      "file_count_citation": "https://www.wellsfargo.com/about/investor-relations/quarterly-earnings/"
+    }
+  ],
+  "historical_quarterly_archive_note": "The Wells Fargo current quarterly-earnings page has no years before 2021. The historical set below uses official SEC quarterly/annual filing documents for 2000–2020 and official Wells Fargo newsroom earnings-release pages found for Q4 2019 and Q1–Q3 2020. SEC submissions data was fetched from the official SEC company-submissions endpoint.",
+  "historical_quarters_2000_2020": [
+    {
+      "quarter": "Q1 2000",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2000 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000091205700024764/",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000091205700024764/",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000091205700024764/",
+          "filing_date": "2000-05-15",
+          "accession_number": "0000912057-00-024764"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q2 2000",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2000 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000091205700036695/a10-q.txt",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000091205700036695/a10-q.txt",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000091205700036695/",
+          "filing_date": "2000-08-11",
+          "accession_number": "0000912057-00-036695"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q3 2000",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2000 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000091205700049918/a2029568z10-q.txt",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000091205700049918/a2029568z10-q.txt",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000091205700049918/",
+          "filing_date": "2000-11-14",
+          "accession_number": "0000912057-00-049918"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q4 2000",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2000 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000091205701504042/a2040410z10-k.txt",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000091205701504042/a2040410z10-k.txt",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000091205701504042/",
+          "filing_date": "2001-03-16",
+          "accession_number": "0000912057-01-504042"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q1 2001",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2001 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000091205701515897/a2047927z10-q.txt",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000091205701515897/a2047927z10-q.txt",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000091205701515897/",
+          "filing_date": "2001-05-15",
+          "accession_number": "0000912057-01-515897"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q2 2001",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2001 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000091205701526885/a2055559z10-q.txt",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000091205701526885/a2055559z10-q.txt",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000091205701526885/",
+          "filing_date": "2001-08-07",
+          "accession_number": "0000912057-01-526885"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q3 2001",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2001 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000091205701538509/a2062316z10-q.txt",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000091205701538509/a2062316z10-q.txt",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000091205701538509/",
+          "filing_date": "2001-11-09",
+          "accession_number": "0000912057-01-538509"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q4 2001",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2001 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000091205702010174/a2072635z10-k.txt",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000091205702010174/a2072635z10-k.txt",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000091205702010174/",
+          "filing_date": "2002-03-15",
+          "accession_number": "0000912057-02-010174"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q1 2002",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2002 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000091205702019610/a2079268z10-q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000091205702019610/a2079268z10-q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000091205702019610/",
+          "filing_date": "2002-05-10",
+          "accession_number": "0000912057-02-019610"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q2 2002",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2002 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000091205702031173/a2086081z10-q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000091205702031173/a2086081z10-q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000091205702031173/",
+          "filing_date": "2002-08-12",
+          "accession_number": "0000912057-02-031173"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q3 2002",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2002 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000091205702041325/a2092607z10-q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000091205702041325/a2092607z10-q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000091205702041325/",
+          "filing_date": "2002-11-07",
+          "accession_number": "0000912057-02-041325"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q4 2002",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2002 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000104746903008749/a2104743z10-k.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000104746903008749/a2104743z10-k.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000104746903008749/",
+          "filing_date": "2003-03-14",
+          "accession_number": "0001047469-03-008749"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q1 2003",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2003 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000104746903017544/a2110247z10-q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000104746903017544/a2110247z10-q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000104746903017544/",
+          "filing_date": "2003-05-08",
+          "accession_number": "0001047469-03-017544"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q2 2003",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2003 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095014903001850/f91828e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095014903001850/f91828e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095014903001850/",
+          "filing_date": "2003-08-08",
+          "accession_number": "0000950149-03-001850"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q3 2003",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2003 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095014903002581/f94144e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095014903002581/f94144e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095014903002581/",
+          "filing_date": "2003-11-07",
+          "accession_number": "0000950149-03-002581"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q4 2003",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2003 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095013404003387/f97006e10vk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095013404003387/f97006e10vk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095013404003387/",
+          "filing_date": "2004-03-12",
+          "accession_number": "0000950134-04-003387"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q1 2004",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2004 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095014904000946/f98601e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095014904000946/f98601e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095014904000946/",
+          "filing_date": "2004-05-07",
+          "accession_number": "0000950149-04-000946"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q2 2004",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2004 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095013404011515/f00790e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095013404011515/f00790e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095013404011515/",
+          "filing_date": "2004-08-06",
+          "accession_number": "0000950134-04-011515"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q3 2004",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2004 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095013404016380/f02618e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095013404016380/f02618e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095013404016380/",
+          "filing_date": "2004-11-04",
+          "accession_number": "0000950134-04-016380"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q4 2004",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2004 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095013405004623/f06409e10vk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095013405004623/f06409e10vk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095013405004623/",
+          "filing_date": "2005-03-10",
+          "accession_number": "0000950134-05-004623"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q1 2005",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2005 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095014905000279/f08578e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095014905000279/f08578e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095014905000279/",
+          "filing_date": "2005-05-05",
+          "accession_number": "0000950149-05-000279"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q2 2005",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2005 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095014905000531/f11248e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095014905000531/f11248e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095014905000531/",
+          "filing_date": "2005-08-04",
+          "accession_number": "0000950149-05-000531"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q3 2005",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2005 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095014905000645/f13987e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095014905000645/f13987e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095014905000645/",
+          "filing_date": "2005-11-03",
+          "accession_number": "0000950149-05-000645"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q4 2005",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2005 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095014906000083/f17867e10vk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095014906000083/f17867e10vk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095014906000083/",
+          "filing_date": "2006-03-09",
+          "accession_number": "0000950149-06-000083"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q1 2006",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2006 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095014906000221/f20091e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095014906000221/f20091e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095014906000221/",
+          "filing_date": "2006-05-04",
+          "accession_number": "0000950149-06-000221"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q2 2006",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2006 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095014906000426/f22531e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095014906000426/f22531e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095014906000426/",
+          "filing_date": "2006-08-03",
+          "accession_number": "0000950149-06-000426"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q3 2006",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2006 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095014906000510/f24614e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095014906000510/f24614e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095014906000510/",
+          "filing_date": "2006-11-02",
+          "accession_number": "0000950149-06-000510"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q4 2006",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2006 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095013407004518/f27602e10vk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095013407004518/f27602e10vk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095013407004518/",
+          "filing_date": "2007-03-01",
+          "accession_number": "0000950134-07-004518"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q1 2007",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2007 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095013407010415/f29849e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095013407010415/f29849e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095013407010415/",
+          "filing_date": "2007-05-07",
+          "accession_number": "0000950134-07-010415"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q2 2007",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2007 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095013407016974/f32463e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095013407016974/f32463e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095013407016974/",
+          "filing_date": "2007-08-06",
+          "accession_number": "0000950134-07-016974"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q3 2007",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2007 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095013407022973/f35144e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095013407022973/f35144e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095013407022973/",
+          "filing_date": "2007-11-06",
+          "accession_number": "0000950134-07-022973"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q4 2007",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2007 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095013408003822/f38267e10vk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095013408003822/f38267e10vk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095013408003822/",
+          "filing_date": "2008-02-29",
+          "accession_number": "0000950134-08-003822"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q1 2008",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2008 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095013408009056/f40533e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095013408009056/f40533e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095013408009056/",
+          "filing_date": "2008-05-09",
+          "accession_number": "0000950134-08-009056"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q2 2008",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2008 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095013408014705/f42774e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095013408014705/f42774e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095013408014705/",
+          "filing_date": "2008-08-08",
+          "accession_number": "0000950134-08-014705"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q3 2008",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2008 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095013408018788/f50227e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095013408018788/f50227e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095013408018788/",
+          "filing_date": "2008-10-30",
+          "accession_number": "0000950134-08-018788"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q4 2008",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2008 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095013409003967/f51597e10vk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095013409003967/f51597e10vk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095013409003967/",
+          "filing_date": "2009-02-27",
+          "accession_number": "0000950134-09-003967"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q1 2009",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2009 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095013409010238/f52324e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095013409010238/f52324e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095013409010238/",
+          "filing_date": "2009-05-11",
+          "accession_number": "0000950134-09-010238"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q2 2009",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2009 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095012309032191/f53200e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095012309032191/f53200e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095012309032191/",
+          "filing_date": "2009-08-07",
+          "accession_number": "0000950123-09-032191"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q3 2009",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2009 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095012309059235/f53317e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095012309059235/f53317e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095012309059235/",
+          "filing_date": "2009-11-06",
+          "accession_number": "0000950123-09-059235"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q4 2009",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2009 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095012310017877/f54129e10vk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095012310017877/f54129e10vk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095012310017877/",
+          "filing_date": "2010-02-26",
+          "accession_number": "0000950123-10-017877"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q1 2010",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2010 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095012310046578/f55268e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095012310046578/f55268e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095012310046578/",
+          "filing_date": "2010-05-07",
+          "accession_number": "0000950123-10-046578"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q2 2010",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2010 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095012310074486/f56107e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095012310074486/f56107e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095012310074486/",
+          "filing_date": "2010-08-09",
+          "accession_number": "0000950123-10-074486"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q3 2010",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2010 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095012310101484/f56682e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095012310101484/f56682e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095012310101484/",
+          "filing_date": "2010-11-05",
+          "accession_number": "0000950123-10-101484"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q4 2010",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2010 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095012311018541/f56816e10vk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095012311018541/f56816e10vk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095012311018541/",
+          "filing_date": "2011-02-25",
+          "accession_number": "0000950123-11-018541"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q1 2011",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2011 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095012311046097/f58691e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095012311046097/f58691e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095012311046097/",
+          "filing_date": "2011-05-06",
+          "accession_number": "0000950123-11-046097"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q2 2011",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2011 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000095012311073266/f59207e10vq.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000095012311073266/f59207e10vq.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000095012311073266/",
+          "filing_date": "2011-08-05",
+          "accession_number": "0000950123-11-073266"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q3 2011",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2011 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000119312511301024/d239752d10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000119312511301024/d239752d10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000119312511301024/",
+          "filing_date": "2011-11-08",
+          "accession_number": "0001193125-11-301024"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q4 2011",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2011 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000119312512084528/d280360d10k.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000119312512084528/d280360d10k.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000119312512084528/",
+          "filing_date": "2012-02-28",
+          "accession_number": "0001193125-12-084528"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q1 2012",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2012 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000119312512216744/d331610d10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000119312512216744/d331610d10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000119312512216744/",
+          "filing_date": "2012-05-08",
+          "accession_number": "0001193125-12-216744"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q2 2012",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2012 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000119312512339392/d389180d10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000119312512339392/d389180d10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000119312512339392/",
+          "filing_date": "2012-08-07",
+          "accession_number": "0001193125-12-339392"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q3 2012",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2012 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000119312512453916/d404366d10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000119312512453916/d404366d10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000119312512453916/",
+          "filing_date": "2012-11-06",
+          "accession_number": "0001193125-12-453916"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q4 2012",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2012 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000119312513078820/d450230d10k.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000119312513078820/d450230d10k.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000119312513078820/",
+          "filing_date": "2013-02-27",
+          "accession_number": "0001193125-13-078820"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q1 2013",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2013 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000119312513206363/d529054d10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000119312513206363/d529054d10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000119312513206363/",
+          "filing_date": "2013-05-08",
+          "accession_number": "0001193125-13-206363"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q2 2013",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2013 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000119312513323232/d577023d10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000119312513323232/d577023d10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000119312513323232/",
+          "filing_date": "2013-08-07",
+          "accession_number": "0001193125-13-323232"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q3 2013",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2013 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297113000576/wfc10q_20130930.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297113000576/wfc10q_20130930.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297113000576/",
+          "filing_date": "2013-11-06",
+          "accession_number": "0000072971-13-000576"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q4 2013",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2013 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297114000337/wfc10k_20131231.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297114000337/wfc10k_20131231.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297114000337/",
+          "filing_date": "2014-02-26",
+          "accession_number": "0000072971-14-000337"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q1 2014",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2014 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297114000424/wfc10q_20140331.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297114000424/wfc10q_20140331.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297114000424/",
+          "filing_date": "2014-05-07",
+          "accession_number": "0000072971-14-000424"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q2 2014",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2014 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297114000518/wfc10q_20140630.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297114000518/wfc10q_20140630.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297114000518/",
+          "filing_date": "2014-08-06",
+          "accession_number": "0000072971-14-000518"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q3 2014",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2014 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297114000597/wfc10q_20140930.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297114000597/wfc10q_20140930.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297114000597/",
+          "filing_date": "2014-11-05",
+          "accession_number": "0000072971-14-000597"
+        }
+      ],
+      "file_count": 1
+    },
+    {
+      "quarter": "Q4 2014",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2014 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000449/wfc-12312014x10k.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000449/wfc-12312014x10k.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000449/",
+          "filing_date": "2015-02-25",
+          "accession_number": "0000072971-15-000449"
+        },
+        {
+          "name": "Q4 2014 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000024/wfc4qer1-14x2015form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000024/wfc4qer1-14x2015form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000024/",
+          "filing_date": "2015-01-14",
+          "accession_number": "0000072971-15-000024"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q1 2015",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2015 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000497/wfc-03312015x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000497/wfc-03312015x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000497/",
+          "filing_date": "2015-05-06",
+          "accession_number": "0000072971-15-000497"
+        },
+        {
+          "name": "Q1 2015 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000488/wfc1qer4-14x2015form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000488/wfc1qer4-14x2015form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000488/",
+          "filing_date": "2015-04-14",
+          "accession_number": "0000072971-15-000488"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q2 2015",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2015 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000607/wfc-06302015x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000607/wfc-06302015x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000607/",
+          "filing_date": "2015-08-05",
+          "accession_number": "0000072971-15-000607"
+        },
+        {
+          "name": "Q2 2015 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000596/wfc2qer7-14x2015form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000596/wfc2qer7-14x2015form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000596/",
+          "filing_date": "2015-07-14",
+          "accession_number": "0000072971-15-000596"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q3 2015",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2015 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000674/wfc-09302015x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000674/wfc-09302015x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000674/",
+          "filing_date": "2015-11-04",
+          "accession_number": "0000072971-15-000674"
+        },
+        {
+          "name": "Q3 2015 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000648/wfc3qer10-14x2015form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000648/wfc3qer10-14x2015form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000648/",
+          "filing_date": "2015-10-14",
+          "accession_number": "0000072971-15-000648"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q4 2015",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2015 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001045/wfc-12312015x10k.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001045/wfc-12312015x10k.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001045/",
+          "filing_date": "2016-02-24",
+          "accession_number": "0000072971-16-001045"
+        },
+        {
+          "name": "Q4 2015 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116000779/wfc4qer1-15x2016form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297116000779/wfc4qer1-15x2016form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116000779/",
+          "filing_date": "2016-01-15",
+          "accession_number": "0000072971-16-000779"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q1 2016",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2016 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001085/wfc-3312016x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001085/wfc-3312016x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001085/",
+          "filing_date": "2016-05-04",
+          "accession_number": "0000072971-16-001085"
+        },
+        {
+          "name": "Q1 2016 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001077/wfc1qer4-14x2016form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001077/wfc1qer4-14x2016form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001077/",
+          "filing_date": "2016-04-14",
+          "accession_number": "0000072971-16-001077"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q2 2016",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2016 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001218/wfc-6302016x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001218/wfc-6302016x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001218/",
+          "filing_date": "2016-08-03",
+          "accession_number": "0000072971-16-001218"
+        },
+        {
+          "name": "Q2 2016 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001196/wfc2qer7-15x2016form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001196/wfc2qer7-15x2016form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001196/",
+          "filing_date": "2016-07-15",
+          "accession_number": "0000072971-16-001196"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q3 2016",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2016 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001340/wfc-9302016x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001340/wfc-9302016x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001340/",
+          "filing_date": "2016-11-03",
+          "accession_number": "0000072971-16-001340"
+        },
+        {
+          "name": "Q3 2016 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001300/wfc3qer10-14x2016form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001300/wfc3qer10-14x2016form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001300/",
+          "filing_date": "2016-10-14",
+          "accession_number": "0000072971-16-001300"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q4 2016",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2016 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000278/wfc-12312016x10k.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000278/wfc-12312016x10k.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000278/",
+          "filing_date": "2017-03-01",
+          "accession_number": "0000072971-17-000278"
+        },
+        {
+          "name": "Q4 2016 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000066/wfc4qer1-13x2017form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000066/wfc4qer1-13x2017form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000066/",
+          "filing_date": "2017-01-13",
+          "accession_number": "0000072971-17-000066"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q1 2017",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2017 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000339/wfc-03312017x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000339/wfc-03312017x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000339/",
+          "filing_date": "2017-05-05",
+          "accession_number": "0000072971-17-000339"
+        },
+        {
+          "name": "Q1 2017 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000308/wfc1qer4-13x2017form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000308/wfc1qer4-13x2017form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000308/",
+          "filing_date": "2017-04-13",
+          "accession_number": "0000072971-17-000308"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q2 2017",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2017 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000397/wfc-06302017x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000397/wfc-06302017x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000397/",
+          "filing_date": "2017-08-04",
+          "accession_number": "0000072971-17-000397"
+        },
+        {
+          "name": "Q2 2017 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000377/wfc2qer7-14x2017form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000377/wfc2qer7-14x2017form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000377/",
+          "filing_date": "2017-07-14",
+          "accession_number": "0000072971-17-000377"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q3 2017",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2017 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000466/wfc-09302017x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000466/wfc-09302017x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000466/",
+          "filing_date": "2017-11-03",
+          "accession_number": "0000072971-17-000466"
+        },
+        {
+          "name": "Q3 2017 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000443/wfc3qer10-13x2017form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000443/wfc3qer10-13x2017form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000443/",
+          "filing_date": "2017-10-13",
+          "accession_number": "0000072971-17-000443"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q4 2017",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2017 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000272/wfc-12312017x10k.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000272/wfc-12312017x10k.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000272/",
+          "filing_date": "2018-03-01",
+          "accession_number": "0000072971-18-000272"
+        },
+        {
+          "name": "Q4 2017 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000006/wfc4qer1-12x2018form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000006/wfc4qer1-12x2018form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000006/",
+          "filing_date": "2018-01-12",
+          "accession_number": "0000072971-18-000006"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q1 2018",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2018 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000324/wfc-03312018x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000324/wfc-03312018x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000324/",
+          "filing_date": "2018-05-04",
+          "accession_number": "0000072971-18-000324"
+        },
+        {
+          "name": "Q1 2018 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000299/wfc1qer4-13x2018form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000299/wfc1qer4-13x2018form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000299/",
+          "filing_date": "2018-04-13",
+          "accession_number": "0000072971-18-000299"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q2 2018",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2018 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000408/wfc-06302018x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000408/wfc-06302018x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000408/",
+          "filing_date": "2018-08-03",
+          "accession_number": "0000072971-18-000408"
+        },
+        {
+          "name": "Q2 2018 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000365/wfc2qer7-13x2018form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000365/wfc2qer7-13x2018form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000365/",
+          "filing_date": "2018-07-13",
+          "accession_number": "0000072971-18-000365"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q3 2018",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2018 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000471/wfc-09302018x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000471/wfc-09302018x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000471/",
+          "filing_date": "2018-11-06",
+          "accession_number": "0000072971-18-000471"
+        },
+        {
+          "name": "Q3 2018 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000434/wfc3qer10-12x2018form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000434/wfc3qer10-12x2018form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000434/",
+          "filing_date": "2018-10-12",
+          "accession_number": "0000072971-18-000434"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q4 2018",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2018 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000227/wfc-12312018x10k.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000227/wfc-12312018x10k.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000227/",
+          "filing_date": "2019-02-27",
+          "accession_number": "0000072971-19-000227"
+        },
+        {
+          "name": "Q4 2018 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000013/wfc4qer1-15x2019form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000013/wfc4qer1-15x2019form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000013/",
+          "filing_date": "2019-01-15",
+          "accession_number": "0000072971-19-000013"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q1 2019",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2019 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000254/wfc-03312019x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000254/wfc-03312019x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000254/",
+          "filing_date": "2019-05-03",
+          "accession_number": "0000072971-19-000254"
+        },
+        {
+          "name": "Q1 2019 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000243/wfc1qer4-12x2019form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000243/wfc1qer4-12x2019form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000243/",
+          "filing_date": "2019-04-12",
+          "accession_number": "0000072971-19-000243"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q2 2019",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2019 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000331/wfc-06302019x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000331/wfc-06302019x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000331/",
+          "filing_date": "2019-08-02",
+          "accession_number": "0000072971-19-000331"
+        },
+        {
+          "name": "Q2 2019 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000311/wfc2qer7-16x2019form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000311/wfc2qer7-16x2019form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000311/",
+          "filing_date": "2019-07-16",
+          "accession_number": "0000072971-19-000311"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q3 2019",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2019 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000406/wfc-09302019x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000406/wfc-09302019x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000406/",
+          "filing_date": "2019-11-01",
+          "accession_number": "0000072971-19-000406"
+        },
+        {
+          "name": "Q3 2019 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000383/wfc3qer10-15x19form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000383/wfc3qer10-15x19form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000383/",
+          "filing_date": "2019-10-15",
+          "accession_number": "0000072971-19-000383"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q4 2019",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2019 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000217/wfc-12312019x10k.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000217/wfc-12312019x10k.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000217/",
+          "filing_date": "2020-02-27",
+          "accession_number": "0000072971-20-000217"
+        },
+        {
+          "name": "Q4 2019 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000011/wfc4qer01-14x20form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000011/wfc4qer01-14x20form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000011/",
+          "filing_date": "2020-01-14",
+          "accession_number": "0000072971-20-000011"
+        },
+        {
+          "name": "Q4 2019 Wells Fargo newsroom earnings release",
+          "file_type": "HTML",
+          "category": "news release page",
+          "url": "https://newsroom.wf.com/news-releases/news-details/2020/Wells-Fargo-Reports-Fourth-Quarter-2019-Financial-Results/default.aspx",
+          "url_citation": "https://newsroom.wf.com/news-releases/news-details/2020/Wells-Fargo-Reports-Fourth-Quarter-2019-Financial-Results/default.aspx"
+        }
+      ],
+      "file_count": 3
+    },
+    {
+      "quarter": "Q1 2020",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q1 2020 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000236/wfc-0331x2020x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000236/wfc-0331x2020x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000236/",
+          "filing_date": "2020-05-05",
+          "accession_number": "0000072971-20-000236"
+        },
+        {
+          "name": "Q1 2020 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000230/wfc1qer04-14x20form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000230/wfc1qer04-14x20form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000230/",
+          "filing_date": "2020-04-14",
+          "accession_number": "0000072971-20-000230"
+        },
+        {
+          "name": "Q1 2020 Wells Fargo newsroom earnings release",
+          "file_type": "HTML",
+          "category": "news release page",
+          "url": "https://newsroom.wf.com/news-releases/news-details/2020/Wells-Fargo-Reports-First-Quarter-2020-Financial-Results/default.aspx",
+          "url_citation": "https://newsroom.wf.com/news-releases/news-details/2020/Wells-Fargo-Reports-First-Quarter-2020-Financial-Results/default.aspx"
+        }
+      ],
+      "file_count": 3
+    },
+    {
+      "quarter": "Q2 2020",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q2 2020 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000288/wfc-0630x2020x10q.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000288/wfc-0630x2020x10q.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000288/",
+          "filing_date": "2020-08-04",
+          "accession_number": "0000072971-20-000288"
+        },
+        {
+          "name": "Q2 2020 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000280/wfc2qer07-14x20form8xk.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000280/wfc2qer07-14x20form8xk.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000280/",
+          "filing_date": "2020-07-14",
+          "accession_number": "0000072971-20-000280"
+        },
+        {
+          "name": "Q2 2020 Wells Fargo newsroom earnings release",
+          "file_type": "HTML",
+          "category": "news release page",
+          "url": "https://newsroom.wf.com/news-releases/news-details/2020/Wells-Fargo-Reports-Second-Quarter-2020-Financial-Results/default.aspx",
+          "url_citation": "https://newsroom.wf.com/news-releases/news-details/2020/Wells-Fargo-Reports-Second-Quarter-2020-Financial-Results/default.aspx"
+        }
+      ],
+      "file_count": 3
+    },
+    {
+      "quarter": "Q3 2020",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q3 2020 sec quarterly report",
+          "file_type": "HTML",
+          "category": "SEC 10-Q",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000338/wfc-20200930.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000338/wfc-20200930.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000338/",
+          "filing_date": "2020-11-02",
+          "accession_number": "0000072971-20-000338"
+        },
+        {
+          "name": "Q3 2020 Wells Fargo newsroom earnings release",
+          "file_type": "HTML",
+          "category": "news release page",
+          "url": "https://newsroom.wf.com/news-releases/news-details/2020/Wells-Fargo-Reports-Third-Quarter-2020-Financial-Results/default.aspx",
+          "url_citation": "https://newsroom.wf.com/news-releases/news-details/2020/Wells-Fargo-Reports-Third-Quarter-2020-Financial-Results/default.aspx"
+        }
+      ],
+      "file_count": 2
+    },
+    {
+      "quarter": "Q4 2020",
+      "quarter_citation": "https://data.sec.gov/submissions/CIK0000072971.json",
+      "files": [
+        {
+          "name": "Q4 2020 sec annual report",
+          "file_type": "HTML",
+          "category": "SEC 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297121000197/wfc-20201231.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297121000197/wfc-20201231.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297121000197/",
+          "filing_date": "2021-02-23",
+          "accession_number": "0000072971-21-000197"
+        },
+        {
+          "name": "Q4 2020 earnings 8-K",
+          "file_type": "HTML",
+          "category": "earnings 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297121000008/wfc-20210115.htm",
+          "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297121000008/wfc-20210115.htm",
+          "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297121000008/",
+          "filing_date": "2021-01-15",
+          "accession_number": "0000072971-21-000008"
+        }
+      ],
+      "file_count": 2
+    }
+  ],
+  "historical_earnings_8k_files": [
+    {
+      "filing_date": "2015-01-14",
+      "form": "8-K",
+      "accession_number": "0000072971-15-000024",
+      "primary_document": "wfc4qer1-14x2015form8xk.htm",
+      "quarter": "Q4 2014",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000024/wfc4qer1-14x2015form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000024/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000024/wfc4qer1-14x2015form8xk.htm"
+    },
+    {
+      "filing_date": "2015-04-14",
+      "form": "8-K",
+      "accession_number": "0000072971-15-000488",
+      "primary_document": "wfc1qer4-14x2015form8xk.htm",
+      "quarter": "Q1 2015",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000488/wfc1qer4-14x2015form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000488/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000488/wfc1qer4-14x2015form8xk.htm"
+    },
+    {
+      "filing_date": "2015-07-14",
+      "form": "8-K",
+      "accession_number": "0000072971-15-000596",
+      "primary_document": "wfc2qer7-14x2015form8xk.htm",
+      "quarter": "Q2 2015",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000596/wfc2qer7-14x2015form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000596/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000596/wfc2qer7-14x2015form8xk.htm"
+    },
+    {
+      "filing_date": "2015-10-14",
+      "form": "8-K",
+      "accession_number": "0000072971-15-000648",
+      "primary_document": "wfc3qer10-14x2015form8xk.htm",
+      "quarter": "Q3 2015",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000648/wfc3qer10-14x2015form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000648/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297115000648/wfc3qer10-14x2015form8xk.htm"
+    },
+    {
+      "filing_date": "2016-01-15",
+      "form": "8-K",
+      "accession_number": "0000072971-16-000779",
+      "primary_document": "wfc4qer1-15x2016form8xk.htm",
+      "quarter": "Q4 2015",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116000779/wfc4qer1-15x2016form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116000779/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297116000779/wfc4qer1-15x2016form8xk.htm"
+    },
+    {
+      "filing_date": "2016-04-14",
+      "form": "8-K",
+      "accession_number": "0000072971-16-001077",
+      "primary_document": "wfc1qer4-14x2016form8xk.htm",
+      "quarter": "Q1 2016",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001077/wfc1qer4-14x2016form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001077/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001077/wfc1qer4-14x2016form8xk.htm"
+    },
+    {
+      "filing_date": "2016-07-15",
+      "form": "8-K",
+      "accession_number": "0000072971-16-001196",
+      "primary_document": "wfc2qer7-15x2016form8xk.htm",
+      "quarter": "Q2 2016",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001196/wfc2qer7-15x2016form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001196/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001196/wfc2qer7-15x2016form8xk.htm"
+    },
+    {
+      "filing_date": "2016-10-14",
+      "form": "8-K",
+      "accession_number": "0000072971-16-001300",
+      "primary_document": "wfc3qer10-14x2016form8xk.htm",
+      "quarter": "Q3 2016",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001300/wfc3qer10-14x2016form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001300/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297116001300/wfc3qer10-14x2016form8xk.htm"
+    },
+    {
+      "filing_date": "2017-01-13",
+      "form": "8-K",
+      "accession_number": "0000072971-17-000066",
+      "primary_document": "wfc4qer1-13x2017form8xk.htm",
+      "quarter": "Q4 2016",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000066/wfc4qer1-13x2017form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000066/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000066/wfc4qer1-13x2017form8xk.htm"
+    },
+    {
+      "filing_date": "2017-04-13",
+      "form": "8-K",
+      "accession_number": "0000072971-17-000308",
+      "primary_document": "wfc1qer4-13x2017form8xk.htm",
+      "quarter": "Q1 2017",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000308/wfc1qer4-13x2017form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000308/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000308/wfc1qer4-13x2017form8xk.htm"
+    },
+    {
+      "filing_date": "2017-07-14",
+      "form": "8-K",
+      "accession_number": "0000072971-17-000377",
+      "primary_document": "wfc2qer7-14x2017form8xk.htm",
+      "quarter": "Q2 2017",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000377/wfc2qer7-14x2017form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000377/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000377/wfc2qer7-14x2017form8xk.htm"
+    },
+    {
+      "filing_date": "2017-10-13",
+      "form": "8-K",
+      "accession_number": "0000072971-17-000443",
+      "primary_document": "wfc3qer10-13x2017form8xk.htm",
+      "quarter": "Q3 2017",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000443/wfc3qer10-13x2017form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000443/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297117000443/wfc3qer10-13x2017form8xk.htm"
+    },
+    {
+      "filing_date": "2018-01-12",
+      "form": "8-K",
+      "accession_number": "0000072971-18-000006",
+      "primary_document": "wfc4qer1-12x2018form8xk.htm",
+      "quarter": "Q4 2017",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000006/wfc4qer1-12x2018form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000006/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000006/wfc4qer1-12x2018form8xk.htm"
+    },
+    {
+      "filing_date": "2018-04-13",
+      "form": "8-K",
+      "accession_number": "0000072971-18-000299",
+      "primary_document": "wfc1qer4-13x2018form8xk.htm",
+      "quarter": "Q1 2018",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000299/wfc1qer4-13x2018form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000299/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000299/wfc1qer4-13x2018form8xk.htm"
+    },
+    {
+      "filing_date": "2018-07-13",
+      "form": "8-K",
+      "accession_number": "0000072971-18-000365",
+      "primary_document": "wfc2qer7-13x2018form8xk.htm",
+      "quarter": "Q2 2018",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000365/wfc2qer7-13x2018form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000365/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000365/wfc2qer7-13x2018form8xk.htm"
+    },
+    {
+      "filing_date": "2018-10-12",
+      "form": "8-K",
+      "accession_number": "0000072971-18-000434",
+      "primary_document": "wfc3qer10-12x2018form8xk.htm",
+      "quarter": "Q3 2018",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000434/wfc3qer10-12x2018form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000434/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297118000434/wfc3qer10-12x2018form8xk.htm"
+    },
+    {
+      "filing_date": "2019-01-15",
+      "form": "8-K",
+      "accession_number": "0000072971-19-000013",
+      "primary_document": "wfc4qer1-15x2019form8xk.htm",
+      "quarter": "Q4 2018",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000013/wfc4qer1-15x2019form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000013/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000013/wfc4qer1-15x2019form8xk.htm"
+    },
+    {
+      "filing_date": "2019-04-12",
+      "form": "8-K",
+      "accession_number": "0000072971-19-000243",
+      "primary_document": "wfc1qer4-12x2019form8xk.htm",
+      "quarter": "Q1 2019",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000243/wfc1qer4-12x2019form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000243/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000243/wfc1qer4-12x2019form8xk.htm"
+    },
+    {
+      "filing_date": "2019-07-16",
+      "form": "8-K",
+      "accession_number": "0000072971-19-000311",
+      "primary_document": "wfc2qer7-16x2019form8xk.htm",
+      "quarter": "Q2 2019",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000311/wfc2qer7-16x2019form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000311/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000311/wfc2qer7-16x2019form8xk.htm"
+    },
+    {
+      "filing_date": "2019-10-15",
+      "form": "8-K",
+      "accession_number": "0000072971-19-000383",
+      "primary_document": "wfc3qer10-15x19form8xk.htm",
+      "quarter": "Q3 2019",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000383/wfc3qer10-15x19form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000383/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297119000383/wfc3qer10-15x19form8xk.htm"
+    },
+    {
+      "filing_date": "2020-01-14",
+      "form": "8-K",
+      "accession_number": "0000072971-20-000011",
+      "primary_document": "wfc4qer01-14x20form8xk.htm",
+      "quarter": "Q4 2019",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000011/wfc4qer01-14x20form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000011/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000011/wfc4qer01-14x20form8xk.htm"
+    },
+    {
+      "filing_date": "2020-04-14",
+      "form": "8-K",
+      "accession_number": "0000072971-20-000230",
+      "primary_document": "wfc1qer04-14x20form8xk.htm",
+      "quarter": "Q1 2020",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000230/wfc1qer04-14x20form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000230/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000230/wfc1qer04-14x20form8xk.htm"
+    },
+    {
+      "filing_date": "2020-07-14",
+      "form": "8-K",
+      "accession_number": "0000072971-20-000280",
+      "primary_document": "wfc2qer07-14x20form8xk.htm",
+      "quarter": "Q2 2020",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000280/wfc2qer07-14x20form8xk.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000280/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000280/wfc2qer07-14x20form8xk.htm"
+    },
+    {
+      "filing_date": "2021-01-15",
+      "form": "8-K",
+      "accession_number": "0000072971-21-000008",
+      "primary_document": "wfc-20210115.htm",
+      "quarter": "Q4 2020",
+      "category": "quarterly earnings 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297121000008/wfc-20210115.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/72971/000007297121000008/",
+      "url_citation": "https://www.sec.gov/Archives/edgar/data/72971/000007297121000008/wfc-20210115.htm"
+    }
+  ],
+  "historical_annual_report_files_2012_2019": [
+    {
+      "name": "2012 Wells Fargo annual report",
+      "file_type": "PDF",
+      "category": "historic annual report",
+      "url": "https://history.wf.com/assets/pdf/annual-reports/2012-annual-report.pdf",
+      "url_citation": "https://history.wf.com/annual-reports/"
+    },
+    {
+      "name": "2013 Wells Fargo annual report",
+      "file_type": "PDF",
+      "category": "historic annual report",
+      "url": "https://history.wf.com/assets/pdf/annual-reports/2013-annual-report.pdf",
+      "url_citation": "https://history.wf.com/annual-reports/"
+    },
+    {
+      "name": "2014 Wells Fargo annual report",
+      "file_type": "PDF",
+      "category": "historic annual report",
+      "url": "https://history.wf.com/assets/pdf/annual-reports/2014-annual-report.pdf",
+      "url_citation": "https://history.wf.com/annual-reports/"
+    },
+    {
+      "name": "2015 Wells Fargo annual report",
+      "file_type": "PDF",
+      "category": "historic annual report",
+      "url": "https://history.wf.com/assets/pdf/annual-reports/2015-annual-report.pdf",
+      "url_citation": "https://history.wf.com/annual-reports/"
+    },
+    {
+      "name": "2016 Wells Fargo annual report",
+      "file_type": "PDF",
+      "category": "historic annual report",
+      "url": "https://history.wf.com/assets/pdf/annual-reports/2016-annual-report.pdf",
+      "url_citation": "https://history.wf.com/annual-reports/"
+    },
+    {
+      "name": "2017 Wells Fargo annual report",
+      "file_type": "PDF",
+      "category": "historic annual report",
+      "url": "https://history.wf.com/assets/pdf/annual-reports/2017-annual-report.pdf",
+      "url_citation": "https://history.wf.com/annual-reports/"
+    },
+    {
+      "name": "2018 Wells Fargo annual report",
+      "file_type": "PDF",
+      "category": "historic annual report",
+      "url": "https://history.wf.com/assets/pdf/annual-reports/2018-annual-report.pdf",
+      "url_citation": "https://history.wf.com/annual-reports/"
+    },
+    {
+      "name": "2019 Wells Fargo annual report",
+      "file_type": "PDF",
+      "category": "historic annual report",
+      "url": "https://history.wf.com/assets/pdf/annual-reports/2019-annual-report.pdf",
+      "url_citation": "https://history.wf.com/annual-reports/"
+    }
+  ],
+  "historical_coverage": {
+    "quarters": 84,
+    "quarter_report_files": 84,
+    "earnings_8k_files": 24,
+    "history_annual_reports": 8,
+    "source_citation": "https://data.sec.gov/submissions/CIK0000072971.json"
+  }
+}
