@@ -1,0 +1,42 @@
+{
+ "workbook": "JPM.xlsx",
+ "title": "JPMorgan Chase & Co. quarterly and annual financial statements and segment data, 1Q04 to 3Q26, FY2004 to FY2025",
+ "built_from": "All 87 Earnings Release Financial Supplements (PDF), 1Q05 to 3Q26, listed at https://www.jpmorganchase.com/ir/quarterly-earnings",
+ "prefixes": {
+  "Income Statement": "is", "Balance Sheet": "bs", "Avg Balance Sheet & Yields": "avg", "Financial Highlights": "fh", "EPS & Share Data": "eps",
+  "Reported to Managed": "r2m", "Segment Results": "seg", "CCB": "ccb", "CIB": "cib", "AWM": "awm", "Corporate": "corp", "Credit": "credit",
+  "Capital": "cap", "Non-GAAP Measures": "nongaap", "Legacy Corp & Inv Bank": "lcib", "Legacy Commercial Banking": "lcb",
+  "Legacy Investment Bank": "lib", "Legacy Retail Fin Services": "lrfs", "Legacy Card Services": "lcard", "Legacy Card Reconciliation": "lcardrec",
+  "Legacy Treasury & Sec Svcs": "ltss", "Legacy Operating Basis IS": "lopis", "Legacy Core NII": "lcorenii", "Legacy Market Risk": "lmr",
+  "Legacy Mortgage Repurchase": "lrepurchase", "Restatement Notes": "restated"
+ },
+ "instant_sheets": ["Balance Sheet"],
+ "page_titles": {
+  "Income Statement": "consolidated statements? of income|statements? of income",
+  "Balance Sheet": "consolidated balance sheets?",
+  "Avg Balance Sheet & Yields": "average balance sheets?",
+  "Financial Highlights": "financial highlights",
+  "EPS & Share Data": "earnings per share",
+  "Reported to Managed": "reconciliation from reported",
+  "Segment Results": "segment .{0,20}results|line of business|lines of business",
+  "CCB": "consumer community banking",
+  "CIB": "commercial investment bank",
+  "AWM": "asset wealth management|asset management",
+  "Corporate": "^jpmorgan chase co corporate|corporate private equity|^corporate",
+  "Credit": "credit related information",
+  "Capital": "capital and other selected|capital intangible assets|capital",
+  "Non-GAAP Measures": "non gaap",
+  "Legacy Corp & Inv Bank": "corporate investment bank",
+  "Legacy Commercial Banking": "commercial banking",
+  "Legacy Investment Bank": "investment bank",
+  "Legacy Retail Fin Services": "retail financial services",
+  "Legacy Card Services": "card services",
+  "Legacy Card Reconciliation": "card services|reconciliation",
+  "Legacy Treasury & Sec Svcs": "treasury securities services",
+  "Legacy Operating Basis IS": "operating basis",
+  "Legacy Core NII": "core net interest income",
+  "Legacy Market Risk": "market risk",
+  "Legacy Mortgage Repurchase": "repurchase liability|mortgage loan repurchase"
+ },
+ "unit_fixes": []
+}

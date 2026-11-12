@@ -1,0 +1,2794 @@
+{
+  "company": "Citigroup Inc. (Citi)",
+  "investor_relations_archive": "Quarterly Earnings Releases and Supplements",
+  "archive_url": "https://www.citigroup.com/global/investors/quarterly-earnings",
+  "archive_url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+  "coverage": {
+    "quarter_count": 39,
+    "quarter_count_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+    "other_archive_item_count": 6,
+    "direct_file_count": 206,
+    "direct_file_count_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+    "direct_file_formats": {
+      "pdf": 156,
+      "xlsx": 25,
+      "xls": 14
+    },
+    "latest_period_on_page": "Third Quarter 2026",
+    "earliest_period_on_page": "First Quarter 2017",
+    "coverage_citation": "https://www.citigroup.com/global/investors/quarterly-earnings"
+  },
+  "quarters": [
+    {
+      "year": 2026,
+      "quarter": 3,
+      "period": "Third Quarter 2026",
+      "release_date": "October 13, 2026",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "2026prqtr3rslt.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32026/2026prqtr3rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2026 - October 13, 2026 Press Release PDF"
+        },
+        {
+          "filename": "2026fsqtr3rslt.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32026/2026fsqtr3rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2026 - October 13, 2026 Financial Supplement PDF"
+        },
+        {
+          "filename": "2026fsqtr3rslt.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32026/2026fsqtr3rslt.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2026 - October 13, 2026 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "2026psqtr3rslt.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32026/2026psqtr3rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2026 - October 13, 2026 Presentation PDF"
+        },
+        {
+          "filename": "3q26-citigroup-earnings-transcript.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32026/3q26-citigroup-earnings-transcript.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2026 - October 13, 2026 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "third-quarter-2026-earnings-call",
+          "format": "html",
+          "document_type": "audio",
+          "url": "https://www.citigroup.com/global/news/article/2026/third-quarter-2026-earnings-call",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Third Quarter 2026 - October 13, 2026 Presentation Audio"
+        }
+      ]
+    },
+    {
+      "year": 2026,
+      "quarter": 2,
+      "period": "Second Quarter 2026",
+      "release_date": "July 14, 2026",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "2026prqtr2rslt.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q22026/2026prqtr2rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2026 - July 14, 2026 Press Release PDF"
+        },
+        {
+          "filename": "2026fsqtr2rslt.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q22026/2026fsqtr2rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2026 - July 14, 2026 Financial Supplement PDF"
+        },
+        {
+          "filename": "2026fsqtr2rslt.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q22026/2026fsqtr2rslt.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2026 - July 14, 2026 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "2026presoqtr2rslt.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q22026/2026presoqtr2rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2026 - July 14, 2026 Presentation PDF"
+        },
+        {
+          "filename": "2026psqtr2-transcript.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2026psqtr2-transcript.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2026 - July 14, 2026 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "second-quarter-2026-earnings-call",
+          "format": "html",
+          "document_type": "audio",
+          "url": "https://www.citigroup.com/global/news/article/2026/second-quarter-2026-earnings-call",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Second Quarter 2026 - July 14, 2026 Presentation Audio"
+        }
+      ]
+    },
+    {
+      "year": 2026,
+      "quarter": 1,
+      "period": "First Quarter 2026",
+      "release_date": "April 14, 2026",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "2026prqtr1rslt.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12026/2026prqtr1rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2026 - April 14, 2026 Press Release PDF"
+        },
+        {
+          "filename": "2026fsqtr1rslt.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12026/2026fsqtr1rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2026 - April 14, 2026 Financial Supplement PDF"
+        },
+        {
+          "filename": "2026fsqtr1rslt.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12026/2026fsqtr1rslt.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2026 - April 14, 2026 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "2026psqtr1rslt.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12026/2026psqtr1rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2026 - April 14, 2026 Presentation PDF"
+        },
+        {
+          "filename": "2026psqtr1-transcript.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2026psqtr1-transcript.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2026 - April 14, 2026 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "first-quarter-2026-earnings-call",
+          "format": "html",
+          "document_type": "audio",
+          "url": "https://www.citigroup.com/global/news/article/2026/first-quarter-2026-earnings-call",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "First Quarter 2026 - April 14, 2026 Presentation Audio"
+        }
+      ]
+    },
+    {
+      "year": 2025,
+      "quarter": 4,
+      "period": "Fourth Quarter 2025",
+      "release_date": "January 14, 2026",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "2025prqtr4rslt.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q42025/2025prqtr4rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter 2025 - January 14, 2026 Press Release PDF"
+        },
+        {
+          "filename": "2025fsqtr4rslt.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q42025/2025fsqtr4rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter 2025 - January 14, 2026 Financial Supplement PDF"
+        },
+        {
+          "filename": "2025fsqtr4rslt.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q42025/2025fsqtr4rslt.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter 2025 - January 14, 2026 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "2025psqtr4rslt.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q42025/2025psqtr4rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter 2025 - January 14, 2026 Presentation PDF"
+        },
+        {
+          "filename": "2025psqtr4-transcript.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2025psqtr4-transcript.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter 2025 - January 14, 2026 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "fourth-quarter-2025-earnings-call",
+          "format": "html",
+          "document_type": "audio",
+          "url": "https://www.citigroup.com/global/news/article/2026/fourth-quarter-2025-earnings-call",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Fourth Quarter 2025 - January 14, 2026 Presentation Audio"
+        }
+      ]
+    },
+    {
+      "year": 2025,
+      "quarter": 3,
+      "period": "Third Quarter 2025",
+      "release_date": "October 14, 2025",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "2025prqtr3rslt.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32025/2025prqtr3rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2025 - October 14, 2025 Press Release PDF"
+        },
+        {
+          "filename": "2025fsqtr3rslt.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32025/2025fsqtr3rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2025 - October 14, 2025 Financial Supplement PDF"
+        },
+        {
+          "filename": "2025fsqtr3rslt.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32025/2025fsqtr3rslt.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2025 - October 14, 2025 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "2025psqtr3rslt.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32025/2025psqtr3rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2025 - October 14, 2025 Presentation PDF"
+        },
+        {
+          "filename": "2025psqtr3-transcript.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32025/2025psqtr3-transcript.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2025 - October 14, 2025 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "third-quarter-2025-earnings-call",
+          "format": "html",
+          "document_type": "audio",
+          "url": "https://www.citigroup.com/global/news/article/2025/third-quarter-2025-earnings-call",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Third Quarter 2025 - October 14, 2025 Presentation Audio"
+        }
+      ]
+    },
+    {
+      "year": 2025,
+      "quarter": 2,
+      "period": "Second Quarter 2025",
+      "release_date": "July 15, 2025",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "2025prqtr2rslt.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2025prqtr2rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2025 - July 15, 2025 Press Release PDF"
+        },
+        {
+          "filename": "2025fsqtr2rslt.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2025fsqtr2rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2025 - July 15, 2025 Financial Supplement PDF"
+        },
+        {
+          "filename": "2025fsqtr2rslt.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2025fsqtr2rslt.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2025 - July 15, 2025 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "2025psqtr2rslt.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2025psqtr2rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2025 - July 15, 2025 Presentation PDF"
+        },
+        {
+          "filename": "transcript.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q22025/transcript.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2025 - July 15, 2025 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "second-quarter-2025-earnings-call",
+          "format": "html",
+          "document_type": "audio",
+          "url": "https://www.citigroup.com/global/news/article/2025/second-quarter-2025-earnings-call",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Second Quarter 2025 - July 15, 2025 Presentation Audio"
+        }
+      ]
+    },
+    {
+      "year": 2025,
+      "quarter": 1,
+      "period": "First Quarter 2025",
+      "release_date": "April 15, 2025",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "2025prqtr1rslt.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12025/2025prqtr1rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2025 - April 15, 2025 Press Release PDF"
+        },
+        {
+          "filename": "2025fsqtr1rslt.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12025/2025fsqtr1rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2025 - April 15, 2025 Financial Supplement PDF"
+        },
+        {
+          "filename": "2025fqtr1rslt.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12025/2025fqtr1rslt.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2025 - April 15, 2025 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "2025psqtr1rslt.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12025/2025psqtr1rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2025 - April 15, 2025 Presentation PDF"
+        },
+        {
+          "filename": "transcript.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12025/transcript.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2025 - April 15, 2025 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "first-quarter-2025-earnings-call",
+          "format": "html",
+          "document_type": "audio",
+          "url": "https://www.citigroup.com/global/news/article/2025/first-quarter-2025-earnings-call",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "First Quarter 2025 - April 15, 2025 Presentation Audio"
+        }
+      ]
+    },
+    {
+      "year": 2024,
+      "quarter": 4,
+      "period": "Fourth Quarter 2024",
+      "release_date": "January 15, 2025",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "4Q24-earnings-press-release.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q42024/4Q24-earnings-press-release.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter 2024 - January 15, 2025 Press Release PDF"
+        },
+        {
+          "filename": "Q42024-Financial-Supplement.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q42024/Q42024-Financial-Supplement.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter 2024 - January 15, 2025 Financial Supplement PDF"
+        },
+        {
+          "filename": "Q42024-Financial-Supplement.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q42024/Q42024-Financial-Supplement.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter 2024 - January 15, 2025 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "4Q24-earnings-presentation.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q42024/4Q24-earnings-presentation.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter 2024 - January 15, 2025 Presentation PDF"
+        },
+        {
+          "filename": "4Q24-Earnings-Transcript.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q42024/4Q24-Earnings-Transcript.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter 2024 - January 15, 2025 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "1_sbk9j58v",
+          "format": "html",
+          "document_type": "audio",
+          "url": "https://video.citi.com/media/Citi+4Q+2025+Earnings+Call/1_sbk9j58v",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Fourth Quarter 2024 - January 15, 2025 Presentation Audio"
+        }
+      ]
+    },
+    {
+      "year": 2024,
+      "quarter": 3,
+      "period": "Third Quarter 2024",
+      "release_date": "October 15, 2024",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "2024pr-qtr3rslt.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32024/2024pr-qtr3rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2024 - October 15, 2024 Press Release PDF"
+        },
+        {
+          "filename": "3Q24-SUPP-ForWeb.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32024/3Q24-SUPP-ForWeb.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2024 - October 15, 2024 Financial Supplement PDF"
+        },
+        {
+          "filename": "3Q24-SUPP-ForWeb.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32024/3Q24-SUPP-ForWeb.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2024 - October 15, 2024 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "2024psqtr3rslt.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32024/2024psqtr3rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2024 - October 15, 2024 Presentation PDF"
+        },
+        {
+          "filename": "3Q24-Earnings-Transcript.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/3Q24-Earnings-Transcript.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2024 - October 15, 2024 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "1_oogfnah5",
+          "format": "html",
+          "document_type": "audio",
+          "url": "https://video.citi.com/media/Citi+3Q+2024+Earnings+Call/1_oogfnah5",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Third Quarter 2024 - October 15, 2024 Presentation Audio"
+        }
+      ]
+    },
+    {
+      "year": 2024,
+      "quarter": 2,
+      "period": "Second Quarter 2024",
+      "release_date": "July 12, 2024",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "2024prqtr2rslt.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q22024/2024prqtr2rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2024 - July 12, 2024 Press Release PDF"
+        },
+        {
+          "filename": "2Q24-SUPP-ForWeb.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q22024/2Q24-SUPP-ForWeb.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2024 - July 12, 2024 Financial Supplement PDF"
+        },
+        {
+          "filename": "2024fqtr2rslt.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q22024/2024fqtr2rslt.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2024 - July 12, 2024 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "2024psqtr2rslt.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q22024/2024psqtr2rslt.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2024 - July 12, 2024 Presentation PDF"
+        },
+        {
+          "filename": "transcript07122024.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/transcript07122024.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2024 - July 12, 2024 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "1_kx9v4r5x",
+          "format": "html",
+          "document_type": "audio",
+          "url": "https://video.citi.com/media/Citi+2Q+2024+Earnings+Call/1_kx9v4r5x",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Second Quarter 2024 - July 12, 2024 Presentation Audio"
+        }
+      ]
+    },
+    {
+      "year": 2024,
+      "quarter": 1,
+      "period": "First Quarter 2024",
+      "release_date": "April 12, 2024",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "2024prq1.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12024/2024prq1.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2024 - April 12, 2024 Press Release PDF"
+        },
+        {
+          "filename": "2024fnq1.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12024/2024fnq1.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2024 - April 12, 2024 Financial Supplement PDF"
+        },
+        {
+          "filename": "2024fnq1.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12024/2024fnq1.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2024 - April 12, 2024 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "2024pstq1.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12024/2024pstq1.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2024 - April 12, 2024 Presentation PDF"
+        },
+        {
+          "filename": "2024q1tr.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2024q1tr.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2024 - April 12, 2024 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "1_chtgqocc",
+          "format": "html",
+          "document_type": "audio",
+          "url": "https://video.citi.com/media/Citi+2024+Q1+Earnings+Call/1_chtgqocc",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "First Quarter 2024 - April 12, 2024 Presentation Audio"
+        }
+      ]
+    },
+    {
+      "year": 2023,
+      "quarter": 4,
+      "period": "Fourth Quarter 2023",
+      "release_date": "January 12, 2024",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "2023prqtr4fn.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2023prqtr4fn.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter 2023 - January 12, 2024 Press Release PDF"
+        },
+        {
+          "filename": "2023fsqtr4fn.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2023fsqtr4fn.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter 2023 - January 12, 2024 Financial Supplement PDF"
+        },
+        {
+          "filename": "2023fsqtr4fn.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2023fsqtr4fn.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter 2023 - January 12, 2024 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "2023ptqtr4fn.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2023ptqtr4fn.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter 2023 - January 12, 2024 Presentation PDF"
+        },
+        {
+          "filename": "4Q23-Earnings-Transcript.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/4Q23-Earnings-Transcript.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter 2023 - January 12, 2024 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "fourth-quarter-full-year-2023-results-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2024/fourth-quarter-full-year-2023-results-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Fourth Quarter 2023 - January 12, 2024 Press Release LINK"
+        },
+        {
+          "filename": "1_9hlkls2j",
+          "format": "html",
+          "document_type": "audio",
+          "url": "https://video.citi.com/media/2024-01-12+Citi+Q4-23+Earnings+Call/1_9hlkls2j",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Fourth Quarter 2023 - January 12, 2024 Presentation Audio"
+        }
+      ]
+    },
+    {
+      "year": 2023,
+      "quarter": 3,
+      "period": "Third Quarter 2023",
+      "release_date": "October 13, 2023",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "Citi-3Q23-Press-Release.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32023/Citi-3Q23-Press-Release.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2023 - October 13, 2023 Press Release PDF"
+        },
+        {
+          "filename": "3Q23-SUPP-For-WEB.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32023/3Q23-SUPP-For-WEB.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2023 - October 13, 2023 Financial Supplement PDF"
+        },
+        {
+          "filename": "3Q23-SUPP-For-WEB.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32023/3Q23-SUPP-For-WEB.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2023 - October 13, 2023 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "3Q23-earnings-presentation_vF.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/3Q23-earnings-presentation_vF.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2023 - October 13, 2023 Presentation PDF"
+        },
+        {
+          "filename": "3Q23-Earnings-Transcript.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/3Q23-Earnings-Transcript.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter 2023 - October 13, 2023 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "2023-third-quarter-results-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2023/2023-third-quarter-results-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Third Quarter 2023 - October 13, 2023 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2023,
+      "quarter": 2,
+      "period": "Second Quarter 2023",
+      "release_date": "July 14, 2023",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "citi-2Q23-press-release.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/citi-2Q23-press-release.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2023 - July 14, 2023 Press Release PDF"
+        },
+        {
+          "filename": "2Q23-supp-web.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2Q23-supp-web.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2023 - July 14, 2023 Financial Supplement PDF"
+        },
+        {
+          "filename": "2Q23-supp-web.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2Q23-supp-web.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2023 - July 14, 2023 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "2Q23-earnings-presentation.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2Q23-earnings-presentation.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2023 - July 14, 2023 Presentation PDF"
+        },
+        {
+          "filename": "2Q23 Earnings Transcript.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2Q23%20Earnings%20Transcript.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter 2023 - July 14, 2023 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "second-quarter-2023-results-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2023/second-quarter-2023-results-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Second Quarter 2023 - July 14, 2023 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2023,
+      "quarter": 1,
+      "period": "First Quarter 2023",
+      "release_date": "April 14, 2023",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "2023prqtr1kman.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2023prqtr1kman.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2023 - April 14, 2023 Press Release PDF"
+        },
+        {
+          "filename": "2023fsqtr1fsa.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2023fsqtr1fsa.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2023 - April 14, 2023 Financial Supplement PDF"
+        },
+        {
+          "filename": "2023fsqtr1fsb.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2023fsqtr1fsb.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2023 - April 14, 2023 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "2023ptqtr1es.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2023ptqtr1es.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2023 - April 14, 2023 Presentation PDF"
+        },
+        {
+          "filename": "2023trptqtr1scr.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2023trptqtr1scr.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter 2023 - April 14, 2023 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "first-quarter-2023-results-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2023/first-quarter-2023-results-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "First Quarter 2023 - April 14, 2023 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2022,
+      "quarter": 4,
+      "period": "Fourth Quarter 2022",
+      "release_date": "January 13, 2023",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer422.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/qer422.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 13, 2023 Press Release PDF"
+        },
+        {
+          "filename": "qer422s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/qer422s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 13, 2023 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer422s.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/qer422s.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 13, 2023 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "20230113-4Q22 Earnings Presentation_20230224.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/20230113-4Q22%20Earnings%20Presentation_20230224.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 13, 2023 Presentation PDF"
+        },
+        {
+          "filename": "tr230113b.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/tr230113b.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 13, 2023 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "fourth-quarter-and-full-year-2022-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2023/fourth-quarter-and-full-year-2022-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Fourth Quarter - January 13, 2023 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2022,
+      "quarter": 3,
+      "period": "Third Quarter 2022",
+      "release_date": "October 14, 2022",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer322.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer322.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 14, 2022 Press Release PDF"
+        },
+        {
+          "filename": "qer322s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer322s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 14, 2022 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer322s.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/qer322s.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 14, 2022 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p221014a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p221014a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 14, 2022 Presentation PDF"
+        },
+        {
+          "filename": "tr221014a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr221014a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 14, 2022 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "third-quarter-2022-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2022/third-quarter-2022-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Third Quarter - October 14, 2022 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2022,
+      "quarter": 2,
+      "period": "Second Quarter 2022",
+      "release_date": "July 15, 2022",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer222.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer222.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 15, 2022 Press Release PDF"
+        },
+        {
+          "filename": "qer222s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer222s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 15, 2022 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer222s.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/qer222s.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 15, 2022 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p220715a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p220715a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 15, 2022 Presentation PDF"
+        },
+        {
+          "filename": "tr220715a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr220715a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 15, 2022 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "second-quarter-2022-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2022/second-quarter-2022-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Second Quarter - July 15, 2022 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2022,
+      "quarter": 1,
+      "period": "First Quarter 2022",
+      "release_date": "April 14, 2022",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer122.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer122.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 14, 2022 Press Release PDF"
+        },
+        {
+          "filename": "qer122s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer122s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 14, 2022 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer122s.xls",
+          "format": "xls",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer122s.xls",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 14, 2022 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p220414a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p220414a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 14, 2022 Presentation PDF"
+        },
+        {
+          "filename": "tr220414a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr220414a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 14, 2022 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "first-quarter-2022-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2022/first-quarter-2022-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "First Quarter - April 14, 2022 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2021,
+      "quarter": 4,
+      "period": "Fourth Quarter 2021",
+      "release_date": "January 14, 2022",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer421.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer421.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 14, 2022 Press Release PDF"
+        },
+        {
+          "filename": "qer421s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer421s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 14, 2022 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer421s.xls",
+          "format": "xls",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer421s.xls",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 14, 2022 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p220114a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p220114a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 14, 2022 Presentation PDF"
+        },
+        {
+          "filename": "tr220114a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr220114a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 14, 2022 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "fourth-quarter-and-full-year-2021-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2022/fourth-quarter-and-full-year-2021-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Fourth Quarter - January 14, 2022 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2021,
+      "quarter": 3,
+      "period": "Third Quarter 2021",
+      "release_date": "October 14, 2021",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer321.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer321.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 14, 2021 Press Release PDF"
+        },
+        {
+          "filename": "qer321s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer321s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 14, 2021 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer321s.xls",
+          "format": "xls",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer321s.xls",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 14, 2021 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p211014a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p211014a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 14, 2021 Presentation PDF"
+        },
+        {
+          "filename": "tr211014a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr211014a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 14, 2021 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "third-quarter-2021-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2021/third-quarter-2021-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Third Quarter - October 14, 2021 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2021,
+      "quarter": 2,
+      "period": "Second Quarter 2021",
+      "release_date": "July 14, 2021",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer221.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer221.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 14, 2021 Press Release PDF"
+        },
+        {
+          "filename": "qer221s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer221s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 14, 2021 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer221s.xls",
+          "format": "xls",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer221s.xls",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 14, 2021 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p210714a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p210714a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 14, 2021 Presentation PDF"
+        },
+        {
+          "filename": "tr210714a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr210714a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 14, 2021 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "second-quarter-2021-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2021/second-quarter-2021-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Second Quarter - July 14, 2021 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2021,
+      "quarter": 1,
+      "period": "First Quarter 2021",
+      "release_date": "April 15, 2021",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer121.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer121.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 15, 2021 Press Release PDF"
+        },
+        {
+          "filename": "qer121s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer121s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 15, 2021 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer121s.xls",
+          "format": "xls",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer121s.xls",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 15, 2021 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p210415a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p210415a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 15, 2021 Presentation PDF"
+        },
+        {
+          "filename": "tr210415a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr210415a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 15, 2021 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "first-quarter-2021-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2021/first-quarter-2021-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "First Quarter - April 15, 2021 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2020,
+      "quarter": 4,
+      "period": "Fourth Quarter 2020",
+      "release_date": "January 15, 2021",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer420.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer420.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 15, 2021 Press Release PDF"
+        },
+        {
+          "filename": "qer420s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer420s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 15, 2021 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer420s.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/qer420s.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 15, 2021 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p210115a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p210115a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 15, 2021 Presentation PDF"
+        },
+        {
+          "filename": "tr210115a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr210115a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 15, 2021 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "fourth-quarter-and-full-year-2020-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2021/fourth-quarter-and-full-year-2020-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Fourth Quarter - January 15, 2021 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2020,
+      "quarter": 3,
+      "period": "Third Quarter 2020",
+      "release_date": "October 13, 2020",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer320.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer320.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 13, 2020 Press Release PDF"
+        },
+        {
+          "filename": "qer320s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer320s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 13, 2020 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer320s.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/qer320s.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 13, 2020 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p201013a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p201013a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 13, 2020 Presentation PDF"
+        },
+        {
+          "filename": "tr201013a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr201013a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 13, 2020 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "third-quarter-2020-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2020/third-quarter-2020-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Third Quarter - October 13, 2020 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2020,
+      "quarter": 2,
+      "period": "Second Quarter 2020",
+      "release_date": "July 14, 2020",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer220.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer220.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 14, 2020 Press Release PDF"
+        },
+        {
+          "filename": "qer220s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer220s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 14, 2020 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer220s.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/qer220s.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 14, 2020 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p200714a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p200714a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 14, 2020 Presentation PDF"
+        },
+        {
+          "filename": "tr200714a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr200714a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 14, 2020 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "second-quarter-2020-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2020/second-quarter-2020-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Second Quarter - July 14, 2020 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2020,
+      "quarter": 1,
+      "period": "First Quarter 2020",
+      "release_date": "April 15, 2020",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer120.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer120.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 15, 2020 Press Release PDF"
+        },
+        {
+          "filename": "qer120s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer120s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 15, 2020 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer120s.xls",
+          "format": "xls",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer120s.xls",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 15, 2020 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p200415a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p200415a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 15, 2020 Presentation PDF"
+        },
+        {
+          "filename": "tr200415a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr200415a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 15, 2020 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "first-quarter-2020-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2020/first-quarter-2020-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "First Quarter - April 15, 2020 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2019,
+      "quarter": 4,
+      "period": "Fourth Quarter 2019",
+      "release_date": "January 14, 2020",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer419.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer419.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 14, 2020 Press Release PDF"
+        },
+        {
+          "filename": "qer419s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer419s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 14, 2020 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer419s.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/qer419s.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 14, 2020 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p200114a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p200114a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 14, 2020 Presentation PDF"
+        },
+        {
+          "filename": "tr200114a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr200114a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 14, 2020 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "fourth-quarter-and-full-year-2019-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2020/fourth-quarter-and-full-year-2019-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Fourth Quarter - January 14, 2020 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2019,
+      "quarter": 3,
+      "period": "Third Quarter 2019",
+      "release_date": "October 15, 2019",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer319.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer319.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 15, 2019 Press Release PDF"
+        },
+        {
+          "filename": "qer319s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer319s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 15, 2019 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer319s.xls",
+          "format": "xls",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer319s.xls",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 15, 2019 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p191015a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p191015a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 15, 2019 Presentation PDF"
+        },
+        {
+          "filename": "tr191015a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr191015a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 15, 2019 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "third-quarter-2019-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2019/third-quarter-2019-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Third Quarter - October 15, 2019 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2019,
+      "quarter": 2,
+      "period": "Second Quarter 2019",
+      "release_date": "July 15, 2019",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer219.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer219.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 15, 2019 Press Release PDF"
+        },
+        {
+          "filename": "qer219s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer219s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 15, 2019 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer219s.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/qer219s.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 15, 2019 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p190715a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p190715a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 15, 2019 Presentation PDF"
+        },
+        {
+          "filename": "tr190715a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr190715a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 15, 2019 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "second-quarter-2019-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2019/second-quarter-2019-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Second Quarter - July 15, 2019 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2019,
+      "quarter": 1,
+      "period": "First Quarter 2019",
+      "release_date": "April 15, 2019",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer119.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer119.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 15, 2019 Press Release PDF"
+        },
+        {
+          "filename": "qer119s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer119s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 15, 2019 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer119s.xls",
+          "format": "xls",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer119s.xls",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 15, 2019 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p190415a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p190415a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 15, 2019 Presentation PDF"
+        },
+        {
+          "filename": "tr190415a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr190415a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 15, 2019 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "first-quarter-2019-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2019/first-quarter-2019-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "First Quarter - April 15, 2019 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2018,
+      "quarter": 4,
+      "period": "Fourth Quarter 2018",
+      "release_date": "January 14, 2019",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer418.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer418.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 14, 2019 Press Release PDF"
+        },
+        {
+          "filename": "qer418s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer418s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 14, 2019 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer418s.xls",
+          "format": "xls",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer418s.xls",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 14, 2019 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p190114a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p190114a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 14, 2019 Presentation PDF"
+        },
+        {
+          "filename": "tr190114a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr190114a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 14, 2019 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "fourth-quarter-and-full-year-2018-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2019/fourth-quarter-and-full-year-2018-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Fourth Quarter - January 14, 2019 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2018,
+      "quarter": 3,
+      "period": "Third Quarter 2018",
+      "release_date": "October 12, 2018",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer318.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer318.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 12, 2018 Press Release PDF"
+        },
+        {
+          "filename": "qer318s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer318s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 12, 2018 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer318s.xls",
+          "format": "xls",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer318s.xls",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 12, 2018 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p181012a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p181012a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 12, 2018 Presentation PDF"
+        },
+        {
+          "filename": "tr181012a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr181012a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 12, 2018 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "third-quarter-2018-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2018/third-quarter-2018-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Third Quarter - October 12, 2018 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2018,
+      "quarter": 2,
+      "period": "Second Quarter 2018",
+      "release_date": "July 13, 2018",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer218.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer218.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 13, 2018 Press Release PDF"
+        },
+        {
+          "filename": "qer218s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer218s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 13, 2018 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer218s.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/qer218s.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 13, 2018 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p180713a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p180713a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 13, 2018 Presentation PDF"
+        },
+        {
+          "filename": "tr180713a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr180713a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 13, 2018 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "second-quarter-2018-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2018/second-quarter-2018-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Second Quarter - July 13, 2018 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2018,
+      "quarter": 1,
+      "period": "First Quarter 2018",
+      "release_date": "April 13, 2018",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer118.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer118.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 13, 2018 Press Release PDF"
+        },
+        {
+          "filename": "qer118s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer118s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 13, 2018 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer118s.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/qer118s.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 13, 2018 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p180413a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p180413a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 13, 2018 Presentation PDF"
+        },
+        {
+          "filename": "tr180413a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr180413a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 13, 2018 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "first-quarter-2018-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2018/first-quarter-2018-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "First Quarter - April 13, 2018 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2017,
+      "quarter": 4,
+      "period": "Fourth Quarter 2017",
+      "release_date": "January 16, 2018",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer417.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer417.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 16, 2018 Press Release PDF"
+        },
+        {
+          "filename": "qer417s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer417s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 16, 2018 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer417s.xls",
+          "format": "xls",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer417s.xls",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 16, 2018 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p180116a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p180116a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 16, 2018 Presentation PDF"
+        },
+        {
+          "filename": "tr180116a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr180116a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Fourth Quarter - January 16, 2018 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "citi-fourth-quarter-2017-earnings-review",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2018/citi-fourth-quarter-2017-earnings-review",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Fourth Quarter - January 16, 2018 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2017,
+      "quarter": 3,
+      "period": "Third Quarter 2017",
+      "release_date": "October 12, 2017",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer317.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer317.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 12, 2017 Press Release PDF"
+        },
+        {
+          "filename": "qer317s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer317s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 12, 2017 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer317s.xls",
+          "format": "xls",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer317s.xls",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 12, 2017 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p171012a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p171012a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 12, 2017 Presentation PDF"
+        },
+        {
+          "filename": "tr171012a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr171012a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Third Quarter - October 12, 2017 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "third-quarter-2017-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2017/third-quarter-2017-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Third Quarter - October 12, 2017 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2017,
+      "quarter": 2,
+      "period": "Second Quarter 2017",
+      "release_date": "July 14, 2017",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer217.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer217.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 14, 2017 Press Release PDF"
+        },
+        {
+          "filename": "qer217s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer217s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 14, 2017 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer217s.xls",
+          "format": "xls",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer217s.xls",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 14, 2017 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p170714a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p170714a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 14, 2017 Presentation PDF"
+        },
+        {
+          "filename": "tr170714a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr170714a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Second Quarter - July 14, 2017 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "second-quarter-2017-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2017/second-quarter-2017-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "Second Quarter - July 14, 2017 Press Release LINK"
+        }
+      ]
+    },
+    {
+      "year": 2017,
+      "quarter": 1,
+      "period": "First Quarter 2017",
+      "release_date": "April 13, 2017",
+      "year_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "quarter_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "release_date_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer117.pdf",
+          "format": "pdf",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer117.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 13, 2017 Press Release PDF"
+        },
+        {
+          "filename": "qer117s.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer117s.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 13, 2017 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer117s.xls",
+          "format": "xls",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer117s.xls",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 13, 2017 Financial Supplement EXCEL"
+        },
+        {
+          "filename": "p170413a.pdf",
+          "format": "pdf",
+          "document_type": "presentation",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/p170413a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 13, 2017 Presentation PDF"
+        },
+        {
+          "filename": "tr170413a.pdf",
+          "format": "pdf",
+          "document_type": "transcript",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr170413a.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "First Quarter - April 13, 2017 Presentation Transcript"
+        }
+      ],
+      "related_links": [
+        {
+          "filename": "first-quarter-2017-results-and-key-metrics",
+          "format": "html",
+          "document_type": "press_release",
+          "url": "https://www.citigroup.com/global/news/press-release/2017/first-quarter-2017-results-and-key-metrics",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "web_page",
+          "label": "First Quarter - April 13, 2017 Press Release LINK"
+        }
+      ]
+    }
+  ],
+  "other_archive_items": [
+    {
+      "title": "Historical Quarterly Summary Financial Information - April 03, 2026",
+      "year_section": 2025,
+      "title_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "4Q25-supp-web.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/4Q25-supp-web.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Historical Quarterly Summary Financial Information - April 03, 2026 Financial Supplement PDF"
+        },
+        {
+          "filename": "4Q25-supp-web.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/4Q25-supp-web.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Historical Quarterly Summary Financial Information - April 03, 2026 Financial Supplement EXCEL"
+        }
+      ]
+    },
+    {
+      "title": "Historical Quarterly Summary Financial Information - April 15, 2025",
+      "year_section": 2025,
+      "title_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "2025fqtr1hstr.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12025/2025fqtr1hstr.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Historical Quarterly Summary Financial Information - April 15, 2025 Financial Supplement EXCEL"
+        }
+      ]
+    },
+    {
+      "title": "Historical Quarterly Summary Financial Information - January 10, 2024",
+      "year_section": 2023,
+      "title_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "3Q23-supp-web.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/3Q23-supp-web.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Historical Quarterly Summary Financial Information - January 10, 2024 Financial Supplement PDF"
+        },
+        {
+          "filename": "3Q23-supp-web.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/3Q23-supp-web.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Historical Quarterly Summary Financial Information - January 10, 2024 Financial Supplement EXCEL"
+        }
+      ]
+    },
+    {
+      "title": "Historical Quarterly Summary Financial Information - April 12, 2022",
+      "year_section": 2021,
+      "title_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer122hqs.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer122hqs.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Historical Quarterly Summary Financial Information - April 12, 2022 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer122hqs.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer122hqs.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Historical Quarterly Summary Financial Information - April 12, 2022 Financial Supplement EXCEL"
+        }
+      ]
+    },
+    {
+      "title": "Historical Financial Supplement - March 01, 2022",
+      "year_section": 2021,
+      "title_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer121hs.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer121hs.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Historical Financial Supplement - March 01, 2022 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer121hs.xlsx",
+          "format": "xlsx",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/qer121hs.xlsx",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Historical Financial Supplement - March 01, 2022 Financial Supplement EXCEL"
+        }
+      ]
+    },
+    {
+      "title": "Historical Financial Supplement - April 09, 2018",
+      "year_section": 2017,
+      "title_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+      "files": [
+        {
+          "filename": "qer117hs.pdf",
+          "format": "pdf",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer117hs.pdf",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Historical Financial Supplement - April 09, 2018 Financial Supplement PDF"
+        },
+        {
+          "filename": "qer117hs.xls",
+          "format": "xls",
+          "document_type": "financial_supplement",
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/qer117hs.xls",
+          "url_citation": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "link_kind": "file",
+          "label": "Historical Financial Supplement - April 09, 2018 Financial Supplement EXCEL"
+        }
+      ]
+    }
+  ],
+  "completeness_notes": [
+    "The fetched archive page contains 10 year sections (2026 through 2017), 45 quarterly-card containers, 39 earnings-quarter cards and 6 non-quarter historical-supplement cards.",
+    "The page was inspected for page-number, next/previous and load-more controls; none were present. All 45 cards were present in the fetched HTML, including the collapsed year sections.",
+    "Direct file links on the page are listed under files; press-release and earnings-call web links are retained under related_links when they are not downloadable file URLs."
+  ],
+  "completeness_notes_citation": "https://www.citigroup.com/global/investors/quarterly-earnings"
+}
