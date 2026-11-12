@@ -267,6 +267,19 @@ class CollectorTest(unittest.TestCase):
         self.assertEqual((copies, row["ext"], row["doc_type"], row["period_end"]), ([], ".pdf", "supplement", "2026-03-31"))
         self.assertFalse(row["title"].startswith(ir.TEXT_COPY_PREFIX))
 
+    def test_a_file_listed_on_another_host_is_not_dropped_as_work_from_a_wrong_site(self):
+        sb = Store()
+        # annual reports listed on the company's history site, not on the IR site the collector crawls
+        url = "https://history.example.test/assets/2019-annual-report.csv"
+        lst = listing({"url": url, "title": "2019 annual report", "doc_type": "annual_report", "ext": ".csv", "section": "Annual reports",
+                       "fiscal_year": 2019, "fiscal_quarter": None, "fiscal_label": "FY2019", "period_end": "2019-12-31", "published": None,
+                       "source_page": "https://history.example.test/annual-reports/"})
+        with self.providers(lst):
+            result = ir.process_company(sb, "TEST", "Test", 1)
+        row = next(iter(sb.rows.values()))
+        self.assertEqual((self.requested, row["doc_type"], row["fiscal_label"], row["period_end"]), ([url], "annual_report", "FY2019", "2019-12-31"))
+        self.assertEqual(result["official"]["missing"], 0)
+
     def test_same_file_under_another_site_token_is_not_stored_twice(self):
         sb = Store()
         old = "https://cdn.example.test/_0123456789abcdef0123456789abcdef/db/1/q1-2026-release.csv"
