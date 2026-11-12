@@ -1,0 +1,35 @@
+name: HOOD Official Host Fallback Probe
+on:
+  push:
+    branches: [research/hood-ir-earnings-archive-2026-11-12]
+    paths: [.github/workflows/hood-ir-source-probe2.yml]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Test CDN aliases and SEC direct links
+        run: |
+          python3 - <<'PY'
+          import urllib.request, urllib.error,time
+          names={
+            'investors_index':'https://investors.robinhood.com/financials/quarterly-results',
+            'investors_file':'https://investors.robinhood.com/static-files/fd90f575-5b4c-4cde-a16d-d114c920fb6a',
+            'gcs_index':'https://robinhood.gcs-web.com/financials/quarterly-results',
+            'gcs_file':'https://robinhood.gcs-web.com/static-files/fd90f575-5b4c-4cde-a16d-d114c920fb6a',
+            'sec_filing':'https://www.sec.gov/Archives/edgar/data/1783879/000178387926000167/hood-20260930.htm',
+            'yahoo_mirror':'https://www.robinhood.com/',
+          }
+          for name,url in names.items():
+            t=time.time()
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Accept':'*/*'})
+              with urllib.request.urlopen(req,timeout=8) as resp:
+                p=resp.read(90)
+                print(name,resp.status,resp.geturl(),resp.headers.get('Content-Type'),round(time.time()-t,2),repr(p),flush=True)
+            except urllib.error.HTTPError as e:
+              print(name,e.code,'ERR',e.headers.get('Server'),repr(e.read(240)),round(time.time()-t,2),flush=True)
+            except Exception as e:print(name,'EXC',type(e).__name__,str(e)[:130],round(time.time()-t,2),flush=True)
+          PY
