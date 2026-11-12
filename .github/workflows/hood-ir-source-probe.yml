@@ -1,0 +1,36 @@
+name: HOOD IR Source Connectivity Probe
+on:
+  push:
+    branches:
+      - research/hood-ir-earnings-archive-2026-11-12
+    paths:
+      - .github/workflows/hood-ir-source-probe.yml
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --disable-pip-version-check requests beautifulsoup4
+      - name: Test Robinhood source speeds
+        run: |
+          python - <<'PY'
+          import requests,time
+          from bs4 import BeautifulSoup
+          checks=[
+           'https://robinhood.gcs-web.com/financials/quarterly-results',
+           'https://robinhood.gcs-web.com/financials/sec-filings?field_nir_sec_form_group_target_id=496&field_nir_sec_date_filed_value=2026',
+           'https://robinhood.gcs-web.com/static-files/6840cc36-4a2d-46d8-a9c3-0b334da724f8',
+          ]
+          for url in checks:
+           t=time.monotonic()
+           try:
+            with requests.get(url,timeout=(10,30),stream=True) as resp:
+             sample=next(resp.iter_content(32768),b'')
+             print(resp.status_code,resp.url,'sample',len(sample),'content-type',resp.headers.get('content-type'),'secs',round(time.monotonic()-t,2),flush=True)
+           except Exception as e:print('ERROR',url,repr(e),'secs',round(time.monotonic()-t,2),flush=True)
+          PY
