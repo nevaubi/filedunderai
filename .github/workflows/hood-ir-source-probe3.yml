@@ -1,0 +1,36 @@
+name: HOOD Public Document Mirror Probe
+on:
+  push:
+    branches: [research/hood-ir-earnings-archive-2026-11-12]
+    paths: [.github/workflows/hood-ir-source-probe3.yml]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Test public raw PDF mirrors
+        run: |
+          python3 - <<'PY'
+          import urllib.request,urllib.parse,urllib.error,time
+          original='https://robinhood.gcs-web.com/static-files/fd90f575-5b4c-4cde-a16d-d114c920fb6a'
+          q=urllib.parse.quote(original,safe='')
+          items={
+            'allorigins':'https://api.allorigins.win/raw?url='+q,
+            'codetabs':'https://api.codetabs.com/v1/proxy?quest='+q,
+            'corsproxyio':'https://corsproxy.io/?url='+q,
+            'corsproxyorg':'https://corsproxy.org/?url='+q,
+            'corslol':'https://api.cors.lol/?url='+q,
+            'valueSense':'https://s3-2.valuesense.io/IR_presentations/HOOD/Investor_presentations/HOOD_Q2_2025.pdf',
+          }
+          for name,url in items.items():
+            t=time.time()
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Accept':'*/*'})
+              with urllib.request.urlopen(req,timeout=12) as resp:
+                data=resp.read(256)
+                print(name,resp.status,resp.headers.get('Content-Type'),round(time.time()-t,1),'HEADER',repr(data[:45]),flush=True)
+            except urllib.error.HTTPError as e: print(name,e.code,repr(e.read(150)),round(time.time()-t,1),flush=True)
+            except Exception as e: print(name,'ERROR',type(e).__name__,str(e)[:130],round(time.time()-t,1),flush=True)
+          PY
