@@ -1120,7 +1120,8 @@ def _drop_other_site_work(state, root):
         for key, item in list(state["queues"][queue].items()):
             if item.get("search") == "site-search" or item["status"] not in ACTIVE:
                 continue
-            if queue == "documents" and item.get("source") != "web":
+            if queue == "documents" and (item.get("source") != "web" or item.get("official")):
+                # a file from an official list stays queued whatever host lists it (an archive site, a newsroom)
                 continue
             if other(item.get(field)):
                 del state["queues"][queue][key]
