@@ -19,11 +19,11 @@ on:
       max_docs:
         description: "Documents per company in this run"
         required: false
-        default: "400"
+        default: "2000"
       hours:
-        description: "Hours (max 5.7)"
+        description: "Hours per pass (two passes; max 2.7)"
         required: false
-        default: "2"
+        default: "2.5"
       extended:
         description: "Also store extended material (regulatory disclosures, offering documents, proxy statements)"
         type: boolean
@@ -46,8 +46,8 @@ env:
   TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
   SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
   TICKERS: ${{ github.event.inputs.tickers || '' }}
-  MAX_DOCS: ${{ github.event.inputs.max_docs || '400' }}
-  HOURS: ${{ github.event.inputs.hours || '2' }}
+  MAX_DOCS: ${{ github.event.inputs.max_docs || '2000' }}
+  HOURS: ${{ github.event.inputs.hours || '2.5' }}
   FU_IR_EXTENDED: ${{ github.event.inputs.extended == 'true' && '1' || '0' }}
 jobs:
   collect:
@@ -72,6 +72,8 @@ jobs:
           echo "TICKERS=$TICKERS" >> "$GITHUB_ENV"
           echo "Tickers: $TICKERS"
       - name: Store listed files
+        run: python -m etl.ir_backfill_runner --lane all --workers 5 --hours "$HOURS" --tickers "$TICKERS" --max-docs "$MAX_DOCS"
+      - name: Second pass for files the hosts refused the first time
         run: python -m etl.ir_backfill_runner --lane all --workers 5 --hours "$HOURS" --tickers "$TICKERS" --max-docs "$MAX_DOCS"
       - name: Coverage against the listings
         run: python -m etl.ir_official report $(echo "$TICKERS" | tr ',' ' ')

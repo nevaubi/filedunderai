@@ -92,6 +92,22 @@ class ReadTest(unittest.TestCase):
         self.assertEqual((ks["of which markets"]["parent"], ks["of which markets"]["sums_to_parent"]), ("is_net_interest_income", False))
         self.assertEqual(b["sheets"][0]["rows"][2]["figures"]["4Q25"], 8)
 
+    def test_hierarchy_is_a_tree_even_when_formulas_and_indentation_disagree(self):
+        # the total is indented under "Pretax income", which the total's own formula counts as a part
+        b = book([("Pretax income", "USD mm", 0, True, [10, 11, 12, 13, 14, None, 40, 50]),
+                  ("Tax", "USD mm", 1, False, [4, 4, 5, 5, 6, None, 16, 20]),
+                  ("Net income", "USD mm", 1, True, subtotal([6, 7], [1, -1]))])
+        ks = {k["name"]: k for k in wb.outline(b)}
+        for k in ks.values():
+            seen, node = set(), k
+            while node is not None:
+                self.assertNotIn(node["id"], seen)
+                seen.add(node["id"])
+                node = next((x for x in ks.values() if x["id"] == node["parent"]), None)
+        self.assertEqual((ks["Tax"]["parent"], ks["Tax"]["subtracts"]), (ks["Net income"]["id"], True))
+        self.assertTrue(ks["Pretax income"]["sums_to_parent"])
+        self.assertIsNone(ks["Net income"]["parent"])
+
     def test_same_label_twice_gets_two_ids(self):
         b = book([("CONSUMER", None, 0, True, [None] * 8), ("Net income", "USD mm", 1, False, [1, 2, 3, 4, 5, None, 9, 14]),
                   ("WHOLESALE", None, 0, True, [None] * 8), ("Net income", "USD mm", 1, False, [2, 3, 4, 5, 6, None, 11, 18])])

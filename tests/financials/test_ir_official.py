@@ -6,12 +6,12 @@ import unittest
 from contextlib import ExitStack
 from unittest.mock import patch
 
-from etl import ir, ir_official, jobs
+from etl import common, ir, ir_official, jobs
 
 try:
-    from test_ir import Store, existing, sub
+    from test_ir import Store, existing, pdf_document, sub
 except ImportError:  # run as tests.financials.test_ir_official
-    from tests.financials.test_ir import Store, existing, sub
+    from tests.financials.test_ir import Store, existing, pdf_document, sub
 
 
 def read(path):
@@ -163,6 +163,7 @@ class CollectorTest(unittest.TestCase):
     def providers(self, lst, bodies=None):
         stack = ExitStack()
         stack.enter_context(patch.object(ir_official, "load", side_effect=lambda t: lst if t == "TEST" else None))
+        stack.enter_context(patch.object(ir, "OFFICIAL_PAUSE", 0))
         stack.enter_context(patch.object(ir, "firecrawl_map", return_value=[]))
         stack.enter_context(patch.object(ir, "_scrape", side_effect=lambda *a, **k: {"html": "<html></html>"}, create=True))
         stack.enter_context(patch.object(ir, "_sec_json", return_value=sub(), create=True))
@@ -248,6 +249,23 @@ class CollectorTest(unittest.TestCase):
             ir.process_company(sb, "TEST", "Test", 1)
         self.assertEqual(self.requested, [url])
         self.assertEqual(len(sb.rows), 1)
+
+    def test_a_refused_listed_pdf_is_retried_before_a_text_only_copy_stands_in(self):
+        sb = Store()
+        url = "https://ir.example.test/q1-2026-supplement.pdf"
+        lst = listing({"url": url, "title": "Q1 2026 Financial supplement", "doc_type": "supplement", "ext": ".pdf"})
+        refused = common.HTTPError(403, "Forbidden")
+        copies = []
+        with patch.object(ir, "text_copy", side_effect=lambda u, **kw: copies.append(u) or b"<!doctype html><html><body><pre>copy</pre></body></html>"):
+            with self.providers(lst, {url: refused}):
+                ir.process_company(sb, "TEST", "Test", 1)
+            self.assertEqual((copies, sb.rows), ([], {}))  # throttled: no stand-in on the first refusal
+            original = pdf_document(["Total net revenue 50,172 57,347"])
+            with self.providers(lst, {url: original}):
+                ir.process_company(sb, "TEST", "Test", 1)
+        row = next(iter(sb.rows.values()))
+        self.assertEqual((copies, row["ext"], row["doc_type"], row["period_end"]), ([], ".pdf", "supplement", "2026-03-31"))
+        self.assertFalse(row["title"].startswith(ir.TEXT_COPY_PREFIX))
 
     def test_same_file_under_another_site_token_is_not_stored_twice(self):
         sb = Store()

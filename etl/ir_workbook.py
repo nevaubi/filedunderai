@@ -249,8 +249,27 @@ def outline(book, config=None):
             if k["parent"] is None and stack:
                 k["parent"] = stack[-1][2]
             stack.append((depth, heads, k["id"]))
+        _break_cycles(block)
         out += block
     return out
+
+
+def _break_cycles(block):
+    """A line can end up under its own descendant: a subtotal indented under a line that an older formula counts as
+    one of its parts. The hierarchy must be a tree, so the loop is cut at a link that makes no adding-up claim (or,
+    failing that, at the lowest line of the loop)."""
+    by_id = {k["id"]: k for k in block}
+    for start in block:
+        while True:
+            seen, node = [], start
+            while node is not None and node["id"] not in {k["id"] for k in seen}:
+                seen.append(node)
+                node = by_id.get(node["parent"])
+            if node is None:
+                break
+            loop = seen[[k["id"] for k in seen].index(node["id"]):]
+            cut = next((k for k in loop if not k["sums_to_parent"]), None) or max(loop, key=lambda k: k["row"]["row"])
+            cut.update(parent=None, sums_to_parent=False, subtracts=False)
 
 
 # ---------------------------------------------------------------- finding a figure on a page
@@ -493,7 +512,12 @@ def publish(sb, ticker, minimum=0.9, log=print):
     log(f"{ticker}: {checked['values']} values checked against their pages, {len(checked['bad_values'])} rejected, {len(checked['ties'])} subtotals tie")
     saved = backup(sb, ticker)
     log(f"{ticker}: previous KPI set saved to raw/{saved}")
-    result = kpitools.publish(sb, data)
+    from .kpi_extract import _publish
+    result = _publish(sb, data)  # waits for the aggregate lease rather than failing when another publisher holds it
+    try:
+        kpitools.build_index(sb, coverage_updates={}, kpi_updates=[ticker])
+    except Exception as e:  # noqa: BLE001 - the counts are refreshed by the next KPI run
+        log(f"{ticker}: coverage index KPI counts not refreshed: {str(e)[:200]}")
     log(f"{ticker}: published {result['values'] - len(result['bad_values'])} values, {len(result['bad_values'])} rejected by the page check, "
         f"{len(result['ties'])} subtotals tie, {len(result['tie_failures'])} do not")
     return result, report

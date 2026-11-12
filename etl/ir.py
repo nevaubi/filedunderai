@@ -218,6 +218,8 @@ def download(url, deadline=None):
 
 
 TEXT_COPY_PREFIX = "[Text-only copy via Firecrawl; original file not retrievable] "
+# Seconds between downloads of files from an official list: a whole archive comes from one host.
+OFFICIAL_PAUSE = float(os.environ.get("FU_IR_OFFICIAL_PAUSE", "0.6"))
 
 
 def text_copy(url, deadline=None):
@@ -1450,16 +1452,21 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
         try:
             title = item.get("title")
             pdf_hint = item.get("ext_hint") in (".pdf", ".pdf?")
+            # A file from an official list answered when the list was checked, so a refusal is most likely the host
+            # throttling this run: it is retried on later passes, and a text-only copy stands in only on the last attempt.
+            copy_ok = item["source"] == "web" and pdf_hint and (not item.get("official") or item["attempts"] >= MAX_ATTEMPTS - 1)
+            if item.get("official") and OFFICIAL_PAUSE:
+                time.sleep(OFFICIAL_PAUSE)
             try:
                 body = _sec_request(url, deadline=deadline, raw=True) if item["source"] == "sec" else download(url, deadline=deadline)
             except HTTPError as e:
-                alt = text_copy(url, deadline=deadline) if item["source"] == "web" and pdf_hint and e.code in (401, 403, 406, 429, 503) else None
+                alt = text_copy(url, deadline=deadline) if copy_ok and e.code in (401, 403, 406, 429, 503) else None
                 if alt is None:
                     raise
                 body, title = alt, TEXT_COPY_PREFIX + (title or "")
             ext = sniff_ext(body, url) or item.get("ext_hint")
             if ext in (".html", ".htm") and item.get("ext_hint") not in (".html", ".htm") and not (title or "").startswith(TEXT_COPY_PREFIX):
-                alt = text_copy(url, deadline=deadline) if item["source"] == "web" and pdf_hint else None
+                alt = text_copy(url, deadline=deadline) if copy_ok else None
                 if alt is None:
                     raise ValueError("Downloaded HTML instead of the linked document")
                 body, title, ext = alt, TEXT_COPY_PREFIX + (title or ""), ".html"
