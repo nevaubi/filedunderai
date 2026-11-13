@@ -2326,7 +2326,7 @@ async function openKpiSource(tk, it, K, e, v) {
 }
 
 /* ---------- IR document library ---------- */
-const DOC_TYPES = { release: "Company release", presentation: "Presentation", supplement: "Supplement / data", remarks: "Prepared remarks / letter", transcript: "Transcript", annual_report: "Annual report", other: "Other" };
+const DOC_TYPES = { release: "Company release", presentation: "Presentation", supplement: "Supplement / data", remarks: "Prepared remarks / letter", transcript: "Transcript", annual_report: "Annual report", sec_filing: "SEC filing", archive: "File archive", image: "Image", other: "Other" };
 function renderIrDocs(host, tk, ir) {
   FU_IR_LIBRARY.render(host, tk, ir, { fileBase: IRPUB, openDocument: doc => openDoc(tk, doc, {}) });
 }

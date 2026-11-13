@@ -3,7 +3,9 @@ name: IR official sources
 # etl/ir_official.py) with the fiscal period, type and release date the company states, corrects those fields on
 # documents already stored, and republishes the document index with the listing and its coverage. Same collector as
 # the backfill (etl/ir_backfill_runner.py -> ir.process_company), run for named tickers with a document budget large
-# enough to take a whole listing in one pass.
+# enough to take a whole listing in one pass. With "extended" on, everything else a company lists is stored too: its
+# copies of 10-Q and 10-K filings and the filings it links on sec.gov, the web page of a release, offering and
+# regulatory documents, XBRL archives and images. Call recordings and event pages are never stored.
 # With "workbooks" on, trend workbooks (etl/ir_sources/workbooks/{TICKER}.xlsx) are then published: every figure is
 # tied to a page line of a stored supplement and checked before it replaces the ticker's IR KPI set (the previous
 # set is saved to raw/kpi_backups/ first). Run it after the documents are stored; it refuses when fewer than 90% of
@@ -25,7 +27,7 @@ on:
         required: false
         default: "2.5"
       extended:
-        description: "Also store extended material (regulatory disclosures, offering documents, proxy statements)"
+        description: "Store everything listed, not only earnings documents (filing copies, release pages, offering and regulatory documents, archives)"
         type: boolean
         required: false
         default: false
