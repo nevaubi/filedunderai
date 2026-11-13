@@ -1,0 +1,46 @@
+name: Archive JPM Quarterly Investor Relations Documents
+on:
+  push:
+    branches:
+      - research/jpm-ir-earnings-archive-2026-11-12
+    paths:
+      - .github/workflows/jpm-ir-archive.yml
+      - research/jpm_ir_archive/**
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Check out archive branch
+        uses: actions/checkout@v4
+      - name: Configure Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install requests and Beautiful Soup
+        run: python -m pip install --disable-pip-version-check requests beautifulsoup4
+      - name: Download all official quarterly documents and create ZIP
+        run: python research/jpm_ir_archive/download.py --workers 6 --output JPM_Quarterly_Earnings
+        continue-on-error: true
+      - name: Upload ZIP even if some source files are unavailable
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: JPM-Quarterly-Earnings-2005-2026
+          path: JPM_Quarterly_Earnings.zip
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Upload manifest and status separately
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: JPM-IR-Download-Manifests
+          path: |
+            JPM_Quarterly_Earnings/download_manifest.csv
+            JPM_Quarterly_Earnings/summary.json
+            JPM_Quarterly_Earnings/official_manifest.json
+          retention-days: 30
+          if-no-files-found: warn
