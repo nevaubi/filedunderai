@@ -6,9 +6,18 @@ name: IR official sources
 # enough to take a whole listing in one pass. With "extended" on, everything else a company lists is stored too: its
 # copies of 10-Q and 10-K filings and the filings it links on sec.gov, the web page of a release, offering and
 # regulatory documents, XBRL archives and images. Call recordings and event pages are never stored.
+#
+# Every company gets its own runner. Reading a file's text is the slow part and it is CPU work, so companies that
+# share one runner wait on each other: beside four others, one company stored 59 filings in two and a half hours,
+# then its last 49 in two minutes once it was alone. Each runner makes two passes; the second retries files the
+# host refused the first time.
+#
+# When the files are stored, the Docling workflow is started for the same companies ("docling" input), so their
+# tables and reading order are parsed on parallel runners right away instead of waiting for the daily run.
+#
 # With "workbooks" on, trend workbooks (etl/ir_sources/workbooks/{TICKER}.xlsx) are then published: every figure is
 # tied to a page line of a stored supplement and checked before it replaces the ticker's IR KPI set (the previous
-# set is saved to raw/kpi_backups/ first). Run it after the documents are stored; it refuses when fewer than 90% of
+# set is saved to raw/kpi_backups/ first). It runs after the documents are stored and refuses when fewer than 90% of
 # the figures are found on a stored page.
 # Needs repository secrets: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, FIRECRAWL_API_KEY, TAVILY_API_KEY, SEC_USER_AGENT.
 on:
@@ -36,6 +45,11 @@ on:
         type: boolean
         required: false
         default: false
+      docling:
+        description: "Parse the stored files with Docling on parallel runners when the download ends"
+        type: boolean
+        required: false
+        default: true
 permissions:
   contents: read
 concurrency:
@@ -52,9 +66,47 @@ env:
   HOURS: ${{ github.event.inputs.hours || '2.5' }}
   FU_IR_EXTENDED: ${{ github.event.inputs.extended == 'true' && '1' || '0' }}
 jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.t.outputs.matrix }}
+      list: ${{ steps.t.outputs.list }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - id: t
+        name: Tickers
+        run: |
+          # The source lists need only the standard library. Tickers come from a form field, so they are checked
+          # before they reach a shell or a matrix.
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os, re
+          from etl import ir_official
+          asked = [t.strip().upper() for t in os.environ.get("TICKERS", "").split(",") if t.strip()]
+          bad = [t for t in asked if not re.fullmatch(r"[A-Z0-9.\-]{1,10}", t)]
+          if bad:
+              raise SystemExit(f"Not a ticker: {bad}")
+          tickers = list(dict.fromkeys(asked)) or ir_official.tickers()
+          if not tickers:
+              raise SystemExit("No ticker has a source list")
+          print("matrix=" + json.dumps(tickers))
+          print("list=" + ",".join(tickers))
+          PY
+      - run: echo "Tickers ${{ steps.t.outputs.list }}"
   collect:
+    needs: plan
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      max-parallel: 12
+      matrix:
+        ticker: ${{ fromJson(needs.plan.outputs.matrix) }}
+    env:
+      TICKER: ${{ matrix.ticker }}
     steps:
       - name: Check secrets
         run: |
@@ -65,23 +117,41 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
       - run: pip install -r requirements.txt
-      - name: Tickers
-        run: |
-          if [ -z "$TICKERS" ]; then
-            TICKERS=$(python -c "from etl import ir_official; print(','.join(ir_official.tickers()))")
-          fi
-          echo "TICKERS=$TICKERS" >> "$GITHUB_ENV"
-          echo "Tickers: $TICKERS"
       - name: Store listed files
-        run: python -m etl.ir_backfill_runner --lane all --workers 5 --hours "$HOURS" --tickers "$TICKERS" --max-docs "$MAX_DOCS"
-      - name: Second pass for files the hosts refused the first time
-        run: python -m etl.ir_backfill_runner --lane all --workers 5 --hours "$HOURS" --tickers "$TICKERS" --max-docs "$MAX_DOCS"
+        run: python -m etl.ir_backfill_runner --lane all --workers 1 --hours "$HOURS" --tickers "$TICKER" --max-docs "$MAX_DOCS"
+      - name: Second pass for files the host refused the first time
+        run: python -m etl.ir_backfill_runner --lane all --workers 1 --hours "$HOURS" --tickers "$TICKER" --max-docs "$MAX_DOCS"
+      - name: Coverage against the listing
+        run: python -m etl.ir_official report "$TICKER"
+  finish:
+    needs: [plan, collect]
+    if: always() && needs.plan.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      actions: write
+    env:
+      LIST: ${{ needs.plan.outputs.list }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
       - name: Coverage against the listings
-        run: python -m etl.ir_official report $(echo "$TICKERS" | tr ',' ' ')
+        run: python -m etl.ir_official report $(echo "$LIST" | tr ',' ' ')
+      - name: Parse the stored files with Docling
+        if: ${{ github.event.inputs.docling != 'false' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run docling-backfill.yml --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME" -f tickers="$LIST" -f shards=20 -f limit=2000 -f hours=5
       - name: Publish trend workbooks
         if: ${{ github.event.inputs.workbooks == 'true' }}
         run: |
-          for t in $(echo "$TICKERS" | tr ',' ' '); do
+          pip install -r requirements.txt
+          for t in $(echo "$LIST" | tr ',' ' '); do
             if [ -f "etl/ir_sources/workbooks/$t.xlsx" ]; then python -m etl.ir_workbook publish "$t"; fi
           done
