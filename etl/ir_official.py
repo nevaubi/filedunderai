@@ -7,9 +7,13 @@ whether the file belongs in the document store) and writes etl/ir_sources/{TICKE
 change the raw file or this module and rebuild, never edit them by hand.
 
 The collector (etl/ir.py) uses a list three ways. It queues every storable file that is not stored yet, with the
-period, type and release date the company states instead of guesses from the file name. It corrects the same fields
-on documents already stored under a listed address. It publishes the list with the document index, so a reader sees
-what the company lists for each quarter, which of it is stored, and which stored copy stands in for a missing file.
+period, type and release date the company states instead of guesses from the file name. Earnings documents are
+always queued ("core"); the rest of what a company lists (SEC filing copies and the filings it links on sec.gov,
+the web page of a release, offering and regulatory documents, XBRL archives, images) is queued when the run asks
+for everything (FU_IR_EXTENDED=1). Only recordings and event pages stay links: there is no document in them. It
+corrects the same fields on documents already stored under a listed address. It publishes the list with the
+document index, so a reader sees what the company lists for each quarter, which of it is stored, and which stored
+copy stands in for a missing file.
 
     python -m etl.ir_official build [TICKER ...]     raw research files -> etl/ir_sources/{T}.json
     python -m etl.ir_official report [TICKER ...]    coverage of the published document index against each list
@@ -26,10 +30,12 @@ import urllib.parse
 HERE = os.path.dirname(os.path.abspath(__file__))
 SOURCES = os.path.join(HERE, "ir_sources")
 RAW = os.path.join(SOURCES, "raw")
-VERSION = 1
+VERSION = 2
 
-# Types the document store keeps. Everything else is carried in the list as a link.
+# Earnings document types: always stored. KEPT_TYPES are written to ir_documents under their own name; any other
+# stored file is typed "other".
 STORED_TYPES = ("release", "presentation", "supplement", "transcript", "remarks", "annual_report")
+KEPT_TYPES = STORED_TYPES + ("sec_filing", "image", "archive")
 TYPE_ORDER = ("release", "presentation", "supplement", "transcript", "remarks", "annual_report", "regulatory",
               "prospectus", "proxy", "other", "sec_filing", "webcast", "image", "archive")
 TYPE_NAMES = {"release": "Earnings release", "presentation": "Earnings presentation", "supplement": "Financial supplement",
@@ -42,6 +48,8 @@ EXTS = (".pdf", ".xlsx", ".xlsm", ".xls", ".csv", ".pptx", ".ppt", ".docx", ".do
         ".htm", ".html", ".aspx", ".jsp")
 PAGE_EXTS = (".htm", ".html", ".aspx", ".jsp")
 MEDIA_EXTS = (".mp3", ".mp4", ".wav")
+# Files kept as they are, without text: there is nothing in them to read by page.
+ORIGINAL_EXTS = (".zip", ".jpg", ".png")
 _ORD = {"first": 1, "second": 2, "third": 3, "fourth": 4, "1st": 1, "2nd": 2, "3rd": 3, "4th": 4}
 _MONTHS = {m: i + 1 for i, m in enumerate(["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"])}
 _GENERIC = re.compile(r"^(view )?(pdf|ppt|xls|xlsx|report|document|agenda|download|file|link|here|pdf icon.*)?( pdf| xbrl)?$", re.I)
@@ -339,23 +347,37 @@ def _record(node, ctx, path, fye, default_page):
 
 
 def store_class(rec, siblings):
-    """core: belongs in the document store. extended: stored only on request (offering documents, regulatory
-    disclosures, proxy statements). link: kept in the list only, with the reason."""
+    """core: an earnings document, always stored. extended: stored when a run asks for everything the company lists
+    (SEC filing copies, the web page of a release, offering and regulatory documents, archives, images). link: kept
+    in the list only, with the reason."""
     t, ext = rec["doc_type"], rec["ext"]
-    if t == "sec_filing":
-        return "link", "SEC filing; the filing itself is read from EDGAR"
     if t == "webcast" or ext in MEDIA_EXTS:
-        return "link", "audio or event page"
+        return "link", "recording or event page; no document to read"
+    if t == "sec_filing":
+        return "extended", "the filing as the company links it; the filing itself is also read from EDGAR"
     if t in ("image", "archive"):
-        return "link", "not a document"
+        return "extended", "kept as the original file, without text"
     if t in STORED_TYPES:
         if t == "release" and (ext is None or ext in PAGE_EXTS) and any(
                 s is not rec and s["doc_type"] == "release" and s["ext"] == ".pdf" and s["period_end"] == rec["period_end"] for s in siblings):
-            return "link", "web page of the release stored as a file"
+            return "extended", "web page of the release; the release file is stored too"
         return "core", None
     if "investor day" in rec["section"].lower():
         return "core", None
     return "extended", None
+
+
+def fetch_of(rec):
+    """How a listed link is retrieved. sec: a document on sec.gov, requested the way EDGAR asks. original: a file kept
+    as it is, without text (archive, image). page: a web page. file: a document file."""
+    host = urllib.parse.urlsplit(rec["url"]).netloc.lower()
+    if host == "sec.gov" or host.endswith(".sec.gov"):
+        return "sec"
+    if rec["ext"] in ORIGINAL_EXTS:
+        return "original"
+    if rec["ext"] in PAGE_EXTS or (rec["ext"] is None and rec["doc_type"] == "release"):
+        return "page"
+    return "file"
 
 
 def _merge(a, b):
@@ -452,15 +474,25 @@ def storable(lst, extended=False):
 
 def stored_type(rec):
     """Type written to ir_documents for a stored file: the store's own vocabulary."""
-    return rec["doc_type"] if rec["doc_type"] in STORED_TYPES else "other"
+    return rec["doc_type"] if rec["doc_type"] in KEPT_TYPES else "other"
 
 
 def queue_item(rec):
     """Fields of a documents-queue entry for a listed file."""
-    return {"url": rec["url"], "title": rec["title"], "source": "web", "source_page": rec.get("source_page"),
-            "ext_hint": rec["ext"] if rec["ext"] and rec["ext"] not in PAGE_EXTS else (".html" if rec["ext"] in PAGE_EXTS else ".pdf?"),
-            "kind_hint": stored_type(rec), "published": rec.get("published"), "fiscal_label": rec.get("fiscal_label"),
+    fetch, ext = fetch_of(rec), rec["ext"]
+    if fetch == "sec":
+        # EDGAR documents are .htm, or .txt for filings before 2002; a link to the filing's folder answers with its index page
+        hint = ".txt" if urllib.parse.urlsplit(rec["url"]).path.lower().endswith(".txt") else ".html" if ext is None or ext in PAGE_EXTS else ext
+    elif fetch == "page":
+        hint = ".html"
+    else:
+        hint = ext or ".pdf?"
+    item = {"url": rec["url"], "title": rec["title"], "source": "sec" if fetch == "sec" else "web", "source_page": rec.get("source_page"),
+            "ext_hint": hint, "kind_hint": stored_type(rec), "published": rec.get("published"), "fiscal_label": rec.get("fiscal_label"),
             "period_end": rec.get("period_end"), "official": VERSION}
+    if fetch == "original":
+        item["original_only"] = True
+    return item
 
 
 def corrections(lst, rows):
@@ -470,7 +502,8 @@ def corrections(lst, rows):
     out = {}
     for row in rows:
         rec = by_key.get(url_key(row.get("url")))
-        if not rec or rec["store"] == "link":
+        # A document on sec.gov keeps what the EDGAR collector wrote: it types and dates exhibits by the filing.
+        if not rec or rec["store"] == "link" or fetch_of(rec) == "sec":
             continue
         want = {"doc_type": stored_type(rec)}
         if rec.get("period_end") or rec["section"] != QUARTERLY:
@@ -506,8 +539,9 @@ def coverage(lst, rows, extended=False):
         elif not want:
             state = "link" if rec["store"] == "link" else "not_collected"
         else:
+            # Only an earnings document can be stood in for by another copy (the SEC exhibit of the same release).
             other = [r for r in slots.get((rec.get("period_end"), stored_type(rec)), []) if url_key(r.get("url")) != url_key(rec["url"])]
-            state = "copy" if other and rec["section"] == QUARTERLY else "missing"
+            state = "copy" if other and rec["section"] == QUARTERLY and rec["store"] == "core" else "missing"
             if state == "copy":
                 files.append({**_brief(rec), "state": state, "copy_id": other[0]["id"]})
                 counts[state] += 1
@@ -551,11 +585,13 @@ def report(names, log=print, rows_for=_published_rows):
             log(f"{tk}: no source list")
             continue
         rows = rows_for(tk)
-        cov = coverage(lst, rows)
+        extended = os.environ.get("FU_IR_EXTENDED") == "1"
+        cov = coverage(lst, rows, extended=extended)
         fixes = corrections(lst, rows)
         out[tk] = {"coverage": cov, "corrections": fixes, "documents": len(rows)}
-        log(f"{tk}: {cov['listed']} listed, {cov['storable']} to store: {cov['stored']} stored, {cov['copy']} covered by another copy, "
-            f"{cov['missing']} missing; {cov['link']} link only, {cov['not_collected']} extended not collected; "
+        wanted = len(storable(lst, extended=extended))
+        log(f"{tk}: {cov['listed']} listed, {wanted} to store{' (everything listed)' if extended else ''}: {cov['stored']} stored, "
+            f"{cov['copy']} covered by another copy, {cov['missing']} missing; {cov['link']} link only, {cov['not_collected']} extended not collected; "
             f"{len(fixes)} stored documents need a field corrected; index holds {len(rows)} documents")
     return out
 

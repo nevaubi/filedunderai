@@ -1,6 +1,6 @@
 (function (root) {
   'use strict';
-  const TYPES = Object.freeze({ release: 'Company release', presentation: 'Presentation', supplement: 'Supplement / data', remarks: 'Prepared remarks / letter', transcript: 'Transcript', annual_report: 'Annual report', other: 'Other' });
+  const TYPES = Object.freeze({ release: 'Company release', presentation: 'Presentation', supplement: 'Supplement / data', remarks: 'Prepared remarks / letter', transcript: 'Transcript', annual_report: 'Annual report', sec_filing: 'SEC filing', archive: 'File archive', image: 'Image', other: 'Other' });
   const PAGE_SIZE = 50;
   const count = value => Number.isSafeInteger(value) && value >= 0 ? value : 0;
   const sum = value => ['discovery', 'documents', 'extractions'].reduce((n, key) => n + count(value?.[key]), 0);

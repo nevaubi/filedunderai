@@ -54,6 +54,16 @@ class ReadersTest(unittest.TestCase):
         self.assertEqual(ir_official.labels("1231", 2026, 3), ("Q3 FY26", "2026-09-30"))
         self.assertEqual(ir_official.labels("1231", 2025, None), ("FY2025", "2025-12-31"))
 
+    def test_text_filings_are_read_by_page(self):
+        text = ir.extract_text(b"<DOCUMENT>\n<TYPE>10-Q\nPart I\n<PAGE>   2\nNet income 42\n\x0cSignatures\n", ".txt")
+        self.assertEqual(([p.strip() for p in text["pages"]], text["extraction"]["status"]),
+                         (["<DOCUMENT>\n<TYPE>10-Q\nPart I", "Net income 42", "Signatures"], "verified"))
+
+    def test_originals_are_recognised_by_their_first_bytes(self):
+        for body, want in ((b"PK\x03\x04rest", ".zip"), (b"\xff\xd8\xff\xe0rest", ".jpg"), (b"\x89PNG\r\n\x1a\nrest", ".png"),
+                           (b"<!doctype html><html>", None), (b"%PDF-1.7", None), (b"", None)):
+            self.assertEqual(ir.sniff_original(body), want, body[:8])
+
     def test_same_file_under_a_new_site_build_token(self):
         a = "https://d1io3yog0oux5.cloudfront.net/_bc4a965077ef1fae05650189449ffdf0/pnc/db/2463/24028/earnings_release/3Q26.pdf"
         b = "https://D1IO3YOG0OUX5.cloudfront.net/_089afc4ce03f3c8175c939c4de65c807/pnc/db/2463/24028/earnings_release/3Q26.pdf#page=2"
@@ -100,7 +110,10 @@ class BuildTest(unittest.TestCase):
         first = self.quarterly("JPM", doc_type="supplement", ext=".pdf", fiscal_year=2005, fiscal_quarter=1)[0]
         self.assertEqual((first["fiscal_label"], first["period_end"], first["store"]), ("Q1 FY05", "2005-03-31", "core"))
         self.assertTrue(first["url"].endswith("/2005/1st-quarter/1q05-earnings-supplement.pdf"))
-        self.assertTrue(all(d["store"] == "link" for d in self.quarterly("JPM", doc_type="sec_filing")))
+        # the 10-Q and 10-K copies on the company's site are stored when a run asks for everything; streams are links
+        filings = self.quarterly("JPM", doc_type="sec_filing")
+        self.assertEqual(({d["store"] for d in filings}, {ir_official.fetch_of(d) for d in filings}), ({"extended"}, {"file"}))
+        self.assertEqual({d["store"] for d in self.quarterly("JPM", doc_type="webcast")}, {"link"})
 
     def test_amzn(self):
         raw = raw_files("AMZN")["AMZN--quarterly-results-and-events.json"]
@@ -108,9 +121,13 @@ class BuildTest(unittest.TestCase):
         self.assertEqual(len({d["period_end"] for d in self.quarterly("AMZN")}), raw["quarter_count"])
         pdfs = self.quarterly("AMZN", doc_type="release", ext=".pdf")
         self.assertEqual((len(pdfs), {d["store"] for d in pdfs}), (35, {"core"}))
-        # the web page of a release is the same release as its PDF: listed, not stored twice
+        # the web page of a release is the same release as its PDF: stored only when a run asks for everything
         pages = [d for d in self.quarterly("AMZN", doc_type="release") if d["ext"] != ".pdf"]
-        self.assertEqual((len(pages), {d["store"] for d in pages}), (35, {"link"}))
+        self.assertEqual((len(pages), {d["store"] for d in pages}), (35, {"extended"}))
+        self.assertEqual(({ir_official.fetch_of(d) for d in pages}, {ir_official.queue_item(d)["ext_hint"] for d in pages}), ({"page"}, {".html"}))
+        # recordings (60 MB to 1 GB each) and event pages hold no document: links
+        calls = self.quarterly("AMZN", doc_type="webcast")
+        self.assertEqual((len(calls), {d["store"] for d in calls}, sum(d["ext"] in ir_official.MEDIA_EXTS for d in calls)), (31, {"link"}, 22))
         self.assertEqual(len(self.quarterly("AMZN", doc_type="presentation")), 34)  # none for Q2 2018
         self.assertFalse(self.quarterly("AMZN", doc_type="presentation", fiscal_year=2018, fiscal_quarter=2))
 
@@ -122,11 +139,21 @@ class BuildTest(unittest.TestCase):
         self.assertEqual(len({d["period_end"] for d in self.quarterly("WFC")}), 23 + raw["historical_coverage"]["quarters"])
         self.assertEqual(len([d for d in self.lists["WFC"]["documents"] if d["section"] == "Annual reports"]), raw["historical_coverage"]["history_annual_reports"])
         filing = self.quarterly("WFC", fiscal_year=2000, fiscal_quarter=1)[0]
-        self.assertEqual((filing["doc_type"], filing["store"], filing["published"]), ("sec_filing", "link", "2000-05-15"))
+        self.assertEqual((filing["doc_type"], filing["store"], filing["published"]), ("sec_filing", "extended", "2000-05-15"))
+        # the filings Wells Fargo links are on sec.gov: requested the way EDGAR asks, as .htm or (before 2002) .txt
+        filings = self.quarterly("WFC", doc_type="sec_filing")
+        items = [ir_official.queue_item(d) for d in filings]
+        self.assertEqual((len(filings), {ir_official.fetch_of(d) for d in filings}, {i["source"] for i in items}), (108, {"sec"}, {"sec"}))
+        self.assertEqual(collections.Counter(i["ext_hint"] for i in items), {".html": 101, ".txt": 7})  # one links the filing's folder
+        self.assertEqual({i["kind_hint"] for i in items}, {"sec_filing"})
 
     def test_pnc(self):
         raw = raw_files("PNC")["PNC--financial-press-releases.json"]
         self.assertEqual(len(self.quarterly("PNC", doc_type="release")), len(raw["quarters"]))
+        # XBRL archives are kept as the original file
+        archives = [d for d in self.quarterly("PNC", doc_type="sec_filing") if d["ext"] == ".zip"]
+        self.assertEqual((len(archives), {d["store"] for d in archives}, {ir_official.queue_item(d).get("original_only") for d in archives}),
+                         (60, {"extended"}, {True}))
         self.assertTrue(all(d["published"] and d["source_page"].startswith("https://investor.pnc.com/news-events/financial-press-releases/detail/")
                             for d in self.quarterly("PNC", doc_type="release")))
         # the January 2009 page of preliminary 2008 results reports the quarter that had just ended
@@ -157,6 +184,13 @@ class BuildTest(unittest.TestCase):
         days = [d for d in self.lists["C"]["documents"] if d["section"] == "Investor days" and d["store"] == "core"]
         self.assertEqual({d["fiscal_year"] for d in days}, {2022, 2024, 2026})
         self.assertFalse([d for d in self.lists["C"]["documents"] if d["doc_type"] in ("regulatory", "prospectus", "proxy") and d["store"] != "extended"])
+
+    def test_only_recordings_and_event_pages_stay_links(self):
+        links = [d for lst in self.lists.values() for d in lst["documents"] if d["store"] == "link"]
+        self.assertEqual(collections.Counter(d["doc_type"] for d in links), {"webcast": 62})
+        self.assertTrue(all(d.get("why") for d in links))
+        kept = collections.Counter(ir_official.stored_type(d) for lst in self.lists.values() for d in lst["documents"] if d["store"] != "link")
+        self.assertEqual(set(kept) - set(ir_official.STORED_TYPES), {"sec_filing", "image", "archive", "other"})
 
 
 class CollectorTest(unittest.TestCase):
@@ -215,7 +249,7 @@ class CollectorTest(unittest.TestCase):
 
     def test_links_and_extended_material_are_listed_not_stored(self):
         sb = Store()
-        lst = listing({"url": "https://ir.example.test/q1-2026-10q.pdf", "title": "Q1 2026 10-Q", "doc_type": "sec_filing", "ext": ".pdf", "store": "link"},
+        lst = listing({"url": "https://events.example.test/q1-2026-call.jsp", "title": "Q1 2026 Webcast", "doc_type": "webcast", "ext": ".jsp", "store": "link"},
                       {"url": "https://ir.example.test/pillar-3-q1-2026.pdf", "title": "Pillar 3", "doc_type": "regulatory", "ext": ".pdf", "store": "extended",
                        "section": "Other regulatory filings"})
         with self.providers(lst):
@@ -223,6 +257,85 @@ class CollectorTest(unittest.TestCase):
         self.assertEqual((result["web"], self.requested, sb.rows), (0, [], {}))
         official = sb.json["ir/TEST.json"]["official"]
         self.assertEqual((official["link"], official["not_collected"], [f["state"] for f in official["files"]]), (1, 1, ["link"]))
+
+    def everything(self):
+        return patch.dict(os.environ, {"FU_IR_EXTENDED": "1"})
+
+    def test_everything_listed_is_stored_when_asked(self):
+        sb = Store()
+        filing, page, archive = ("https://www.sec.gov/Archives/edgar/data/1/000000000126000009/test-20260331.htm",
+                                 "https://ir.example.test/news/q1-2026-results", "https://ir.example.test/filings/q1-2026-xbrl.zip")
+        copy = "https://ir.example.test/filings/q1-2026-10q.pdf"
+        lst = listing({"url": "https://ir.example.test/q1-2026-release.pdf", "title": "Q1 2026 Earnings release", "doc_type": "release", "ext": ".pdf"},
+                      {"url": page, "title": "Q1 2026 Earnings release (web page)", "doc_type": "release", "ext": None, "store": "extended"},
+                      {"url": filing, "title": "Q1 2026 10-Q", "doc_type": "sec_filing", "ext": ".htm", "store": "extended"},
+                      {"url": copy, "title": "Q1 2026 10-Q", "doc_type": "sec_filing", "ext": ".pdf", "store": "extended"},
+                      {"url": archive, "title": "Q1 2026 10-Q (XBRL)", "doc_type": "sec_filing", "ext": ".zip", "store": "extended"})
+        bodies = {"https://ir.example.test/q1-2026-release.pdf": pdf_document(["Revenue 42"]), copy: pdf_document(["Form 10-Q", "Revenue 42"]),
+                  page: b"<!doctype html><html><body><p>First quarter revenue was 42.</p></body></html>", archive: b"PK\x03\x04" + b"\0" * 64}
+        asked_of_edgar = []
+
+        def edgar(url, **kw):
+            asked_of_edgar.append(url)
+            return b"<html><body><p>Quarterly report. Revenue 42.</p></body></html>"
+        with self.everything(), self.providers(lst, bodies), patch.object(ir, "_sec_request", side_effect=edgar):
+            result = ir.process_company(sb, "TEST", "Test", 1)
+        rows = {r["url"]: r for r in sb.rows.values()}
+        self.assertEqual((len(rows), result["official"]["stored"], result["official"]["missing"]), (5, 5, 0))
+        # the sec.gov document is asked of EDGAR, never of the web downloader
+        self.assertEqual((asked_of_edgar, filing in self.requested), ([filing], False))
+        self.assertEqual({(r["doc_type"], r["ext"], r["fiscal_label"], r["period_end"]) for r in rows.values()},
+                         {("release", ".pdf", "Q1 FY26", "2026-03-31"), ("release", ".html", "Q1 FY26", "2026-03-31"),
+                          ("sec_filing", ".html", "Q1 FY26", "2026-03-31"), ("sec_filing", ".pdf", "Q1 FY26", "2026-03-31"),
+                          ("sec_filing", ".zip", "Q1 FY26", "2026-03-31")})
+        # an archive is kept as the original file: no text, and no extraction is queued for it
+        kept = rows[archive]
+        self.assertEqual((kept["text_path"], kept["pages"], sb.objects["ir", kept["storage_path"]][:4]), (None, None, b"PK\x03\x04"))
+        state = json.loads(sb.objects["raw", "ir/checkpoints/TEST.json"])
+        self.assertEqual((state["outcomes"][kept["id"]]["status"], kept["id"] in state["queues"]["extractions"]), ("unsupported", False))
+        self.assertTrue(rows[copy]["text_path"] and rows[page]["text_path"] and rows[filing]["text_path"])
+
+    def test_extended_material_waits_until_it_is_asked_for(self):
+        sb = Store()
+        lst = listing({"url": "https://ir.example.test/filings/q1-2026-10q.pdf", "title": "Q1 2026 10-Q", "doc_type": "sec_filing", "ext": ".pdf", "store": "extended"},
+                      {"url": "https://www.sec.gov/Archives/edgar/data/1/000000000126000009/test-20260331.htm", "title": "Q1 2026 10-Q", "doc_type": "sec_filing",
+                       "ext": ".htm", "store": "extended"})
+        with self.providers(lst), patch.object(ir, "_sec_request", side_effect=AssertionError("not asked for")):
+            result = ir.process_company(sb, "TEST", "Test", 1)
+        self.assertEqual((self.requested, sb.rows, result["official"]["not_collected"]), ([], {}, 2))
+
+    def test_an_error_page_in_place_of_an_archive_is_not_stored(self):
+        sb = Store()
+        url = "https://ir.example.test/filings/q1-2026-xbrl.zip"
+        lst = listing({"url": url, "title": "Q1 2026 10-Q (XBRL)", "doc_type": "sec_filing", "ext": ".zip", "store": "extended"})
+        with self.everything(), self.providers(lst, {url: b"<!doctype html><html><body>Access denied</body></html>"}):
+            result = ir.process_company(sb, "TEST", "Test", 1)
+        state = json.loads(sb.objects["raw", "ir/checkpoints/TEST.json"])
+        self.assertEqual((sb.rows, result["official"]["missing"], state["queues"]["documents"][url]["error"]),
+                         ({}, 1, "Downloaded content is not the linked file"))
+        with self.everything(), self.providers(lst, {url: b"PK\x03\x04" + b"\0" * (ir.ORIGINAL_MAX_BYTES + 1)}):
+            ir.process_company(sb, "TEST", "Test", 1)
+        state = json.loads(sb.objects["raw", "ir/checkpoints/TEST.json"])
+        self.assertEqual(sb.rows, {})
+        self.assertIn("stored up to", state["queues"]["documents"][url]["error"])
+
+    def test_an_sec_document_keeps_what_the_edgar_collector_wrote(self):
+        sb = Store()
+        url = "https://www.sec.gov/Archives/edgar/data/1/000000000126000001/test-8k.htm"
+        did = existing(sb, url)
+        sb.rows[did].update(doc_type="release", fiscal_label="Q4 FY25", period_end="2025-12-31", title="8-K 2026-04-14 test-8k.htm (Items 2.02)")
+        lst = listing({"url": url, "title": "Q1 2026 8-K", "doc_type": "sec_filing", "ext": ".htm", "store": "extended"})
+        self.assertEqual(ir_official.corrections(lst, list(sb.rows.values())), {})
+        cov = ir_official.coverage(lst, list(sb.rows.values()), extended=True)
+        self.assertEqual((cov["stored"], cov["files"][0]["id"]), (1, did))
+
+    def test_only_an_earnings_document_can_be_covered_by_another_copy(self):
+        sb = Store()
+        did = existing(sb, "https://ir.example.test/filings/q1-2026-10q.pdf")
+        sb.rows[did].update(period_end="2026-03-31", doc_type="sec_filing")
+        lst = listing({"url": "https://ir.example.test/filings/q1-2026-xbrl.zip", "title": "Q1 2026 10-Q (XBRL)", "doc_type": "sec_filing", "ext": ".zip", "store": "extended"})
+        cov = ir_official.coverage(lst, list(sb.rows.values()), extended=True)
+        self.assertEqual((cov["copy"], cov["missing"]), (0, 1))
 
     def test_a_quarter_held_only_as_an_sec_copy_is_reported_as_a_copy_and_still_queued(self):
         sb = Store()

@@ -273,7 +273,22 @@ def sniff_ext(body, url):
 CT = {".pdf": "application/pdf", ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsm": "application/vnd.ms-excel.sheet.macroEnabled.12",
       ".xls": "application/vnd.ms-excel", ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation", ".ppt": "application/vnd.ms-powerpoint",
       ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".doc": "application/msword", ".csv": "text/csv",
-      ".htm": "text/plain; charset=utf-8", ".html": "text/plain; charset=utf-8"}
+      ".htm": "text/plain; charset=utf-8", ".html": "text/plain; charset=utf-8", ".txt": "text/plain; charset=utf-8",
+      ".zip": "application/zip", ".jpg": "image/jpeg", ".png": "image/png"}
+# Largest file kept as an original without text (archives, images); larger ones are reported, not stored.
+ORIGINAL_MAX_BYTES = int(os.environ.get("FU_IR_ORIGINAL_MAX_MB", "45")) * 1024 * 1024
+
+
+def sniff_original(body):
+    """Extension of a file that is kept as it is, from its first bytes; None when it is not such a file (an error
+    page answered in its place, for instance)."""
+    if body[:4] in (b"PK\x03\x04", b"PK\x05\x06"):
+        return ".zip"
+    if body[:3] == b"\xff\xd8\xff":
+        return ".jpg"
+    if body[:8] == b"\x89PNG\r\n\x1a\n":
+        return ".png"
+    return None
 
 
 def _text_result(kind, content, limits=None, errors=None):
@@ -583,6 +598,12 @@ def extract_text(body, ext, deadline=None):
         result = _text_result("pages", [text])
         result["extraction"]["coordinates"] = "document; no physical page mapping"
         return result
+    if ext == ".txt":
+        # EDGAR text filings mark their pages with <PAGE>; without a marker the filing is one page.
+        pages = [p for p in re.split(r"\f|^[ \t]*<PAGE>[^\n]*$", body.decode("utf-8", "replace"), flags=re.M) if p.strip()]
+        if len(pages) > 2000:
+            limits.append("pages:2000")
+        return _text_result("pages", pages[:2000], limits)
     if ext in (".htm", ".html", ".md"):
         from bs4 import BeautifulSoup
         if ext == ".md":
@@ -1465,24 +1486,34 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
                 if alt is None:
                     raise
                 body, title = alt, TEXT_COPY_PREFIX + (title or "")
-            ext = sniff_ext(body, url) or item.get("ext_hint")
+            # A listed archive or image is kept as the original file, without text.
+            original_only = bool(item.get("original_only") and item.get("official"))
+            if original_only:
+                ext = sniff_original(body)
+                if not ext:
+                    raise ValueError("Downloaded content is not the linked file")
+                if len(body) > ORIGINAL_MAX_BYTES:
+                    raise ValueError(f"Original is {len(body) // (1024 * 1024)} MB; files kept without text are stored up to {ORIGINAL_MAX_BYTES // (1024 * 1024)} MB")
+            else:
+                ext = sniff_ext(body, url) or item.get("ext_hint")
             if ext in (".html", ".htm") and item.get("ext_hint") not in (".html", ".htm") and not (title or "").startswith(TEXT_COPY_PREFIX):
                 alt = text_copy(url, deadline=deadline) if copy_ok else None
                 if alt is None:
                     raise ValueError("Downloaded HTML instead of the linked document")
                 body, title, ext = alt, TEXT_COPY_PREFIX + (title or ""), ".html"
-            if not body or not ext or ext in (".zip", ".ole", ".pdf?"):
+            if not body or not ext or ext in (".ole", ".pdf?") or (ext == ".zip" and not original_only):
                 raise ValueError("Unsupported or empty downloaded original")
             stored = store_document(sb, ticker, url, body, ext, title, item.get("source_page"), have_hashes,
                                     kind_hint=item.get("kind_hint"), log=log, fye=fye,
                                     ref_date=dt.date.fromisoformat(item["ref_date"]) if item.get("ref_date") else None,
                                     published=item.get("published"), outcomes=state["outcomes"], deadline=deadline,
-                                    period=(item.get("fiscal_label"), item.get("period_end")) if item.get("official") else None)
+                                    period=(item.get("fiscal_label"), item.get("period_end")) if item.get("official") else None,
+                                    original_only=original_only)
             if stored:
                 stats[item["source"]] += 1
                 by_id[did] = {"id": did}
                 quality = state["outcomes"][did]
-                if quality["status"] != "verified":
+                if quality["status"] != "verified" and not original_only:
                     task = _enqueue(state, "extractions", did, id=did)
                     if task:
                         _failure(task, ValueError("Extraction " + quality["status"]), stats, "extraction")
@@ -1519,12 +1550,12 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
 
 
 def store_document(sb, ticker, url, body, ext, title, source_page, have_hashes, kind_hint=None, log=print, fye=None, ref_date=None, published=None, outcomes=None, deadline=None,
-                   period=None):
+                   period=None, original_only=False):
     """Stores the original file and its extracted text, classifies it and writes the ir_documents row.
 
     period is (fiscal label, period end) as the company states it on its own results page (etl/ir_official.py). When
     given, the period and kind_hint are taken as stated: nothing is inferred from the file name, the retrieval date
-    or the first page."""
+    or the first page. original_only keeps the file without reading it (an archive or an image has no pages)."""
     did = doc_id(url)
     sha = hashlib.sha256(body).hexdigest()
     if sha in have_hashes:
@@ -1533,7 +1564,9 @@ def store_document(sb, ticker, url, body, ext, title, source_page, have_hashes, 
     sb.put_object("ir", path, body, CT.get(ext, "application/octet-stream"), "public, max-age=31536000, immutable")
     text = None
     try:
-        text = extract_text(body, ext, deadline=deadline)
+        text = ({"kind": "pages", "pages": [], "extraction": {"status": "unsupported", "nonempty": False, "limits": [],
+                                                                "errors": [f"kept as the original file:{ext}"]}}
+                if original_only else extract_text(body, ext, deadline=deadline))
     except Exception as e:
         text = {"kind": "pages", "pages": [], "extraction": {"status": "failed", "nonempty": False, "limits": [], "errors": [str(e)[:200]]}}
         log(f"  {ticker} text {url[-60:]} failed: {str(e)[:100]}")
