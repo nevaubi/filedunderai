@@ -39,6 +39,8 @@ const PUBLIC_RX = [
   /^changes\/(feed|[A-Za-z0-9_.-]{1,32})\.json$/,
   /^earnings\/(preview|score|calls)\/[A-Za-z0-9_.-]{1,32}\.json$/,
   /^earnings\/season\.json$/,
+  /^calls\/(coverage|themes|people|[A-Za-z0-9_.-]{1,32})\.json$/,
+  /^calls\/themes\/[a-z0-9_-]{1,64}\.json$/,
   /^themes\/(index|[a-z0-9_-]{1,64})\.json$/,
   /^entities\/index\.json$/,
   /^form144\/(recent|[A-Za-z0-9_.-]{1,32})\.json$/,
