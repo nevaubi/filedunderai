@@ -10,6 +10,9 @@ test("cleanPath allows dataset files only", () => {
   assert.equal(cleanPath("prices/IDX_GSPC.json"), "prices/IDX_GSPC.json");
   assert.equal(cleanPath("universe.json"), "universe.json");
   assert.equal(cleanPath("companies/BRK.B.json"), "companies/BRK.B.json");
+  for (const ok of ["calls/JPM.json", "calls/themes.json", "calls/coverage.json", "calls/themes/tariffs.json", "estimates/analysts.json", "regulatory/catalysts.json"]) {
+    assert.equal(cleanPath(ok), ok, ok);
+  }
   for (const bad of ["../raw/x.json", "/companies/NVDA.json", "companies/../universe.json", "raw/NVDA.json", "companies/NVDA.txt", "companies/a/b.json", "", null]) {
     assert.equal(cleanPath(bad), null, String(bad));
   }
