@@ -1,0 +1,55 @@
+name: Mirror HOOD Quarterly IR and SEC Attachments
+on:
+  push:
+    branches:
+      - research/hood-ir-earnings-archive-2026-11-12
+    paths:
+      - .github/workflows/hood-ir-archive.yml
+      - research/hood_ir_archive/**
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Check out isolated research branch
+        uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install crawler dependencies
+        run: python -m pip install --disable-pip-version-check requests beautifulsoup4
+      - name: Collect every published quarter and SEC data format
+        run: python research/hood_ir_archive/download.py --workers 7 --output HOOD_Quarterly_Earnings
+        continue-on-error: true
+      - name: Print archive verification
+        if: always()
+        run: |
+          if test -f HOOD_Quarterly_Earnings/summary.json; then
+            cat HOOD_Quarterly_Earnings/summary.json | head -c 10000
+          else
+            echo "No archive summary produced"
+          fi
+      - name: Upload complete raw-file archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: HOOD-Quarterly-IR-Archive-2021-2026
+          path: HOOD_Quarterly_Earnings/
+          if-no-files-found: warn
+          compression-level: 6
+          retention-days: 30
+      - name: Upload source and verification manifests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: HOOD-IR-Manifests
+          path: |
+            HOOD_Quarterly_Earnings/summary.json
+            HOOD_Quarterly_Earnings/official_source_inventory.json
+            HOOD_Quarterly_Earnings/download_manifest.csv
+          if-no-files-found: warn
+          retention-days: 30
