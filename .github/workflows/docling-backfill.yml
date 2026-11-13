@@ -3,6 +3,9 @@ name: Docling document parsing
 # docling/{ticker}/{id}.json.gz to the "ir" bucket. Documents already parsed are skipped, so the workflow can be
 # re-run until coverage is complete. Start with a trial (shards=4, limit=125 is about 500 documents).
 # The daily schedule picks up newly stored documents (and keeps working through the backfill) on 8 runners.
+# "tickers" limits a run to named companies: the IR official sources workflow starts one for the companies whose
+# files it has just stored, so they are parsed the same hour. "ocr" reads pages that have no text layer (scans);
+# it is off by default because IR documents are born digital and OCR is several times slower per page.
 on:
   schedule:
     - cron: "17 6 * * *"
@@ -28,6 +31,15 @@ on:
         description: "Table model: auto (accurate for supplements, fast otherwise), accurate or fast"
         required: false
         default: "auto"
+      tickers:
+        description: "Only these tickers (comma separated; empty = every company)"
+        required: false
+        default: ""
+      ocr:
+        description: "OCR pages without a text layer (scanned documents); slower"
+        type: boolean
+        required: false
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -38,6 +50,8 @@ env:
   SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
   SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
   DOCLING_TABLES: ${{ github.event.inputs.tables || 'auto' }}
+  DOCLING_OCR: ${{ github.event.inputs.ocr == 'true' && '1' || '0' }}
+  TICKERS: ${{ github.event.inputs.tickers || '' }}
   OMP_NUM_THREADS: "4"
 jobs:
   plan:
@@ -86,7 +100,7 @@ jobs:
         run: |
           python -m etl.docling_ingest --shard "$SHARD" --shards "$SHARDS" \
             --limit "${{ github.event.inputs.limit || '250' }}" --hours "${{ github.event.inputs.hours || '5' }}" \
-            --doc-types "${{ github.event.inputs.doc_types }}"
+            --doc-types "${{ github.event.inputs.doc_types }}" --tickers "$TICKERS"
   publish:
     needs: parse
     if: always()
@@ -99,4 +113,4 @@ jobs:
           python-version: "3.12"
       - run: pip install -r requirements.txt
       - name: Publish tables for the app
-        run: python -m etl.docling_ingest --publish
+        run: python -m etl.docling_ingest --publish --tickers "$TICKERS"

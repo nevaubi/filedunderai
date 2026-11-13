@@ -294,6 +294,17 @@ def publish(sb, tickers=None, workers=8, log=print):
     return totals
 
 
+def ticker_list(text):
+    """Tickers of a --tickers value, upper-cased; None when it names none (every company). The value reaches a
+    database filter, so anything that is not ticker-shaped is refused."""
+    import re
+    names = [x.strip().upper() for x in (text or "").split(",") if x.strip()]
+    bad = [x for x in names if not re.fullmatch(r"[A-Z0-9.\-]{1,10}", x)]
+    if bad:
+        raise SystemExit(f"Not a ticker: {bad}")
+    return list(dict.fromkeys(names)) or None
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--shard", type=int, default=int(os.environ.get("SHARD", 0)))
@@ -307,10 +318,10 @@ def main(argv=None):
     ap.add_argument("--publish", action="store_true", help="copy parsed tables to public-data doctables/ and exit")
     a = ap.parse_args(argv)
     if a.publish:
-        print(json.dumps(publish(Supabase(), tickers=[x for x in a.tickers.split(",") if x] or None)))
+        print(json.dumps(publish(Supabase(), tickers=ticker_list(a.tickers))))
         return 0
     stats = run(Supabase(), a.shard, a.shards, a.limit, a.hours, a.engine,
-                doc_types=[x for x in a.doc_types.split(",") if x] or DEFAULT_TYPES, tickers=[x for x in a.tickers.split(",") if x] or None, redo=a.redo)
+                doc_types=[x for x in a.doc_types.split(",") if x] or DEFAULT_TYPES, tickers=ticker_list(a.tickers), redo=a.redo)
     print(json.dumps(stats))
     return 0 if stats["done"] or not stats["failed"] else 1
 
