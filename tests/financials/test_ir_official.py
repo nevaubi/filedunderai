@@ -70,6 +70,13 @@ class ReadersTest(unittest.TestCase):
         self.assertEqual(ir_official.url_key(a), ir_official.url_key(b))
         self.assertNotEqual(ir_official.url_key(a), ir_official.url_key(a.replace("3Q26", "2Q26")))
 
+    def test_a_file_behind_a_sign_in_is_fetched_from_the_public_site(self):
+        listed = "https://www.citivelocity.com/rcs/citigpa/storage/public/Green-and-Social-Bond-Report-2023.pdf"
+        self.assertEqual(ir_official.public_url(listed), "https://www.citigroup.com/rcs/citigpa/storage/public/Green-and-Social-Bond-Report-2023.pdf")
+        for same in ("https://content.citivelocity.com/speedUi/aknetpublic/photogallery.zip", "https://www.citivelocity.com/other/file.pdf",
+                     "https://www.citigroup.com/rcs/citigpa/storage/public/fund-over.pdf"):
+            self.assertEqual(ir_official.public_url(same), same)
+
     def test_types(self):
         for words, url, want in (("earnings_release_pdf", "https://x.test/a.pdf", "release"), ("Earnings Supplement (xls)", "https://x.test/a.xlsx", "supplement"),
                                  ("sec_filing_xbrl_zip", "https://x.test/a.zip", "sec_filing"), ("10-Q", "https://x.test/a.pdf", "sec_filing"),
@@ -184,6 +191,11 @@ class BuildTest(unittest.TestCase):
         days = [d for d in self.lists["C"]["documents"] if d["section"] == "Investor days" and d["store"] == "core"]
         self.assertEqual({d["fiscal_year"] for d in days}, {2022, 2024, 2026})
         self.assertFalse([d for d in self.lists["C"]["documents"] if d["doc_type"] in ("regulatory", "prospectus", "proxy") and d["store"] != "extended"])
+        # two bond reports are linked on a host that asks for a sign-in; the list says where the public copy is
+        public = {d["title"]: d["fetch_url"] for d in self.lists["C"]["documents"] if d.get("fetch_url")}
+        self.assertEqual(public, {f"Citi\u2019s {y} Green and Social Bond Report": f"https://www.citigroup.com/rcs/citigpa/storage/public/Green-and-Social-Bond-Report-{y}.pdf"
+                                  for y in (2023, 2024)})
+        self.assertFalse([d for t in ("JPM", "AMZN", "WFC", "PNC") for d in self.lists[t]["documents"] if d.get("fetch_url")])
 
     def test_only_recordings_and_event_pages_stay_links(self):
         links = [d for lst in self.lists.values() for d in lst["documents"] if d["store"] == "link"]
@@ -402,6 +414,103 @@ class CollectorTest(unittest.TestCase):
         with self.providers(lst):
             result = ir.process_company(sb, "TEST", "Test", 1)
         self.assertEqual((self.requested, list(sb.rows), result["official"]["stored"]), ([], [did], 1))
+
+    def test_a_listed_file_whose_bytes_are_stored_under_another_address_counts_as_stored(self):
+        sb = Store()
+        # one deck at two addresses, as a company's own pages link it
+        a, b = "https://ir.example.test/decks/investor-day.csv", "https://ir.example.test/decks/investor-day.csv?nocache=699"
+        deck = b"Label,Value\nClients,42\n"
+        lst = listing({"url": a, "title": "Investor day deck", "doc_type": "presentation", "ext": ".csv"},
+                      {"url": b, "title": "Investor day deck (events page)", "doc_type": "presentation", "ext": ".csv"})
+        with self.providers(lst, {a: deck, b: deck}):
+            result = ir.process_company(sb, "TEST", "Test", 1)
+        self.assertEqual((len(sb.rows), sorted(self.requested)), (1, [a, b]))
+        kept = next(iter(sb.rows))
+        official = sb.json["ir/TEST.json"]["official"]
+        self.assertEqual((official["stored"], official["same_file"], official["missing"], result["official"]["missing"]), (2, 1, 0, 0))
+        other = [f for f in official["files"] if f.get("same_file")]
+        self.assertEqual([(f["state"], f["id"]) for f in other], [("stored", kept)])
+        with self.providers(lst, {a: deck, b: deck}):
+            again = ir.process_company(sb, "TEST", "Test", 1)
+        self.assertEqual((self.requested, again["official"]["same_file"]), ([], 1))
+
+    def test_a_file_marked_done_before_the_other_address_was_recorded_is_fetched_once_more(self):
+        sb = Store()
+        a, b = "https://ir.example.test/decks/investor-day.csv", "https://ir.example.test/decks/investor-day.csv?nocache=699"
+        deck = b"Label,Value\nClients,42\n"
+        lst = listing({"url": a, "title": "Investor day deck", "doc_type": "presentation", "ext": ".csv"},
+                      {"url": b, "title": "Investor day deck (events page)", "doc_type": "presentation", "ext": ".csv"})
+        with self.providers(lst, {a: deck, b: deck}):
+            ir.process_company(sb, "TEST", "Test", 1)
+        # a checkpoint written before the collector recorded which document holds the same bytes
+        state = json.loads(sb.objects["raw", "ir/checkpoints/TEST.json"])
+        skipped = [u for u, i in state["queues"]["documents"].items() if i.pop("same_as", None)]
+        self.assertEqual(len(skipped), 1)
+        sb.objects["raw", "ir/checkpoints/TEST.json"] = json.dumps(state)
+        with self.providers(lst, {a: deck, b: deck}):
+            result = ir.process_company(sb, "TEST", "Test", 1)
+        self.assertEqual((self.requested, len(sb.rows), result["official"]["stored"], result["official"]["missing"]), (skipped, 1, 2, 0))
+        with self.providers(lst, {a: deck, b: deck}):
+            ir.process_company(sb, "TEST", "Test", 1)
+        self.assertEqual(self.requested, [])
+
+    def test_a_file_behind_a_sign_in_is_stored_from_its_public_address_under_the_listed_one(self):
+        sb = Store()
+        listed, public = "https://login.example.test/files/q1-2026-supplement.pdf", "https://www.example.test/files/q1-2026-supplement.pdf"
+        lst = listing({"url": listed, "fetch_url": public, "title": "Q1 2026 Financial supplement", "doc_type": "supplement", "ext": ".pdf"})
+        with self.providers(lst, {listed: common.HTTPError(401, "Unauthorized"), public: pdf_document(["Total net revenue 50,172 57,347"])}):
+            result = ir.process_company(sb, "TEST", "Test", 1)
+        row = next(iter(sb.rows.values()))
+        self.assertEqual((self.requested, row["url"], row["id"], row["ext"], result["official"]["stored"]), ([public], listed, ir.doc_id(listed), ".pdf", 1))
+
+    def test_a_text_only_copy_is_replaced_by_the_file_once_the_list_gives_its_public_address(self):
+        sb = Store()
+        listed, public = "https://login.example.test/files/q1-2026-supplement.pdf", "https://www.example.test/files/q1-2026-supplement.pdf"
+        did = existing(sb, listed)
+        sb.rows[did].update(title=ir.TEXT_COPY_PREFIX + "Q1 2026 Financial supplement", ext=".html", doc_type="supplement", period_end="2026-03-31",
+                            sha256="0" * 64)
+        lst = listing({"url": listed, "fetch_url": public, "title": "Q1 2026 Financial supplement", "doc_type": "supplement", "ext": ".pdf"})
+        copies = []
+        with patch.object(ir, "text_copy", side_effect=lambda u, **kw: copies.append(u) or b"<!doctype html><html><body><pre>copy</pre></body></html>"):
+            with self.providers(lst, {listed: common.HTTPError(401, "Unauthorized"), public: pdf_document(["Total net revenue 50,172 57,347"])}):
+                result = ir.process_company(sb, "TEST", "Test", 1)
+                first = list(self.requested)
+                ir.process_company(sb, "TEST", "Test", 1)
+        row = sb.rows[did]
+        self.assertEqual((first, self.requested, copies, list(sb.rows), row["ext"], row["title"], result["official"]["stored"]),
+                         ([public], [public], [], [did], ".pdf", "Q1 2026 Financial supplement", 1))
+        # a text-only copy with no public address in the list is left as it is
+        sb2 = Store()
+        did2 = existing(sb2, listed)
+        sb2.rows[did2].update(title=ir.TEXT_COPY_PREFIX + "Q1 2026 Financial supplement", ext=".html", doc_type="supplement", period_end="2026-03-31")
+        with self.providers(listing({"url": listed, "title": "Q1 2026 Financial supplement", "doc_type": "supplement", "ext": ".pdf"})):
+            ir.process_company(sb2, "TEST", "Test", 1)
+        self.assertEqual((self.requested, sb2.rows[did2]["ext"]), ([], ".html"))
+
+    def test_the_web_page_of_a_release_is_covered_by_the_stored_release_file(self):
+        sb = Store()
+        did = existing(sb, "https://ir.example.test/files/q1-2026-release.pdf")
+        sb.rows[did].update(period_end="2026-03-31", doc_type="release")
+        page = {"url": "https://www.example.test/news/2026/first-quarter-results", "title": "Q1 2026 Earnings release (web page)", "doc_type": "release",
+                "ext": None, "store": "extended", "why": ir_official.RELEASE_PAGE}
+        cov = ir_official.coverage(listing(page), list(sb.rows.values()), extended=True)
+        self.assertEqual((cov["copy"], cov["missing"], cov["files"][0]["copy_id"]), (1, 0, did))
+        # any other extended file with nothing stored under its address is missing
+        cov = ir_official.coverage(listing({**page, "why": None}), list(sb.rows.values()), extended=True)
+        self.assertEqual((cov["copy"], cov["missing"]), (0, 1))
+
+    def test_the_report_counts_files_stored_under_another_address(self):
+        sb = Store()
+        did = existing(sb, "https://ir.example.test/decks/investor-day.csv")
+        lst = listing({"url": "https://ir.example.test/decks/investor-day.csv?nocache=699", "title": "Investor day deck", "doc_type": "presentation", "ext": ".csv"})
+        lines = []
+        with patch.object(ir_official, "load", return_value=lst):
+            out = ir_official.report(["TEST"], log=lines.append, rows_for=lambda tk: list(sb.rows.values()),
+                                     same_for=lambda tk: {ir_official.url_key(lst["documents"][0]["url"]): did})
+            plain = ir_official.report(["TEST"], log=lines.append, rows_for=lambda tk: list(sb.rows.values()))
+        self.assertEqual((out["TEST"]["coverage"]["stored"], out["TEST"]["coverage"]["missing"]), (1, 0))
+        self.assertIn("1 stored (1 under another address), 0 covered by another copy, 0 missing", lines[0])
+        self.assertEqual(plain["TEST"]["coverage"]["missing"], 1)
 
 
 if __name__ == "__main__":

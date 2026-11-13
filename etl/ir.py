@@ -1221,27 +1221,38 @@ def _correct_listed(sb, official, rows):
 def _queue_official(state, official, rows, extended=False):
     """Queues every listed file that is not stored yet, with the period, type and date the company states. A file
     found earlier by crawling keeps its queue entry and takes the listed fields; one that was blocked is tried again
-    once per list version, because the list was checked against the live site."""
-    stored = {ir_official.url_key(r.get("url")) for r in rows}
+    once per list version, because the list was checked against the live site. Two more cases are fetched again:
+    a file marked done with nothing stored under its address (its bytes were already held under another address, and
+    the fetch records which document that is), and a text-only copy whose file has a public address in the list."""
+    stored = {}
+    for r in rows:
+        stored.setdefault(ir_official.url_key(r.get("url")), r)
     queue = state["queues"]["documents"]
     by_key = {ir_official.url_key(u): u for u in queue}
     n = 0
     for rec in ir_official.storable(official, extended=extended):
         key = ir_official.url_key(rec["url"])
-        if key in stored:
-            continue
+        row = stored.get(key)
         fields = ir_official.queue_item(rec)
-        url = by_key.get(key) or _url(rec["url"])
+        replace = bool(row and fields.get("fetch_url") and (row.get("title") or "").startswith(TEXT_COPY_PREFIX))
+        if row and not replace:
+            continue
+        url = by_key.get(key) or (row["url"] if row else _url(rec["url"]))
         if not url:
             continue
         item = queue.get(url)
         if item is None:
-            if _enqueue(state, "documents", url, **{**fields, "url": url}) is not None:
+            if _enqueue(state, "documents", url, **{**fields, "url": url, **({"replace": True} if replace else {})}) is not None:
                 n += 1
             continue
-        retry = item.get("status") == "blocked" and item.get("official") != fields["official"]
+        newer = item.get("official") != fields["official"]
+        retry = item.get("status") == "blocked" and newer
+        recheck = item.get("status") == "done" and not row and "same_as" not in item
+        again = replace and (item.get("status") != "blocked" or newer)
         item.update({k: v for k, v in fields.items() if k not in ("url", "source") and v is not None})
-        if retry:
+        if again:
+            item["replace"] = True
+        if retry or recheck or (again and item.get("status") not in ACTIVE):
             item.update(status="pending", attempts=0)
             item.pop("error", None)
             n += 1
@@ -1353,6 +1364,7 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
             stats["official_queued"] = _queue_official(state, official, existing, extended=os.environ.get("FU_IR_EXTENDED") == "1")
     by_id = {r["id"]: r for r in existing}
     have_hashes = {r["sha256"] for r in existing if r.get("sha256")}
+    stored_as = {r["sha256"]: r["id"] for r in existing if r.get("sha256")}
     site = (sb.select("ir_sites", f"select=*&ticker=eq.{ticker}") or [None])[0]
     # Poll source roots independently from old archive failures. Successful pages
     # keep their actual completed_at; no-op invocations cannot renew freshness.
@@ -1464,7 +1476,7 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
         return item.get("published") or item.get("period_end") or f"{period_hint(url, item.get('title', ''))[1] or 0:04d}-00-00"
     for url, item in sorted(state["queues"]["documents"].items(), key=document_date, reverse=True):
         did = doc_id(url)
-        if did in by_id:
+        if did in by_id and not item.get("replace"):
             _complete(item)
             continue
         if (item["status"] not in ACTIVE or remaining <= 0 or _expired(deadline) or repair_existing or publish_only or (not web and item.get("source") == "web")
@@ -1476,11 +1488,14 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
             pdf_hint = item.get("ext_hint") in (".pdf", ".pdf?")
             # A file from an official list answered when the list was checked, so a refusal is most likely the host
             # throttling this run: it is retried on later passes, and a text-only copy stands in only on the last attempt.
-            copy_ok = item["source"] == "web" and pdf_hint and (not item.get("official") or item["attempts"] >= MAX_ATTEMPTS - 1)
+            copy_ok = (item["source"] == "web" and pdf_hint and not item.get("replace")
+                       and (not item.get("official") or item["attempts"] >= MAX_ATTEMPTS - 1))
             if item.get("official") and OFFICIAL_PAUSE:
                 time.sleep(OFFICIAL_PAUSE)
+            # A listed host that asks for a sign-in: the list gives the public address of the same file.
+            source_url = (item.get("fetch_url") if item.get("official") else None) or url
             try:
-                body = _sec_request(url, deadline=deadline, raw=True) if item["source"] == "sec" else download(url, deadline=deadline)
+                body = _sec_request(url, deadline=deadline, raw=True) if item["source"] == "sec" else download(source_url, deadline=deadline)
             except HTTPError as e:
                 alt = text_copy(url, deadline=deadline) if copy_ok and e.code in (401, 403, 406, 429, 503) else None
                 if alt is None:
@@ -1509,14 +1524,20 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
                                     published=item.get("published"), outcomes=state["outcomes"], deadline=deadline,
                                     period=(item.get("fiscal_label"), item.get("period_end")) if item.get("official") else None,
                                     original_only=original_only)
+            sha = hashlib.sha256(body).hexdigest()
             if stored:
                 stats[item["source"]] += 1
                 by_id[did] = {"id": did}
+                stored_as[sha] = did
                 quality = state["outcomes"][did]
                 if quality["status"] != "verified" and not original_only:
                     task = _enqueue(state, "extractions", did, id=did)
                     if task:
                         _failure(task, ValueError("Extraction " + quality["status"]), stats, "extraction")
+            elif item.get("official") and stored_as.get(sha) != did:
+                # The same bytes are already stored under another address: the listed link opens that document.
+                item["same_as"] = stored_as.get(sha) or ""
+            item.pop("replace", None)
             _complete(item)
         except DeadlineReached:
             break
@@ -1539,7 +1560,8 @@ def _process_company(sb, ticker, name, cik, since_year, max_docs, refresh_site, 
              "results_page": site.get("results_url") if site else None, "documents": rows, "coverage": coverage}
     if official:
         # What the company lists on its own pages, by fiscal period, and which stored document holds each file.
-        listed = ir_official.coverage(official, rows, extended=os.environ.get("FU_IR_EXTENDED") == "1")
+        same = {ir_official.url_key(u): i["same_as"] for u, i in state["queues"]["documents"].items() if i.get("same_as")}
+        listed = ir_official.coverage(official, rows, extended=os.environ.get("FU_IR_EXTENDED") == "1", same=same)
         # Extended material that was not requested stays a count; its files are in etl/ir_sources/{ticker}.json.
         index["official"] = {"version": official["version"], "pages": sorted({b["page"] for b in official["built_from"] if b.get("page")}),
                              **{**listed, "files": [f for f in listed["files"] if f["state"] != "not_collected"]}}
