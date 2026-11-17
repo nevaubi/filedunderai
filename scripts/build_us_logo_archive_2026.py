@@ -118,7 +118,36 @@ def build_universe():
         if len(selected)==TARGET:
             break
     if len(selected)<TARGET:
-        raise RuntimeError(f"Only {len(selected)} validated US company ranks; no fabricated 2500 list")
+        print("Live market-cap source is inaccessible; falling back to a published US-listed equity dataset (2026-06-25).",flush=True)
+        secondary="https://raw.githubusercontent.com/scottcovert/us-stocks-dataset/master/data/stocks_enriched.json"
+        resp=get(secondary,timeout=50)
+        if not resp:
+            raise RuntimeError("Both ranking sources unavailable; refusing to invent company rankings")
+        payload=resp.json()
+        stocks=payload.get("stocks",[]) if isinstance(payload,dict) else payload
+        stocks=sorted(stocks,key=lambda x:float(x.get("marketCap") or 0),reverse=True)
+        selected,names,symbols=[],set(),set()
+        for s in stocks:
+            t=str(s.get("symbol","")).upper().strip()
+            n=str(s.get("name","")).strip()
+            if not re.fullmatch(r"[A-Z][A-Z0-9.\-]{0,12}",t) or t in symbols or not n:
+                continue
+            if re.search(r"\b(acquisition (corp|corporation|company)|spac|etf|etn|warrants?|municipal income fund|closed.end fund)\b",n,re.I):
+                continue
+            canon=norm_name(n)
+            if len(canon)<2 or canon in names:
+                continue
+            selected.append(dict(source_rank=len(selected)+1,ticker=t,name=n,
+                country="US-listed (domicile not verified)",
+                market_cap=str(s.get("marketCap") or ""), sector=str(s.get("sector") or "")))
+            names.add(canon);symbols.add(t)
+            if len(selected)==TARGET:
+                break
+        global RANKING_SOURCE
+        RANKING_SOURCE=secondary+" (dataset market caps as of 2026-06-25; US listed, domicile not independently validated)"
+        print(f"Fallback market cap ranking includes {len(selected)} companies",flush=True)
+    if len(selected)<TARGET:
+        raise RuntimeError(f"Only {len(selected)} validated US-listed company ranks; refusing to pad with fictitious entries")
     for i,r in enumerate(selected,1):
         r["us_rank"]=i
     return selected
